@@ -196,6 +196,7 @@ addLayer("xp", {
         let mult = new Decimal(1);
 
         if (hasUpgrade("xp", 13)) mult = mult.times(2);
+        if (hasUpgrade("xp", 23)) mult = mult.times(upgradeEffect("xp", 23));
         if (hasUpgrade("xp", 31)) mult = mult.times(upgradeEffect("xp", 31));
         if (hasUpgrade("xp", 33)) mult = mult.times(upgradeEffect("xp", 33));
 
