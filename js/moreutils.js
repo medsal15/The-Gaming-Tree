@@ -32,3 +32,19 @@ function canAffordLayerBuyable(layer) {
     }
     return false;
 }
+/**
+ * Sums the amount of purchased buyables in a layer
+ *
+ * @param {String} layer Layer to check in
+ * @returns {Decimal} The amount of purchased buyables
+ */
+function layerBuyableAmount(layer) {
+    if (!tmp[layer].buyables) return new Decimal(0);
+
+    let sum = new Decimal(0);
+    for (let id in tmp[layer].buyables) {
+        if (isNaN(id)) continue;
+        sum = sum.add(getBuyableAmount(layer, id));
+    }
+    return sum;
+}

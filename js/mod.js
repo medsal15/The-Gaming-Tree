@@ -1,20 +1,23 @@
 let modInfo = {
-	name: "The Gaming Tree",
-	id: "mymod",
-	author: "medsal15",
-	pointsName: "points",
-	modFiles: ["moreutils.js", "layers/experience.js", "tree.js"],
+	name: 'The Gaming Tree',
+	id: 'thegamingtree',
+	author: 'medsal15',
+	pointsName: 'points',
+	modFiles: [
+		'moreutils.js', 'tree.js',
+		'layers/experience.js',
+	],
 
-	discordName: "",
-	discordLink: "",
+	discordName: '',
+	discordLink: '',
 	initialStartPoints: new Decimal (10), // Used for hard resets and new players
 	offlineLimit: 12,  // In hours
 };
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1",
-	name: "Experience",
+	num: '0.1',
+	name: 'Experience',
 };
 
 let changelog = `<h1>Changelog:</h1><br>
@@ -26,7 +29,7 @@ let winText = `Congratulations! You have reached the end and beaten this game, b
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
 // (The ones here are examples, all official functions are already taken care of)
-var doNotCallTheseFunctionsEveryTick = ["blowUpEverything"]
+var doNotCallTheseFunctionsEveryTick = ['blowUpEverything']
 
 function getStartPoints() {
     return new Decimal(modInfo.initialStartPoints);
@@ -34,7 +37,7 @@ function getStartPoints() {
 
 // Determines if it should show points/sec
 function canGenPoints() {
-	return hasUpgrade("xp", 11);
+	return hasUpgrade('xp', 11);
 }
 
 // Calculate points/sec!
@@ -44,10 +47,12 @@ function getPointGen() {
 
 	let gain = new Decimal(1);
 
-	if (hasUpgrade("xp", 12)) gain = gain.times(3);
-	if (hasUpgrade("xp", 21)) gain = gain.times(upgradeEffect("xp", 21));
-	if (hasUpgrade("xp", 22)) gain = gain.times(upgradeEffect("xp", 22));
-	if (hasUpgrade("xp", 32)) gain = gain.times(upgradeEffect("xp", 32));
+	// XP layer
+	if (hasUpgrade('xp', 12)) gain = gain.times(upgradeEffect('xp', 12));
+	if (hasUpgrade('xp', 21)) gain = gain.times(upgradeEffect('xp', 21));
+	if (hasUpgrade('xp', 23)) gain = gain.times(upgradeEffect('xp', 23));
+	gain = gain.times(buyableEffect('xp', 12));
+	gain = gain.times(buyableEffect('xp', 13).points);
 
 	return gain;
 }
