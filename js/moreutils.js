@@ -48,3 +48,16 @@ function layerBuyableAmount(layer) {
     }
     return sum;
 }
+/**
+ * Calculates the sum of the `amount` first consecutive powers of `base`
+ *
+ * @param {Decimal} base
+ * @param {Decimal} amount
+ * @returns {Decimal}
+ */
+function powerSum(base, amount) {
+    if (amount.eq(0)) return Decimal.dZero;
+    if (base.eq(1)) return base.times(amount);
+
+    return base.pow(amount.add(1)).div(base.minus(1));
+}

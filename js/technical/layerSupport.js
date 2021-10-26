@@ -49,7 +49,7 @@ function updateLayers(){
     for (row in OTHER_LAYERS) {
         OTHER_LAYERS[row].sort((a, b) => (a.position > b.position) ? 1 : -1)
         for (layer in OTHER_LAYERS[row])
-            OTHER_LAYERS[row][layer] = OTHER_LAYERS[row][layer].layer 
+            OTHER_LAYERS[row][layer] = OTHER_LAYERS[row][layer].layer
     }
     for (row in TREE_LAYERS) {
         TREE_LAYERS[row].sort((a, b) => (a.position > b.position) ? 1 : -1)
@@ -108,7 +108,7 @@ function setupLayer(layer){
                     layers[layer].challenges[thing].unlocked = true
                 if (layers[layer].challenges[thing].completionLimit === undefined)
                     layers[layer].challenges[thing].completionLimit = 1
-                else if (layers[layer].challenges[thing].marked === undefined) 
+                else if (layers[layer].challenges[thing].marked === undefined)
                     layers[layer].challenges[thing].marked = function() {return maxedChallenge(this.layer, this.id)}
 
             }
@@ -125,9 +125,9 @@ function setupLayer(layer){
                     layers[layer].buyables[thing].unlocked = true
                 layers[layer].buyables[thing].canBuy = function() {return canBuyBuyable(this.layer, this.id)}
                 if (layers[layer].buyables[thing].purchaseLimit === undefined) layers[layer].buyables[thing].purchaseLimit = new Decimal(Infinity)
-        
-            }  
-    
+
+            }
+
         }
     }
 
@@ -141,7 +141,7 @@ function setupLayer(layer){
                 if (layers[layer].clickables[thing].unlocked === undefined)
                     layers[layer].clickables[thing].unlocked = true
             }
-        }  
+        }
     }
 
     if (layers[layer].bars){
@@ -151,7 +151,7 @@ function setupLayer(layer){
             layers[layer].bars[thing].layer = layer
             if (layers[layer].bars[thing].unlocked === undefined)
                 layers[layer].bars[thing].unlocked = true
-        }  
+        }
     }
 
     if (layers[layer].infoboxes){
@@ -160,9 +160,9 @@ function setupLayer(layer){
             layers[layer].infoboxes[thing].layer = layer
             if (layers[layer].infoboxes[thing].unlocked === undefined)
                 layers[layer].infoboxes[thing].unlocked = true
-        }  
+        }
     }
-    
+
     if (layers[layer].grid) {
         layers[layer].grid.layer = layer
         if (layers[layer].grid.getUnlocked === undefined)
@@ -202,15 +202,19 @@ function setupLayer(layer){
 
     ROW_LAYERS[row][layer]=layer;
     let position = (layers[layer].position !== undefined ? layers[layer].position : layer)
-    
+
     if (!isNaN(displayRow) || displayRow < 0) TREE_LAYERS[displayRow].push({layer: layer, position: position})
     else OTHER_LAYERS[displayRow].push({layer: layer, position: position})
 
     if (maxRow < layers[layer].displayRow) maxRow = layers[layer].displayRow
-    
+
 }
 
 
+/**
+ * @param {String} layerName
+ * @param {Layer} layerData
+ */
 function addLayer(layerName, layerData, tabLayers = null){ // Call this to add layers from a different file!
     layers[layerName] = layerData
     layers[layerName].isLayer = true
@@ -227,10 +231,10 @@ function addLayer(layerName, layerData, tabLayers = null){ // Call this to add l
                         style = tmp[this.embedLayer].nodeStyle
                         if (style['border-color'] === undefined) style['border-color'] = tmp[this.embedLayer].color
                         return style
-                    } 
+                    }
                 },
                 unlocked() {return tmp[this.embedLayer].layerShown},
-            }       
+            }
         }
         layers[layerName].tabFormat = format
     }

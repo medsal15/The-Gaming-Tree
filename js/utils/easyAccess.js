@@ -1,3 +1,4 @@
+/** @param {string} layer @param {string|number} id */
 function hasUpgrade(layer, id) {
 	return ((player[layer].upgrades.includes(toNumber(id)) || player[layer].upgrades.includes(id.toString())) && !tmp[layer].deactivated)
 }
@@ -6,6 +7,7 @@ function hasMilestone(layer, id) {
 	return ((player[layer].milestones.includes(toNumber(id)) || player[layer].milestones.includes(id.toString())) && !tmp[layer].deactivated)
 }
 
+/** @param {string} layer @param {string|number} id */
 function hasAchievement(layer, id) {
 	return ((player[layer].achievements.includes(toNumber(id)) || player[layer].achievements.includes(id.toString())) && !tmp[layer].deactivated)
 }
@@ -22,10 +24,12 @@ function challengeCompletions(layer, id) {
 	return (player[layer].challenges[id])
 }
 
+/** @param {string} layer @param {string|number} id @returns {Decimal} */
 function getBuyableAmount(layer, id) {
 	return (player[layer].buyables[id])
 }
 
+/** @param {string} layer @param {string|number} id @param {Decimal} amt */
 function setBuyableAmount(layer, id, amt) {
 	player[layer].buyables[id] = amt
 }

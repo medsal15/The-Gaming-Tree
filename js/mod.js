@@ -5,7 +5,11 @@ let modInfo = {
 	pointsName: 'points',
 	modFiles: [
 		'moreutils.js', 'tree.js',
+		'layers/achievements.js',
 		'layers/experience.js',
+		'layers/level.js', 'layers/coin.js',
+
+		'devtools.js',
 	],
 
 	discordName: '',
@@ -16,11 +20,15 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: '0.1',
-	name: 'Experience',
+	num: '0.2',
+	name: 'Money and Power',
 };
 
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.2</h3><br>
+		- Added L & C layers.<br>
+		- Added achievements.<br>
+		- Update endgame: 9 layer and 9 coin upgrades.<br>
 	<h3>v0.1</h3><br>
 		- Added XP layer.<br>
 		- Update endgame: 9 experience upgrades.`;
@@ -31,16 +39,25 @@ let winText = `Congratulations! You have reached the end and beaten this game, b
 // (The ones here are examples, all official functions are already taken care of)
 var doNotCallTheseFunctionsEveryTick = ['blowUpEverything']
 
+/**
+ * @returns {Boolean}
+ */
 function getStartPoints() {
     return new Decimal(modInfo.initialStartPoints);
 }
 
 // Determines if it should show points/sec
+/**
+ * @returns {Boolean}
+ */
 function canGenPoints() {
 	return hasUpgrade('xp', 11);
 }
 
 // Calculate points/sec!
+/**
+ * @returns {Decimal}
+ */
 function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0);
@@ -54,6 +71,12 @@ function getPointGen() {
 	gain = gain.times(buyableEffect('xp', 12));
 	gain = gain.times(buyableEffect('xp', 13).points);
 
+	// L layer
+	if (hasUpgrade('l', 12)) gain = gain.times(upgradeEffect('l', 12));
+
+	// C layer
+	if (hasUpgrade('c', 11)) gain = gain.times(upgradeEffect('c', 11));
+
 	return gain;
 }
 
@@ -66,8 +89,11 @@ function addedPlayerData() {
 var displayThings = [ ]
 
 // Determines when the game "ends"
+/**
+ * @returns {Boolean}
+ */
 function isEndgame() {
-	return player.xp.upgrades.length >= 9;
+	return player.l.upgrades.length + player.c.upgrades.length >= 18;
 }
 
 
@@ -78,6 +104,9 @@ function isEndgame() {
 var backgroundStyle = { }
 
 // You can change this if you have things that can be messed up by long tick lengths
+/**
+ * @returns {Number}
+ */
 function maxTickLength() {
 	return(3600); // Default is 1 hour which is just arbitrarily large
 }

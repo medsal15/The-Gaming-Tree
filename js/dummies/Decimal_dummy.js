@@ -18,25 +18,25 @@ class Decimal {
     /** @type {Number} */
     exponent;
     /** @type {Decimal} */
-    dZero;
+    static dZero;
     /** @type {Decimal} */
-    dOne;
+    static dOne;
     /** @type {Decimal} */
-    dNegOne;
+    static dNegOne;
     /** @type {Decimal} */
-    dTwo;
+    static dTwo;
     /** @type {Decimal} */
-    dTen;
+    static dTen;
     /** @type {Decimal} */
-    dNaN;
+    static dNaN;
     /** @type {Decimal} */
-    dInf;
+    static dInf;
     /** @type {Decimal} */
-    dNegInf;
+    static dNegInf;
     /** @type {Decimal} */
-    dNumberMax;
+    static dNumberMax;
     /** @type {Decimal} */
-    dNumberMin;
+    static dNumberMin;
 
     /** @param {Decimal|String|Number} value */
     constructor(value);

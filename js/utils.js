@@ -1,5 +1,8 @@
 // ************ Big Feature related ************
 
+/**
+ * @param {String} layer
+ */
 function respecBuyables(layer) {
 	if (!layers[layer].buyables) return
 	if (!layers[layer].buyables.respec) return
@@ -9,17 +12,27 @@ function respecBuyables(layer) {
 	document.activeElement.blur()
 }
 
+/**
+ * @param {String} layer
+ * @param {String|Number} id
+ * @returns {Boolean}
+ */
 function canAffordUpgrade(layer, id) {
 	let upg = tmp[layer].upgrades[id]
 	if(tmp[layer].deactivated) return false
 	if (tmp[layer].upgrades[id].canAfford === false) return false
 	let cost = tmp[layer].upgrades[id].cost
-	if (cost !== undefined) 
+	if (cost !== undefined)
 		return canAffordPurchase(layer, upg, cost)
 
 	return true
 }
 
+/**
+ * @param {String} layer
+ * @param {String|Number} id
+ * @returns {Boolean}
+ */
 function canBuyBuyable(layer, id) {
 	let b = temp[layer].buyables[id]
 	return (b.unlocked && run(b.canAfford, b) && player[layer].buyables[id].lt(b.purchaseLimit) && !tmp[layer].deactivated)
@@ -27,6 +40,11 @@ function canBuyBuyable(layer, id) {
 
 
 
+/**
+ * @param {String} layer
+ * @param {{currencyLocation: String, currencyInternalName: String, currencyLayer: String}} thing
+ * @param {String|Number|Decimal} cost
+ */
 function canAffordPurchase(layer, thing, cost) {
 	if (thing.currencyInternalName) {
 		let name = thing.currencyInternalName
@@ -46,10 +64,18 @@ function canAffordPurchase(layer, thing, cost) {
 	}
 }
 
+/**
+ * @param {String} layer
+ * @param {String|Number} id
+ */
 function buyUpgrade(layer, id) {
 	buyUpg(layer, id)
 }
 
+/**
+ * @param {String} layer
+ * @param {String|Number} id
+ */
 function buyUpg(layer, id) {
 	if (!tmp[layer].upgrades || !tmp[layer].upgrades[id]) return
 	let upg = tmp[layer].upgrades[id]
@@ -90,6 +116,10 @@ function buyUpg(layer, id) {
 	needCanvasUpdate = true
 }
 
+/**
+ * @param {String} layer
+ * @param {String|Number} id
+ */
 function buyMaxBuyable(layer, id) {
 	if (!player[layer].unlocked) return
 	if (!tmp[layer].buyables[id].unlocked) return
@@ -100,6 +130,10 @@ function buyMaxBuyable(layer, id) {
 	updateBuyableTemp(layer)
 }
 
+/**
+ * @param {String} layer
+ * @param {String|Number} id
+ */
 function buyBuyable(layer, id) {
 	if (!player[layer].unlocked) return
 	if (!tmp[layer].buyables[id].unlocked) return
@@ -109,6 +143,10 @@ function buyBuyable(layer, id) {
 	updateBuyableTemp(layer)
 }
 
+/**
+ * @param {String} layer
+ * @param {String|Number} id
+ */
 function clickClickable(layer, id) {
 	if (!player[layer].unlocked || tmp[layer].deactivated) return
 	if (!tmp[layer].clickables[id].unlocked) return
@@ -118,6 +156,10 @@ function clickClickable(layer, id) {
 	updateClickableTemp(layer)
 }
 
+/**
+ * @param {String} layer
+ * @param {String|Number} id
+ */
 function clickGrid(layer, id) {
 	if (!player[layer].unlocked  || tmp[layer].deactivated) return
 	if (!run(layers[layer].grid.getUnlocked, layers[layer].grid, id)) return
@@ -127,6 +169,11 @@ function clickGrid(layer, id) {
 }
 
 // Function to determine if the player is in a challenge
+/**
+ * @param {String} layer
+ * @param {String|Number} id
+ * @returns {Boolean}
+ */
 function inChallenge(layer, id) {
 	let challenge = player[layer].activeChallenge
 	if (!challenge) return false
@@ -142,6 +189,10 @@ function inChallenge(layer, id) {
 
 var onTreeTab = true
 
+/**
+ * @param {String} name
+ * @param {null} prev unused
+ */
 function showTab(name, prev) {
 	if (LAYERS.includes(name) && !layerunlocked(name)) return
 	if (player.tab !== name) clearParticles(function(p) {return p.layer === player.tab})
@@ -157,6 +208,10 @@ function showTab(name, prev) {
 
 }
 
+/**
+ * @param {String} name
+ * @param {String} prev
+ */
 function showNavTab(name, prev) {
 	console.log(prev)
 	if (LAYERS.includes(name) && !layerunlocked(name)) return
@@ -173,6 +228,9 @@ function showNavTab(name, prev) {
 }
 
 
+/**
+ * @param {String} layer
+ */
 function goBack(layer) {
 	let nextTab = "none"
 
@@ -184,6 +242,12 @@ function goBack(layer) {
 
 }
 
+/**
+ * @template T
+ * @param {Object} obj1
+ * @param {T} obj2
+ * @returns {T}
+ */
 function layOver(obj1, obj2) {
 	for (let x in obj2) {
 		if (obj2[x] instanceof Decimal) obj1[x] = new Decimal(obj2[x])
@@ -192,9 +256,13 @@ function layOver(obj1, obj2) {
 	}
 }
 
+/**
+ * @param {String} layer
+ * @returns {Boolean}
+ */
 function prestigeNotify(layer) {
 	if (layers[layer].prestigeNotify) return layers[layer].prestigeNotify()
-	
+
 	if (isPlainObject(tmp[layer].tabFormat)) {
 		for (subtab in tmp[layer].tabFormat){
 			if (subtabResetNotify(layer, 'mainTabs', subtab))
@@ -213,11 +281,20 @@ function prestigeNotify(layer) {
 	else return false
 }
 
+/**
+ * @param {String} name
+ */
 function notifyLayer(name) {
 	if (player.tab == name || !layerunlocked(name)) return
 	player.notify[name] = 1
 }
 
+/**
+ * @param {String} layer
+ * @param {String} family
+ * @param {String} id
+ * @returns {Boolean}
+ */
 function subtabShouldNotify(layer, family, id) {
     let subtab = {}
     if (family == "mainTabs") subtab = tmp[layer].tabFormat[id]
@@ -227,6 +304,12 @@ function subtabShouldNotify(layer, family, id) {
     else return subtab.shouldNotify
 }
 
+/**
+ * @param {String} layer
+ * @param {String} family
+ * @param {String} id
+ * @returns {Boolean}
+ */
 function subtabResetNotify(layer, family, id) {
 	let subtab = {}
 	if (family == "mainTabs") subtab = tmp[layer].tabFormat[id]
@@ -235,10 +318,18 @@ function subtabResetNotify(layer, family, id) {
 	else return subtab.prestigeNotify
 }
 
+/**
+ * @param {String} layer
+ * @returns {Boolean}
+ */
 function nodeShown(layer) {
 	return layerShown(layer)
 }
 
+/**
+ * @param {String} layer
+ * @returns {Boolean}
+ */
 function layerunlocked(layer) {
 	if (tmp[layer] && tmp[layer].type == "none") return (player[layer].unlocked)
 	return LAYERS.includes(layer) && (player[layer].unlocked || (tmp[layer].canReset && tmp[layer].layerShown))
@@ -249,12 +340,19 @@ function keepGoing() {
 	needCanvasUpdate = true;
 }
 
+/**
+ * @param {Decimal} x
+ * @returns {Number}
+ */
 function toNumber(x) {
 	if (x.mag !== undefined) return x.toNumber()
 	if (x + 0 !== x) return parseFloat(x)
 	return x
 }
 
+/**
+ * @param {String} layer
+ */
 function updateMilestones(layer) {
 	if (tmp[layer].deactivated) return
 	for (id in layers[layer].milestones) {
@@ -267,6 +365,9 @@ function updateMilestones(layer) {
 	}
 }
 
+/**
+ * @param {String} layer
+ */
 function updateAchievements(layer) {
 	if (tmp[layer].deactivated) return
 	for (id in layers[layer].achievements) {
@@ -278,6 +379,10 @@ function updateAchievements(layer) {
 	}
 }
 
+/**
+ * @param {Number} diff
+ * @param {String} layer
+ */
 function addTime(diff, layer) {
 	let data = player
 	let time = data.timePlayed
@@ -327,15 +432,26 @@ document.onkeyup = function (e) {
 }
 
 var onFocused = false
+/**
+ * @param {Boolean} x
+ */
 function focused(x) {
 	onFocused = x
 }
 
 
+/**
+ * @param {any} obj
+ * @returns {Boolean}
+ */
 function isFunction(obj) {
 	return !!(obj && obj.constructor && obj.call && obj.apply);
 };
 
+/**
+ * @param {any} obj
+ * @returns {Boolean}
+ */
 function isPlainObject(obj) {
 	return (!!obj) && (obj.constructor === Object)
 }
@@ -343,13 +459,18 @@ function isPlainObject(obj) {
 document.title = modInfo.name
 
 // Converts a string value to whatever it's supposed to be
+/**
+ * @param {String} value
+ * @param {String|Number|Decimal} oldValue
+ * @returns {String|Number|Decimal}
+ */
 function toValue(value, oldValue) {
 	if (oldValue instanceof Decimal) {
 		value = new Decimal (value)
 		if (checkDecimalNaN(value)) return decimalZero
 		return value
 	}
-	if (!isNaN(oldValue)) 
+	if (!isNaN(oldValue))
 		return parseFloat(value) || 0
 	return value
 }
@@ -359,6 +480,13 @@ var activePopups = [];
 var popupID = 0;
 
 // Function to show popups
+/**
+ * @param {String} type
+ * @param {String} text
+ * @param {String} title
+ * @param {Number} timer time in seconds to display it
+ * @param {String?} color
+ */
 function doPopup(type = "none", text = "This is a test popup.", title = "", timer = 3, color = "") {
 	switch (type) {
 		case "achievement":
@@ -384,6 +512,9 @@ function doPopup(type = "none", text = "This is a test popup.", title = "", time
 
 
 //Function to reduce time on active popups
+/**
+ * @param {Number} diff in seconds
+ */
 function adjustPopupTime(diff) {
 	for (popup in activePopups) {
 		activePopups[popup].time -= diff;
@@ -393,6 +524,13 @@ function adjustPopupTime(diff) {
 	}
 }
 
+/**
+ * @template T, E
+ * @param {(args: T) => E} func
+ * @param {any} target bound to the function
+ * @param {T} args
+ * @returns {E} returns `func` if it's not a valid function
+ */
 function run(func, target, args = null) {
 	if (isFunction(func)) {
 		let bound = func.bind(target)
@@ -402,6 +540,13 @@ function run(func, target, args = null) {
 		return func;
 }
 
+/**
+ * @param {String} layer
+ * @param {String|Number} func id of a function in a grid
+ * @param {any} data
+ * @param {any}
+ * @returns {any} returns `func` if it's not a valid function
+ */
 function gridRun(layer, func, data, id) {
 	if (isFunction(layers[layer].grid[func])) {
 		let bound = layers[layer].grid[func].bind(layers[layer].grid)
