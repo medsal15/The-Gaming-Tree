@@ -28,7 +28,7 @@ let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.2</h3><br>
 		- Added L & C layers.<br>
 		- Added achievements.<br>
-		- Update endgame: 9 layer and 9 coin upgrades.<br>
+		- Update endgame: 9 level and 9 coin upgrades.<br>
 	<h3>v0.1</h3><br>
 		- Added XP layer.<br>
 		- Update endgame: 9 experience upgrades.`;
