@@ -407,8 +407,8 @@ function addTime(diff, layer) {
 	else data.timePlayed = time
 }
 
-shiftDown = false
-ctrlDown = false
+var shiftDown = false
+var ctrlDown = false
 
 document.onkeydown = function (e) {
 	if (player === undefined) return;

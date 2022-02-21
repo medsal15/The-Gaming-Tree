@@ -22,6 +22,7 @@ function producedafter(seconds = 60) {
  * @param {(d: Decimal) => Decimal} fn
  */
 function checkfunction(fn, iterations = 3, start = 1, step = 10) {
+    if (!isFinite(iterations)) return;
     if (typeof fn != 'function') return;
 
     if (!iterations) iterations = 3;

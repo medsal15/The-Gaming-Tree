@@ -14,14 +14,14 @@ addLayer('ach', {
             content: [
                 ['display-text', function() { return `You have ${formatWhole(layers.ach.ownedAchievements())} / ${formatWhole(layers.ach.totalAchievements())} achievements`; }],
                 'blank',
-                ['achievements', [1, 3]],
+                ['achievements', [1, 3, 4]],
             ],
         },
         'Secrets': {
             content: [
                 ['display-text', function() { return `You have ${formatWhole(layers.ach.ownedAchievements('secret'))} secrets`; }],
                 'blank',
-                ['achievements', [2, 4, 5]],
+                ['achievements', [2, 5, 6]],
             ],
             unlocked() {
                 return layers.ach.ownedAchievements('secret').gte(1);
@@ -34,273 +34,270 @@ addLayer('ach', {
     achievements: {
         //#region Normal achievements
         11: {
-            name: 'Getting started',
-            done() {
-                return hasUpgrade('xp', 11);
-            },
-            tooltip: 'Buy the first XP upgrade',
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp[this.layer].color)
+            name: 'Start',
+            tooltip: 'Start making points',
+            done() { return hasUpgrade('xp', 11); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.xp.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.xp.color;
+
+                return style;
             },
         },
         12: {
-            name: 'But wait, there\'s more!',
-            done() {
-                let needed = [11, 12, 13];
-                for (let id of needed) {
-                    if (!hasUpgrade('xp', id)) return false;
-                }
-                return true;
-            },
-            tooltip: 'Buy the first row of XP upgrades',
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp[this.layer].color)
+            name: 'Experowce',
+            tooltip: 'Purchase the first row of XP upgrades',
+            done() { return [11, 12, 13].every(id => hasUpgrade('xp', id)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.xp.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.xp.color;
+
+                return style;
             },
         },
         13: {
-            name: '2nd line',
-            done() {
-                let needed = [21, 22, 23];
-                for (let id of needed) {
-                    if (!hasUpgrade('xp', id)) return false;
-                }
-                return true;
-            },
-            tooltip: 'Buy the second row of XP upgrades',
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp[this.layer].color)
+            name: 'SiXP',
+            tooltip: 'Purchase the first two rows of XP upgrades',
+            done() { return [11, 12, 13, 21, 22, 23].every(id => hasUpgrade('xp', id)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.xp.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.xp.color;
+
+                return style;
             },
         },
         14: {
-            name: '3rd line\'s the charm',
-            done() {
-                let needed = [31, 32, 33];
-                for (let id of needed) {
-                    if (!hasUpgrade('xp', id)) return false;
-                }
-                return true;
-            },
-            tooltip: 'Buy the third row of XP upgrades',
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp[this.layer].color)
+            name: 'Threexperience',
+            tooltip: 'Purchase the first three rows of XP upgrades',
+            done() { return [11, 12, 13, 21, 22, 23, 31, 32, 33].every(id => hasUpgrade('xp', id)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.xp.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.xp.color;
+
+                return style;
             },
         },
         15: {
-            name: 'Skilled',
-            done() {
-                return tmp.xp.currentSkillAmount.gte(1);
-            },
-            tooltip: 'Buy a skill',
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp[this.layer].color)
+            name: 'Not again',
+            tooltip: 'Reset your XP layer',
+            done() { return hasAchievement('ach', 11) && !hasUpgrade('xp', 11); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.xp.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.xp.color;
+
+                return style;
             },
         },
         31: {
-            name: 'Level up',
-            done() {
-                return player.l.points.gte(1);
-            },
-            tooltip: 'Get a level',
-            unlocked() {
-                return hasAchievement('ach', 15);
-            },
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp[this.layer].color)
+            name: 'Slow gain',
+            tooltip: 'Passively gain XP',
+            unlocked() { return player.l.unlocked; },
+            done() { return tmp.xp.passiveGeneration >= 0; },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.l.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.l.color;
+
+                return style;
             },
         },
         32: {
-            name: 'A tenth',
-            done() {
-                return hasMilestone('l', 2) && hasMilestone('l', 0);
-            },
-            tooltip: 'Generate 10% of your XP on reset per second',
-            unlocked() {
-                return hasAchievement('ach', 15);
-            },
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp[this.layer].color)
+            name: 'Double base gain',
+            tooltip: 'Get base point gain to be 2',
+            unlocked() { return player.l.unlocked; },
+            done() { return upgradeEffect('xp', 11).gte(2); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.l.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.l.color;
+
+                return style;
             },
         },
         33: {
-            name: 'It\'s not even made of gold',
-            done() {
-                return player.c.points.gte(1);
-            },
-            tooltip: 'Get a coin',
-            unlocked() {
-                return hasAchievement('ach', 15);
-            },
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp[this.layer].color)
+            name: 'Auto level up',
+            tooltip: 'Automate levelling up',
+            unlocked() { return player.l.unlocked; },
+            done() { return tmp.l.autoPrestige; },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.l.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.l.color;
+
+                return style;
             },
         },
         34: {
-            name: 'Long term approach',
-            done() {
-                return hasUpgrade('c', 23);
-            },
-            tooltip: 'Unlock the bank',
-            unlocked() {
-                return hasAchievement('ach', 15);
-            },
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp[this.layer].color)
+            name: 'Jumping levels',
+            tooltip: 'Reach level 20',
+            unlocked() { return player.l.unlocked; },
+            done() { return player.l.best.gte(20); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.l.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.l.color;
+
+                return style;
             },
         },
         35: {
-            name: 'Rich and powerful',
-            done() {
-                return player.c.upgrades.length + player.l.upgrades.length >= 18;
+            name: 'So many levels',
+            tooltip: 'Complete the first three rows of Level upgrades',
+            unlocked() { return player.l.unlocked; },
+            done() { return [11, 12, 13, 21, 22, 23, 31, 32, 33].every(id => hasUpgrade('l', id)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.l.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.l.color;
+
+                return style;
             },
-            tooltip: 'Get all the L and C upgrades',
-            unlocked() {
-                return hasAchievement('ach', 15);
+        },
+        41: {
+            name: 'Money',
+            tooltip: 'Get a few coins',
+            unlocked() { return player.c.unlocked; },
+            done() { return player.c.best.gte(5); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.c.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.c.color;
+
+                return style;
             },
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp[this.layer].color)
+        },
+        42: {
+            name: 'QoL isn\'t free you know',
+            tooltip: 'Keep XP upgrades',
+            unlocked() { return player.c.unlocked; },
+            done() { return hasUpgrade('c', 22); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.c.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.c.color;
+
+                return style;
+            },
+        },
+        43: {
+            name: 'What do you mean, real coins?',
+            tooltip: 'Unlock real coins',
+            unlocked() { return player.c.unlocked; },
+            done() { return hasUpgrade('c', 23); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.c.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.c.color;
+
+                return style;
+            },
+        },
+        44: {
+            name: 'Actual money',
+            tooltip: 'Unlock copper coins',
+            unlocked() { return player.c.unlocked; },
+            done() { return hasUpgrade('c', 43); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.c.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.c.color;
+
+                return style;
+            },
+        },
+        45: {
+            name: 'Cashed out',
+            tooltip: 'Get the first six rows of Coin and special coins upgrades',
+            unlocked() { return player.c.unlocked; },
+            done() { return [11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53, 61, 62, 63].every(id => hasUpgrade('c', id)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.c.color); },
+            style() {
+                const style = {};
+
+                if (hasAchievement(this.layer, this.id)) style['background-color'] = tmp.c.color;
+
+                return style;
             },
         },
         //#endregion
         //#region Secret achievements
         21: {
-            name: '2 is 1',
-            done() {
-                let needed = [21, 22, 23];
-                for (let id of needed) {
-                    if (!hasUpgrade('xp', id)) return false;
-                }
-                let forbidden = [11, 12, 13];
-                for (let id of forbidden) {
-                    if (hasUpgrade('xp', id)) return false;
-                }
-                return true;
-            },
-            tooltip: 'Complete the second row of XP upgrades before any upgrade on the first row',
-            unlocked() {
-                return hasAchievement('ach', this.id);
-            },
-            style: {'background-color': '#bb77ff'},
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Gotten!", 3, '#bb77ff')
-            },
+            name: 'Missed the first',
+            tooltip: 'Complete the second row of XP upgrades before starting the first',
+            done() { return [11, 12, 13].every(id => !hasUpgrade('xp', id)) && [21, 22, 23].every(id => hasUpgrade('xp', id)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, 'rgb(127,0,255)'); },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+            style: {'background-color': 'rgb(127,0,255)'},
         },
         22: {
-            name: '3 early',
-            done() {
-                let needed = [31, 32, 33];
-                for (let id of needed) {
-                    if (!hasUpgrade('xp', id)) return false;
-                }
-                let forbidden = [11, 12, 13, 21, 22, 23];
-                for (let id of forbidden) {
-                    if (hasUpgrade('xp', id)) return false;
-                }
-                return true;
-            },
-            tooltip: 'Complete the third row of XP upgrades before any upgrade on the first or second rows',
-            unlocked() {
-                return hasAchievement('ach', this.id);
-            },
-            style: {'background-color': '#bb77ff'},
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Gotten!", 3, '#bb77ff')
-            },
-        },
-        41: {
-            name: 'No wheels',
-            done() {
-                if (tmp.xp.passiveGeneration == 0) return false;
-                let forbidden = [11, 12, 13, 21, 22, 23, 31, 32];
-                for (let id of forbidden) {
-                    if (hasUpgrade('l', id)) return false;
-                }
-                return true;
-            },
-            tooltip: 'Get passive xp generation without any non permanent L upgrade',
-            unlocked() {
-                return hasAchievement('ach', this.id);
-            },
-            style: {'background-color': '#bb77ff'},
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Gotten!", 3, '#bb77ff')
-            },
-        },
-        42: {
-            name: 'Pentagram',
-            done() {
-                let forbidden = [11, 12, 13, 21, 22, 23, 31, 32];
-                for (let id of forbidden) {
-                    if (hasUpgrade('l', id)) return false;
-                }
-                let required = [0, 1, 2, 3, 4];
-                for (let id of required) {
-                    if (!hasMilestone('l', id)) return false;
-                }
-                return true;
-            },
-            tooltip: 'Get all L milestones without any non permanent L upgrade',
-            unlocked() {
-                return hasAchievement('ach', this.id);
-            },
-            style: {'background-color': '#bb77ff'},
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Gotten!", 3, '#bb77ff')
-            },
-        },
-        45: {
-            name: 'Lone stand',
-            done() {
-                let forbidden_coin = [11, 12, 13, 21, 22, 23, 31];
-                let forbidden_level = [11, 12, 13, 21, 22, 23, 31, 32];
-
-                if (forbidden_coin.every(id => hasUpgrade('c', id)) && forbidden_level.every(id => !hasUpgrade('l', id))) return true;
-                if (forbidden_level.every(id => hasUpgrade('c', id)) && forbidden_coin.every(id => !hasUpgrade('l', id))) return true;
-                return false;
-            },
-            tooltip: 'Get all L upgrades without any permanent C upgrade, or vice versa',
-            unlocked() {
-                return hasAchievement('ach', this.id);
-            },
-            style: {'background-color': '#bb77ff'},
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Gotten!", 3, '#bb77ff')
-            },
+            name: 'Downside up',
+            tooltip: 'Complete the third row of XP upgrades before the starting any other',
+            done() { return [11, 12, 13, 21, 22, 23].every(id => !hasUpgrade('xp', id)) && [31, 32, 33].every(id => hasUpgrade('xp', id)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, 'rgb(127,0,255)'); },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+            style: {'background-color': 'rgb(127,0,255)'},
         },
         51: {
-            name: 'Higher than owned',
-            done() {
-                if (tmp.c.passiveGeneration != 0 && tmp.c.resetGain.times(tmp.c.passiveGeneration).gt(player.c.points)) return true;
-
-                return false;
-            },
-            tooltip: 'Passively gain more coins than you own',
-            unlocked() {
-                return hasAchievement('ach', this.id);
-            },
-            style: {'background-color': '#bb77ff'},
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Gotten!", 3, '#bb77ff')
-            },
+            name: 'Penniless',
+            tooltip: 'Complete the third row of coin upgrades without any special coins',
+            done() { return Object.values(player.c.coins).every(c => c.lte(0)) && [31, 32, 33].every(id => hasUpgrade('c', id)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, 'rgb(127,0,255)'); },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+            style: {'background-color': 'rgb(127,0,255)'},
         },
         52: {
-            name: 'Greedy',
+            name: 'Pay 2 Win',
+            tooltip: 'Complete the six first rows of coin upgrades without any level',
             done() {
-                if (player.c.upgrades.length < 9) return false;
-                if (Object.values(player.c.buyables).every(d => d.gt(0))) return false;
-                return true;
+                [11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53, 61, 62, 63].every(id => hasUpgrade('c', id))
+                    && player.l.upgrades.length == 0;
             },
-            tooltip: 'Get all C upgrades without any investment',
-            unlocked() {
-                return hasAchievement('ach', this.id);
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, 'rgb(127,0,255)'); },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+            style: {'background-color': 'rgb(127,0,255)'},
+        },
+        61: {
+            name: 'Full level mileage',
+            tooltip: 'Get all 4 level milestones without any level upgrades',
+            done() { [1, 2, 3, 4].every(id => hasMilestone('l', id)) && player.l.upgrades == 0; },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, 'rgb(127,0,255)'); },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+            style: {'background-color': 'rgb(127,0,255)'},
+        },
+        62: {
+            name: 'Pure grind',
+            tooltip: 'Get all 4 level milestones and 9 level upgrades without any coin upgrades',
+            done() {
+                [1, 2, 3, 4].every(id => hasMilestone('l', id)) &&
+                    [11, 12, 13, 21, 22, 23, 31, 32, 33].every(id => hasUpgrade('l', id));
             },
-            style: {'background-color': '#bb77ff'},
-            onComplete() {
-                doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Gotten!", 3, '#bb77ff')
-            },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, 'rgb(127,0,255)'); },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+            style: {'background-color': 'rgb(127,0,255)'},
         },
         //#endregion
     },
     type: 'none',
+    position: 1,
     tooltip() {
         let lines = [
             `<span style="white-space: nowrap">${formatWhole(layers.ach.ownedAchievements())} / ${formatWhole(layers.ach.totalAchievements())} achievements</span>`
@@ -317,12 +314,14 @@ addLayer('ach', {
 
         switch (type) {
             case 'secret':
-                rows = [2, 4, 5];
+                rows = [2, 5, 6];
                 break;
             case 'normal':
             default:
-                rows = [1, 3];
+                rows = [1, 3, 4];
         }
+
+        if (!rows.length) return [];
 
         let achievements = Object.keys(layers.ach.achievements).filter(id => {
             if (isNaN(id)) return false;

@@ -5,9 +5,10 @@ let modInfo = {
 	pointsName: 'points',
 	modFiles: [
 		'moreutils.js', 'tree.js',
-		'layers/achievements.js',
+		'layers/automation.js', 'layers/achievements.js',
 		'layers/experience.js',
 		'layers/level.js', 'layers/coin.js',
+		//'layers/monster.js', 'layers/party.js', 'layers/lootbox.js',
 
 		'devtools.js',
 	],
@@ -20,18 +21,14 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: '0.2',
-	name: 'Money and Power',
+	num: '0.1',
+	name: 'Reboot',
 };
 
 let changelog = `<h1>Changelog:</h1><br>
-	<h3>v0.2</h3><br>
-		- Added L & C layers.<br>
-		- Added achievements.<br>
-		- Update endgame: 9 level and 9 coin upgrades.<br>
 	<h3>v0.1</h3><br>
-		- Added XP layer.<br>
-		- Update endgame: 9 experience upgrades.`;
+		- Added XP, C and L layers.<br>
+		- Update endgame: 18 coin upgrades and 9 level upgrades.`;
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`;
 
@@ -62,20 +59,19 @@ function getPointGen() {
 	if(!canGenPoints())
 		return new Decimal(0);
 
-	let gain = new Decimal(1);
+	let gain = upgradeEffect('xp', 11);
 
 	// XP layer
 	if (hasUpgrade('xp', 12)) gain = gain.times(upgradeEffect('xp', 12));
 	if (hasUpgrade('xp', 21)) gain = gain.times(upgradeEffect('xp', 21));
-	if (hasUpgrade('xp', 23)) gain = gain.times(upgradeEffect('xp', 23));
-	gain = gain.times(buyableEffect('xp', 12));
-	gain = gain.times(buyableEffect('xp', 13).points);
+	if (hasUpgrade('xp', 22)) gain = gain.times(upgradeEffect('xp', 22));
+	if (hasUpgrade('xp', 31)) gain = gain.times(upgradeEffect('xp', 31));
 
 	// L layer
-	if (hasUpgrade('l', 12)) gain = gain.times(upgradeEffect('l', 12));
+	if (hasUpgrade('l', 12)) gain = gain.times(upgradeEffect('l', 12).point_boost);
 
 	// C layer
-	if (hasUpgrade('c', 11)) gain = gain.times(upgradeEffect('c', 11));
+	if (hasUpgrade('c', 13)) gain = gain.times(upgradeEffect('c', 13));
 
 	return gain;
 }
@@ -93,7 +89,7 @@ var displayThings = [ ]
  * @returns {Boolean}
  */
 function isEndgame() {
-	return player.l.upgrades.length + player.c.upgrades.length >= 18;
+	return player.l.upgrades.length >= 9 && player.c.upgrades.length >= 18;
 }
 
 
@@ -113,4 +109,5 @@ function maxTickLength() {
 
 // Use this if you need to undo inflation from an older version. If the version is older than the version that fixed the issue,
 // you can cap their current resources with this.
-function fixOldSave(oldVersion) { }
+function fixOldSave(oldVersion) {
+}

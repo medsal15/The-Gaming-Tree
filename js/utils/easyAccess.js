@@ -3,6 +3,7 @@ function hasUpgrade(layer, id) {
 	return ((player[layer].upgrades.includes(toNumber(id)) || player[layer].upgrades.includes(id.toString())) && !tmp[layer].deactivated)
 }
 
+/** @param {string} layer @param {string|number} id */
 function hasMilestone(layer, id) {
 	return ((player[layer].milestones.includes(toNumber(id)) || player[layer].milestones.includes(id.toString())) && !tmp[layer].deactivated)
 }
@@ -20,6 +21,7 @@ function maxedChallenge(layer, id) {
 	return ((player[layer].challenges[id] >= tmp[layer].challenges[id].completionLimit) && !tmp[layer].deactivated)
 }
 
+/** @param {string} layer @param {string|number} id @returns {number} */
 function challengeCompletions(layer, id) {
 	return (player[layer].challenges[id])
 }
@@ -34,6 +36,7 @@ function setBuyableAmount(layer, id, amt) {
 	player[layer].buyables[id] = amt
 }
 
+/** @param {string} layer @param {string|number} id @param {number|Decimal|string} amt */
 function addBuyables(layer, id, amt) {
 	player[layer].buyables[id] = player[layer].buyables[id].add(amt)
 }
@@ -54,6 +57,7 @@ function setGridData(layer, id, data) {
 	player[layer].grid[id] = data
 }
 
+/** @param {string} layer @param {string|number} id */
 function upgradeEffect(layer, id) {
 	return (tmp[layer].upgrades[id].effect)
 }
@@ -74,6 +78,7 @@ function achievementEffect(layer, id) {
 	return (tmp[layer].achievements[id].effect)
 }
 
+/** @param {string} layer @param {number} id */
 function gridEffect(layer, id) {
 	return (gridRun(layer, 'getEffect', player[layer].grid[id], id))
 }

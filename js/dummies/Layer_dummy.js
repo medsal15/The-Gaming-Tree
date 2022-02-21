@@ -1,5 +1,11 @@
 // Exists for IDE purposes
 // No function is actually implemented and the file is not loaded
+
+/**
+ * @template T
+ * @typedef {T|() => T} CanBePredicate
+ */
+
 class Layer {
     /**
      * **assigned automagically**
@@ -18,7 +24,7 @@ class Layer {
      *
      * Used in reset confirmations (and the default infobox title). If absent, it just uses the layer's id.
      *
-     * @type {String}
+     * @type {CanBePredicate<String>}
      */
     name;
     /**
@@ -26,14 +32,14 @@ class Layer {
      * Add any variables you have to it.
      * Make sure to use `Decimal` values rather than normal numbers.
      *
-     * @returns {LayerData}
+     * @type {() => LayerData}
      */
     startData;
     /**
      * A color associated with this layer, used in many places.
      * (A string in hex format with a #)
      *
-     * @type {String}
+     * @type {CanBePredicate<String>}
      */
     color;
     /**
@@ -50,7 +56,7 @@ class Layer {
      *
      * Changes where the layer node appears without changing where it is in the reset order.
      *
-     * @type {Number|'side'}
+     * @type {CanBePredicate<Number|'side'>}
      */
     displayRow;
     /**
@@ -75,7 +81,7 @@ class Layer {
      * A function that returns a description of this effect.
      * If the text stays constant, it can just be a string.
      *
-     * @type {String|() => String}
+     * @type {CanBePredicate<String>}
      */
     effectDescription;
     /**
@@ -86,7 +92,7 @@ class Layer {
      *
      * Defaults to true.
      *
-     * @type {'ghost'|Boolean|() => (Boolean|'ghost')}
+     * @type {CanBePredicate<'ghost'|Boolean>}
      */
     layerShown;
     /**
@@ -103,7 +109,7 @@ class Layer {
      * A "CSS object" where the keys are CSS attributes,
      * containing any CSS that should affect this layer's entire tab.
      *
-     * @type {{[key: String]: String}}
+     * @type {CanBePredicate<{[key: String]: String}>}
      */
     style;
     /**
@@ -807,6 +813,7 @@ class SubTab {
     embedLayer;
 };
 
+/** @template T */
 class Upgrade {
     /**
      * **optional**
@@ -932,7 +939,7 @@ class Upgrade {
      *
      * The internal name for that currency.
      *
-     * @type {String}
+     * @type {keyof T}
      */
     currencyInternalName;
     /**
@@ -952,7 +959,7 @@ class Upgrade {
      * (e.g. a buyable's amount), you can access it this way.
      * This is a function returning the object in "player" that contains the value (like `player[this.layer].buyables`)
      *
-     * @type {String}
+     * @type {() => T}
      */
     currencyLocation;
     /**

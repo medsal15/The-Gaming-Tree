@@ -40,6 +40,12 @@ function sumValues(x) {
     return x.reduce((a, b) => Decimal.add(a, b))
 }
 
+/**
+ * @param {Decimal|number|string} decimal
+ * @param {number} [precision]
+ * @param {boolean} [small]
+ * @returns {string}
+ */
 function format(decimal, precision = 2, small) {
     small = small || modInfo.allowSmall
     decimal = new Decimal(decimal)
@@ -67,7 +73,7 @@ function format(decimal, precision = 2, small) {
         val = exponentialFormat(decimal, precision)
         return val.replace(/([^(?:e|F)]*)$/, '-$1')
     }
-    else   
+    else
         return format(decimal, precision) + "⁻¹"
 
 }
@@ -97,8 +103,8 @@ function toPlaces(x, precision, maxAccepted) {
 }
 
 // Will also display very small numbers
-function formatSmall(x, precision=2) { 
-    return format(x, precision, true)    
+function formatSmall(x, precision=2) {
+    return format(x, precision, true)
 }
 
 function invertOOM(x){

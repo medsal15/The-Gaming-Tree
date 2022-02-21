@@ -2,17 +2,22 @@
  * Checks if an upgrade can be purchased in a layer
  *
  * @param {String} layer Layer to check for
+ * @param {number[]} [rows] Rows to check for, by default all rows are checked
  * @returns {Boolean} True if an unlocked upgrade can be purchased
  */
-function canAffordLayerUpgrade(layer) {
-    if (!tmp[layer].upgrades) return false;
+function canAffordLayerUpgrade(layer, rows={includes: n => true, length: 1}) {
+    if (!tmp[layer].upgrades || !rows.length) return false;
 
-    for (let id in tmp[layer].upgrades) {
-        if (isNaN(id)) continue;
-        let upgrade = tmp[layer].upgrades[id];
-        if (!upgrade.unlocked) continue;
-        if (!hasUpgrade(layer, id) && canAffordUpgrade(layer, id)) return true;
-    }
+    try {
+        for (const id in tmp[layer].upgrades) {
+            if (isNaN(id)) continue;
+            const row = Math.floor(id / 10);
+            if (!rows.includes(row)) continue;
+            let upgrade = tmp[layer].upgrades[id];
+            if (!upgrade.unlocked) continue;
+            if (!hasUpgrade(layer, id) && canAffordUpgrade(layer, id)) return true;
+        }
+    } catch {};
     return false;
 }
 /**
@@ -33,6 +38,23 @@ function canAffordLayerBuyable(layer) {
     return false;
 }
 /**
+ * Checks if a challenge can be completed in a layer
+ *
+ * @param {String} layer Layer to check for
+ * @returns {Boolean} True if an unlocked challenge can be completed
+ */
+function canCompleteLayerChallenge(layer) {
+    if (!tmp[layer].challenges) return false;
+
+    for (let id in tmp[layer].challenges) {
+        if (isNaN(id)) continue;
+        let challenge = tmp[layer].challenges[id];
+        if (!challenge.unlocked) continue;
+        if (canCompleteChallenge(layer, id)) return true;
+    }
+    return false;
+}
+/**
  * Sums the amount of purchased buyables in a layer
  *
  * @param {String} layer Layer to check in
@@ -49,15 +71,12 @@ function layerBuyableAmount(layer) {
     return sum;
 }
 /**
- * Calculates the sum of the `amount` first consecutive powers of `base`
+ * Colors text with a layer's color
  *
- * @param {Decimal} base
- * @param {Decimal} amount
- * @returns {Decimal}
+ * @param {string} layer
+ * @param {string} text
+ * @returns {string}
  */
-function powerSum(base, amount) {
-    if (amount.eq(0)) return Decimal.dZero;
-    if (base.eq(1)) return base.times(amount);
-
-    return base.pow(amount.add(1)).div(base.minus(1));
+function layerColor(layer, text) {
+    return `<span style="color:${tmp[layer].color}">${text}</span>`;
 }
