@@ -102,7 +102,7 @@ addLayer('ach', {
             name: 'Slow gain',
             tooltip: 'Passively gain XP',
             unlocked() { return player.l.unlocked; },
-            done() { return tmp.xp.passiveGeneration >= 0; },
+            done() { return tmp.xp.passiveGeneration > 0; },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, tmp.l.color); },
             style() {
                 const style = {};

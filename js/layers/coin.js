@@ -502,7 +502,7 @@ addLayer('c', {
                 let base = 0;
 
                 if (hasUpgrade('c', 41) || player.c.coins.chocolate.gt(0)) base += .01;
-                if (hasUpgrade('c', 43) || player.c.copper.chocolate.gt(0)) base += .01;
+                if (hasUpgrade('c', 43) || player.c.coins.copper.gt(0)) base += .01;
 
                 return base;
             },
