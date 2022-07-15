@@ -33,7 +33,7 @@ const TMT_VERSION = {
 
 /**
  * @param {String} layer
- * @param {String?} useType
+ * @param {'static'|'normal'|'none'|'custom'|null} useType
  * @return {Decimal}
  */
 function getResetGain(layer, useType = null) {
@@ -67,7 +67,7 @@ function getResetGain(layer, useType = null) {
 /**
  * @param {String} layer
  * @param {Boolean} canMax
- * @param {String?} useType
+ * @param {'static'|'normal'|'none'|'custom'|null} useType
  * @returns {Decimal}
  */
 function getNextAt(layer, canMax=false, useType = null) {
@@ -117,8 +117,9 @@ function softcap(value, cap, power = 0.5) {
 		return value.pow(power).times(cap.pow(decimalOne.sub(power)))
 }
 
-// Return true if the layer should be highlighted. By default checks for upgrades only.
 /**
+ * Return true if the layer should be highlighted. By default checks for upgrades only.
+ *
  * @param {String} layer
  * @returns {Boolean}
  */

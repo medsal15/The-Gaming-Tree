@@ -14,6 +14,7 @@ function getStartOptions() {
 		forceOneTab: false,
 		oldStyle: false,
 		tooltipForcing: true,
+		colorLevels: true,
 	}
 }
 
@@ -43,7 +44,7 @@ function changeTreeQuality() {
 }
 function toggleAuto(toggle) {
 	Vue.set(player[toggle[0]], [toggle[1]], !player[toggle[0]][toggle[1]]);
-	needCanvasUpdate=true
+	needCanvasUpdate = true
 }
 
 const MS_DISPLAYS = ["ALL", "LAST, AUTO, INCOMPLETE", "AUTOMATION, INCOMPLETE", "INCOMPLETE", "NONE"];
@@ -60,19 +61,14 @@ function milestoneShown(layer, id) {
 	switch (options.msDisplay) {
 		case "always":
 			return true;
-			break;
 		case "last":
 			return (auto) || !complete || player[layer].lastMilestone === id;
-			break;
 		case "automation":
 			return (auto) || !complete;
-			break;
 		case "incomplete":
 			return !complete;
-			break;
 		case "never":
 			return false;
-			break;
 	}
 	return false;
 }

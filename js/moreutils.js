@@ -75,8 +75,9 @@ function layerBuyableAmount(layer) {
  *
  * @param {string} layer
  * @param {string} text
+ * @param {string} [style]
  * @returns {string}
  */
-function layerColor(layer, text) {
-    return `<span style="color:${tmp[layer].color}">${text}</span>`;
+function layerColor(layer, text, style="") {
+    return `<span style="color:${tmp[layer].color};${style}">${text}</span>`;
 }

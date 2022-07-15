@@ -5,9 +5,14 @@ addLayer('xp', {
         return {
             unlocked: true,
             points: new Decimal(0),
-            unlockedUpgrades: [11],
-            keep_all_ups: false,
+            unlockedUpgrades: [],
+            level: new Decimal(0),
+            health: new Decimal(10),
+            kills: new Decimal(0),
         };
+    },
+    tooltip() {
+        return `${formatWhole(player.xp.points)} experience<br>${formatWhole(player.xp.kills)} kills`;
     },
     color: '#7FBF7F',
     row: 0,
@@ -46,16 +51,6 @@ addLayer('xp', {
             },
         },
         {
-            key: 'x',
-            description: 'X: Reset for experience points',
-            unlocked() {
-                return player.xp.unlocked;
-            },
-            onPress() {
-                if (player.xp.unlocked) doReset('xp');
-            },
-        },
-        {
             key: 'X',
             description: 'Shift + X: Display experience points layer',
             unlocked() {
@@ -67,297 +62,257 @@ addLayer('xp', {
         },
     ],
     tabFormat: {
+        'Enemy': {
+            content: [
+                [
+                    'display-text',
+                    () => `You have ${layerColor('xp', format(player.xp.points, 0), 'font-size:1.5em;')} experience
+                    and <span style="color:#9F9F5F;font-size:1.5em;">${format(player.xp.kills, 0)}</span> kills`,
+                ],
+                'blank',
+                ['bar', 'health'],
+                ['display-text', () => {
+                    let text = '';
+                    if (options.colorLevels) {
+                        text = layers.xp.enemyColor();
+                    } else {
+                        text = `Level ${formatWhole(player.xp.level)}`;
+                    }
+                    return `${text} slime`
+                }],
+                ['clickables', [1]],
+            ],
+        },
         'Upgrades': {
             content: [
-                'main-display',
-                'prestige-button',
+                [
+                    'display-text',
+                    () => `You have ${layerColor('xp', format(player.xp.points, 0), 'font-size:1.5em;')} experience
+                    and <span style="color:#9F9F5F;font-size:1.5em;">${format(player.xp.kills, 0)}</span> kills`,
+                ],
                 'blank',
-                'upgrades',
+                ['upgrades', [1, 2, 3]],
             ],
-            shouldNotify() {
-                return canAffordLayerUpgrade('xp');
-            },
+            shouldNotify() { return canAffordLayerUpgrade('xp'); },
+        },
+    },
+    clickables: {
+        11: {
+            style: { 'background-image': `url('./resources/gladius.svg')`, },
+            canClick() { return player.xp.health.gt(0); },
+            onClick() { player.xp.health = player.xp.health.minus(tmp.xp.clickDamage); },
+            onHold() { player.xp.health = player.xp.health.minus(tmp.xp.clickDamage.div(10)); },
         },
     },
     upgrades: {
         11: {
-            title: 'New game',
-            description: 'Begin generating points',
-            cost() {
-                let cost = new Decimal(1);
-
-                // Allows point generation no matter how strong the nerf is
-                cost = cost.times(tmp[this.layer].gainMult.min(1)).floor();
-
-                return cost;
-            },
-            unlocked() { return player[this.layer].unlockedUpgrades.includes(+this.id); },
-            onPurchase() { player[this.layer].unlockedUpgrades.push(12, 13); },
-            effect() {
-                let base = new Decimal(1);
-
-                base = base.times(tmp.l.effect.up_boost || new Decimal(1));
-
-                return base;
-            },
-            effectDisplay() {
-                return `+${format(tmp[this.layer].upgrades[this.id].effect)}`;
-            },
+            title: 'Sharper sword',
+            description: 'Double damage',
+            effect() { return new Decimal(2); },
+            unlocked() { return player.xp.kills.gte(5); },
+            cost: new Decimal(5),
         },
         12: {
-            title: 'Bonus score',
-            description() {
-                if (!shiftDown) {
-                    return 'Points multiply point gain';
-                } else {
-                    let formula = 'log3(points + 3)';
-
-                    return `Formula: ${formula}`;
-                }
-            },
-            effect() {
-                let base = player.points;
-
-                base = base.add(3).log(3);
-
-                base = base.times(tmp.l.effect.up_boost || new Decimal(1));
-
-                return base;
-            },
-            effectDisplay() {
-                return `*${format(tmp[this.layer].upgrades[this.id].effect)}`;
-            },
-            cost: new Decimal(5),
-            unlocked() { return player[this.layer].unlockedUpgrades.includes(+this.id); },
-            onPurchase() { if (hasUpgrade(this.layer, 13)) player[this.layer].unlockedUpgrades.push(21, 22, 23); },
+            title: 'Stronger monsters',
+            description: 'Adds 10 to enemy health, but gain 50% more experience',
+            effect() { return { bonus_health: new Decimal(10), xp_multiplier: new Decimal(1.5) }; },
+            unlocked() { return player.xp.kills.gte(10); },
+            cost: new Decimal(10),
+            onPurchase() {
+                player.xp.health = player.xp.health.add(10);
+            }
         },
         13: {
-            title: 'XP score',
+            title: 'High quality enemy drops',
             description() {
                 if (!shiftDown) {
-                    return 'Points multiply XP gain';
-                } else {
-                    let formula = 'log9(points + 9)';
-
-                    return `Formula: ${formula}`;
+                    return 'Enemy kills boost experience gain';
                 }
-            },
-            effect() {
-                let base = player.points;
 
-                base = base.add(9).log(9);
+                let formula = '4√(kills + 1)';
 
-                base = base.times(tmp.l.effect.up_boost || new Decimal(1));
-
-                return base;
+                return `Formula: ${formula}`;
             },
-            effectDisplay() {
-                return `*${format(tmp[this.layer].upgrades[this.id].effect)}`;
-            },
-            cost: new Decimal(15),
-            unlocked() { return player[this.layer].unlockedUpgrades.includes(+this.id); },
-            onPurchase() { if (hasUpgrade(this.layer, 13)) player[this.layer].unlockedUpgrades.push(21, 22, 23); },
+            effect() { return player.xp.kills.add(1).root(4); },
+            effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
+            unlocked() { return player.xp.kills.gte(20); },
+            cost: new Decimal(20),
         },
         21: {
-            title: 'Bestiary',
+            title: 'Life drain',
             description() {
                 if (!shiftDown) {
-                    return 'XP multiplies point gain';
-                } else {
-                    let formula = '3√XP + 1';
-
-                    return `Formula: ${formula}`;
+                    return 'Enemy health boosts base damage';
                 }
-            },
-            effect() {
-                let base = player.xp.points;
 
-                base = base.root(3).add(1);
+                let formula = 'health / 20';
 
-                base = base.times(tmp.l.effect.up_boost || new Decimal(1));
-
-                return base;
+                return `Formula: ${formula}`;
             },
-            effectDisplay() {
-                return `*${format(tmp[this.layer].upgrades[this.id].effect)}`;
-            },
-            cost: new Decimal(50),
-            unlocked() { return player[this.layer].unlockedUpgrades.includes(+this.id); },
-            onPurchase() { if ([22, 23].every(id => hasUpgrade(this.layer, id))) player[this.layer].unlockedUpgrades.push(31, 32, 33); },
+            effect() { return player.xp.health.max(0).div(20); },
+            effectDisplay() { return `+${format(tmp[this.layer].upgrades[this.id].effect)}`; },
+            unlocked() { return player.xp.kills.gte(30); },
+            cost: new Decimal(100),
         },
         22: {
-            title: 'Score X2',
-            description() {
-                if ((tmp.l.effect.up_boost || new Decimal(1)).eq(1)) {
-                    return 'Doubles point gain';
-                } else {
-                    return 'Multiplies point gain';
-                }
-            },
-            effect() {
-                let base = new Decimal(2);
-
-                base = base.times(tmp.l.effect.up_boost || new Decimal(1));
-
-                return base;
-            },
-            effectDisplay() {
-                return `*${format(tmp[this.layer].upgrades[this.id].effect)}`;
-            },
-            cost: new Decimal(250),
-            unlocked() { return player[this.layer].unlockedUpgrades.includes(+this.id); },
-            onPurchase() { if ([21, 23].every(id => hasUpgrade(this.layer, id))) player[this.layer].unlockedUpgrades.push(31, 32, 33); },
+            title: 'Sword trap',
+            description: 'Passively deal 5% of your damage every second',
+            unlocked() { return player.xp.kills.gte(50); },
+            cost: new Decimal(200),
         },
         23: {
-            title: 'Improved learning capacity',
+            title: 'Bloody sword',
             description() {
                 if (!shiftDown) {
-                    return 'XP multiplies XP gain';
-                } else {
-                    let formula = '9√XP + 1';
-
-                    return `Formula: ${formula}`;
+                    return 'Enemy kills boost damage';
                 }
-            },
-            effect() {
-                let base = player.xp.points;
 
-                base = base.root(9).add(1);
+                let formula = 'log4(kills + 4)';
 
-                base = base.times(tmp.l.effect.up_boost || new Decimal(1));
-
-                return base;
+                return `Formula: ${formula}`;
             },
-            effectDisplay() {
-                return `*${format(tmp[this.layer].upgrades[this.id].effect)}`;
-            },
-            cost: new Decimal(500),
-            unlocked() { return player[this.layer].unlockedUpgrades.includes(+this.id); },
-            onPurchase() { if ([21, 22].every(id => hasUpgrade(this.layer, id))) player[this.layer].unlockedUpgrades.push(31, 32, 33); },
+            effect() { return player.xp.kills.add(4).log(4); },
+            effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
+            unlocked() { return player.xp.kills.gte(70); },
+            cost: new Decimal(300),
         },
         31: {
-            title: 'Score grinding knowledge',
+            title: 'Second roll',
             description() {
                 if (!shiftDown) {
-                    return 'XP upgrades multiply point gain';
-                } else {
-                    let formula = '[XP upgrades]';
-
-                    return `Formula: ${formula}`;
+                    return 'Enemy max health boosts XP gain';
                 }
-            },
-            effect() {
-                let base = new Decimal(player.xp.upgrades.length);
 
-                base = base.times(tmp.l.effect.up_boost || new Decimal(1));
+                let formula = 'log2(max health/100 + 2)';
 
-                return base;
+                return `Formula: ${formula}`;
             },
-            effectDisplay() {
-                return `*${format(tmp[this.layer].upgrades[this.id].effect)}`;
-            },
-            cost: new Decimal(2_500),
-            unlocked() { return player[this.layer].unlockedUpgrades.includes(+this.id); },
+            effect() { return tmp.xp.enemyHealth.max(0).add(4).log(4); },
+            effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
+            unlocked() { return player.xp.kills.gte(90); },
+            cost: new Decimal(500),
         },
         32: {
-            title: 'XP rate tools',
+            title: 'Kiting',
             description() {
                 if (!shiftDown) {
-                    return 'XP upgrades multiply XP gain';
-                } else {
-                    let formula = '2√[XP upgrades]';
-
-                    return `Formula: ${formula}`;
+                    return 'XP boosts damage';
                 }
-            },
-            effect() {
-                let base = new Decimal(player.xp.upgrades.length);
 
-                base = base.root(2);
+                let formula = 'log10(XP + 10)';
 
-                base = base.times(tmp.l.effect.up_boost || new Decimal(1));
-
-                return base;
+                return `Formula: ${formula}`;
             },
-            effectDisplay() {
-                return `*${format(tmp[this.layer].upgrades[this.id].effect)}`;
-            },
-            cost: new Decimal(7_500),
-            unlocked() { return player[this.layer].unlockedUpgrades.includes(+this.id); },
+            effect() { return player.xp.points.max(0).add(10).log(10); },
+            effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
+            unlocked() { return player.xp.kills.gte(125); },
+            cost: new Decimal(1_500),
         },
         33: {
-            title: 'XP X2',
+            title: 'Level up',
             description() {
-                const lines = [];
-                if ((tmp.l.effect.up_boost || new Decimal(1)).eq(1)) {
-                    lines.push('Doubles XP gain');
-                } else {
-                    lines.push('Multiples XP gain');
+                if (!shiftDown) {
+                    return `Damage multiplies itself, double enemy health, unlock levels (coming soon)`;
                 }
 
-                if (!player.l.unlocked || !player.c.unlocked) {
-                    lines.push('Unlock 2 new layers')
-                }
+                let formula = 'log10(damage + 10)';
 
-                return lines.join('<br>');
+                return `Formula: ${formula}`;
             },
-            effect() {
-                let base = new Decimal(2);
-
-                base = base.times(tmp.l.effect.up_boost || new Decimal(1));
-
-                return base;
-            },
-            effectDisplay() {
-                return `*${format(tmp[this.layer].upgrades[this.id].effect)}`;
-            },
-            cost: new Decimal(25_000),
-            unlocked() { return player[this.layer].unlockedUpgrades.includes(+this.id); },
-            onPurchase() { player.l.unlocked = player.c.unlocked = true; },
+            effect() { return tmp.xp.clickDamage.max(0).add(10).log(10); },
+            effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
+            unlocked() { return player.xp.kills.gte(160); },
+            cost: new Decimal(4_000),
         },
     },
-    type: 'normal',
-    baseResource: 'points',
-    baseAmount() {
-        return player.points;
+    /** @param {number} diff */
+    update(diff) {
+        if (hasUpgrade('xp', 22)) {
+            let damage = tmp.xp.clickDamage.times(.05).times(diff);
+
+            player.xp.health = player.xp.health.minus(damage);
+        }
     },
-    requires: new Decimal(10),
-    exponent: new Decimal(.5),
-    gainMult() {
-        let mult = new Decimal(1);
+    automate() {
+        if (player.xp.health.lte(0)) {
+            player.xp.points = player.xp.points.add(tmp.xp.enemyExperience);
 
-        // XP layer
-        if (hasUpgrade('xp', 13)) mult = mult.times(upgradeEffect('xp', 13));
-        if (hasUpgrade('xp', 23)) mult = mult.times(upgradeEffect('xp', 23));
-        if (hasUpgrade('xp', 32)) mult = mult.times(upgradeEffect('xp', 32));
+            player.xp.kills = player.xp.kills.add(1);
+            player.xp.level = player.xp.kills.div(10).root(2).floor();
+            player.xp.health = layers.xp.enemyHealth();
+        }
+    },
+    bars: {
+        health: {
+            direction: RIGHT,
+            width: 200,
+            height: 50,
+            progress() {
+                const max = tmp.xp.enemyHealth;
+                return player.xp.health.div(max);
+            },
+            display() { return `${format(player.xp.health)} / ${format(tmp.xp.enemyHealth)}`; },
+            baseStyle: { 'background-color': 'red' },
+            fillStyle: { 'background-color': 'lime' },
+            textStyle: { 'color': 'black' },
+        },
+    },
+    type: 'none',
+    enemyColor() {
+        /** @type {number} */
+        let l = player.xp.level.toNumber();
+        if (isNaN(l)) {
+            return `Level ${player.xp.level}`;
+        } else if (!isFinite(l)) {
+            return 'Rainbow';
+        }
 
-        // L layer
-        mult = mult.times(tmp.l.effect.xp_nerf);
-        if (hasUpgrade('l', 11)) mult = mult.times(upgradeEffect('l', 11));
-        if (hasUpgrade('l', 13)) mult = mult.times(upgradeEffect('l', 13));
-        if (hasUpgrade('l', 22)) mult = mult.times(upgradeEffect('l', 22).xp_mult);
+        const colors = ['black', 'red', 'yellow', 'green', 'cyan', 'blue', 'magenta', 'white'];
 
-        // C layer
-        mult = mult.times(tmp.c.effect.xp_boost);
-        if (hasUpgrade('c', 42)) mult = mult.times(upgradeEffect('c', 42));
+        let color = [];
+        do {
+            const c = l % colors.length;
 
-        return mult;
+            l -= c;
+            color.push(colors[c]);
+        } while (l > 0);
+
+        let c = color.join(' ');
+        return c.replace(/^(.)/, s => s.toUpperCase());
+    },
+    enemyHealth() {
+        let base = new Decimal(2).pow(player.xp.level).times(10);
+
+        if (hasUpgrade('xp', 12)) base = base.add(upgradeEffect('xp', 12).bonus_health);
+
+        return base;
+    },
+    enemyExperience() {
+        /** @type {Decimal} */
+        let xp_gain = player.xp.level.add(1);
+
+        if (hasUpgrade('xp', 12)) xp_gain = xp_gain.times(upgradeEffect('xp', 12).xp_multiplier);
+        if (hasUpgrade('xp', 13)) xp_gain = xp_gain.times(upgradeEffect('xp', 13));
+        if (hasUpgrade('xp', 31)) xp_gain = xp_gain.times(upgradeEffect('xp', 31));
+
+        return xp_gain;
+    },
+    clickDamage() {
+        let damage = new Decimal(1);
+
+        if (hasUpgrade('xp', 21)) damage = damage.add(upgradeEffect('xp', 21));
+
+        if (hasUpgrade('xp', 11)) damage = damage.times(upgradeEffect('xp', 11));
+        if (hasUpgrade('xp', 32)) damage = damage.times(upgradeEffect('xp', 32));
+        if (hasUpgrade('xp', 33)) damage = damage.times(upgradeEffect('xp', 33));
+
+        return damage;
     },
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
         let keep = ['unlockedUpgrades'];
 
-        if (layers[layer].row <= 2) keep.push('upgrades');
-
         layerDataReset(this.layer, keep);
-    },
-    passiveGeneration() {
-        let base = 0;
-
-        if (hasMilestone('l', 1)) base += .01;
-        if (hasMilestone('l', 3)) base += .09;
-
-        return base;
     },
 });

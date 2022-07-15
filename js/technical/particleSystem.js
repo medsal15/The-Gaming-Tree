@@ -3,6 +3,12 @@ var particleID = 0;
 var mouseX = 0;
 var mouseY = 0;
 
+/**
+ * @template {Particle} T
+ * @param {T} data
+ * @param {number} [amount]
+ * @param {keyof newParticles} [type]
+ */
 function makeParticles(data, amount=1, type = "normal") {
     for (let x = 0; x < amount; x++) {
         let particle = newParticles[type]()
@@ -17,7 +23,7 @@ function makeParticles(data, amount=1, type = "normal") {
                     break;
                 default:
                     particle[thing]=run(data[thing], data, x)
-                    
+
             }
         }
         if (data.dir === undefined) {
@@ -50,8 +56,8 @@ function updateParticles(diff) {
 		particle.time -= diff;
         particle.fadeInTimer -= diff;
 		if (particle["time"] < 0) {
-			Vue.delete(particles, p); 
-            
+			Vue.delete(particles, p);
+
 		}
         else {
             if (particle.update) run(particle.update, particle)
@@ -65,6 +71,10 @@ function updateParticles(diff) {
 	}
 }
 
+/**
+ * @param {Particle} particle
+ * @param {number} dir
+ */
 function setDir(particle, dir) {
     particle.dir = dir
     particle.xVel = particle.speed * sin(particle.dir)
@@ -136,11 +146,11 @@ function updateMouse(event) {
 function getOpacity(particle) {
     if ((particle.time < particle.fadeOutTime) && particle.fadeOutTime)
         return particle.time / particle.fadeOutTime
-    if (particle.fadeInTimer > 0) 
+    if (particle.fadeInTimer > 0)
         return 1 - (particle.fadeInTimer / particle.fadeInTime)
-    
+
     return 1
-}   
+}
 
 function constructParticleStyle(particle){
     let style =  {
@@ -157,11 +167,14 @@ function constructParticleStyle(particle){
         style.mask = "url(#pmask" + particle.id + ")"
         style["-webkit-mask-box-image"] = "url(" + particle.image + ")"
     }
-    else 
+    else
         style["background-image"] = "url(" + particle.image + ")"
     return style
 }
 
+/**
+ * @param {boolean|(particle: Particle) => boolean} [check]
+ */
 function clearParticles(check) {
     if (!check) check = true
 

@@ -1,3 +1,18 @@
+/**
+ * @type {{
+ * 	[id: string]: TempLayer,
+ * 	displayThings: (string|() => string)[],
+ * 	gameEnded: boolean,
+ * 	other: {
+ * 		lastPoints: Decimal,
+ * 		oomps: Decimal,
+ * 		screenWidth: number,
+ * 		screenHeight: number,
+ * 	},
+ * 	pointGen: Decimal,
+ *	scrolled: boolean,
+ * }}
+ */
 var tmp = {}
 var temp = tmp // Proxy for tmp
 var funcs = {}
@@ -30,7 +45,7 @@ function setupTemp() {
 	tmp.scrolled = 0
 	tmp.gameEnded = false
 	funcs = {}
-	
+
 	setupTempData(layers, tmp, funcs)
 	for (layer in layers){
 		tmp[layer].resetGain = {}
@@ -88,7 +103,7 @@ function setupTempData(layerData, tmpData, funcsData) {
 		} else {
 			tmpData[item] = layerData[item]
 		}
-	}	
+	}
 }
 
 
@@ -117,7 +132,7 @@ function updateTemp() {
 	for (thing in displayThings){
 		let text = displayThings[thing]
 		if (isFunction(text)) text = text()
-		tmp.displayThings.push(text) 
+		tmp.displayThings.push(text)
 	}
 }
 
@@ -137,7 +152,7 @@ function updateTempData(layerData, tmpData, funcsData, useThis) {
 			else value = layerData[item]()
 			Vue.set(tmpData, item, value)
 		}
-	}	
+	}
 }
 
 function updateChallengeTemp(layer)

@@ -218,9 +218,9 @@ function load() {
 
 function loadOptions() {
 	let get2 = localStorage.getItem(modInfo.id+"_options");
-	if (get2) 
+	if (get2)
 		options = Object.assign(getStartOptions(), JSON.parse(decodeURIComponent(escape(atob(get2)))));
-	else 
+	else
 		options = getStartOptions()
 	if (themes.indexOf(options.theme) < 0) theme = "default"
 	fixData(options, getStartOptions())
@@ -235,25 +235,30 @@ function setupModInfo() {
 function fixNaNs() {
 	NaNcheck(player);
 }
-function NaNcheck(data) {
-	for (item in data) {
-		if (data[item] == null) {
-		}
+/**
+ * Checks for NaN
+ *
+ * @param {Object} data
+ * @param {string} [path=''] Path to the NaN
+ */
+function NaNcheck(data, path='') {
+	if (path.length > 0) path += '.'
+	for (let item in data) {
+		if (data[item] == null) {}
 		else if (Array.isArray(data[item])) {
-			NaNcheck(data[item]);
+			NaNcheck(data[item], `${path}${item}`);
 		}
 		else if (data[item] !== data[item] || checkDecimalNaN(data[item])) {
 			if (!NaNalert) {
 				clearInterval(interval);
 				NaNalert = true;
-				alert("Invalid value found in player, named '" + item + "'. Please let the creator of this mod know! You can refresh the page, and you will be un-NaNed.")
+				alert(`Invalid value found in player, named '${item}' at '${path}'. Please let the creator of this mod know! You can refresh the page, and you will be un-NaNed.`)
 				return
 			}
 		}
-		else if (data[item] instanceof Decimal) {
-		}
+		else if (data[item] instanceof Decimal) {}
 		else if ((!!data[item]) && (data[item].constructor === Object)) {
-			NaNcheck(data[item]);
+			NaNcheck(data[item], `${path}${item}`);
 		}
 	}
 }

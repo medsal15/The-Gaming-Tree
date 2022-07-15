@@ -170,9 +170,9 @@ function clickGrid(layer, id) {
 
 // Function to determine if the player is in a challenge
 /**
- * @param {String} layer
- * @param {String|Number} id
- * @returns {Boolean}
+ * @param {string} layer
+ * @param {string|number} id
+ * @returns {boolean}
  */
 function inChallenge(layer, id) {
 	let challenge = player[layer].activeChallenge

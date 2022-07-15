@@ -1,4 +1,3 @@
-/** @type {{[id: string]: Layer}} */
 var layers = {}
 
 const decimalZero = new Decimal(0)
@@ -241,6 +240,10 @@ function addLayer(layerName, layerData, tabLayers = null){ // Call this to add l
     }
 }
 
+/**
+ * @param {string} layerName
+ * @param {TreeNode} layerData
+ */
 function addNode(layerName, layerData){ // Does the same thing, but for non-layer nodes
     layers[layerName] = layerData
     layers[layerName].isLayer = false

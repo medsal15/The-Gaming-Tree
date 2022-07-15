@@ -1,5 +1,7 @@
-var canvas;
-var ctx;
+/** @type {HTMLCanvasElement} */
+let canvas;
+/** @type {CanvasRenderingContext2D} */
+let ctx;
 
 window.addEventListener("resize", (_=>resizeCanvas()));
 
@@ -21,7 +23,18 @@ function resizeCanvas() {
 		drawTree();
 }
 
-
+/**
+ * @type {{
+ * 	1: string,
+ * 	2: string,
+ * 	3: string,
+ * 	color: string,
+ * 	points: string,
+ * 	locked: string,
+ * 	background: string,
+ * 	background_tooltip: string,
+ * }|undefined}
+ */
 var colors_theme
 
 function drawTree() {
