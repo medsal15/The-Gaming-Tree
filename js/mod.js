@@ -7,6 +7,7 @@ let modInfo = {
 		'moreutils.js', 'tree.js',
 		'layers/automation.js', 'layers/achievements.js',
 		'layers/experience.js',
+		'layers/level.js', 'layers/loot.js',
 
 		'devtools.js',
 	],
@@ -19,11 +20,15 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: '0.1.1',
+	num: '0.2',
 	name: '',
 };
 
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.2</h3><br>
+		- Buff attack holding<br>
+		- Added Levels and Loot.<br>
+		- Update endgame: ???<br>
 	<h3>v0.1.1</h3><br>
 		- Fix memory error in experience with enemy color enabled.<br>
 	<h3>v0.1</h3><br>
@@ -34,7 +39,7 @@ let winText = `Congratulations! You have reached the end and beaten this game, b
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
 // (The ones here are examples, all official functions are already taken care of)
-var doNotCallTheseFunctionsEveryTick = ['enemyColor']
+var doNotCallTheseFunctionsEveryTick = ['enemyColor', 'onKill']
 
 /**
  * @returns {Decimal}
@@ -72,7 +77,7 @@ var displayThings = []
  * @returns {Boolean}
  */
 function isEndgame() {
-	return player.xp.upgrades.length >= 9;
+	return false;
 }
 
 
