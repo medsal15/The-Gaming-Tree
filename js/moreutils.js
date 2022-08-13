@@ -5,7 +5,7 @@
  * @param {number[]} [rows] Rows to check for, by default all rows are checked
  * @returns {Boolean} True if an unlocked upgrade can be purchased
  */
-function canAffordLayerUpgrade(layer, rows={includes: n => true, length: 1}) {
+function canAffordLayerUpgrade(layer, rows = { includes: n => true, length: 1 }) {
     if (!tmp[layer].upgrades || !rows.length) return false;
 
     try {
@@ -17,7 +17,7 @@ function canAffordLayerUpgrade(layer, rows={includes: n => true, length: 1}) {
             if (!upgrade.unlocked) continue;
             if (!hasUpgrade(layer, id) && canAffordUpgrade(layer, id)) return true;
         }
-    } catch {};
+    } catch { };
     return false;
 }
 /**
@@ -78,6 +78,6 @@ function layerBuyableAmount(layer) {
  * @param {string} [style]
  * @returns {string}
  */
-function layerColor(layer, text, style="") {
-    return `<span style="color:${tmp[layer].color};${style}">${text}</span>`;
+function layerColor(layer, text, style = "") {
+    return `<span style="color:${tmp[layer].color};text-shadow:${tmp[layer].color} 0 0 10px;${style}">${text}</span>`;
 }
