@@ -107,7 +107,7 @@ addLayer('lo', {
                 return `Your slimy traps divide your enemy's health by ${format(buyableEffect(this.layer, this.id))}<br><br>Cost: ${cost}`;
             },
             unlocked() { return player.lo.shown; },
-            effect(x) { return x.add(1).root(2); },
+            effect(x) { return x.add(1).root(4); },
             cost(x) {
                 return {
                     slime_goo: new Decimal(1.5).pow(x).times(10),
@@ -370,6 +370,12 @@ addLayer('lo', {
                 //! too big, limited to 63 loops
                 alert('Too many items are being rolled at once, tell the mod creator if it is not supported yet');
             } else {
+                /**
+                 * You might be wondering what kinda cheat this is.
+                 *
+                 * The trick is to roll a number, then check every possible roll,
+                 * starting from the most common one, until the total weight is above the roll.
+                 */
                 let roll = Math.random();
                 let n = 0;
                 for (; n < 2 ** rolled.length - 1 && roll > 0; n++) {
