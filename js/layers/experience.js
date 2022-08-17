@@ -67,6 +67,7 @@ addLayer('xp', {
                 ],
                 'blank',
                 ['bar', 'health'],
+                //['display-text', () => `${format(player.xp.health)} / ${format(tmp.xp.enemyHealth)}`],
                 ['display-text', () => {
                     let text = '';
                     if (options.colorLevels) {
