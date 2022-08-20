@@ -73,7 +73,7 @@ addLayer('xp', {
                 ['bar', 'health'],
                 ['display-text', () => {
                     let text = '';
-                    if (options.colorLevels && false) {
+                    if (options.colorLevels) {
                         // Buggy
                         text = layers.xp.enemyColor();
                     } else {
