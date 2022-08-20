@@ -25,7 +25,7 @@ let VERSION = {
 
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.1.1</h3><br>
-		- Fix memory error in experience by disabling enemy colors.<br>
+		- Fix memory error in experience with enemy color enabled.<br>
 	<h3>v0.1</h3><br>
 		- Added XP.<br>
 		- Update endgame: 9 XP upgrades.`;

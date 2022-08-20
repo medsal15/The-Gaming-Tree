@@ -274,7 +274,7 @@ addLayer('xp', {
         do {
             const c = l % colors.length;
 
-            l -= c;
+            l = Math.floor(l / colors.length);
             color.push(colors[c]);
         } while (l > 0);
 
