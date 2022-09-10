@@ -76,7 +76,7 @@ let VERSION = {
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.2</h3><br>
 		- Buff attack holding.<br>
-		- Buff ${layerColor('xp', 'Kiting')}<br>
+		- Buff <span style="color:#7FBF7F">Kiting</span><br>
 		- Added Levels and Loot.<br>
 		- Update endgame: 1000 kills<br>
 	<h3>v0.1.1</h3><br>
