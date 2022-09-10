@@ -1,3 +1,23 @@
+/**
+ * @param {string} skill
+ *
+ * @returns {[
+ *  'row',
+ *  [
+ *      ['bar', string],
+ *      ...['clickable', number][],
+ *  ],
+ * ]|''}
+ */
+function l_skill_row(skill) {
+    /** @type {number[]} */
+    let clickables = tmp.l.skills[skill].clickables;
+    return tmp.l.bars[skill].unlocked ? ['row', [
+        ['bar', skill],
+        ...clickables.map(n => ['clickable', n]),
+    ]] : ''
+}
+
 addLayer('l', {
     name: 'Levels',
     symbol: 'L',
@@ -48,42 +68,10 @@ addLayer('l', {
                     `You have <span style="color:#84C1FF;text-shadow:#84C1FF 0 0 10px;font-size:1.5em;">
                     ${formatWhole(tmp.l.skills.points)}</span> unassigned skill points`
                 ] : '',
-                () => {
-                    let skill = 'learning';
-                    /** @type {number[]} */
-                    let clickables = tmp.l.skills[skill].clickables;
-                    return tmp.l.bars[skill].unlocked ? ['row', [
-                        ['bar', skill],
-                        ...clickables.map(n => ['clickable', n]),
-                    ]] : ''
-                },
-                () => {
-                    let skill = 'attacking';
-                    /** @type {number[]} */
-                    let clickables = tmp.l.skills[skill].clickables;
-                    return tmp.l.bars[skill].unlocked ? ['row', [
-                        ['bar', skill],
-                        ...clickables.map(n => ['clickable', n]),
-                    ]] : ''
-                },
-                () => {
-                    let skill = 'trapping';
-                    /** @type {number[]} */
-                    let clickables = tmp.l.skills[skill].clickables;
-                    return tmp.l.bars[skill].unlocked ? ['row', [
-                        ['bar', skill],
-                        ...clickables.map(n => ['clickable', n]),
-                    ]] : ''
-                },
-                () => {
-                    let skill = 'evolving';
-                    /** @type {number[]} */
-                    let clickables = tmp.l.skills[skill].clickables;
-                    return tmp.l.bars[skill].unlocked ? ['row', [
-                        ['bar', skill],
-                        ...clickables.map(n => ['clickable', n]),
-                    ]] : ''
-                },
+                ['buyables', [1]],
+                () => l_skill_row('attack'),
+                () => l_skill_row('learning'),
+                () => l_skill_row('running'),
             ],
         },
         'Milestones': {
@@ -98,96 +86,126 @@ addLayer('l', {
     milestones: {
         0: {
             requirementDescription: 'Get a level',
-            effectDescription: 'Unlock a skill to get more XP',
+            effectDescription: 'Unlock a skill to deal more damage',
             done() { return player.l.best.gte(1); },
         },
         1: {
             requirementDescription: 'Get 3 levels',
-            effectDescription: 'Unlock a skill to deal more damage',
+            effectDescription: 'Unlock a skill to earn more xp and levels',
             done() { return player.l.best.gte(3); },
             unlocked() { return hasMilestone('l', 0); },
         },
         2: {
-            requirementDescription: 'Get some levels',
-            effectDescription: 'Unlock a skill to deal more passive damage',
-            done() { return false; },
+            requirementDescription: 'Get 5 levels',
+            effectDescription: 'Unlock a skill to skill faster',
+            done() { return player.l.best.gte(5); },
             unlocked() { return hasMilestone('l', 1); },
         },
-        //todo
+        3: {
+            requirementDescription: 'Get 7 levels',
+            effectDescription() { return `Levels multiply skill points amount by ${format(tmp.l.milestones[3].effect)}`; },
+            done() { return player.l.best.gte(7); },
+            unlocked() { return hasMilestone('l', 2); },
+            effect() { return player.l.points.root(2); },
+        },
     },
     clickables: {
         11: {
+            title() { return `Add ${formatWhole(player.l.change)} skill points to attacking`; },
+            display() { return `Attacking has ${formatWhole(player.l.skills.attack.points)} skill points assigned`; },
+            unlocked() { return hasMilestone('l', 0); },
+            canClick() { return tmp.l.skills.points.gte(player.l.change); },
+            onClick() { player.l.skills.attack.points = player.l.skills.attack.points.add(player.l.change); },
+        },
+        12: {
+            title() { return `Remove ${formatWhole(player.l.change)} skill points from attacking`; },
+            display() { return `Attacking has ${formatWhole(player.l.skills.attack.points)} skill points assigned`; },
+            unlocked() { return hasMilestone('l', 0); },
+            canClick() { return player.l.skills.attack.points.gte(player.l.change); },
+            onClick() { player.l.skills.attack.points = player.l.skills.attack.points.minus(player.l.change); },
+        },
+        13: {
             title() { return `Add ${formatWhole(player.l.change)} skill points to learning`; },
             display() { return `Learning has ${formatWhole(player.l.skills.learning.points)} skill points assigned`; },
-            unlocked() { return hasMilestone('l', 0); },
+            unlocked() { return hasMilestone('l', 1); },
             canClick() { return tmp.l.skills.points.gte(player.l.change); },
             onClick() { player.l.skills.learning.points = player.l.skills.learning.points.add(player.l.change); },
         },
-        12: {
+        14: {
             title() { return `Remove ${formatWhole(player.l.change)} skill points from learning`; },
             display() { return `Learning has ${formatWhole(player.l.skills.learning.points)} skill points assigned`; },
-            unlocked() { return hasMilestone('l', 0); },
+            unlocked() { return hasMilestone('l', 1); },
             canClick() { return player.l.skills.learning.points.gte(player.l.change); },
             onClick() { player.l.skills.learning.points = player.l.skills.learning.points.minus(player.l.change); },
         },
-        13: {
-            title() { return `Add ${formatWhole(player.l.change)} skill points to attacking`; },
-            display() { return `Attacking has ${formatWhole(player.l.skills.attacking.points)} skill points assigned`; },
-            unlocked() { return hasMilestone('l', 1); },
-            canClick() { return tmp.l.skills.points.gte(player.l.change); },
-            onClick() { player.l.skills.attacking.points = player.l.skills.attacking.points.add(player.l.change); },
-        },
-        14: {
-            title() { return `Remove ${formatWhole(player.l.change)} skill points from attacking`; },
-            display() { return `Attacking has ${formatWhole(player.l.skills.attacking.points)} skill points assigned`; },
-            unlocked() { return hasMilestone('l', 1); },
-            canClick() { return player.l.skills.attacking.points.gte(player.l.change); },
-            onClick() { player.l.skills.attacking.points = player.l.skills.attacking.points.minus(player.l.change); },
-        },
         15: {
-            title() { return `Add ${formatWhole(player.l.change)} skill points to trapping`; },
-            display() { return `Trapping has ${formatWhole(player.l.skills.trapping.points)} skill points assigned`; },
-            unlocked() { return false && hasMilestone('l', 2); },
+            title() { return `Add ${formatWhole(player.l.change)} skill points to running`; },
+            display() { return `Running has ${formatWhole(player.l.skills.running.points)} skill points assigned`; },
+            unlocked() { return hasMilestone('l', 2); },
             canClick() { return tmp.l.skills.points.gte(player.l.change); },
-            onClick() { player.l.skills.trapping.points = player.l.skills.trapping.points.add(player.l.change); },
+            onClick() { player.l.skills.running.points = player.l.skills.running.points.add(player.l.change); },
         },
         16: {
-            title() { return `Remove ${formatWhole(player.l.change)} skill points from trapping`; },
-            display() { return `Trapping has ${formatWhole(player.l.skills.trapping.points)} skill points assigned`; },
-            unlocked() { return false && hasMilestone('l', 2); },
-            canClick() { return player.l.skills.trapping.points.gte(player.l.change); },
-            onClick() { player.l.skills.trapping.points = player.l.skills.trapping.points.minus(player.l.change); },
+            title() { return `Remove ${formatWhole(player.l.change)} skill points from running`; },
+            display() { return `Running has ${formatWhole(player.l.skills.running.points)} skill points assigned`; },
+            unlocked() { return hasMilestone('l', 2); },
+            canClick() { return player.l.skills.running.points.gte(player.l.change); },
+            onClick() { player.l.skills.running.points = player.l.skills.running.points.minus(player.l.change); },
         },
         17: {
-            title() { return `Add ${formatWhole(player.l.change)} skill points to evolving`; },
-            display() { return `Evolving has ${formatWhole(player.l.skills.evolving.points)} skill points assigned`; },
-            unlocked() { return false && hasMilestone('l', 3); },
+            title() { return `Add ${formatWhole(player.l.change)} skill points to looting`; },
+            display() { return `Looting has ${formatWhole(player.l.skills.looting.points)} skill points assigned`; },
+            unlocked() { return hasMilestone('l', -1) && false; },
             canClick() { return tmp.l.skills.points.gte(player.l.change); },
-            onClick() { player.l.skills.evolving.points = player.l.skills.evolving.points.add(player.l.change); },
+            onClick() { player.l.skills.looting.points = player.l.skills.looting.points.add(player.l.change); },
         },
         18: {
-            title() { return `Remove ${formatWhole(player.l.change)} skill points from evolving`; },
-            display() { return `Evolving has ${formatWhole(player.l.skills.evolving.points)} skill points assigned`; },
-            unlocked() { return false && hasMilestone('l', 3); },
-            canClick() { return player.l.skills.evolving.points.gte(player.l.change); },
-            onClick() { player.l.skills.evolving.points = player.l.skills.evolving.points.minus(player.l.change); },
+            title() { return `Remove ${formatWhole(player.l.change)} skill points from looting`; },
+            display() { return `Looting has ${formatWhole(player.l.skills.looting.points)} skill points assigned`; },
+            unlocked() { return hasMilestone('l', -1) && false; },
+            canClick() { return player.l.skills.looting.points.gte(player.l.change); },
+            onClick() { player.l.skills.looting.points = player.l.skills.looting.points.minus(player.l.change); },
         },
-        //todo
     },
     bars: {
+        attack: {
+            direction: RIGHT,
+            width: 300,
+            height: 50,
+            progress() { return player.l.skills[this.id].progress.div(tmp[this.layer].skills[this.id].needed); },
+            unlocked() { return hasMilestone('l', 0); },
+            textStyle: { 'color': 'gray' },
+            display() {
+                return `Attack level ${formatWhole(player.l.skills[this.id].level)}<br>
+                Multiplies damage by ${format(tmp.l.skills[this.id].effect)}`;
+            },
+        },
         learning: {
             direction: RIGHT,
             width: 300,
             height: 50,
             progress() { return player.l.skills[this.id].progress.div(tmp[this.layer].skills[this.id].needed); },
-            unlocked() { return hasMilestone('l', 0); },
+            unlocked() { return hasMilestone('l', 1); },
             textStyle: { 'color': 'gray' },
             display() {
                 return `Learning level ${formatWhole(player.l.skills[this.id].level)}<br>
-                Multiplies XP gain by ${format(tmp.l.skills[this.id].effect)}`;
+                Multiplies XP gain by ${format(tmp.l.skills[this.id].effect.xp_mult)} and
+                divides Level cost by ${format(tmp.l.skills[this.id].effect.l_div)}`;
             },
         },
-        attacking: {
+        running: {
+            direction: RIGHT,
+            width: 300,
+            height: 50,
+            progress() { return player.l.skills[this.id].progress.div(tmp[this.layer].skills[this.id].needed); },
+            unlocked() { return hasMilestone('l', 2); },
+            textStyle: { 'color': 'gray' },
+            display() {
+                return `Running level ${formatWhole(player.l.skills[this.id].level)}<br>
+                Multiplies skill speed by ${format(tmp.l.skills[this.id].effect)}`;
+            },
+        },
+        looting: {
             direction: RIGHT,
             width: 300,
             height: 50,
@@ -195,44 +213,19 @@ addLayer('l', {
             unlocked() { return hasMilestone('l', 1); },
             textStyle: { 'color': 'gray' },
             display() {
-                return `Attacking level ${formatWhole(player.l.skills[this.id].level)}<br>
-                Multiplies damage gain by ${format(tmp.l.skills[this.id].effect)}`;
+                return `Looting level ${formatWhole(player.l.skills[this.id].level)}<br>
+                Multiplies XP gain by ${format(tmp.l.skills[this.id].effect)}`;
             },
         },
-        trapping: {
-            direction: RIGHT,
-            width: 300,
-            height: 50,
-            progress() { return player.l.skills[this.id].progress.div(tmp[this.layer].skills[this.id].needed); },
-            unlocked() { return false && hasMilestone('l', 2); },
-            textStyle: { 'color': 'gray' },
-            display() {
-                return `Trapping level ${formatWhole(player.l.skills[this.id].level)}<br>
-                Increases passive damage by ${format(tmp.l.skills[this.id].effect.times(100))}%`;
-            },
-        },
-        evolving: {
-            direction: RIGHT,
-            width: 300,
-            height: 50,
-            progress() { return player.l.skills[this.id].progress.div(tmp[this.layer].skills[this.id].needed); },
-            unlocked() { return false && hasMilestone('l', 3); },
-            textStyle: { 'color': 'gray' },
-            display() {
-                return `Evolving level ${formatWhole(player.l.skills[this.id].level)}<br>
-                Multiplies enemy level by ${format(tmp.l.skills[this.id].effect)}`;
-            },
-        },
-        /**
-         * TODO
-         * - Slaying: bonus kills, unlocked with loot
-         * - Looting: bonus loot, unlocked with loot
-         */
+
+    },
+    buyables: {
     },
     /**
      * @type {{
      *  points(): Decimal,
      *  [k: string]: {
+     *      readonly id: string,
      *      needed(): Decimal,
      *      effect(): Decimal,
      *      clickables: number[],
@@ -240,25 +233,68 @@ addLayer('l', {
      * }}
      */
     skills: {
-        points() { return player.l.points.minus(Object.keys(this).reduce((p, s) => p.add(s in player.l.skills ? player.l.skills[s].points : 0), new Decimal(0))).max(0); },
-        learning: {
-            needed() { return new Decimal(2).pow(player.l.skills.learning.level).times(25); },
-            effect() { return new Decimal(1.2).pow(player.l.skills.learning.level); },
+        points() {
+            let points = player.l.points;
+
+            points = points.add(buyableEffect('lo', 14));
+
+            if (hasMilestone('l', 3)) points = points.times(tmp.l.milestones[3].effect);
+
+            let loss = Object.keys(this).reduce((p, s) => p.add(s in player.l.skills ? player.l.skills[s].points : 0), new Decimal(0));
+
+            return points.minus(loss).max(0).floor();
+        },
+        attack: {
+            _id: false,
+            get id() {
+                if (!this._id) {
+                    this._id = (Object.entries(layers.l.skills).find(/**@param {[string, typeof this]}*/([_, k]) => k == this) ?? [false])[0];
+                }
+                return this._id;
+            },
+            needed() { return new Decimal(1.5).pow(player.l.skills[this.id].level).times(25); },
+            effect() { return new Decimal(1.1).pow(player.l.skills[this.id].level); },
             clickables: [11, 12],
         },
-        attacking: {
-            needed() { return new Decimal(1.5).pow(player.l.skills.attacking.level).times(50); },
-            effect() { return player.l.skills.attacking.level.div(10).add(1); },
+        learning: {
+            _id: false,
+            get id() {
+                if (!this._id) {
+                    this._id = (Object.entries(layers.l.skills).find(/**@param {[string, typeof this]}*/([_, k]) => k == this) ?? [false])[0];
+                }
+                return this._id;
+            },
+            needed() { return new Decimal(1.75).pow(player.l.skills[this.id].level).times(50); },
+            effect() {
+                return {
+                    xp_mult: player.l.points.div(14).times(player.l.skills[this.id].level).add(1),
+                    l_div: player.l.points.div(7).times(player.l.skills[this.id].level).add(1),
+                };
+            },
             clickables: [13, 14],
         },
-        trapping: {
-            needed() { return new Decimal(2).pow(player.l.skills.trapping.level).times(100); },
-            effect() { return player.l.skills.trapping.level.div(20); },
+        running: {
+            _id: false,
+            get id() {
+                if (!this._id) {
+                    this._id = (Object.entries(layers.l.skills).find(/**@param {[string, typeof this]}*/([_, k]) => k == this) ?? [false])[0];
+                }
+                return this._id;
+            },
+            needed() { return new Decimal(2).pow(player.l.skills[this.id].level).times(99); },
+            effect() { return new Decimal(1.5).pow(player.l.skills[this.id].level); },
             clickables: [15, 16],
         },
-        evolving: {
-            needed() { return new Decimal(5).pow(player.l.skills.evolving.level).times(20); },
-            effect() { return player.l.skills.evolving.level.div(10).add(1).root(2); },
+        looting: {
+            _id: false,
+            get id() {
+                if (!this._id) {
+                    this._id = (Object.entries(layers.l.skills).find(/**@param {[string, typeof this]}*/([_, k]) => k == this) ?? [false])[0];
+                }
+                return this._id;
+            },
+            needed() { return new Decimal(3).pow(player.l.skills[this.id].level.div(2)).times(200); },
+            effect() { return new Decimal(1.1).pow(player.l.skills[this.id].level); },
             clickables: [17, 18],
         },
     },
@@ -274,7 +310,7 @@ addLayer('l', {
              */
             const skill = player.l.skills[s];
             if (skill.points.gt(0)) {
-                let gain = skill.points.pow(2).times(diff);
+                let gain = skill.points.pow(2).times(diff).times(tmp.l.skills.running.effect);
 
                 skill.progress = skill.progress.add(gain);
 
@@ -288,6 +324,13 @@ addLayer('l', {
     type: 'static',
     baseResource: 'experience points',
     baseAmount() { return player.xp.points; },
+    gainMult() {
+        let div = Decimal.dOne;
+
+        div = div.div(tmp.l.skills.learning.effect.l_div);
+
+        return div;
+    },
     requires: new Decimal(10_000),
     exponent: new Decimal(2),
     base: new Decimal(1.5),

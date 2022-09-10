@@ -6,7 +6,7 @@ addLayer('xp', {
             unlocked: true,
             points: new Decimal(0),
             level: new Decimal(0),
-            health: new Decimal(10),
+            health: (tmp.xp?.enemyHealth) ?? new Decimal(10),
             kills: new Decimal(0),
             last_drops: [],
         };
@@ -67,7 +67,6 @@ addLayer('xp', {
                 ],
                 'blank',
                 ['bar', 'health'],
-                //['display-text', () => `${format(player.xp.health)} / ${format(tmp.xp.enemyHealth)}`],
                 ['display-text', () => {
                     let text = '';
                     if (options.colorLevels) {
@@ -86,7 +85,8 @@ addLayer('xp', {
 
                     let text = 'Enemy dropped ';
                     if (!player.xp.last_drops.length) text += 'nothing';
-                    else text += player.xp.last_drops.map/**@param {[string, Decimal]}*/(([item, amount]) => `${format(amount)} ${layers.lo.items[item].name}`).join(', ');
+                    else
+                        text += new Intl.ListFormat('en').format(player.xp.last_drops.map/**@param {[string, Decimal]}*/(([item, amount]) => `${format(amount)} ${layers.lo.items[item].name}`));
 
                     return text;
                 }],
@@ -171,12 +171,10 @@ addLayer('xp', {
         },
         22: {
             title: 'Sword trap',
-            description() { return `Passively deal ${this.effect().times(100)}% of your damage every second`; },
+            description() { return `Passively deal ${formatWhole(this.effect().times(100))}% of your damage every second`; },
             unlocked() { return player.xp.kills.gte(50) || player.l.unlocked || player.lo.shown; },
             effect() {
-                let base = new Decimal(.1);
-
-                base = base.add(tmp.l.skills.trapping.effect);
+                let base = new Decimal(.25);
 
                 return base;
             },
@@ -222,11 +220,11 @@ addLayer('xp', {
                     return 'XP boosts damage';
                 }
 
-                let formula = 'log100(XP + 100)';
+                let formula = 'log50(XP + 50)';
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.xp.points.max(0).add(100).log(100); },
+            effect() { return player.xp.points.max(0).add(50).log(50); },
             effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
             unlocked() { return player.xp.kills.gte(125) || player.l.unlocked || player.lo.shown; },
             cost: new Decimal(1_500),
@@ -267,7 +265,8 @@ addLayer('xp', {
     update(diff) {
         let passive_damage = Decimal.dZero;
 
-        if (hasUpgrade('xp', 22)) passive_damage = passive_damage.add(tmp.xp.clickDamage.times(upgradeEffect('xp', 22)));
+        if (hasUpgrade('xp', 22)) passive_damage = passive_damage.add(upgradeEffect('xp', 22));
+        passive_damage = passive_damage.add(buyableEffect('lo', 13));
 
         if (passive_damage.gt(0)) {
             /** @type {Decimal} */
@@ -284,8 +283,6 @@ addLayer('xp', {
             /** @type {Decimal} */
             let xp_gain = tmp.xp.enemyExperience;
 
-            xp_gain = xp_gain.times(tmp.l.skills.learning.effect);
-
             // Kills
             let kills_gain = Decimal.dOne;
 
@@ -293,11 +290,12 @@ addLayer('xp', {
             player.xp.last_drops = layers.lo.items.onKill('slime', player.xp.level, kills_gain);
 
             player.xp.points = player.xp.points.add(xp_gain);
+            player.xp.total = player.xp.total.add(xp_gain);
+            player.xp.best = player.xp.best.max(player.xp.points);
             player.xp.kills = player.xp.kills.add(kills_gain);
 
             /** @type {Decimal} */
             let level = player.xp.kills.div(10).root(2);
-            level = level.times(tmp.l.skills.evolving.effect);
             player.xp.level = level.floor();
 
             player.xp.health = layers.xp.enemyHealth();
@@ -334,8 +332,6 @@ addLayer('xp', {
 
         if (hasUpgrade('xp', 33)) base = base.times(2);
 
-        base = base.div(buyableEffect('lo', 11));
-
         return base;
     },
     enemyExperience() {
@@ -345,6 +341,7 @@ addLayer('xp', {
         if (hasUpgrade('xp', 12)) xp_gain = xp_gain.times(upgradeEffect('xp', 12).xp_multiplier);
         if (hasUpgrade('xp', 13)) xp_gain = xp_gain.times(upgradeEffect('xp', 13));
         if (hasUpgrade('xp', 31)) xp_gain = xp_gain.times(upgradeEffect('xp', 31));
+        xp_gain = xp_gain.times(tmp.l.skills['learning'].effect.xp_mult)
 
         return xp_gain;
     },
@@ -352,14 +349,13 @@ addLayer('xp', {
         let damage = new Decimal(1);
 
         if (hasUpgrade('xp', 21)) damage = damage.add(upgradeEffect('xp', 21));
-        damage = damage.add(buyableEffect('lo', 12));
+        damage = damage.add(buyableEffect('lo', 11));
 
         if (hasUpgrade('xp', 11)) damage = damage.times(upgradeEffect('xp', 11));
         if (hasUpgrade('xp', 23)) damage = damage.times(upgradeEffect('xp', 23));
         if (hasUpgrade('xp', 32)) damage = damage.times(upgradeEffect('xp', 32));
         if (hasUpgrade('xp', 33)) damage = damage.times(upgradeEffect('xp', 33));
-
-        damage = damage.times(tmp.l.skills.attacking.effect);
+        damage = damage.times(tmp.l.skills['attack'].effect);
 
         return damage;
     },
@@ -368,6 +364,15 @@ addLayer('xp', {
 
         let keep = [];
 
+        /** @type {number[]} */
+        let kept_upgrades = [];
+        /** @type {Decimal} */
+        let kept_amount = buyableEffect('lo', 12).xp_keep;
+        if (kept_amount.gt(0)) kept_upgrades = [...player.xp.upgrades];
+        if (kept_amount.lt(kept_upgrades.length)) kept_upgrades.length = kept_amount.toNumber();
+
         layerDataReset(this.layer, keep);
+
+        player.xp.upgrades = [...kept_upgrades];
     },
 });

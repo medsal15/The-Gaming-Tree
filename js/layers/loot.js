@@ -53,7 +53,7 @@ addLayer('lo', {
     tabFormat: {
         'Crafting': {
             content: [
-                ['upgrades', [1]],
+                ['upgrades', [1, 2]],
                 'blank',
                 ['infobox', 'inventory'],
                 ['clickables', [1]],
@@ -70,23 +70,10 @@ addLayer('lo', {
             unlocked() { return player.lo.shown; },
         },
     },
-    clickables: {
-        11: {
-            title: 'Craft slime core',
-            display: 'Convert 50 slime goo and 10 slime core shards into a slime core',
-            canClick() { return 'slime_core_shards' in player.lo.items && player.lo.items.slime_goo.gte(50) && player.lo.items.slime_core_shards.gte(10); },
-            onClick() {
-                player.lo.items.slime_goo = player.lo.items.slime_goo.minus(50);
-                player.lo.items.slime_core_shards = player.lo.items.slime_core_shards.minus(10);
-                player.lo.items.slime_core = player.lo.items.slime_core.add(1);
-            },
-            unlocked() { return player.lo.shown; },
-        },
-    },
     upgrades: {
         11: {
             title: 'Lootbag',
-            description: 'Start getting items<br>This upgrade does a Loot reset',
+            description: 'Start getting items<br><span style="color:orange;font-weight:bold">This upgrade does a Loot reset</span>',
             cost: new Decimal(250),
             currencyDisplayName: 'kills',
             currencyInternalName: 'kills',
@@ -99,70 +86,22 @@ addLayer('lo', {
     },
     buyables: {
         11: {
-            title: 'Slimy trap',
-            display() {
-                const cost = Object.entries(tmp[this.layer].buyables[this.id].cost)
-                    .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
-                    .join(', ');
-                return `Your slimy traps divide your enemy's health by ${format(buyableEffect(this.layer, this.id))}<br><br>Cost: ${cost}`;
-            },
-            unlocked() { return player.lo.shown; },
-            effect(x) { return x.add(1).root(4); },
-            cost(x) {
-                return {
-                    slime_goo: new Decimal(1.5).pow(x).times(10),
-                };
-            },
-            canAfford() {
-                /** @type {{[k: string]: Decimal}} */
-                const items = player.lo.items;
-                /** @type {{[k: string]: Decimal}} */
-                const cost = tmp[this.layer].buyables[this.id].cost;
-
-                return Object.entries(cost).every(([k, c]) => items[k].gte(c));
-            },
-            buy() {
-                /** @type {{[k: string]: Decimal}} */
-                const items = player.lo.items;
-                /** @type {{[k: string]: Decimal}} */
-                const cost = tmp[this.layer].buyables[this.id].cost;
-
-                Object.entries(cost).forEach(([k, c]) => items[k] = items[k].minus(c));
-                addBuyables(this.layer, this.id, 1);
-            },
-            buyMax() {
-                /** @type {{[k: string]: Decimal}} */
-                const items = player.lo.items;
-
-                let target_amount = items.slime_goo.div(10).log(1.5).floor();
-                let current_amount = getBuyableAmount(this.layer, this.id);
-                if (target_amount.lte(current_amount)) return;
-
-                // You know what, I'm not doing the true calculation
-                /** @type {Decimal} */
-                let target_cost = this.cost(target_amount);
-                /** @type {Decimal} */
-                let current_cost = this.cost(current_amount);
-
-                let final_cost = target_cost.minus(current_cost);
-                player.lo.items.slime_goo = player.lo.items.slime_goo.minus(final_cost);
-                setBuyableAmount(this.layer, this.id, target_amount);
-            },
-        },
-        12: {
             title: 'Slime sword',
             display() {
                 const cost = Object.entries(tmp[this.layer].buyables[this.id].cost)
                     .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
                     .join(', ');
-                return `Your slime swords add ${format(buyableEffect(this.layer, this.id))} damage to your attacks<br><br>Cost: ${cost}`;
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime swords
+                add ${format(buyableEffect(this.layer, this.id))} damage to your attacks<br><br>Cost: ${cost}`;
             },
             unlocked() { return player.lo.shown; },
-            effect(x) { return x.root(2).div(4); },
+            effect(x) {
+                return x.add(1).log2().div(1.25);
+            },
             cost(x) {
                 return {
                     slime_goo: new Decimal(2).pow(x).times(10),
-                    slime_core_shard: new Decimal(1.25).pow(x).times(5),
+                    slime_core_shard: new Decimal(2).pow(x),
                 };
             },
             canAfford() {
@@ -182,45 +121,28 @@ addLayer('lo', {
                 Object.entries(cost).forEach(([k, c]) => items[k] = items[k].minus(c));
                 addBuyables(this.layer, this.id, 1);
             },
-            buyMax() {
-                /** @type {{[k: string]: Decimal}} */
-                const items = player.lo.items;
-
-                let target_amount = [
-                    // Slime goo
-                    items.slime_goo.div(10).log(2).floor(),
-                    // Slime core shard
-                    items.slime_core_shard.div(5).log(1.5).floor(),
-                ].sort((a, b) => a.gt(b))[0];
-                let current_amount = getBuyableAmount(this.layer, this.id);
-
-                if (target_amount.lte(current_amount)) return;
-
-                // You know what, I'm not doing the true calculation
-                /** @type {{[k: string]: Decimal}} */
-                let target_cost = this.cost(target_amount);
-                /** @type {{[k: string]: Decimal}} */
-                let current_cost = this.cost(current_amount);
-
-                Object.entries(target_cost).map(([key, cost]) => [key, cost.minus(current_cost[key])])
-                    .forEach(/**@param {[string, Decimal]}*/([key, cost]) => items[key] = items[key].minus(cost));
-                setBuyableAmount(this.layer, this.id, target_amount);
-            },
         },
-        13: {
+        12: {
             title: 'Slime bag',
             display() {
                 const cost = Object.entries(tmp[this.layer].buyables[this.id].cost)
                     .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
                     .join(', ');
-                return `Your slime bags multiply your item drop chances by ${buyableEffect(this.layer, this.id)}, squared for slime items<br><br>Cost: ${cost}`;
+                const effect = buyableEffect(this.layer, this.id);
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime bags multiply drop chances by ${format(effect.chance)} and
+                store ${formatWhole(effect.xp_keep)} XP upgrades<br><br>Cost: ${cost}`;
             },
             unlocked() { return player.lo.shown; },
-            effect(x) { return x.div(10).add(1); },
+            effect(x) {
+                return {
+                    chance: new Decimal(.1).times(x).add(1),
+                    xp_keep: x,
+                };
+            },
             cost(x) {
                 return {
-                    slime_goo: new Decimal(5).pow(x).times(5),
-                    slime_core: new Decimal(2).pow(x),
+                    slime_goo: new Decimal(x).add(1).pow(1.5).times(7),
+                    slime_core_shard: new Decimal(1.5).pow(x).times(3),
                 };
             },
             canAfford() {
@@ -240,29 +162,86 @@ addLayer('lo', {
                 Object.entries(cost).forEach(([k, c]) => items[k] = items[k].minus(c));
                 addBuyables(this.layer, this.id, 1);
             },
-            buyMax() {
+        },
+        13: {
+            title: 'Slime spike',
+            display() {
+                const cost = Object.entries(tmp[this.layer].buyables[this.id].cost)
+                    .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
+                    .join(', ');
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime spikes increase
+                passive damage by ${format(buyableEffect(this.layer, this.id).times(100))}%<br><br>Cost: ${cost}`;
+            },
+            unlocked() { return player.lo.shown; },
+            effect(x) {
+                return x.pow(2).div(100);
+            },
+            cost(x) {
+                return {
+                    slime_goo: new Decimal(1.5).pow(x).times(10),
+                    slime_core: new Decimal(1.5).pow(x).times(2),
+                };
+            },
+            canAfford() {
                 /** @type {{[k: string]: Decimal}} */
                 const items = player.lo.items;
-
-                let target_amount = [
-                    // Slime goo
-                    items.slime_goo.div(5).log(5).floor(),
-                    // Slime core
-                    items.slime_Core.log2().floor(),
-                ].sort((a, b) => a.gt(b))[0];
-                let current_amount = getBuyableAmount(this.layer, this.id);
-
-                if (target_amount.lte(current_amount)) return;
-
-                // You know what, I'm not doing the true calculation
                 /** @type {{[k: string]: Decimal}} */
-                let target_cost = this.cost(target_amount);
-                /** @type {{[k: string]: Decimal}} */
-                let current_cost = this.cost(current_amount);
+                const cost = tmp[this.layer].buyables[this.id].cost;
 
-                Object.entries(target_cost).map(([key, cost]) => [key, cost.minus(current_cost[key])])
-                    .forEach(/**@param {[string, Decimal]}*/([key, cost]) => items[key] = items[key].minus(cost));
-                setBuyableAmount(this.layer, this.id, target_amount);
+                return Object.entries(cost).every(([k, c]) => items[k].gte(c));
+            },
+            buy() {
+                /** @type {{[k: string]: Decimal}} */
+                const items = player.lo.items;
+                /** @type {{[k: string]: Decimal}} */
+                const cost = tmp[this.layer].buyables[this.id].cost;
+
+                Object.entries(cost).forEach(([k, c]) => items[k] = items[k].minus(c));
+                addBuyables(this.layer, this.id, 1);
+            },
+        },
+        14: {
+            title: 'Slime orb',
+            display() {
+                const cost = Object.entries(tmp[this.layer].buyables[this.id].cost)
+                    .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
+                    .join(', ');
+                const req = `${layers.l.resource} ${format(tmp[this.layer].buyables[this.id].requires['l'])}`;
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime orbs increase
+                skill points by ${format(buyableEffect(this.layer, this.id).times(100))}%<br><br>Requires: ${req}<br>Cost: ${cost}`;
+            },
+            unlocked: false,
+            effect(x) {
+                return x;
+            },
+            cost(x) {
+                return {};
+            },
+            requires(x = getBuyableAmount('lo', 14)) {
+                return {
+                    l: x,
+                };
+            },
+            canAfford() {
+                /** @type {{[k: string]: Decimal}} */
+                const items = player.lo.items;
+                /** @type {{[k: string]: Decimal}} */
+                const cost = tmp[this.layer].buyables[this.id].cost;
+
+                return Object.entries(cost)
+                    .filter(([k]) => k != 'l')
+                    .every(([k, c]) => items[k].gte(c)) &&
+                    player.l.points.gte(tmp[this.layer].buyables[this.id].requires['l']);
+            },
+            buy() {
+                /** @type {{[k: string]: Decimal}} */
+                const items = player.lo.items;
+                /** @type {{[k: string]: Decimal}} */
+                const cost = tmp[this.layer].buyables[this.id].cost;
+
+                Object.entries(cost)
+                    .forEach(([k, c]) => items[k] = items[k].minus(c));
+                addBuyables(this.layer, this.id, 1);
             },
         },
     },
@@ -289,30 +268,31 @@ addLayer('lo', {
             return formatWhole(player.lo.items[item]);
         },
         getStyle(_, id) {
+            let style = {
+                'background-repeat': 'no-repeat',
+                'background-size': 'contain',
+            };
+            switch (Math.floor(id / 100)) {
+                case 1:
+                    style['background-color'] = '#7FBF7F';
+                    break;
+            }
+
             return {
                 get 101() {
-                    return {
-                        'background-color': '#7FBF7F',
+                    return Object.assign({}, style, {
                         'background-image': `url('./resources/images/spill.svg')`,
-                        'background-repeat': 'no-repeat',
-                        'background-size': 'contain',
-                    };
+                    });
                 },
                 get 102() {
-                    return {
-                        'background-color': '#7FBF7F',
+                    return Object.assign({}, style, {
                         'background-image': `url('./resources/images/slime_core_shard.svg')`,
-                        'background-repeat': 'no-repeat',
-                        'background-size': 'contain',
-                    };
+                    });
                 },
                 get 103() {
-                    return {
-                        'background-color': '#7FBF7F',
+                    return Object.assign({}, style, {
                         'background-image': `url('./resources/images/slime_core.svg')`,
-                        'background-repeat': 'no-repeat',
-                        'background-size': 'contain',
-                    };
+                    });
                 },
             }[id];
         },
@@ -353,7 +333,11 @@ addLayer('lo', {
                     break;
             }
 
-            /** @type {string[]} */
+            /**
+             * Items bound to your luck
+             *
+             * @type {string[]}
+             */
             const rolled = [];
             items.forEach(item => {
                 /** @type {Decimal} */
@@ -367,14 +351,13 @@ addLayer('lo', {
             });
 
             if (rolled.length >= 7) {
-                //! too big, limited to 63 loops
-                alert('Too many items are being rolled at once, tell the mod creator if it is not supported yet');
+                // Fuck it, you're getting a little of everything instead
             } else {
-                /**
-                 * You might be wondering what kinda cheat this is.
-                 *
-                 * The trick is to roll a number, then check every possible roll,
-                 * starting from the most common one, until the total weight is above the roll.
+                /*
+                You might be wondering what kinda cheat this is.
+
+                The trick is to roll a number, then check every possible roll,
+                starting from the most common one, until the total weight is above the roll.
                  */
                 let roll = Math.random();
                 let n = 0;
@@ -407,9 +390,10 @@ addLayer('lo', {
         },
         slime_goo: {
             chance() {
-                let base = new Decimal(.1);
+                let base = new Decimal(1 / 3);
 
-                base = base.times(buyableEffect('lo', 13).pow(2));
+                base = base.times(buyableEffect('lo', 12).chance);
+                base = base.times(tmp.l.skills.looting.effect);
 
                 return base;
             },
@@ -418,9 +402,10 @@ addLayer('lo', {
         },
         slime_core_shard: {
             chance() {
-                let base = new Decimal(.01);
+                let base = new Decimal(1 / 16);
 
-                base = base.times(buyableEffect('lo', 13).pow(2));
+                base = base.times(buyableEffect('lo', 12).chance);
+                base = base.times(tmp.l.skills.looting.effect);
 
                 return base;
             },
@@ -429,9 +414,10 @@ addLayer('lo', {
         },
         slime_core: {
             chance() {
-                let base = new Decimal(.001);
+                let base = new Decimal(1 / 125);
 
-                base = base.times(buyableEffect('lo', 13).pow(2));
+                base = base.times(buyableEffect('lo', 12).chance);
+                base = base.times(tmp.l.skills.looting.effect);
 
                 return base;
             },

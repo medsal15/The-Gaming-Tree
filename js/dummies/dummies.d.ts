@@ -1,7 +1,8 @@
 type CompareResult = -1 | 0 | 1;
 type DecimalSource = string | number | Decimal;
 type Computable<T> = T | (() => T);
-type CSSStyles = {[css_attribute: string]: string};
+type Computed<T> = T extends (...args) => any ? ReturnType<T> : T;
+type CSSStyles = { [k in keyof CSSStyleDeclaration]?: CSSStyleDeclaration[k] }
 
 declare class Decimal {
     //#region Constants
@@ -326,7 +327,7 @@ declare class Layer<T extends LayerData> {
      * Using "side" instead of a number will cause the layer to appear off to the side as a smaller node
      * (useful for achievements and statistics). Side layers are not affected by resets unless you add a doReset to them.
      */
-    row: number|'side'
+    row: number | 'side'
     /**
      * **OVERRIDE**
      *
@@ -353,7 +354,7 @@ declare class Layer<T extends LayerData> {
      * It can also return "ghost", which will hide the layer, but its node will still take up space in the tree.
      * Defaults to true.
      */
-    layerShown?(): boolean|'ghost'
+    layerShown?(): boolean | 'ghost'
     /**
      * An array containing information on any hotkeys associated with this layer
      */
@@ -367,65 +368,67 @@ declare class Layer<T extends LayerData> {
      *
      * See the docs about it.
      */
-    tabFormat?: {[id: string]: {
-        /**
-         * The tab layout code for the subtab, in the tab layout format.
-         */
-        content: (string|[string, any])[],
-        /**
-         * Applies CSS to the whole subtab when switched to, in the form of an "CSS Object", where the keys are CSS attributes,
-         * and the values are the values for those attributes (both as strings).
-         */
-        style?: Computable<CSSStyles>
-        /**
-         * A CSS object, which affects the appearance of the button for that subtab.
-         */
-        buttonStyle?: Computable<CSSStyles>,
-        /**
-         * A function to determine if the button for this subtab should be visible.
-         * By default, a subtab is always unlocked. You can't use the "this" keyword in this function.
-         */
-        unlocked?: Computable<boolean>,
-        /**
-         * If true, the tab button will be highlighted to notify the player that there is something there.
-         */
-        shouldNotify?(): boolean,
-        /**
-         * If true, the tab button will be highlighted to notify the player that there is something there.
-         */
-        prestigeNotify?(): boolean,
-        /**
-         * specifies the color that the subtab glows. If this subtab is causing the main layer to node glow
-         * (and it would't otherwise) the node also glows this color. Is NOT overridden by embedding a layer.
-         */
-        glowColor?: Computable<string>,
-        /**
-         * **SIGNIFICANT**
-         *
-         * The id of another layer. If you have this, it will override "content", "style" and "shouldNotify",
-         * instead displaying the entire layer in the subtab.
-         */
-        embedLayer?: string,
-    }}
+    tabFormat?: {
+        [id: string]: {
+            /**
+             * The tab layout code for the subtab, in the tab layout format.
+             */
+            content: (string | [string, any])[],
+            /**
+             * Applies CSS to the whole subtab when switched to, in the form of an "CSS Object", where the keys are CSS attributes,
+             * and the values are the values for those attributes (both as strings).
+             */
+            style?: Computable<CSSStyles>
+            /**
+             * A CSS object, which affects the appearance of the button for that subtab.
+             */
+            buttonStyle?: Computable<CSSStyles>,
+            /**
+             * A function to determine if the button for this subtab should be visible.
+             * By default, a subtab is always unlocked. You can't use the "this" keyword in this function.
+             */
+            unlocked?: Computable<boolean>,
+            /**
+             * If true, the tab button will be highlighted to notify the player that there is something there.
+             */
+            shouldNotify?(): boolean,
+            /**
+             * If true, the tab button will be highlighted to notify the player that there is something there.
+             */
+            prestigeNotify?(): boolean,
+            /**
+             * specifies the color that the subtab glows. If this subtab is causing the main layer to node glow
+             * (and it would't otherwise) the node also glows this color. Is NOT overridden by embedding a layer.
+             */
+            glowColor?: Computable<string>,
+            /**
+             * **SIGNIFICANT**
+             *
+             * The id of another layer. If you have this, it will override "content", "style" and "shouldNotify",
+             * instead displaying the entire layer in the subtab.
+             */
+            embedLayer?: string,
+        }
+    }
     /**
      * An alternative to `tabFormat`, which is inserted in between Milestones and Buyables in the standard tab layout. (cannot do subtabs)
      */
-    midsection?: (string|[string, any])[]
+    midsection?: (string | [string, any])[]
 
     // Big features
     /**
      * A set of one-time purchases which can have unique upgrade conditions, currency costs, and bonuses.
      */
-    upgrades: {[id: number]: Upgrade}
+    upgrades: { [id: number]: Upgrade }
     /**
      * A list of bonuses gained upon reaching certain thresholds of a resource. Often used for automation/QOL.
      */
-    milestones: {[id: number]: Milestone}
+    milestones: { [id: number]: Milestone }
     /**
      * The player can enter challenges, which make the game harder.
      * If they reach a goal and beat the challenge, they recieve a bonus.
      */
-    challenges?: {[id: number]: Challenge}
+    challenges?: { [id: number]: Challenge }
     /**
      * Effectively upgrades that can be bought multiple times, and are optionally respeccable. Many uses.
      */
@@ -476,54 +479,58 @@ declare class Layer<T extends LayerData> {
      * An area that functions like a set of subtabs,
      * with buttons at the top changing the content within. (Advanced)
      */
-    microtabs?: {[id: string]: {[id: string]: {
-        /**
-         * The tab layout code for the subtab, in the tab layout format.
-         */
-        content: (string|[string, any])[],
-        /**
-         * Applies CSS to the whole subtab when switched to, in the form of an "CSS Object", where the keys are CSS attributes,
-         * and the values are the values for those attributes (both as strings).
-         */
-        style?: Computable<CSSStyles>
-        /**
-         * A CSS object, which affects the appearance of the button for that subtab.
-         */
-        buttonStyle?: Computable<CSSStyles>,
-        /**
-         * A function to determine if the button for this subtab should be visible.
-         * By default, a subtab is always unlocked. You can't use the "this" keyword in this function.
-         */
-        unlocked?: Computable<boolean>,
-        /**
-         * If true, the tab button will be highlighted to notify the player that there is something there.
-         */
-        shouldNotify?(): boolean,
-        /**
-         * If true, the tab button will be highlighted to notify the player that there is something there.
-         */
-        prestigeNotify?(): boolean,
-        /**
-         * specifies the color that the subtab glows. If this subtab is causing the main layer to node glow
-         * (and it would't otherwise) the node also glows this color. Is NOT overridden by embedding a layer.
-         */
-        glowColor?: Computable<string>,
-        /**
-         * **SIGNIFICANT**
-         *
-         * The id of another layer. If you have this, it will override "content", "style" and "shouldNotify",
-         * instead displaying the entire layer in the subtab.
-         */
-        embedLayer?: string,
-    }}}
+    microtabs?: {
+        [id: string]: {
+            [id: string]: {
+                /**
+                 * The tab layout code for the subtab, in the tab layout format.
+                 */
+                content: (string | [string, any])[],
+                /**
+                 * Applies CSS to the whole subtab when switched to, in the form of an "CSS Object", where the keys are CSS attributes,
+                 * and the values are the values for those attributes (both as strings).
+                 */
+                style?: Computable<CSSStyles>
+                /**
+                 * A CSS object, which affects the appearance of the button for that subtab.
+                 */
+                buttonStyle?: Computable<CSSStyles>,
+                /**
+                 * A function to determine if the button for this subtab should be visible.
+                 * By default, a subtab is always unlocked. You can't use the "this" keyword in this function.
+                 */
+                unlocked?: Computable<boolean>,
+                /**
+                 * If true, the tab button will be highlighted to notify the player that there is something there.
+                 */
+                shouldNotify?(): boolean,
+                /**
+                 * If true, the tab button will be highlighted to notify the player that there is something there.
+                 */
+                prestigeNotify?(): boolean,
+                /**
+                 * specifies the color that the subtab glows. If this subtab is causing the main layer to node glow
+                 * (and it would't otherwise) the node also glows this color. Is NOT overridden by embedding a layer.
+                 */
+                glowColor?: Computable<string>,
+                /**
+                 * **SIGNIFICANT**
+                 *
+                 * The id of another layer. If you have this, it will override "content", "style" and "shouldNotify",
+                 * instead displaying the entire layer in the subtab.
+                 */
+                embedLayer?: string,
+            }
+        }
+    }
     /**
      * Display some information as a progress bar, gague, or similar. They are highly customizable, and can be vertical as well.
      */
-    bars?: {[id: string]: Bar}
+    bars?: { [id: string]: Bar }
     /**
      * Kind of like milestones, but with a different display style and some other differences. Extra features are on the way at a later date!
      */
-    achievements?: {[id: number]: Achievement}
+    achievements?: { [id: number]: Achievement }
     /**
      * If false, disables popup message when you get the achievement. True by default.
      */
@@ -535,7 +542,7 @@ declare class Layer<T extends LayerData> {
     /**
      * Displays some text in a box that can be shown or hidden.
      */
-    infoboxes?: {[id: string]: Infobox}
+    infoboxes?: { [id: string]: Infobox }
     /**
      * A grid of buttons that behave the same, but have their own data.
      */
@@ -617,7 +624,7 @@ declare class Layer<T extends LayerData> {
      * - "custom": You can define everything, from the calculations to the text on the button, yourself. (See more at the bottom)
      * - "none": This layer does not prestige, and therefore does not need any of the other features in this section.
      */
-    type?: 'normal'|'static'|'custom'|'none'
+    type?: 'normal' | 'static' | 'custom' | 'none'
     /**
      * The name of the resource that determines how much of the main currency you gain on reset.
      */
@@ -732,7 +739,7 @@ declare class Layer<T extends LayerData> {
      * The color value can either be a string with a hex color code, or a number from 1-3 (theme-affected colors).
      * A third element in the array optionally specifies line width.
      */
-    branches?: Computable<string[]|[string, string|1|2|3, number?][]>
+    branches?: Computable<string[] | [string, string | 1 | 2 | 3, number?][]>
     /**
      * A CSS object, where the keys are CSS attributes, which styles this layer's node on the tree.
      */
@@ -813,7 +820,7 @@ declare class Layer<T extends LayerData> {
      * }
      * ```
      */
-    componentStyles?: Computable<{[k: string]: CSSStyles}>
+    componentStyles?: Computable<{ [k: string]: CSSStyles }>
     /**
      * If true, this layer will use the left tab instead of the right tab.
      */
@@ -861,27 +868,29 @@ declare class TempLayer {
     readonly layer: string
     readonly name?: string
     readonly color: string
-    readonly row: number|'side'
+    readonly row: number | 'side'
     readonly displayRow?: number
     readonly resource: string
     readonly effect?: any
     readonly layerShown?: boolean
     readonly style?: CSSStyles
-    readonly tabFormat?: {[id: string]: {
-        content: (string|[string, any])[],
-        style?: CSSStyles,
-        buttonStyle?: CSSStyles,
-        unlocked?: boolean,
-        shouldNotify?: boolean,
-        prestigeNotify?: boolean,
-        glowColor?: string,
-        embedLayer?: string,
-    }}
-    readonly midsection?: (string|[string, any])[]
+    readonly tabFormat?: {
+        [id: string]: {
+            content: (string | [string, any])[],
+            style?: CSSStyles,
+            buttonStyle?: CSSStyles,
+            unlocked?: boolean,
+            shouldNotify?: boolean,
+            prestigeNotify?: boolean,
+            glowColor?: string,
+            embedLayer?: string,
+        }
+    }
+    readonly midsection?: (string | [string, any])[]
 
-    readonly upgrades?: {[id: number]: Upgrade}
-    readonly milestones?: {[id: number]: Milestone}
-    readonly challenges?: {[id: number]: Challenge}
+    readonly upgrades?: { [id: number]: Upgrade }
+    readonly milestones?: { [id: number]: Milestone }
+    readonly challenges?: { [id: number]: Challenge }
     readonly buyables?: {
         respecText?: string,
         showRespec?: boolean,
@@ -893,21 +902,25 @@ declare class TempLayer {
         showMasterButton?: boolean,
         [id: number]: Clickable,
     }
-    readonly microtabs?: {[id: string]: {[id: string]: {
-        content: (string|[string, any])[],
-        style?: CSSStyles,
-        buttonStyle?: CSSStyles,
-        unlocked?: boolean,
-        shouldNotify?: boolean,
-        prestigeNotify?: boolean,
-        glowColor?: string,
-        embedLayer?: string,
-    }}}
-    readonly bars?: {[id: string]: Bar}
-    readonly achievements?: {[id: number]: Achievement}
+    readonly microtabs?: {
+        [id: string]: {
+            [id: string]: {
+                content: (string | [string, any])[],
+                style?: CSSStyles,
+                buttonStyle?: CSSStyles,
+                unlocked?: boolean,
+                shouldNotify?: boolean,
+                prestigeNotify?: boolean,
+                glowColor?: string,
+                embedLayer?: string,
+            }
+        }
+    }
+    readonly bars?: { [id: string]: Bar }
+    readonly achievements?: { [id: number]: Achievement }
     readonly achievementPopups?: boolean
     readonly milestonePopups?: boolean
-    readonly infoboxes?: {[id: string]: Infobox}
+    readonly infoboxes?: { [id: string]: Infobox }
     readonly grid?: {
         readonly layer: string,
 
@@ -917,7 +930,7 @@ declare class TempLayer {
         readonly maxCols: number,
     }
 
-    readonly type?: 'normal'|'static'|'custom'|'none'
+    readonly type?: 'normal' | 'static' | 'custom' | 'none'
     readonly baseResource: string
     readonly baseAmount: Decimal
     readonly requires: Decimal
@@ -940,7 +953,7 @@ declare class TempLayer {
     readonly symbol?: string
     readonly image?: string
     readonly position?: number
-    readonly branches?: string[]|[string, string|1|2|3, number?][]
+    readonly branches?: string[] | [string, string | 1 | 2 | 3, number?][]
     readonly nodeStyle: CSSStyles
     readonly tooltip?: string
     readonly tooltipLocked?: string
@@ -951,7 +964,7 @@ declare class TempLayer {
     readonly increaseUnlockOrder?: string[]
     readonly shouldNotify?: boolean
     readonly glowColor?: string
-    readonly componentStyles?: {[k: string]: CSSStyles}
+    readonly componentStyles?: { [k: string]: CSSStyles }
     readonly leftTab?: boolean
     readonly previousTab?: string
     readonly deactivated?: boolean
@@ -1070,7 +1083,7 @@ declare class Bar {
      * A function that returns the portion of the bar that is filled, from "empty" at 0 to "full" at 1, updating automatically.
      * (Nothing bad happens if the value goes out of these bounds, and it can be a number or `Decimal`.)
      */
-    progress(): number|Decimal
+    progress(): number | Decimal
     /**
      * A function that returns text to be displayed on top of the bar, can use HTML.
      */
@@ -1214,7 +1227,7 @@ declare class Buyable {
      * The color value can either be a string with a hex color code, or a number from 1-3 (theme-affected colors).
      * A third element in the array optionally specifies line width.
      */
-    branches?: Computable<string[]|[string, string|1|2|3, number?][]>
+    branches?: Computable<string[] | [string, string | 1 | 2 | 3, number?][]>
 }
 
 declare class Challenge {
@@ -1251,7 +1264,7 @@ declare class Challenge {
      * A function that returns true if you meet the win condition for the challenge.
      * Returning a number will allow bulk completing the challenge.
      */
-    canComplete(): boolean|number
+    canComplete(): boolean | number
     /**
      * A description of the reward's effect.
      * *You will also have to implement the effect where it is applied.*
@@ -1416,7 +1429,7 @@ declare class Clickable {
      * The color value can either be a string with a hex color code, or a number from 1-3 (theme-affected colors).
      * A third element in the array optionally specifies line width.
      */
-    branches?: Computable<string[]|[string, string|1|2|3, number?][]>
+    branches?: Computable<string[] | [string, string | 1 | 2 | 3, number?][]>
 }
 
 declare class Infobox {
@@ -1677,7 +1690,7 @@ declare class TreeNode {
      * Alternatively, an entry in the array can be a 2-element array consisting of the id and a color value.
      * The color value can either be a string with a hex color code, or a number from 1-3 (theme-affected colors).
      */
-    branches?: Computable<string[]|[string, string|1|2|3, number?][]>
+    branches?: Computable<string[] | [string, string | 1 | 2 | 3, number?][]>
     /**
      * A CSS object, where the keys are CSS attributes, which styles this node on the tree.
      */
@@ -1790,7 +1803,7 @@ declare class Upgrade {
      * The color value can either be a string with a hex color code, or a number from 1-3 (theme-affected colors).
      * A third element in the array optionally specifies line width.
      */
-    branches?: Computable<string[]|[string, string|1|2|3, number?][]>
+    branches?: Computable<string[] | [string, string | 1 | 2 | 3, number?][]>
 }
 declare class CurrencyUpgrade<T> extends Upgrade {
     /**

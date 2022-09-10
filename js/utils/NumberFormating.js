@@ -26,7 +26,7 @@ function commaFormat(num, precision) {
 function regularFormat(num, precision) {
     if (num === null || num === undefined) return "NaN"
     if (num.mag < 0.0001) return (0).toFixed(precision)
-    if (num.mag < 0.1 && precision !==0) precision = Math.max(precision, 4)
+    if (num.mag < 0.1 && precision !== 0) precision = Math.max(precision, 4)
     return num.toStringWithDecimalPlaces(precision)
 }
 
@@ -41,7 +41,7 @@ function sumValues(x) {
 }
 
 /**
- * @param {Decimal|number|string} decimal
+ * @param {DecimalSource} decimal
  * @param {number} [precision]
  * @param {boolean} [small]
  * @returns {string}
@@ -69,7 +69,7 @@ function format(decimal, precision = 2, small) {
 
     decimal = invertOOM(decimal)
     let val = ""
-    if (decimal.lt("1e1000")){
+    if (decimal.lt("1e1000")) {
         val = exponentialFormat(decimal, precision)
         return val.replace(/([^(?:e|F)]*)$/, '-$1')
     }
@@ -78,6 +78,7 @@ function format(decimal, precision = 2, small) {
 
 }
 
+/** @param {DecimalSource} decimal */
 function formatWhole(decimal) {
     decimal = new Decimal(decimal)
     if (decimal.gte(1e9)) return format(decimal, 2)
@@ -103,11 +104,11 @@ function toPlaces(x, precision, maxAccepted) {
 }
 
 // Will also display very small numbers
-function formatSmall(x, precision=2) {
+function formatSmall(x, precision = 2) {
     return format(x, precision, true)
 }
 
-function invertOOM(x){
+function invertOOM(x) {
     let e = x.log10().ceil()
     let m = x.div(Decimal.pow(10, e))
     e = e.neg()

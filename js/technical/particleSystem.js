@@ -9,12 +9,12 @@ var mouseY = 0;
  * @param {number} [amount]
  * @param {keyof newParticles} [type]
  */
-function makeParticles(data, amount=1, type = "normal") {
+function makeParticles(data, amount = 1, type = "normal") {
     for (let x = 0; x < amount; x++) {
         let particle = newParticles[type]()
         for (thing in data) {
 
-            switch(thing) {
+            switch (thing) {
                 case 'onClick': // Functions that should be copied over
                 case 'onMouseEnter':
                 case 'onMouseLeave':
@@ -22,16 +22,16 @@ function makeParticles(data, amount=1, type = "normal") {
                     particle[thing] = data[thing]
                     break;
                 default:
-                    particle[thing]=run(data[thing], data, x)
+                    particle[thing] = run(data[thing], data, x)
 
             }
         }
         if (data.dir === undefined) {
             particle.dir = particle.angle
         }
-        particle.dir = particle.dir + (particle.spread * (x- amount/2 + 0.5))
+        particle.dir = particle.dir + (particle.spread * (x - amount / 2 + 0.5))
 
-        if(particle.offset) {
+        if (particle.offset) {
             particle.x += particle.offset * sin(particle.dir)
             particle.y += particle.offset * cos(particle.dir) * -1
         }
@@ -39,36 +39,36 @@ function makeParticles(data, amount=1, type = "normal") {
         particle.xVel = particle.speed * sin(particle.dir)
         particle.yVel = particle.speed * cos(particle.dir) * -1
         particle.fadeInTimer = particle.fadeInTime
-	    Vue.set(particles, particle.id, particle)
+        Vue.set(particles, particle.id, particle)
 
     }
 }
 
 // Makes a particle at a random location that stays still until it despawns
-function makeShinies(data, amount=1) {
+function makeShinies(data, amount = 1) {
     makeParticles(data, amount, "shiny")
 }
 
 
 function updateParticles(diff) {
-	for (p in particles) {
+    for (p in particles) {
         let particle = particles[p]
-		particle.time -= diff;
+        particle.time -= diff;
         particle.fadeInTimer -= diff;
-		if (particle["time"] < 0) {
-			Vue.delete(particles, p);
+        if (particle["time"] < 0) {
+            Vue.delete(particles, p);
 
-		}
+        }
         else {
             if (particle.update) run(particle.update, particle)
             particle.angle += particle.rotation
             particle.x += particle.xVel
             particle.y += particle.yVel
             particle.speed = Math.sqrt(Math.pow(particle.xVel, 2) + Math.pow(particle.yVel, 2))
-            particle.dir = atan(-particle.xVel/particle.yVel)
+            particle.dir = atan(-particle.xVel / particle.yVel)
             particle.yVel += particle.gravity
         }
-	}
+    }
 }
 
 /**
@@ -152,10 +152,10 @@ function getOpacity(particle) {
     return 1
 }
 
-function constructParticleStyle(particle){
-    let style =  {
-        left: (particle.x  - particle.height/2) + 'px',
-        top: (particle.y - particle.height/2) + 'px',
+function constructParticleStyle(particle) {
+    let style = {
+        left: (particle.x - particle.height / 2) + 'px',
+        top: (particle.y - particle.height / 2) + 'px',
         width: particle.width + 'px',
         height: particle.height + 'px',
         transform: "rotate(" + particle.angle + "deg)",
@@ -179,21 +179,21 @@ function clearParticles(check) {
     if (!check) check = true
 
     for (p in particles) {
-        if (run(check, particles[p], particles[p])){
+        if (run(check, particles[p], particles[p])) {
             Vue.delete(particles, p)
         }
     }
 }
 
 // Trig with degrees
-function sin(x) { return Math.sin(x*Math.PI/180)}
+function sin(x) { return Math.sin(x * Math.PI / 180) }
 
-function cos(x) {return Math.cos(x*Math.PI/180)}
+function cos(x) { return Math.cos(x * Math.PI / 180) }
 
-function tan(x) {return Math.tan(x*Math.PI/180)}
+function tan(x) { return Math.tan(x * Math.PI / 180) }
 
-function asin(x) { return Math.asin(x)*180/Math.PI}
+function asin(x) { return Math.asin(x) * 180 / Math.PI }
 
-function acos(x) { return Math.acos(x)*180/Math.PI}
+function acos(x) { return Math.acos(x) * 180 / Math.PI }
 
-function atan(x) { return Math.atan(x)*180/Math.PI}
+function atan(x) { return Math.atan(x) * 180 / Math.PI }

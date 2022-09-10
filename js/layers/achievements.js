@@ -14,14 +14,14 @@ addLayer('ach', {
             content: [
                 ['display-text', () => `You have ${formatWhole(layers.ach.ownedAchievements())} / ${formatWhole(layers.ach.totalAchievements())} achievements`],
                 'blank',
-                ['achievements', [1]],
+                ['achievements', () => layers.ach.getAchievementsRows()],
             ],
         },
         'Secrets': {
             content: [
                 ['display-text', () => `You have ${formatWhole(layers.ach.ownedAchievements('secret'))} secrets`],
                 'blank',
-                ['achievements', []],
+                ['achievements', () => layers.ach.getAchievementsRows('secret')],
             ],
             unlocked() {
                 return layers.ach.ownedAchievements('secret').gte(1);
@@ -88,6 +88,126 @@ addLayer('ach', {
                 return s;
             },
         },
+        21: {
+            name: 'Sticky sword',
+            done() { return getBuyableAmount('lo', 11).gte(1); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, layers.lo.color); },
+            tooltip: 'Buy a sword',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.lo.color;
+                return s;
+            },
+            unlocked() { return player.lo.shown; },
+        },
+        22: {
+            name: 'Better than a coin flip',
+            done() { return Object.values(tmp.lo.items).some(v => typeof v == 'object' && v.chance.gte(.5)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, layers.lo.color); },
+            tooltip: 'Get an item\'s chance above 50%',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.lo.color;
+                return s;
+            },
+            unlocked() { return player.lo.shown; },
+        },
+        23: {
+            name: 'Many bags',
+            done() { return buyableEffect('lo', 12).xp_keep.gte(9); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, layers.lo.color); },
+            tooltip: 'Keep all your XP upgrades',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.lo.color;
+                return s;
+            },
+            unlocked() { return player.lo.shown; },
+        },
+        24: {
+            name: 'All the time',
+            done() { return Object.values(tmp.lo.items).some(v => typeof v == 'object' && v.chance.gte(1)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, layers.lo.color); },
+            tooltip: 'Get an item\'s chance above 100%',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.lo.color;
+                return s;
+            },
+            unlocked() { return player.lo.shown; },
+        },
+        25: {
+            name: 'Sword Trap duplicate',
+            done() { return buyableEffect('lo', 13).gte(.25); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, layers.lo.color); },
+            tooltip: 'Get Slime spike\'s effect to at least 25%',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.lo.color;
+                return s;
+            },
+            unlocked() { return player.lo.shown; },
+        },
+        31: {
+            name: 'Level up',
+            done() { return player.l.best.gte(1); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, layers.l.color); },
+            tooltip: 'Get a level',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.l.color;
+                return s;
+            },
+            unlocked() { return player.l.unlocked; },
+        },
+        32: {
+            name: 'Big damage',
+            done() { return tmp.l.skills.attack.effect.gte(1.5); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, layers.l.color); },
+            tooltip: 'Deal at least 50% more damage through your attack skill',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.l.color;
+                return s;
+            },
+            unlocked() { return player.l.unlocked; },
+        },
+        33: {
+            name: 'Half price level',
+            done() { return tmp.l.skills.learning.effect.l_div.gte(2); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, layers.l.color); },
+            tooltip: 'Get skilled enough to halve your level cost',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.l.color;
+                return s;
+            },
+            unlocked() { return player.l.unlocked; },
+        },
+        34: {
+            name: 'Faster skills',
+            done() { return tmp.l.skills.running.effect.gte(5); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, layers.l.color); },
+            tooltip: 'Multiply skilling speed by at least 5',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.l.color;
+                return s;
+            },
+            unlocked() { return player.l.unlocked; },
+        },
+        35: {
+            name: 'More skill points',
+            done() { return hasMilestone('l', 3); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Gotten!", 3, layers.l.color); },
+            tooltip: 'Get your levels to boost your skill point amount',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.l.color;
+                return s;
+            },
+            unlocked() { return player.l.unlocked; },
+        },
         //#endregion
         //#region Secret achievements
         //#endregion
@@ -105,18 +225,23 @@ addLayer('ach', {
 
         return lines.join('<br />')
     },
-    getAchievements(type = 'normal') {
+    getAchievementsRows(type = 'normal') {
         let rows = [];
 
         switch (type) {
             case 'normal':
             default:
-                rows = [1];
+                rows = [1, 2, 3, 4];
                 break;
             case 'secret':
                 rows = [];
                 break;
         }
+
+        return rows;
+    },
+    getAchievements(type = 'normal') {
+        let rows = layers.ach.getAchievementsRows(type);
 
         if (!rows.length) return [];
 
