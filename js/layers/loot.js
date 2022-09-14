@@ -53,12 +53,12 @@ addLayer('lo', {
     tabFormat: {
         'Crafting': {
             content: [
-                ['upgrades', [1, 2]],
+                ['upgrades', [1]],
                 'blank',
                 ['infobox', 'inventory'],
                 ['clickables', [1]],
                 'blank',
-                ['buyables', [1]],
+                ['buyables', [1, 2]],
             ],
         },
         'Items': {
@@ -73,7 +73,7 @@ addLayer('lo', {
     upgrades: {
         11: {
             title: 'Lootbag',
-            description: 'Start getting items<br><span style="color:orange;font-weight:bold">This upgrade does a Loot reset</span>',
+            description: 'Start getting items<br><span style="color:#ff2400;font-weight:bold">This upgrade does a Loot reset</span>',
             cost: new Decimal(250),
             currencyDisplayName: 'kills',
             currencyInternalName: 'kills',
@@ -85,13 +85,14 @@ addLayer('lo', {
         },
     },
     buyables: {
+        // Slime
         11: {
             title: 'Slime sword',
             display() {
                 const cost = Object.entries(tmp[this.layer].buyables[this.id].cost)
                     .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
                     .join(', ');
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime swords
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime swords\
                 add ${format(buyableEffect(this.layer, this.id))} damage to your attacks<br><br>Cost: ${cost}`;
             },
             unlocked() { return player.lo.shown; },
@@ -121,6 +122,13 @@ addLayer('lo', {
                 Object.entries(cost).forEach(([k, c]) => items[k] = items[k].minus(c));
                 addBuyables(this.layer, this.id, 1);
             },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = '#7FBF7F';
+
+                return style;
+            },
         },
         12: {
             title: 'Slime bag',
@@ -129,7 +137,8 @@ addLayer('lo', {
                     .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
                     .join(', ');
                 const effect = buyableEffect(this.layer, this.id);
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime bags multiply drop chances by ${format(effect.chance)} and
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime bags\
+                multiply drop chances by ${format(effect.chance)} and\
                 store ${formatWhole(effect.xp_keep)} XP upgrades<br><br>Cost: ${cost}`;
             },
             unlocked() { return player.lo.shown; },
@@ -162,6 +171,13 @@ addLayer('lo', {
                 Object.entries(cost).forEach(([k, c]) => items[k] = items[k].minus(c));
                 addBuyables(this.layer, this.id, 1);
             },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = '#7FBF7F';
+
+                return style;
+            },
         },
         13: {
             title: 'Slime spike',
@@ -169,7 +185,7 @@ addLayer('lo', {
                 const cost = Object.entries(tmp[this.layer].buyables[this.id].cost)
                     .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
                     .join(', ');
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime spikes increase
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime spikes increase\
                 passive damage by ${format(buyableEffect(this.layer, this.id).times(100))}%<br><br>Cost: ${cost}`;
             },
             unlocked() { return player.lo.shown; },
@@ -199,6 +215,13 @@ addLayer('lo', {
                 Object.entries(cost).forEach(([k, c]) => items[k] = items[k].minus(c));
                 addBuyables(this.layer, this.id, 1);
             },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = '#7FBF7F';
+
+                return style;
+            },
         },
         14: {
             title: 'Slime orb',
@@ -207,7 +230,7 @@ addLayer('lo', {
                     .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
                     .join(', ');
                 const req = `${layers.l.resource} ${format(tmp[this.layer].buyables[this.id].requires['l'])}`;
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime orbs increase
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime orbs increase\
                 skill points by ${format(buyableEffect(this.layer, this.id).times(100))}%<br><br>Requires: ${req}<br>Cost: ${cost}`;
             },
             unlocked: false,
@@ -243,95 +266,243 @@ addLayer('lo', {
                     .forEach(([k, c]) => items[k] = items[k].minus(c));
                 addBuyables(this.layer, this.id, 1);
             },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = '#7FBF7F';
+
+                return style;
+            },
+        },
+        // Ore
+        21: {
+            title: 'Stone forge',
+            display() {
+                const cost = Object.entries(tmp[this.layer].buyables[this.id].cost)
+                    .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
+                    .join(', ');
+                const req = hasUpgrade('o', 33) ? '' : '<span style="font-weight:bold;color:#FF2400">Requires tin anvil</span><br>';
+                return `${req}\
+                Your ${formatWhole(getBuyableAmount(this.layer, this.id))} stone forges\
+                multiply your damage by ${format(buyableEffect(this.layer, this.id))}<br><br>Cost: ${cost}`;
+            },
+            unlocked() { return hasUpgrade('o', 33) || getBuyableAmount('lo', 21).gte(1) || getBuyableAmount('lo', 22).gte(1) || getBuyableAmount('lo', 23).gte(1); },
+            effect(x) {
+                return new Decimal(1.1).pow(x.div(2));
+            },
+            cost(x) {
+                return {
+                    stone: new Decimal(2).pow(x).times(200),
+                    copper_ore: new Decimal(1.25).pow(x).times(75),
+                };
+            },
+            canAfford() {
+                if (!hasUpgrade('o', 33)) return false;
+
+                /** @type {{[k: string]: Decimal}} */
+                const items = player.lo.items;
+                /** @type {{[k: string]: Decimal}} */
+                const cost = tmp[this.layer].buyables[this.id].cost;
+
+                return Object.entries(cost).every(([k, c]) => items[k].gte(c));
+            },
+            buy() {
+                /** @type {{[k: string]: Decimal}} */
+                const items = player.lo.items;
+                /** @type {{[k: string]: Decimal}} */
+                const cost = tmp[this.layer].buyables[this.id].cost;
+
+                Object.entries(cost).forEach(([k, c]) => items[k] = items[k].minus(c));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = '#BCBCBC';
+
+                return style;
+            },
+        },
+        22: {
+            title: 'Copper golem',
+            display() {
+                const cost = Object.entries(tmp[this.layer].buyables[this.id].cost)
+                    .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
+                    .join(', ');
+                const req = hasUpgrade('o', 33) ? '' : '<span style="font-weight:bold;color:#FF2400">Requires tin anvil</span><br>';
+                return `${req}\
+                Your ${formatWhole(getBuyableAmount(this.layer, this.id))} copper golems\
+                divide level costs by ${format(buyableEffect(this.layer, this.id))}<br><br>Cost: ${cost}`;
+            },
+            unlocked() { return hasUpgrade('o', 33) || getBuyableAmount('lo', 21).gte(1) || getBuyableAmount('lo', 22).gte(1) || getBuyableAmount('lo', 23).gte(1); },
+            effect(x) {
+                return new Decimal(1.1).pow(x);
+            },
+            cost(x) {
+                return {
+                    stone: new Decimal(1.75).pow(x).times(75),
+                    copper_ore: new Decimal(2).pow(x).times(100),
+                    slime_core: new Decimal(1.25).pow(x),
+                };
+            },
+            canAfford() {
+                if (!hasUpgrade('o', 33)) return false;
+
+                /** @type {{[k: string]: Decimal}} */
+                const items = player.lo.items;
+                /** @type {{[k: string]: Decimal}} */
+                const cost = tmp[this.layer].buyables[this.id].cost;
+
+                return Object.entries(cost).every(([k, c]) => items[k].gte(c));
+            },
+            buy() {
+                /** @type {{[k: string]: Decimal}} */
+                const items = player.lo.items;
+                /** @type {{[k: string]: Decimal}} */
+                const cost = tmp[this.layer].buyables[this.id].cost;
+
+                Object.entries(cost).forEach(([k, c]) => items[k] = items[k].minus(c));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = '#B87333';
+
+                return style;
+            },
+        },
+        23: {
+            title: 'Tin chest',
+            display() {
+                const cost = Object.entries(tmp[this.layer].buyables[this.id].cost)
+                    .map(/**@param {[string, Decimal]}*/([key, cost]) => `${layers.lo.items[key].name} ${format(cost)}`)
+                    .join(', ');
+                /** @type {{o_keep: Decimal, ore_health: Decimal}} */
+                const effect = buyableEffect(this.layer, this.id);
+                const req = hasUpgrade('o', 33) ? '' : '<span style="font-weight:bold;color:#FF2400">Requires tin anvil</span><br>';
+                return `${req}\
+                Your ${formatWhole(getBuyableAmount(this.layer, this.id))} tin chests\
+                store ${formatWhole(effect.o_keep)} ore upgrades\
+                and multiply ore health by ${format(effect.ore_health)}<br><br>Cost: ${cost}`;
+            },
+            unlocked() { return hasUpgrade('o', 33) || getBuyableAmount('lo', 21).gte(1) || getBuyableAmount('lo', 22).gte(1) || getBuyableAmount('lo', 23).gte(1); },
+            effect(x) {
+                return {
+                    o_keep: x,
+                    ore_health: x.add(1).root(3),
+                };
+            },
+            cost(x) {
+                return {
+                    stone: new Decimal(1.75).pow(x).times(150),
+                    copper_ore: new Decimal(1.75).pow(x).times(125),
+                    tin_ore: new Decimal(2).pow(x).times(5),
+                };
+            },
+            canAfford() {
+                if (!hasUpgrade('o', 33)) return false;
+
+                /** @type {{[k: string]: Decimal}} */
+                const items = player.lo.items;
+                /** @type {{[k: string]: Decimal}} */
+                const cost = tmp[this.layer].buyables[this.id].cost;
+
+                return Object.entries(cost).every(([k, c]) => items[k].gte(c));
+            },
+            buy() {
+                /** @type {{[k: string]: Decimal}} */
+                const items = player.lo.items;
+                /** @type {{[k: string]: Decimal}} */
+                const cost = tmp[this.layer].buyables[this.id].cost;
+
+                Object.entries(cost).forEach(([k, c]) => items[k] = items[k].minus(c));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = '#C4BC86';
+
+                return style;
+            },
         },
     },
     grid: {
-        rows: 1,
+        rows() {
+            if (hasChallenge('b', 11)) return 3;
+            if (tmp.o.layerShown) return 2;
+            return 1;
+        },
         cols: 3,
+        maxRows: 3,
         // Required, even though I am only using grid for display
         getStartData(_) { return null; },
         getTitle(_, id) {
-            return {
-                get 101() { return layers.lo.items.slime_goo.name.replace(/^(.)/, s => s.toUpperCase()); },
-                get 102() { return layers.lo.items.slime_core_shard.name.replace(/^(.)/, s => s.toUpperCase()); },
-                get 103() { return layers.lo.items.slime_core.name.replace(/^(.)/, s => s.toUpperCase()); },
-            }[id];
+            const item = layers.lo.items.itemId(id);
+            if (item === false) return '';
+            return layers.lo.items[item].name.replace(/^(.)/, s => s.toUpperCase());
         },
         getDisplay(_, id) {
-            let item = {
-                get 101() { return 'slime_goo'; },
-                get 102() { return 'slime_core_shard'; },
-                get 103() { return 'slime_core'; },
-            }[id];
-            if (!item) return;
+            const item = layers.lo.items.itemId(id);
+            if (item === false) return;
 
             return formatWhole(player.lo.items[item]);
         },
         getStyle(_, id) {
-            let style = {
+            const item = layers.lo.items.itemId(id);
+            if (item === false) return { 'background-color': 'transparent' };
+
+            return Object.assign({
                 'background-repeat': 'no-repeat',
                 'background-size': 'contain',
-            };
-            switch (Math.floor(id / 100)) {
-                case 1:
-                    style['background-color'] = '#7FBF7F';
-                    break;
-            }
-
-            return {
-                get 101() {
-                    return Object.assign({}, style, {
-                        'background-image': `url('./resources/images/spill.svg')`,
-                    });
-                },
-                get 102() {
-                    return Object.assign({}, style, {
-                        'background-image': `url('./resources/images/slime_core_shard.svg')`,
-                    });
-                },
-                get 103() {
-                    return Object.assign({}, style, {
-                        'background-image': `url('./resources/images/slime_core.svg')`,
-                    });
-                },
-            }[id];
+            }, tmp.lo.items[item].gridStyle ?? {});
         },
         getTooltip(_, id) {
-            let item = {
-                get 101() { return 'slime_goo'; },
-                get 102() { return 'slime_core_shard'; },
-                get 103() { return 'slime_core'; },
-            }[id];
-            if (!item) return;
+            const item = layers.lo.items.itemId(id);
+            if (item === false) return;
 
             /** @type {Decimal} */
             const chance = tmp.lo.items[item].chance;
-            if (chance.gte(1)) return format(chance);
+            if (chance.gte(1)) return `+${format(chance)}`;
             else return `${format(chance.times(100))}% chance`;
         },
     },
+    /**
+     * @type {{
+     *  onKill: (type: string, level: Decimal, kills: Decimal) => [string, Decimal][],
+     *  itemId: (id: number) => string|false,
+     *  [k: string]: {
+     *      chance: Computable<Decimal>,
+     *      name: string,
+     *      unlocked: Computable<boolean>,
+     *      types: Computable<string[]>,
+     *      gridStyle: Computable<CSSStyles>,
+     *      gridId: number,
+     *  },
+     * }}
+     */
     items: {
         /**
-         * @param {'slime'} type
+         * @param {string} type
          * @param {Decimal} level
          * @param {Decimal} kills
+         * @param {Decimal} [chance_mult]
          * @returns {[string, Decimal][]}
          */
-        onKill(type, level, kills) {
-            if (!hasUpgrade('lo', 11)) return;
+        onKill(type, level, kills, chance_mult = Decimal.dOne) {
+            if (!hasUpgrade('lo', 11) && type != 'ore') return [];
             /** @type {{[item: string]: Decimal}} */
             const stored = player.lo.items;
-            /** @type {string[]} */
-            const items = [];
             /** @type {{[item: string]: Decimal}} */
             const looted = {};
 
-            switch (type) {
-                case 'slime':
-                    // Odds of getting everything: 1/1e6
-                    items.push('slime_goo', 'slime_core_shard', 'slime_core');
-                    break;
-            }
+            /** @type {string[]} */
+            const items = Object.entries(tmp.lo.items)
+                .filter(([_, v]) => typeof v != 'function' && v.types.includes(type) && v.unlocked)
+                .map(([k]) => k);
+
+            if (!items.length) return [];
 
             /**
              * Items bound to your luck
@@ -341,7 +512,7 @@ addLayer('lo', {
             const rolled = [];
             items.forEach(item => {
                 /** @type {Decimal} */
-                const chance = tmp.lo.items[item].chance;
+                const chance = tmp.lo.items[item].chance.times(chance_mult);
                 if (chance.gte(1)) {
                     if (item in looted) looted[item] = looted[item].add(chance);
                     else looted[item] = chance;
@@ -352,6 +523,11 @@ addLayer('lo', {
 
             if (rolled.length >= 7) {
                 // Fuck it, you're getting a little of everything instead
+                rolled.forEach(item => {
+                    /** @type {Decimal} */
+                    const chance = tmp.lo.items[item].chance.times(chance_mult);
+                    looted[item] = (looted[item] ?? Decimal.dZero).add(chance);
+                });
             } else {
                 /*
                 You might be wondering what kinda cheat this is.
@@ -361,10 +537,10 @@ addLayer('lo', {
                  */
                 let roll = Math.random();
                 let n = 0;
-                for (; n < 2 ** rolled.length - 1 && roll > 0; n++) {
+                for (; n < 2 ** rolled.length && roll > 0; n++) {
                     const r = rolled.map((item, i) => {
                         /** @type {number} */
-                        let c = tmp.lo.items[item].chance.toNumber();
+                        let c = tmp.lo.items[item].chance.times(chance_mult).toNumber();
 
                         if ((2 ** i & n) == 0) c = 1 - c;
 
@@ -373,14 +549,13 @@ addLayer('lo', {
 
                     roll -= r;
                 }
-                n--;
+                n = Math.max(0, n - 1);
                 // Chosen set of items
                 let loot = rolled.filter((_, i) => (2 ** i & n) != 0);
 
                 new Set(loot).forEach(item => {
                     const amount = new Decimal(loot.filter(i => i == item).length);
-                    if (item in looted) looted[item] = looted[item].add(amount);
-                    else looted[item] = amount;
+                    looted[item] = (looted[item] ?? Decimal.dZero).add(amount);
                 });
             }
 
@@ -388,17 +563,42 @@ addLayer('lo', {
 
             return Object.entries(looted);
         },
+        itemId(id) {
+            if (isNaN(id)) return false;
+
+            /** @type {{[k: number]: string|false}} */
+            const map = layers.lo.items.itemId.map ??= {};
+            if (id in map) {
+                return map[id];
+            }
+
+            const item = Object.entries(layers.lo.items).filter(([_, v]) => typeof v == 'object').find(([_, v]) => v.gridId == id);
+            if (!item) {
+                map[id] = false;
+            } else {
+                map[id] = item[0];
+            }
+            return map[id];
+        },
+        // slime
         slime_goo: {
             chance() {
                 let base = new Decimal(1 / 3);
 
                 base = base.times(buyableEffect('lo', 12).chance);
                 base = base.times(tmp.l.skills.looting.effect);
+                if (hasUpgrade('o', 32)) base = base.times(upgradeEffect('o', 32));
 
                 return base;
             },
             name: 'slime goo',
             unlocked: true,
+            types: ['slime'],
+            gridStyle: {
+                'background-color': '#7FBF7F',
+                'background-image': `url('./resources/images/spill.svg')`,
+            },
+            gridId: 101,
         },
         slime_core_shard: {
             chance() {
@@ -406,11 +606,18 @@ addLayer('lo', {
 
                 base = base.times(buyableEffect('lo', 12).chance);
                 base = base.times(tmp.l.skills.looting.effect);
+                if (hasUpgrade('o', 32)) base = base.times(upgradeEffect('o', 32));
 
                 return base;
             },
             name: 'slime core shards',
             unlocked: true,
+            types: ['slime'],
+            gridStyle: {
+                'background-color': '#7FBF7F',
+                'background-image': `url('./resources/images/slime_core_shard.svg')`,
+            },
+            gridId: 102,
         },
         slime_core: {
             chance() {
@@ -418,16 +625,129 @@ addLayer('lo', {
 
                 base = base.times(buyableEffect('lo', 12).chance);
                 base = base.times(tmp.l.skills.looting.effect);
+                if (hasUpgrade('o', 32)) base = base.times(upgradeEffect('o', 32));
 
                 return base;
             },
             name: 'slime cores',
             unlocked: true,
+            types: ['slime'],
+            gridStyle: {
+                'background-color': '#7FBF7F',
+                'background-image': `url('./resources/images/slime_core.svg')`,
+            },
+            gridId: 103,
+        },
+        // ore
+        stone: {
+            chance() {
+                let base = new Decimal(1 / 4);
+
+                base = base.times(buyableEffect('lo', 12).chance);
+                base = base.times(tmp.l.skills.looting.effect);
+                if (hasUpgrade('o', 23)) base = base.times(upgradeEffect('o', 23));
+
+                return base;
+            },
+            name: 'stone',
+            unlocked() { return tmp.o.layerShown; },
+            types: ['ore'],
+            gridStyle: {
+                'background-image': `url('./resources/images/stone-block.svg')`,
+                'background-color': '#BCBCBC',
+            },
+            gridId: 201,
+        },
+        copper_ore: {
+            chance() {
+                let base = new Decimal(1 / 27);
+
+                base = base.times(buyableEffect('lo', 12).chance);
+                base = base.times(tmp.l.skills.looting.effect);
+                if (hasUpgrade('o', 23)) base = base.times(upgradeEffect('o', 23));
+
+                return base;
+            },
+            name: 'copper ore',
+            unlocked() { return tmp.o.layerShown; },
+            types: ['ore'],
+            gridStyle: {
+                'background-image': `url('./resources/images/ore.svg')`,
+                'background-color': '#B87333',
+            },
+            gridId: 202,
+        },
+        tin_ore: {
+            chance() {
+                let base = new Decimal(1 / 256);
+
+                base = base.times(buyableEffect('lo', 12).chance);
+                base = base.times(tmp.l.skills.looting.effect);
+                if (hasUpgrade('o', 23)) base = base.times(upgradeEffect('o', 23));
+
+                return base;
+            },
+            name: 'tin ore',
+            unlocked() { return tmp.o.layerShown; },
+            types: ['ore'],
+            gridStyle: {
+                'background-image': `url('./resources/images/ore.svg')`,
+                'background-color': '#C4BC86',
+            },
+            gridId: 203,
+        },
+        // skeleton
+        bone: {
+            chance() {
+                let base = new Decimal(1 / 9);
+
+                base = base.times(buyableEffect('lo', 12).chance);
+                base = base.times(tmp.l.skills.looting.effect);
+
+                return base;
+            },
+            name: 'bone',
+            unlocked() { return hasChallenge('b', 11); },
+            types: ['skeleton'],
+            gridStyle: {
+                'background-image': `url('./resources/images/bone.svg')`,
+                'background-color': 'transparent',
+                'border-color': '#EEEEEE',
+                'color': '#777777',
+            },
+            gridId: 301,
+        },
+        skull: {
+            chance() {
+                let base = new Decimal(1 / 64);
+
+                base = base.times(buyableEffect('lo', 12).chance);
+                base = base.times(tmp.l.skills.looting.effect);
+
+                return base;
+            },
+            name: 'skull',
+            unlocked() { return hasChallenge('b', 11); },
+            types: ['skeleton'],
+            gridStyle: {
+                'background-image': `url('./resources/images/piece-skull.svg')`,
+                'background-color': 'transparent',
+                'border-color': '#EEEEEE',
+                'color': '#777777',
+            },
+            gridId: 302,
         },
     },
     // Only for doReset
     type: 'static',
     baseAmount() { return Decimal.dZero; },
     requires: Decimal.dOne,
-    branches: ['xp'],
+    branches: ['xp', 'o'],
+    doReset(layer) {
+        if (layers[layer].row <= this.row) return;
+
+        let keep = ['shown'];
+
+        layerDataReset(this.layer, keep);
+    },
 });

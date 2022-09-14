@@ -19,7 +19,7 @@ function respecBuyables(layer) {
  */
 function canAffordUpgrade(layer, id) {
 	let upg = tmp[layer].upgrades[id]
-	if(tmp[layer].deactivated) return false
+	if (tmp[layer].deactivated) return false
 	if (tmp[layer].upgrades[id].canAfford === false) return false
 	let cost = tmp[layer].upgrades[id].cost
 	if (cost !== undefined)
@@ -49,7 +49,7 @@ function canAffordPurchase(layer, thing, cost) {
 	if (thing.currencyInternalName) {
 		let name = thing.currencyInternalName
 		if (thing.currencyLocation) {
-			return !(thing.currencyLocation[name].lt(cost))
+			return !((thing.currencyLocation[name] ?? Decimal.dZero).lt(cost))
 		}
 		else if (thing.currencyLayer) {
 			let lr = thing.currencyLayer
@@ -161,7 +161,7 @@ function clickClickable(layer, id) {
  * @param {String|Number} id
  */
 function clickGrid(layer, id) {
-	if (!player[layer].unlocked  || tmp[layer].deactivated) return
+	if (!player[layer].unlocked || tmp[layer].deactivated) return
 	if (!run(layers[layer].grid.getUnlocked, layers[layer].grid, id)) return
 	if (!gridRun(layer, 'getCanClick', player[layer].grid[id], id)) return
 
@@ -195,7 +195,7 @@ var onTreeTab = true
  */
 function showTab(name, prev) {
 	if (LAYERS.includes(name) && !layerunlocked(name)) return
-	if (player.tab !== name) clearParticles(function(p) {return p.layer === player.tab})
+	if (player.tab !== name) clearParticles(function (p) { return p.layer === player.tab })
 	if (tmp[name] && player.tab === name && isPlainObject(tmp[name].tabFormat)) {
 		player.subtabs[name].mainTabs = Object.keys(layers[name].tabFormat)[0]
 	}
@@ -215,11 +215,11 @@ function showTab(name, prev) {
 function showNavTab(name, prev) {
 	console.log(prev)
 	if (LAYERS.includes(name) && !layerunlocked(name)) return
-	if (player.navTab !== name) clearParticles(function(p) {return p.layer === player.navTab})
+	if (player.navTab !== name) clearParticles(function (p) { return p.layer === player.navTab })
 	if (tmp[name] && tmp[name].previousTab !== undefined) prev = tmp[name].previousTab
 	var toTreeTab = name == "tree-tab"
 	console.log(name + prev)
-	if (name!== "none" && prev && !tmp[prev]?.leftTab == !tmp[name]?.leftTab) player[name].prevTab = prev
+	if (name !== "none" && prev && !tmp[prev]?.leftTab == !tmp[name]?.leftTab) player[name].prevTab = prev
 	else if (player[name])
 		player[name].prevTab = ""
 	player.navTab = name
@@ -264,13 +264,13 @@ function prestigeNotify(layer) {
 	if (layers[layer].prestigeNotify) return layers[layer].prestigeNotify()
 
 	if (isPlainObject(tmp[layer].tabFormat)) {
-		for (subtab in tmp[layer].tabFormat){
+		for (subtab in tmp[layer].tabFormat) {
 			if (subtabResetNotify(layer, 'mainTabs', subtab))
 				return true
 		}
 	}
 	for (family in tmp[layer].microtabs) {
-		for (subtab in tmp[layer].microtabs[family]){
+		for (subtab in tmp[layer].microtabs[family]) {
 			if (subtabResetNotify(layer, family, subtab))
 				return true
 		}
@@ -296,12 +296,12 @@ function notifyLayer(name) {
  * @returns {Boolean}
  */
 function subtabShouldNotify(layer, family, id) {
-    let subtab = {}
-    if (family == "mainTabs") subtab = tmp[layer].tabFormat[id]
-    else subtab = tmp[layer].microtabs[family][id]
+	let subtab = {}
+	if (family == "mainTabs") subtab = tmp[layer].tabFormat[id]
+	else subtab = tmp[layer].microtabs[family][id]
 	if (!subtab.unlocked) return false
-    if (subtab.embedLayer) return tmp[subtab.embedLayer].notify
-    else return subtab.shouldNotify
+	if (subtab.embedLayer) return tmp[subtab.embedLayer].notify
+	else return subtab.shouldNotify
 }
 
 /**
@@ -466,7 +466,7 @@ document.title = modInfo.name
  */
 function toValue(value, oldValue) {
 	if (oldValue instanceof Decimal) {
-		value = new Decimal (value)
+		value = new Decimal(value)
 		if (checkDecimalNaN(value)) return decimalZero
 		return value
 	}

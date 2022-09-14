@@ -1,23 +1,3 @@
-/**
- * @param {string} skill
- *
- * @returns {[
- *  'row',
- *  [
- *      ['bar', string],
- *      ...['clickable', number][],
- *  ],
- * ]|''}
- */
-function l_skill_row(skill) {
-    /** @type {number[]} */
-    let clickables = tmp.l.skills[skill].clickables;
-    return tmp.l.bars[skill].unlocked ? ['row', [
-        ['bar', skill],
-        ...clickables.map(n => ['clickable', n]),
-    ]] : ''
-}
-
 addLayer('l', {
     name: 'Levels',
     symbol: 'L',
@@ -69,9 +49,9 @@ addLayer('l', {
                     ${formatWhole(tmp.l.skills.points)}</span> unassigned skill points`
                 ] : '',
                 ['buyables', [1]],
-                () => l_skill_row('attack'),
-                () => l_skill_row('learning'),
-                () => l_skill_row('running'),
+                () => layers.l.skill_row('attack'),
+                () => layers.l.skill_row('learning'),
+                () => layers.l.skill_row('running'),
             ],
         },
         'Milestones': {
@@ -93,19 +73,19 @@ addLayer('l', {
             requirementDescription: 'Get 3 levels',
             effectDescription: 'Unlock a skill to earn more xp and levels',
             done() { return player.l.best.gte(3); },
-            unlocked() { return hasMilestone('l', 0); },
+            unlocked() { return hasMilestone('l', 0) || player.b.unlocked; },
         },
         2: {
             requirementDescription: 'Get 5 levels',
             effectDescription: 'Unlock a skill to skill faster',
             done() { return player.l.best.gte(5); },
-            unlocked() { return hasMilestone('l', 1); },
+            unlocked() { return hasMilestone('l', 1) || player.b.unlocked; },
         },
         3: {
             requirementDescription: 'Get 7 levels',
             effectDescription() { return `Levels multiply skill points amount by ${format(tmp.l.milestones[3].effect)}`; },
             done() { return player.l.best.gte(7); },
-            unlocked() { return hasMilestone('l', 2); },
+            unlocked() { return hasMilestone('l', 2) || player.b.unlocked; },
             effect() { return player.l.points.root(2); },
         },
     },
@@ -311,6 +291,7 @@ addLayer('l', {
             const skill = player.l.skills[s];
             if (skill.points.gt(0)) {
                 let gain = skill.points.pow(2).times(diff).times(tmp.l.skills.running.effect);
+                if (hasUpgrade('o', 31)) gain = gain.times(upgradeEffect('o', 31));
 
                 skill.progress = skill.progress.add(gain);
 
@@ -328,6 +309,7 @@ addLayer('l', {
         let div = Decimal.dOne;
 
         div = div.div(tmp.l.skills.learning.effect.l_div);
+        div = div.div(buyableEffect('lo', 22));
 
         return div;
     },
@@ -336,4 +318,23 @@ addLayer('l', {
     base: new Decimal(1.5),
     roundUpCost: true,
     branches: ['xp'],
+    /**
+    * @param {string} skill
+    *
+    * @returns {[
+    *  'row',
+    *  [
+    *      ['bar', string],
+    *      ...['clickable', number][],
+    *  ],
+    * ]|''}
+    */
+    skill_row(skill) {
+        /** @type {number[]} */
+        let clickables = tmp.l.skills[skill].clickables;
+        return tmp.l.bars[skill].unlocked ? ['row', [
+            ['bar', skill],
+            ...clickables.map(n => ['clickable', n]),
+        ]] : ''
+    },
 });

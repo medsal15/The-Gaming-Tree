@@ -8,6 +8,7 @@ addLayer('xp', {
             level: new Decimal(0),
             health: (tmp.xp?.enemyHealth) ?? new Decimal(10),
             kills: new Decimal(0),
+            type: 'slime',
             last_drops: [],
         };
     },
@@ -16,6 +17,7 @@ addLayer('xp', {
     },
     color: '#7FBF7F',
     row: 0,
+    position: 0,
     resource: 'experience',
     hotkeys: [
         {
@@ -70,12 +72,11 @@ addLayer('xp', {
                 ['display-text', () => {
                     let text = '';
                     if (options.colorLevels) {
-                        // Buggy
                         text = layers.xp.enemyColor();
                     } else {
                         text = `Level ${formatWhole(player.xp.level)}`;
                     }
-                    return `${text} slime`
+                    return `${text} ${player.xp.type}`
                 }],
                 ['clickables', [1]],
                 ['display-text', () => `Current damage: ${format(tmp.xp.clickDamage)}`],
@@ -113,10 +114,34 @@ addLayer('xp', {
     },
     clickables: {
         11: {
+            style: { 'background-image': `url('./resources/images/previous-button.svg')` },
+            unlocked() { return tmp.xp.types.length > 1; },
+            canClick() { return player.xp.type != tmp.xp.types[0]; },
+            onClick() {
+                const i = tmp.xp.types.indexOf(player.xp.type);
+                if (i == -1) player.xp.type = 'slime';
+                else player.xp.type = tmp.xp.types[i - 1];
+                player.xp.level = Decimal.dZero;
+                player.xp.health = tmp.xp.enemyHealth;
+            },
+        },
+        12: {
             style: { 'background-image': `url('./resources/images/gladius.svg')`, },
             canClick() { return player.xp.health.gt(0); },
             onClick() { player.xp.health = player.xp.health.minus(tmp.xp.clickDamage); },
-            onHold() { player.xp.health = player.xp.health.minus(tmp.xp.clickDamage.div(5)); },
+            onHold() { player.xp.health = player.xp.health.minus(tmp.xp.clickDamage.div(3)); },
+        },
+        13: {
+            style: { 'background-image': `url('./resources/images/next-button.svg')` },
+            unlocked() { return tmp.xp.types.length > 1; },
+            canClick() { return player.xp.type != tmp.xp.types[tmp.xp.types.length - 1]; },
+            onClick() {
+                const i = tmp.xp.types.indexOf(player.xp.type);
+                if (i == -1) player.xp.type = 'slime';
+                else player.xp.type = tmp.xp.types[i + 1];
+                player.xp.level = Decimal.dZero;
+                player.xp.health = tmp.xp.enemyHealth;
+            },
         },
     },
     upgrades: {
@@ -261,7 +286,6 @@ addLayer('xp', {
             textStyle: { 'color': 'black' },
         },
     },
-    /** @param {number} diff */
     update(diff) {
         let passive_damage = Decimal.dZero;
 
@@ -287,7 +311,7 @@ addLayer('xp', {
             let kills_gain = Decimal.dOne;
 
             // Apply gains
-            player.xp.last_drops = layers.lo.items.onKill('slime', player.xp.level, kills_gain);
+            player.xp.last_drops = layers.lo.items.onKill(player.xp.type, player.xp.level, kills_gain);
 
             player.xp.points = player.xp.points.add(xp_gain);
             player.xp.total = player.xp.total.add(xp_gain);
@@ -326,17 +350,38 @@ addLayer('xp', {
         return c.replace(/^(.)/, s => s.toUpperCase());
     },
     enemyHealth() {
-        let base = new Decimal(2).pow(player.xp.level).times(10);
+        /** @type {Decimal} */
+        let base;
+        switch (player.xp.type) {
+            default:
+            case 'slime':
+                base = new Decimal(2).pow(player.xp.level).times(10);
+                break;
+            case 'skeleton':
+                base = new Decimal(3).pow(player.xp.level).times(40);
+                break;
+        }
 
         if (hasUpgrade('xp', 12)) base = base.add(upgradeEffect('xp', 12).bonus_health);
 
         if (hasUpgrade('xp', 33)) base = base.times(2);
 
+        if (inChallenge('b', 11) && player.xp.type == 'slime') base = base.times(10);
+
         return base;
     },
     enemyExperience() {
         /** @type {Decimal} */
-        let xp_gain = player.xp.level.add(1);
+        let xp_gain;
+        switch (player.xp.type) {
+            default:
+            case 'slime':
+                xp_gain = player.xp.level.add(1);
+                break;
+            case 'skeleton':
+                xp_gain = player.xp.level.add(1).times(3);
+                break;
+        }
 
         if (hasUpgrade('xp', 12)) xp_gain = xp_gain.times(upgradeEffect('xp', 12).xp_multiplier);
         if (hasUpgrade('xp', 13)) xp_gain = xp_gain.times(upgradeEffect('xp', 13));
@@ -356,6 +401,8 @@ addLayer('xp', {
         if (hasUpgrade('xp', 32)) damage = damage.times(upgradeEffect('xp', 32));
         if (hasUpgrade('xp', 33)) damage = damage.times(upgradeEffect('xp', 33));
         damage = damage.times(tmp.l.skills['attack'].effect);
+        if (hasUpgrade('o', 21)) damage = damage.times(upgradeEffect('o', 21));
+        damage = damage.times(buyableEffect('lo', 21));
 
         return damage;
     },
@@ -374,5 +421,12 @@ addLayer('xp', {
         layerDataReset(this.layer, keep);
 
         player.xp.upgrades = [...kept_upgrades];
+    },
+    types() {
+        const types = ['slime'];
+
+        if (hasChallenge('b', 11)) types.push('skeleton');
+
+        return types;
     },
 });

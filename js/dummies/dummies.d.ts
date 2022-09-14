@@ -970,7 +970,7 @@ declare class TempLayer {
     readonly deactivated?: boolean
 
     readonly getResetGain?: Decimal
-    readonly getNextat?: Decimal
+    readonly getNextAt?: Decimal
     readonly canReset?: boolean
     readonly prestigeNotify?: boolean
 }
@@ -1407,6 +1407,10 @@ declare class Clickable {
      */
     onClick(): void
     /**
+     * A function that is called 20x/sec when the button is held for at least 0.25 seconds.
+     */
+    onHold(): void
+    /**
      * Applies CSS to this clickable, in the form of an object where the keys are CSS attributes,
      * and the values are the values for those attributes (both as strings).
      */
@@ -1834,4 +1838,6 @@ declare class LayerData {
     best?: Decimal
     unlockOrder?: string[]
     resetTime?: number
+    upgrades?: number[]
+    activeChallenge?: number | null
 }
