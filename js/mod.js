@@ -157,7 +157,7 @@ function addedPlayerData() {
 var displayThings = [
 	() => {
 		let id = player.b.activeChallenge;
-		if (id === null) return '';
+		if (!id) return '';
 
 		return `In Boss challenge: ${layerColor('b', layers['b'].challenges[id].name)}`;
 	},
