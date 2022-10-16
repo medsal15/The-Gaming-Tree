@@ -1,10 +1,12 @@
 // ************ Options ************
 
+/** @type {ReturnType<typeof getStartOptions>} */
 let options = {}
 
 function getStartOptions() {
 	return {
 		autosave: true,
+		/** @type {MS_DISPLAYS[number]} */
 		msDisplay: "always",
 		theme: "default",
 		hqTree: false,
@@ -14,7 +16,9 @@ function getStartOptions() {
 		forceOneTab: false,
 		oldStyle: false,
 		tooltipForcing: true,
-		colorLevels: true,
+		colorLevels: false,
+		/** @type {keyof typeof CHANCE_MODE} */
+		chanceMode: 'NEVER',
 	}
 }
 
@@ -47,6 +51,7 @@ function toggleAuto(toggle) {
 	needCanvasUpdate = true
 }
 
+/** @type {['ALL','LAST, AUTO, INCOMPLETE','AUTOMATION, INCOMPLETE','INCOMPLETE','NONE']} */
 const MS_DISPLAYS = ["ALL", "LAST, AUTO, INCOMPLETE", "AUTOMATION, INCOMPLETE", "INCOMPLETE", "NONE"];
 
 const MS_SETTINGS = ["always", "last", "automation", "incomplete", "never"];
@@ -71,4 +76,14 @@ function milestoneShown(layer, id) {
 			return false;
 	}
 	return false;
+}
+
+const CHANCE_MODE = {
+	'NEVER': 'never',
+	'BELOW 1': 'below 100%',
+	'BELOW 0.5': 'below 50%',
+};
+function switchChanceMode() {
+	const modes = Object.keys(CHANCE_MODE);
+	options.chanceMode = modes[(modes.indexOf(options.chanceMode) + 1) % modes.length];
 }

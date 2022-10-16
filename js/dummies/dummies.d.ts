@@ -1308,7 +1308,7 @@ declare class Challenge {
      * If a challenge combines the effects of other challenges in this layer, you can use this.
      * An array of challenge ids. The player is effectively in all of those challenges when in the current one.
      */
-    countAs?: number[]
+    countsAs?: number[]
     /**
      * The amount of times you can complete this challenge. Default is 1 completion.
      */
@@ -1318,6 +1318,11 @@ declare class Challenge {
      * and the values are the values for those attributes (both as strings).
      */
     style?: Computable<CSSStyles>
+    /**
+     * Applies CSS to this challenge's button, in the form of an object where the keys are CSS attributes,
+     * and the values are the values for those attributes (both as strings).
+     */
+    buttonStyle?: Computable<CSSStyles>
     /**
      * Adds a mark to the corner of the challenge.
      * If it's "true" it will be a star, but it can also be an image URL.

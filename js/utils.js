@@ -341,7 +341,7 @@ function keepGoing() {
 }
 
 /**
- * @param {Decimal} x
+ * @param {Decimal|string} x
  * @returns {Number}
  */
 function toNumber(x) {

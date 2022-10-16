@@ -81,3 +81,39 @@ function layerBuyableAmount(layer) {
 function layerColor(layer, text, style = "") {
     return `<span style="color:${tmp[layer].color};text-shadow:${tmp[layer].color} 0 0 10px;${style}">${text}</span>`;
 }
+/**
+ * Like format, but returns an array of each coin types, limited to 100.
+ *
+ * If the highest coin type is above 1e9, it will be the only one returned.
+ *
+ * @param {DecimalSource} decimal
+ * @param {string[]} coin_types
+ * @returns {string[]}
+ */
+function formatCoins(decimal, coin_types) {
+    if (!coin_types?.length) return [format(decimal)];
+
+    let d = new Decimal(decimal);
+    const limit = new Decimal(100).pow(coin_types.length).times(1e9);
+
+    if (d.gte(limit)) {
+        const arr = new Array(coin_types.length - 1).fill("0");
+        arr.push(format(d.div(limit)));
+        return arr;
+    }
+
+    return new Array(coin_types.length).fill(0).map((_, i) => {
+        if (i == coin_types.length - 1) return formatWhole(d);
+        let c = d.toNumber() % 100;
+        d = d.div(100).floor();
+        return formatWhole(c);
+    });
+}
+/**
+ * Shorthand for Decimal and shorter way to create one
+ *
+ * @type {((val: DecimalSource) => Decimal)&{[k in keyof typeof Decimal]: (typeof Decimal)[k]}}
+ */
+const D = new Proxy(val => new Decimal(val), {
+    get(_, prop) { return Decimal[prop]; },
+});

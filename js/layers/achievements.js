@@ -240,7 +240,7 @@ addLayer('ach', {
         },
         43: {
             name: 'Debt free',
-            done() { return false; },
+            done() { return hasChallenge('b', 12); },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, layers.b.color); },
             tooltip() {
                 if (hasAchievement(this.layer, this.id) || inChallenge('b', 12)) return 'Defeat the Lich CEO';
@@ -254,10 +254,13 @@ addLayer('ach', {
             unlocked() { return player.b.unlocked; },
         },
         44: {
-            name: 'Giving to those in need',
+            name: 'Working for a better yesterday',
             done() { return false; },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, layers.b.color); },
-            tooltip: 'Defeat ???',
+            tooltip() {
+                if (hasAchievement(this.layer, this.id) || inChallenge('b', 21)) return 'Defeat tomorrow\'s pirates';
+                return 'Defeat ???';
+            },
             style() {
                 let s = {};
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.b.color;
@@ -411,6 +414,30 @@ addLayer('ach', {
             style: { 'background-color': 'rgb(127,0,255)' },
             unlocked() { return hasAchievement(this.layer, this.id); },
         },
+        81: {
+            name: 'Even levels?!',
+            done() { return inChallenge('b', 12) && player.l.points.gt(100) && player.l.points.lte(101); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
+            tooltip: 'Lose a level to your debts',
+            style: { 'background-color': 'rgb(127,0,255)' },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+        },
+        82: {
+            name: 'Full negation',
+            done() { return inChallenge('b', 12) && player.s.upgrades.filter(id => id < 51).length == 12; },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
+            tooltip: 'Cancel all your debts',
+            style: { 'background-color': 'rgb(127,0,255)' },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+        },
+        83: {
+            name: 'Straight to the point',
+            done() { return inChallenge('b', 12) && player.s.upgrades.filter(id => id < 51).length == 0 && hasUpgrade('s', 51); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
+            tooltip: 'Only pay your final debt',
+            style: { 'background-color': 'rgb(127,0,255)' },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+        },
         //#endregion
     },
     type: 'none',
@@ -435,7 +462,7 @@ addLayer('ach', {
                 rows = [1, 5, 2, 6, 3, 4];
                 break;
             case 'secret':
-                rows = [7];
+                rows = [7, 8];
                 break;
         }
 
@@ -457,10 +484,10 @@ addLayer('ach', {
         return achievements;
     },
     totalAchievements(type = 'normal') {
-        return new Decimal(this.getAchievements(type).length);
+        return D(this.getAchievements(type).length);
     },
     ownedAchievements(type = 'normal') {
-        return new Decimal(this.getAchievements(type).filter(id => hasAchievement('ach', id)).length);
+        return D(this.getAchievements(type).filter(id => hasAchievement('ach', id)).length);
     },
     achievementPopups: false,
 });

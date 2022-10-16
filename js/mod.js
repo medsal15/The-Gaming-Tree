@@ -28,7 +28,7 @@ let modInfo = {
 		'layers/automation.js', 'layers/achievements.js',
 		'layers/experience.js', 'layers/ore.js',
 		'layers/level.js', 'layers/loot.js',
-		'layers/boss.js',
+		'layers/boss.js', 'layers/shop.js',
 
 		'devtools.js',
 	],
@@ -64,17 +64,22 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: '0.3',
+	num: '0.4',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
-	name: 'Wrath of the Slime King',
+	name: 'Indebted',
 };
 
 /**
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.4</h3><br>
+		- Changed the boss hotkey effect.<br>
+		- Added an option to change the items chance display.<br>
+		- Added another boss, a miniboss, and the shop.<br>
+		- Update endgame: Beat the 2nd boss<br>
 	<h3>v0.3</h3><br>
 		- Added Boss.<br>
 		- Update endgame: Beat the boss<br>
@@ -102,7 +107,7 @@ let winText = `Congratulations! You have reached the end and beaten this game, b
  * var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything"]
  * ```
  */
-var doNotCallTheseFunctionsEveryTick = ['enemyColor', 'onKill', 'skill_row', 'itemId']
+var doNotCallTheseFunctionsEveryTick = ['enemyColor', 'onKill', 'skill_row', 'itemId', 'formatCoins', 'canGet'];
 
 /**
  * A function to determine the amount of points the player starts with after a reset.
@@ -155,6 +160,7 @@ function addedPlayerData() {
  * @type {Computable<string>[]}
  */
 var displayThings = [
+	() => isEndgame() ? '<span style="color:#60C0F0">You are past endgame. Content may not be balanced.</span>' : '',
 	() => {
 		let id = player.b.activeChallenge;
 		if (!id) return '';
@@ -169,7 +175,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return hasChallenge('b', 11);
+	return hasChallenge('b', 12);
 }
 
 

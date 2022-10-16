@@ -1,18 +1,19 @@
 addLayer('o', {
     name: 'Mining',
     symbol: 'M',
+    deactivated() { return inChallenge('b', 21); },
     startData() {
         return {
             unlocked: true,
-            points: new Decimal(0),
-            health: tmp.o?.oreHealth ?? new Decimal(10),
+            points: D(0),
+            health: tmp.o?.oreHealth ?? D(10),
             last_drops: [],
         };
     },
     tooltip() {
         return `${formatWhole(player.lo.items.stone)} stone<br>${formatWhole(player.lo.items.copper_ore)} copper ore<br>${formatWhole(player.lo.items.tin_ore)} tin ore`;
     },
-    layerShown() { return inChallenge('b', 11) || hasChallenge('b', 11); },
+    layerShown() { return !tmp[this.layer].deactivated && (inChallenge('b', 11) || hasChallenge('b', 11)); },
     color: '#BCBCBC',
     row: 0,
     position: 1,
@@ -57,13 +58,13 @@ addLayer('o', {
                 'blank',
                 ['upgrades', [1, 2, 3]],
             ],
-        }
+        },
     },
     upgrades: {
         11: {
             title: 'Stone pickaxe',
             description: 'Double ore health',
-            effect() { return new Decimal(2); },
+            effect() { return D(2); },
             unlocked() { return tmp.o.layerShown; },
             style() {
                 const row = Math.floor(this.id / 10);
@@ -85,7 +86,7 @@ addLayer('o', {
 
                 return style;
             },
-            cost: new Decimal(10),
+            cost: D(10),
             currencyDisplayName: 'stone',
             currencyInternalName: 'stone',
             currencyLocation() { return player.lo.items; },
@@ -96,11 +97,11 @@ addLayer('o', {
                 if (!shiftDown) {
                     return 'Ore health boosts ore health regeneration';
                 }
-                let formula = '√(ore health + 1)';
+                let formula = '2√(ore health + 1)';
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.o.health.add(1).root(2); },
+            effect() { return player.o.health.max(0).add(1).root(2); },
             effectDisplay() { return `*${format(this.effect())}`; },
             unlocked() { return hasUpgrade('o', 11) || hasChallenge('b', 11); },
             style() {
@@ -123,7 +124,7 @@ addLayer('o', {
 
                 return style;
             },
-            cost: new Decimal(3),
+            cost: D(3),
             currencyDisplayName: 'copper ore',
             currencyInternalName: 'copper_ore',
             currencyLocation() { return player.lo.items; },
@@ -138,12 +139,8 @@ addLayer('o', {
 
                 return `Formula: ${formula}`;
             },
-            effect() {
-                return tmp.xp.enemyHealth.add(10).log(10);
-            },
-            effectDisplay() {
-                return `Ore max health *${format(this.effect())}`;
-            },
+            effect() { return tmp.xp.enemyHealth.max(0).add(10).log(10); },
+            effectDisplay() { return `Ore max health *${format(this.effect())}`; },
             unlocked() { return hasUpgrade('o', 12) || hasChallenge('b', 11); },
             style() {
                 const row = Math.floor(this.id / 10);
@@ -165,7 +162,7 @@ addLayer('o', {
 
                 return style;
             },
-            cost: new Decimal(1),
+            cost: D(1),
             currencyDisplayName: 'tin ore',
             currencyInternalName: 'tin_ore',
             currencyLocation() { return player.lo.items; },
@@ -180,7 +177,7 @@ addLayer('o', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.lo.items.stone.div(10).add(5).log(5); },
+            effect() { return player.lo.items.stone.max(0).div(10).add(5).log(5); },
             effectDisplay() { return `*${format(this.effect())}`; },
             unlocked() { return hasUpgrade('o', 11) || hasChallenge('b', 11); },
             style() {
@@ -203,7 +200,7 @@ addLayer('o', {
 
                 return style;
             },
-            cost: new Decimal(50),
+            cost: D(50),
             currencyDisplayName: 'stone',
             currencyInternalName: 'stone',
             currencyLocation() { return player.lo.items; },
@@ -232,7 +229,7 @@ addLayer('o', {
 
                 return style;
             },
-            cost: new Decimal(15),
+            cost: D(15),
             currencyDisplayName: 'copper ore',
             currencyInternalName: 'copper_ore',
             currencyLocation() { return player.lo.items; },
@@ -247,7 +244,7 @@ addLayer('o', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.lo.items.tin_ore.add(3).root(2); },
+            effect() { return player.lo.items.tin_ore.max(0).add(3).root(2); },
             effectDisplay() { return `*${format(this.effect())}`; },
             unlocked() { return hasUpgrade('o', 22) || hasUpgrade('o', 13) || hasChallenge('b', 11); },
             style() {
@@ -270,7 +267,7 @@ addLayer('o', {
 
                 return style;
             },
-            cost: new Decimal(5),
+            cost: D(5),
             currencyDisplayName: 'tin ore',
             currencyInternalName: 'tin_ore',
             currencyLocation() { return player.lo.items; },
@@ -285,7 +282,7 @@ addLayer('o', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.lo.items.stone.add(10).log10().root(2); },
+            effect() { return player.lo.items.stone.max(0).add(10).log10().root(2); },
             effectDisplay() { return `*${format(this.effect())}`; },
             unlocked() { return hasUpgrade('o', 21) || hasChallenge('b', 11); },
             style() {
@@ -308,7 +305,7 @@ addLayer('o', {
 
                 return style;
             },
-            cost: new Decimal(250),
+            cost: D(250),
             currencyDisplayName: 'stone',
             currencyInternalName: 'stone',
             currencyLocation() { return player.lo.items; },
@@ -323,7 +320,7 @@ addLayer('o', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.lo.items.copper_ore.root(2).div(10).add(1); },
+            effect() { return player.lo.items.copper_ore.max(0).root(2).div(10).add(1); },
             effectDisplay() { return `*${format(this.effect())}`; },
             unlocked() { return hasUpgrade('o', 31) || hasUpgrade('o', 22) || hasChallenge('b', 11); },
             style() {
@@ -346,7 +343,7 @@ addLayer('o', {
 
                 return style;
             },
-            cost: new Decimal(75),
+            cost: D(75),
             currencyDisplayName: 'copper ore',
             currencyInternalName: 'copper_ore',
             currencyLocation() { return player.lo.items; },
@@ -355,13 +352,20 @@ addLayer('o', {
             title: 'Tin anvil',
             description() {
                 if (!shiftDown) {
-                    return 'Unlock new craftable items<br>Ore upgrades boost ore health';
+                    let unlock_text = '';
+                    if (!hasUpgrade('s', 83)) unlock_text = 'Unlock new craftable items<br>';
+                    return `${unlock_text}Ore upgrades boost ore health`;
                 }
                 let formula = '2√(ore upgrades)';
+                if (hasUpgrade('s', 83)) formula += ' * 2';
 
                 return `Formula: ${formula}`;
             },
-            effect() { return Decimal.root(player.o.upgrades.length, 2); },
+            effect() {
+                let base = D.root(player.o.upgrades.length, 2).max(1);
+                if (hasUpgrade('s', 83)) base = base.times(2);
+                return base;
+            },
             effectDisplay() { return `*${format(this.effect())}`; },
             unlocked() { return hasUpgrade('o', 32) || hasUpgrade('o', 23) || hasChallenge('b', 11); },
             style() {
@@ -384,7 +388,7 @@ addLayer('o', {
 
                 return style;
             },
-            cost: new Decimal(25),
+            cost: D(25),
             currencyDisplayName: 'tin ore',
             currencyInternalName: 'tin_ore',
             currencyLocation() { return player.lo.items; },
@@ -396,11 +400,11 @@ addLayer('o', {
             canClick() { return player.o.health.gte(1); },
             onClick() {
                 player.o.health = player.o.health.minus(1);
-                player.o.last_drops = layers.lo.items.onKill('ore', Decimal.dOne, Decimal.dOne);
+                player.o.last_drops = layers.lo.items.onKill('ore', D.dOne, D.dOne);
             },
             onHold() {
                 player.o.health = player.o.health.minus(1);
-                player.o.last_drops = layers.lo.items.onKill('ore', Decimal.dOne, Decimal.dOne);
+                player.o.last_drops = layers.lo.items.onKill('ore', D.dOne, D.dOne);
             },
         },
     },
@@ -419,20 +423,26 @@ addLayer('o', {
         },
     },
     oreHealth() {
-        let base = new Decimal(10);
+        let health = D(10);
 
-        if (hasUpgrade('o', 11)) base = base.times(upgradeEffect('o', 11));
-        if (hasUpgrade('o', 13)) base = base.times(upgradeEffect('o', 13));
-        if (hasUpgrade('o', 33)) base = base.times(upgradeEffect('o', 33));
-        base = base.times(buyableEffect('lo', 23).ore_health);
+        if (hasUpgrade('o', 11)) health = health.times(upgradeEffect('o', 11));
+        if (hasUpgrade('o', 13)) health = health.times(upgradeEffect('o', 13));
+        if (hasUpgrade('o', 33)) health = health.times(upgradeEffect('o', 33));
+        health = health.times(buyableEffect('lo', 23).ore_health);
+        health = health.times(buyableEffect('lo', 31));
+        if (hasUpgrade('s', 63)) health = health.times(upgradeEffect('s', 63));
 
-        return base;
+        return health;
     },
     update(diff) {
         if (player.o.health.lt(tmp.o.oreHealth)) {
-            let regen = new Decimal(diff);
+            let regen = D(diff);
 
             if (hasUpgrade('o', 12)) regen = regen.times(upgradeEffect('o', 12));
+            regen = regen.times(buyableEffect('lo', 33));
+            regen = regen.times(tmp.l.skills.mining.effect);
+            if (hasUpgrade('s', 63)) regen = regen.times(upgradeEffect('s', 63));
+            if (hasUpgrade('s', 83)) regen = regen.times(upgradeEffect('s', 83));
 
             player.o.health = player.o.health.add(regen).min(tmp.o.oreHealth);
         }
@@ -442,7 +452,7 @@ addLayer('o', {
             /** @type {Decimal} */
             const mined = player.o.health.floor();
 
-            player.o.last_drops = layers.lo.items.onKill('ore', Decimal.dOne, Decimal.dOne, mined);
+            player.o.last_drops = layers.lo.items.onKill('ore', D.dOne, mined);
             player.o.health = player.o.health.minus(mined);
         }
     },
@@ -455,12 +465,12 @@ addLayer('o', {
         let kept_upgrades = [];
         /** @type {Decimal} */
         let kept_amount = buyableEffect('lo', 23).o_keep;
-        if (kept_amount.gt(0)) kept_upgrades = [...player.xp.upgrades];
+        if (kept_amount.gt(0)) kept_upgrades = [...player.o.upgrades];
         if (kept_amount.lt(kept_upgrades.length)) kept_upgrades.length = kept_amount.toNumber();
 
         layerDataReset(this.layer, keep);
 
-        ['stone', 'copper_ore', 'tin_ore'].forEach(item => player.lo.items[item] = Decimal.dZero);
+        ['stone', 'copper_ore', 'tin_ore'].forEach(item => player.lo.items[item] = D.dZero);
 
         player.o.upgrades = [...kept_upgrades];
     },

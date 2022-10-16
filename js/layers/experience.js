@@ -4,12 +4,13 @@ addLayer('xp', {
     startData() {
         return {
             unlocked: true,
-            points: new Decimal(0),
-            level: new Decimal(0),
-            health: (tmp.xp?.enemyHealth) ?? new Decimal(10),
-            kills: new Decimal(0),
+            points: D(0),
+            level: D(0),
+            health: (tmp.xp?.enemyHealth) ?? D(10),
+            kills: D(0),
             type: 'slime',
             last_drops: [],
+            ignore_type_warning: false,
         };
     },
     tooltip() {
@@ -79,6 +80,11 @@ addLayer('xp', {
                     return `${text} ${player.xp.type}`
                 }],
                 ['clickables', [1]],
+                () => tmp.xp.types.length > 1 ? ['row', [
+                    ['display-text', 'Ignore type change warning'],
+                    'blank',
+                    ['toggle', ['xp', 'ignore_type_warning']],
+                ]] : '',
                 ['display-text', () => `Current damage: ${format(tmp.xp.clickDamage)}`],
                 'blank',
                 ['display-text', () => {
@@ -118,11 +124,12 @@ addLayer('xp', {
             unlocked() { return tmp.xp.types.length > 1; },
             canClick() { return player.xp.type != tmp.xp.types[0]; },
             onClick() {
+                if (!player.xp.ignore_type_warning && !confirm('Are you sure you want to change enemy type?\nThis will reset XP')) return;
                 const i = tmp.xp.types.indexOf(player.xp.type);
-                if (i == -1) player.xp.type = 'slime';
+                if (i == -1) player.xp.type = tmp.xp.types[0];
                 else player.xp.type = tmp.xp.types[i - 1];
-                player.xp.level = Decimal.dZero;
-                player.xp.health = tmp.xp.enemyHealth;
+
+                layers[this.layer].doReset('xp', true);
             },
         },
         12: {
@@ -136,11 +143,12 @@ addLayer('xp', {
             unlocked() { return tmp.xp.types.length > 1; },
             canClick() { return player.xp.type != tmp.xp.types[tmp.xp.types.length - 1]; },
             onClick() {
+                if (!player.xp.ignore_type_warning && !confirm('Are you sure you want to change enemy type?\nThis will reset XP')) return;
                 const i = tmp.xp.types.indexOf(player.xp.type);
-                if (i == -1) player.xp.type = 'slime';
+                if (i == -1) player.xp.type = tmp.xp.types[0];
                 else player.xp.type = tmp.xp.types[i + 1];
-                player.xp.level = Decimal.dZero;
-                player.xp.health = tmp.xp.enemyHealth;
+
+                layers[this.layer].doReset('xp', true);
             },
         },
     },
@@ -148,19 +156,19 @@ addLayer('xp', {
         11: {
             title: 'Sharper sword',
             description: 'Double damage',
-            effect() { return new Decimal(2); },
+            effect() { return D(2); },
             unlocked() { return player.xp.kills.gte(5) || player.l.unlocked || player.lo.shown; },
-            cost: new Decimal(5),
+            cost: D(5),
         },
         12: {
             title: 'Stronger monsters',
             description: 'Adds 10 to enemy health, but gain 50% more experience',
-            effect() { return { bonus_health: new Decimal(10), xp_multiplier: new Decimal(1.5) }; },
+            effect() { return { bonus_health: D(10), xp_multiplier: D(1.5) }; },
             unlocked() { return player.xp.kills.gte(10) || player.l.unlocked || player.lo.shown; },
-            cost: new Decimal(10),
+            cost: D(10),
             onPurchase() {
                 player.xp.health = player.xp.health.add(10);
-            }
+            },
         },
         13: {
             title: 'High quality enemy drops',
@@ -173,10 +181,10 @@ addLayer('xp', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.xp.kills.add(1).root(4); },
+            effect() { return player.xp.kills.max(0).add(1).root(4); },
             effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
             unlocked() { return player.xp.kills.gte(20) || player.l.unlocked || player.lo.shown; },
-            cost: new Decimal(20),
+            cost: D(20),
         },
         21: {
             title: 'Life drain',
@@ -192,19 +200,19 @@ addLayer('xp', {
             effect() { return player.xp.health.max(0).div(20).root(2); },
             effectDisplay() { return `+${format(tmp[this.layer].upgrades[this.id].effect)}`; },
             unlocked() { return player.xp.kills.gte(30) || player.l.unlocked || player.lo.shown; },
-            cost: new Decimal(100),
+            cost: D(100),
         },
         22: {
             title: 'Sword trap',
             description() { return `Passively deal ${formatWhole(this.effect().times(100))}% of your damage every second`; },
             unlocked() { return player.xp.kills.gte(50) || player.l.unlocked || player.lo.shown; },
             effect() {
-                let base = new Decimal(.25);
+                let base = D(.25);
 
                 return base;
             },
             effectDisplay() { return `${format(tmp.xp.clickDamage.times(this.effect()))} passive damage per second`; },
-            cost: new Decimal(200),
+            cost: D(200),
         },
         23: {
             title: 'Bloody sword',
@@ -217,10 +225,10 @@ addLayer('xp', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.xp.kills.add(8).log(8); },
+            effect() { return player.xp.kills.max(0).add(8).log(8); },
             effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
             unlocked() { return player.xp.kills.gte(70) || player.l.unlocked || player.lo.shown; },
-            cost: new Decimal(300),
+            cost: D(300),
         },
         31: {
             title: 'Second roll',
@@ -236,7 +244,7 @@ addLayer('xp', {
             effect() { return tmp.xp.enemyHealth.max(0).add(4).log(4); },
             effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
             unlocked() { return player.xp.kills.gte(90) || player.l.unlocked || player.lo.shown; },
-            cost: new Decimal(500),
+            cost: D(500),
         },
         32: {
             title: 'Kiting',
@@ -252,7 +260,7 @@ addLayer('xp', {
             effect() { return player.xp.points.max(0).add(50).log(50); },
             effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
             unlocked() { return player.xp.kills.gte(125) || player.l.unlocked || player.lo.shown; },
-            cost: new Decimal(1_500),
+            cost: D(1_500),
         },
         33: {
             title: 'Level up',
@@ -268,7 +276,43 @@ addLayer('xp', {
             effect() { return tmp.xp.clickDamage.max(0).add(25).log(25); },
             effectDisplay() { return `*${format(tmp[this.layer].upgrades[this.id].effect)}`; },
             unlocked() { return player.xp.kills.gte(160) || player.l.unlocked || player.lo.shown; },
-            cost: new Decimal(4_000),
+            cost: D(4_000),
+        },
+        41: {
+            title: 'Double kills',
+            description: 'Double kill gain',
+            effect() { return D(2); },
+            unlocked() { return hasChallenge('b', 21); },
+            cost: D(8_000),
+        },
+        42: {
+            title: 'Life stone',
+            description() {
+                if (!shiftDown) return 'Enemy health boosts ore drops';
+                let formula = 'log7(health + 7)';
+
+                return `Formula: ${formula}`;
+            },
+            effect() { return player.xp.health.add(7).log(7); },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            unlocked() { return hasChallenge('b', 21); },
+            cost: D(80_000),
+        },
+        43: {
+            title: 'Slime crown',
+            description() {
+                if (!hasChallenge('b', 12)) return 'Looks good on your head.<br>You might want to fight another boss';
+                return 'Skeletons can drop slime items, but only at 10% of the rate';
+            },
+            effect() {
+                const active = hasUpgrade(this.layer, this.id) && hasChallenge('b', 12) && player.xp.type == 'skeleton';
+                return {
+                    active,
+                    mult: D(.1),
+                };
+            },
+            unlocked() { return hasChallenge('b', 21); },
+            cost: D(8e6),
         },
     },
     bars: {
@@ -287,7 +331,7 @@ addLayer('xp', {
         },
     },
     update(diff) {
-        let passive_damage = Decimal.dZero;
+        let passive_damage = D.dZero;
 
         if (hasUpgrade('xp', 22)) passive_damage = passive_damage.add(upgradeEffect('xp', 22));
         passive_damage = passive_damage.add(buyableEffect('lo', 13));
@@ -296,19 +340,16 @@ addLayer('xp', {
             /** @type {Decimal} */
             let damage = tmp.xp.clickDamage.times(passive_damage).times(diff);
 
-            if (damage.gte(player.xp.health)) player.xp.health = Decimal.dZero;
-            else player.xp.health = player.xp.health.minus(damage);
+            player.xp.health = player.xp.health.minus(damage);
         }
     },
     automate() {
         if (player.xp.health.gt(tmp.xp.enemyHealth)) player.xp.health = tmp.xp.enemyHealth;
         if (player.xp.health.lte(0)) {
-            // XP gain
             /** @type {Decimal} */
             let xp_gain = tmp.xp.enemyExperience;
-
-            // Kills
-            let kills_gain = Decimal.dOne;
+            /** @type {Decimal} */
+            let kills_gain = tmp.xp.enemyKills;
 
             // Apply gains
             player.xp.last_drops = layers.lo.items.onKill(player.xp.type, player.xp.level, kills_gain);
@@ -351,24 +392,27 @@ addLayer('xp', {
     },
     enemyHealth() {
         /** @type {Decimal} */
-        let base;
+        let health;
         switch (player.xp.type) {
             default:
             case 'slime':
-                base = new Decimal(2).pow(player.xp.level).times(10);
+                health = D(2).pow(player.xp.level).times(10);
                 break;
             case 'skeleton':
-                base = new Decimal(3).pow(player.xp.level).times(40);
+                health = D(3).pow(player.xp.level).times(40);
+                break;
+            case 'pirate':
+                health = D(4).pow(player.xp.level).times(90);
                 break;
         }
 
-        if (hasUpgrade('xp', 12)) base = base.add(upgradeEffect('xp', 12).bonus_health);
+        if (hasUpgrade('xp', 12)) health = health.add(upgradeEffect('xp', 12).bonus_health);
 
-        if (hasUpgrade('xp', 33)) base = base.times(2);
+        if (hasUpgrade('xp', 33)) health = health.times(2);
 
-        if (inChallenge('b', 11) && player.xp.type == 'slime') base = base.times(10);
+        if (inChallenge('b', 11) && player.xp.type == 'slime') health = health.times(10);
 
-        return base;
+        return health;
     },
     enemyExperience() {
         /** @type {Decimal} */
@@ -381,17 +425,31 @@ addLayer('xp', {
             case 'skeleton':
                 xp_gain = player.xp.level.add(1).times(3);
                 break;
+            case 'pirate':
+                xp_gain = player.xp.level.add(2).times(4);
+                break;
         }
 
         if (hasUpgrade('xp', 12)) xp_gain = xp_gain.times(upgradeEffect('xp', 12).xp_multiplier);
         if (hasUpgrade('xp', 13)) xp_gain = xp_gain.times(upgradeEffect('xp', 13));
         if (hasUpgrade('xp', 31)) xp_gain = xp_gain.times(upgradeEffect('xp', 31));
-        xp_gain = xp_gain.times(tmp.l.skills['learning'].effect.xp_mult)
+        xp_gain = xp_gain.times(tmp.l.skills['learning'].effect.xp_mult);
+        if (hasUpgrade('s', 11)) xp_gain = xp_gain.times(upgradeEffect('s', 11));
+        if (hasUpgrade('s', 51)) xp_gain = xp_gain.times(upgradeEffect('s', 51));
 
-        return xp_gain;
+        return xp_gain.max(1);
+    },
+    enemyKills() {
+        let kills = D.dOne;
+
+        if (hasUpgrade('s', 12)) kills = kills.times(upgradeEffect('s', 12));
+        if (hasUpgrade('s', 51)) kills = kills.times(upgradeEffect('s', 51));
+        if (hasUpgrade('xp', 41)) kills = kills.times(upgradeEffect('xp', 41));
+
+        return kills.max(1);
     },
     clickDamage() {
-        let damage = new Decimal(1);
+        let damage = D(1);
 
         if (hasUpgrade('xp', 21)) damage = damage.add(upgradeEffect('xp', 21));
         damage = damage.add(buyableEffect('lo', 11));
@@ -404,12 +462,12 @@ addLayer('xp', {
         if (hasUpgrade('o', 21)) damage = damage.times(upgradeEffect('o', 21));
         damage = damage.times(buyableEffect('lo', 21));
 
-        return damage;
+        return damage.max(1);
     },
-    doReset(layer) {
-        if (layers[layer].row <= this.row) return;
+    doReset(layer, force = false) {
+        if (!force && layers[layer].row <= this.row) return;
 
-        let keep = [];
+        let keep = ['type', 'last_drops', 'ignore_type_warning'];
 
         /** @type {number[]} */
         let kept_upgrades = [];
@@ -423,9 +481,12 @@ addLayer('xp', {
         player.xp.upgrades = [...kept_upgrades];
     },
     types() {
+        if (inChallenge('b', 21)) return ['slime'];
+
         const types = ['slime'];
 
         if (hasChallenge('b', 11)) types.push('skeleton');
+        if (hasChallenge('b', 12)) types.push('pirate');
 
         return types;
     },
