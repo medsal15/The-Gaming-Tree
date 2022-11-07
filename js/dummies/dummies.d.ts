@@ -2,7 +2,8 @@ type CompareResult = -1 | 0 | 1;
 type DecimalSource = string | number | Decimal;
 type Computable<T> = T | (() => T);
 type Computed<T> = T extends (...args) => any ? ReturnType<T> : T;
-type CSSStyles = { [k in keyof CSSStyleDeclaration]?: CSSStyleDeclaration[k] }
+type CSSStyles = { [k in keyof CSSStyleDeclaration]?: CSSStyleDeclaration[k] };
+type AchievementTypes = 'normal' | 'bonus' | 'secret';
 
 declare class Decimal {
     //#region Constants
@@ -408,6 +409,10 @@ declare class Layer<T extends LayerData> {
              * instead displaying the entire layer in the subtab.
              */
             embedLayer?: string,
+            /**
+             * Specifies the shown name of the subtab
+             */
+            name?: Computable<string>,
         }
     }
     /**
@@ -1846,3 +1851,189 @@ declare class LayerData {
     upgrades?: number[]
     activeChallenge?: number | null
 }
+
+declare let layers: {
+    // Side
+    ach: Layer<any> & {
+        getAchievementsRows(type?: AchievementTypes): number[],
+        getAchievements(type?: AchievementTypes): string[],
+        totalAchievements(type?: AchievementTypes): Decimal,
+        ownedAchievements(type?: AchievementTypes): Decimal,
+    },
+    // Row 0
+    xp: Layer<any> & {
+        enemyColor(): string,
+        enemyHealth(): Decimal,
+        enemyExperience(): Decimal,
+        enemyKills(): Decimal,
+        clickDamage(): Decimal,
+        types(): string[],
+    },
+    o: Layer<any> & {
+        oreHealth(): Decimal,
+    },
+    // Row 1
+    l: Layer<any> & {
+        skills: {
+            points(): Decimal,
+            total(): Decimal,
+            [k: string]: {
+                readonly id: string,
+                needed(): Decimal,
+                effect(): Decimal,
+                clickables: number[],
+            },
+        },
+        skill_row(skill: string): ['row', [['bar', string], ...['clickable', number][]]],
+    },
+    lo: Layer<any> & {
+        items: {
+            onKill(type: string, level: Decimal, chance_mult: Decimal): [string, Decimal][],
+            itemId(id: number): string | false,
+            chanceMult(): Decimal,
+            canGet(type: string): Decimal,
+            [k: string]: {
+                chance: Computable<Decimal>,
+                name: string,
+                unlocked: Computable<boolean>,
+                types: Computable<string[]>,
+                gridStyle: Computable<CSSStyles>,
+                gridId: number,
+                debtFree: Computable<boolean>,
+            },
+        },
+    },
+    // Row 2
+    b: Layer<any>,
+    s: Layer<any> & {
+        altBase(): Decimal,
+        coin_types: [string, string][],
+        formatCoins(amount: Decimal, span?: boolean): string,
+    },
+};
+declare let temp: {
+    displayThings: (string | (() => string))[],
+    gameEnded: boolean,
+    other: {
+        lastPoints: Decimal,
+        oomps: Decimal,
+        screenWidth: number,
+        screenHeight: number,
+    },
+    pointGen: Decimal,
+    scrolled: boolean,
+    // Side
+    ach: TempLayer & {
+        getAchievementsRows: number[],
+        getAchievements: string[],
+        totalAchievements: Decimal,
+        ownedAchievements: Decimal,
+    },
+    // Row 0
+    xp: TempLayer & {
+        enemyColor: string,
+        enemyHealth: Decimal,
+        enemyExperience: Decimal,
+        enemyKills: Decimal,
+        clickDamage: Decimal,
+        types: string[],
+    },
+    o: TempLayer & {
+        oreHealth: Decimal,
+    },
+    // Row 1
+    l: TempLayer & {
+        skills: {
+            points: Decimal,
+            total: Decimal,
+            [k: string]: {
+                readonly id: string,
+                needed: Decimal,
+                effect: Decimal,
+                clickables: number[],
+            },
+        },
+        skill_row(skill: string): ['row', [['bar', string], ...['clickable', number][]]],
+    },
+    lo: TempLayer & {
+        items: {
+            onKill(type: string, level: Decimal, chance_mult: Decimal): [string, Decimal][],
+            itemId(id: number): string | false,
+            chanceMult: Decimal,
+            canGet(type: string): Decimal,
+            [k: string]: {
+                chance: Decimal,
+                name: string,
+                unlocked: boolean,
+                types: string[],
+                gridStyle: CSSStyles,
+                gridId: number,
+                debtFree: boolean,
+            },
+        },
+    },
+    // Row 2
+    b: TempLayer,
+    s: TempLayer & {
+        altBase: Decimal,
+        coin_types: [string, string][],
+        formatCoins(amount: Decimal, span?: boolean): string,
+    },
+};
+declare let tmp: typeof temp;
+declare let player: {
+    devSpeed: string,
+    hasNaN: boolean,
+    keepGoing: boolean,
+    lastSafeTab: string,
+    navTab: string,
+    offTime: {
+        remain: number,
+    },
+    points: Decimal,
+    subtabs: {
+        [key: string]: {
+            mainTabs: string,
+        },
+    },
+    tab: string,
+    time: number,
+    timePlayed: number,
+    version: string,
+    versionType: string,
+    // Side
+    ach: LayerData & {
+        short_mode: boolean,
+    },
+    // Row 0
+    xp: LayerData & {
+        health: Decimal,
+        kills: Decimal,
+        type: string,
+        last_drops: [string, Decimal][],
+        ignore_type_warning: boolean,
+    },
+    o: LayerData & {
+        health: Decimal,
+        last_drops: [string, Decimal][],
+    },
+    // Row 1
+    l: LayerData & {
+        skills: {
+            [k: string]: {
+                level: Decimal,
+                points: Decimal,
+                progress: Decimal,
+            }
+        },
+    },
+    lo: LayerData & {
+        shown: boolean,
+        items: { [k: string]: Decimal },
+    },
+    // Row 2
+    b: LayerData & {
+        auto_enter: boolean,
+    },
+    s: LayerData,
+};

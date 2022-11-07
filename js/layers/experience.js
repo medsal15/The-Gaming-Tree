@@ -88,7 +88,7 @@ addLayer('xp', {
                 ['display-text', () => `Current damage: ${format(tmp.xp.clickDamage)}`],
                 'blank',
                 ['display-text', () => {
-                    if (!hasUpgrade('lo', 11) || player.xp.kills.lte(0)) return;
+                    if (!(hasUpgrade('lo', 11) || hasUpgrade('s', 72)) || player.xp.kills.lte(0)) return;
 
                     let text = 'Enemy dropped ';
                     if (!player.xp.last_drops.length) text += 'nothing';
@@ -107,7 +107,7 @@ addLayer('xp', {
                     and <span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;font-size:1.5em;">${format(player.xp.kills, 0)}</span> kills`,
                 ],
                 'blank',
-                ['upgrades', [1, 2, 3]],
+                ['upgrades', [1, 2, 3, 4]],
             ],
             buttonStyle() {
                 // If you figure out why shouldNotify does nothing when it returns true, I'll use it again.

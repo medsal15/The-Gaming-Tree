@@ -74,7 +74,7 @@ addLayer('b', {
             onEnter() { layerDataReset('lo', ['shown']); },
             onExit() { rowReset(layers[this.layer].row, this.layer); },
             onComplete() { layerDataReset('lo', ['shown']); },
-            buttonStyle() { if (inChallenge(this.layer, this.id)) return { 'display': 'none' }; },
+            buttonStyle() { if (inChallenge(this.layer, this.id) && !canCompleteChallenge(this.layer, this.id)) return { 'display': 'none' }; },
         },
         12: {
             name: 'The Lich CEO',
@@ -83,7 +83,7 @@ addLayer('b', {
             The Lich CEO opens a shop though, maybe there's something useful in there.<br><br>\
             Your debt make you lose 1% of your previous layers' currencies and items every second`,
             goalDescription: `Pay off your debts.`,
-            canComplete() { return hasUpgrade('s', 41); },
+            canComplete() { return hasUpgrade('s', 51); },
             rewardDescription() {
                 if (!hasChallenge(this.layer, this.id)) {
                     return `You're too poor to see the reward`;
@@ -95,7 +95,7 @@ addLayer('b', {
             onExit() { rowReset(layers[this.layer].row, this.layer); },
             onComplete() { layerDataReset('lo', ['shown']); },
             unlocked() { return player.b.best.gte(2); },
-            buttonStyle() { if (inChallenge(this.layer, this.id)) return { 'display': 'none' }; },
+            buttonStyle() { if (inChallenge(this.layer, this.id) && !canCompleteChallenge(this.layer, this.id)) return { 'display': 'none' }; },
         },
         21: {
             name: 'The Slime Queen',
@@ -103,8 +103,8 @@ addLayer('b', {
                 return `Stuck in ${layerColor('b', 'The Slime King')}, but all other layers are disabled.<br>\
                 You can only kill slimes.`;
             },
-            goalDescription: 'Kill a thousand slimes',
-            canComplete() { return player.xp.kills.gte(1000); },
+            goalDescription: 'Kill 500 slimes',
+            canComplete() { return player.xp.kills.gte(500); },
             rewardDescription: 'Autobuy and unlock more XP upgrades, and double slime drops',
             countsAs: [11],
             onEnter() { layerDataReset('xp', ['ignore_type_warning']); },
@@ -113,9 +113,10 @@ addLayer('b', {
                 const style = {
                     'background-color': '#BB0000',
                 };
-                if (inChallenge(this.layer, this.id)) style['display'] = 'none';
+                if (inChallenge(this.layer, this.id) && !canCompleteChallenge(this.layer, this.id)) style['display'] = 'none';
                 return style;
             },
+            unlocked() { return hasChallenge('b', 11); },
         },
     },
     update(diff) {

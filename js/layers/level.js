@@ -47,7 +47,7 @@ addLayer('l', {
                 () => player.l.unlocked ? [
                     'display-text',
                     `You have\
-                    <span style="color:#84C1FF;text-shadow:#84C1FF 0 0 10px;font-size:1.5em;">${formatWhole(tmp.l.skills.points)}/${formatWhole(tmp.l.skills.total)}</span>\
+                    <span style="color:#84C1FF;text-shadow:#84C1FF 0 0 10px;font-size:1.5em;">${formatWhole(tmp.l.skills.points.floor())}/${formatWhole(tmp.l.skills.total.floor())}</span>\
                     unassigned skill points`
                 ] : '',
                 ['buyables', [1]],
@@ -219,7 +219,7 @@ addLayer('l', {
             width: 300,
             height: 50,
             progress() { return player.l.skills[this.id].progress.div(tmp[this.layer].skills[this.id].needed); },
-            unlocked() { return hasUpgrade('s', 31); },
+            unlocked() { return false; },
             textStyle: { 'color': 'gray' },
             display() {
                 return `Mining level ${formatWhole(player.l.skills[this.id].level)}<br>

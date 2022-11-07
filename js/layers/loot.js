@@ -42,7 +42,7 @@ addLayer('lo', {
 
         return style;
     },
-    layerShown() { return !tmp[this.layer].deactivated && player.lo.shown || hasUpgrade('xp', 33); },
+    layerShown() { return !tmp[this.layer].deactivated && (player.lo.shown || hasUpgrade('xp', 33)); },
     hotkeys: [
         {
             key: 'O',
@@ -678,14 +678,8 @@ addLayer('lo', {
         },
     },
     grid: {
-        rows() {
-            if (hasChallenge('b', 12)) return 4;
-            if (hasChallenge('b', 11)) return 3;
-            if (tmp.o.layerShown) return 2;
-            return 1;
-        },
-        cols: 3,
-        maxRows: 4,
+        cols: 10,
+        rows: 10,
         // Required, even though I am only using grid for display
         getStartData(_) { return null; },
         getTitle(_, id) {
@@ -701,7 +695,7 @@ addLayer('lo', {
         },
         getStyle(_, id) {
             const item = layers.lo.items.itemId(id);
-            if (item === false) return { 'display': 'none' };
+            if (item === false || !tmp.lo.items[item].unlocked) return { 'display': 'none' };
 
             return Object.assign({
                 'background-repeat': 'no-repeat',

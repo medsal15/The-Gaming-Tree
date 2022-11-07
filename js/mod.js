@@ -78,6 +78,7 @@ let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.4</h3><br>
 		- Changed the boss hotkey effect.<br>
 		- Added an option to change the items chance display.<br>
+		- Added short tooltip mode for achievements.<br>
 		- Added another boss, a miniboss, and the shop.<br>
 		- Update endgame: Beat the 2nd boss<br>
 	<h3>v0.3</h3><br>

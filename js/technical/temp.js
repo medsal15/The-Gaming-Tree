@@ -1,18 +1,3 @@
-/**
- * @type {{
- * 	[id: string]: TempLayer,
- * 	displayThings: (string|() => string)[],
- * 	gameEnded: boolean,
- * 	other: {
- * 		lastPoints: Decimal,
- * 		oomps: Decimal,
- * 		screenWidth: number,
- * 		screenHeight: number,
- * 	},
- * 	pointGen: Decimal,
- *	scrolled: boolean,
- * }}
- */
 var tmp = {}
 var temp = tmp // Proxy for tmp
 var funcs = {}

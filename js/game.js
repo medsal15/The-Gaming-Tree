@@ -1,27 +1,3 @@
-/**
- * @type {{
- * 	devSpeed: String,
- * 	hasNaN: Boolean,
- * 	keepGoing: Boolean,
- * 	lastSafeTab: String,
- * 	navTab: String,
- * 	offTime: {
- * 		remain: Number,
- * 	},
- * 	points: Decimal,
- * 	subtabs: {
- * 		[key: String]: {
- * 			mainTabs: String,
- * 		},
- * 	},
- * 	tab: String,
- * 	time: Number,
- * 	timePlayed: Number,
- * 	version: String,
- * 	versionType: String,
- * 	[key: String]: LayerData,
- * }}
- */
 var player;
 var needCanvasUpdate = true;
 

@@ -5,8 +5,6 @@ addLayer('s', {
         const data = {
             points: D.dZero,
             unlocked: true,
-            stocks: {},
-            stock_time: D.dZero,
         };
 
         return data;
@@ -55,10 +53,7 @@ addLayer('s', {
                 ['upgrades', [1, 2, 3, 4, 5]],
             ],
             unlocked() { return inChallenge('b', 12); },
-        },
-        'Investments': {
-            content() { return this['Debt'].content; },
-            unlocked() { return !inChallenge('b', 12) && hasChallenge('b', 12); },
+            name() { return inChallenge('b', 12) ? 'Debt' : 'Investments'; },
         },
     },
     upgrades: {
@@ -74,7 +69,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -100,7 +103,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -126,7 +137,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -152,7 +171,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -178,7 +205,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -204,7 +239,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -230,7 +273,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -256,7 +307,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -282,7 +341,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -308,7 +375,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -334,7 +409,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(100);
@@ -355,7 +438,15 @@ addLayer('s', {
                 if (inChallenge('b', 12)) return 'Does nothing';
                 return 'A useless investment';
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 1);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             fullDisplay() {
                 return `<h3>${tmp[this.layer].upgrades[this.id].title}</h3><br>\
                 <span>${tmp[this.layer].upgrades[this.id].description}</span><br><br>\
@@ -373,7 +464,15 @@ addLayer('s', {
 
                 return `Formula: ${formula}`;
             },
-            cost() { return tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 4); },
+            cost() {
+                /** @type {Decimal} */
+                let cost = tmp.s.altBase.pow(player.s.upgrades.filter(id => +id <= 51).length + 2.9);
+                // Round to the nearest power of 100
+                const pow100 = D(100).pow(cost.log(100).floor());
+                cost = cost.div(pow100).floor().times(pow100);
+
+                return cost;
+            },
             effect() {
                 if (inChallenge('b', 12)) return D.dOne;
                 return D(player.s.upgrades.filter(id => id <= 51).length).div(20);
@@ -411,11 +510,11 @@ addLayer('s', {
             title: 'Bank',
             description() {
                 if (!shiftDown) return 'Coins boost coin gain';
-                let formula = '2√(coins + 2)';
+                let formula = 'log4(coins + 4)';
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.s.points.max(0).add(2).root(2); },
+            effect() { return player.s.points.max(0).add(4).log(4); },
             effectDisplay() { return `*${format(this.effect())}`; },
             cost: D(5),
             fullDisplay() {
@@ -545,11 +644,11 @@ addLayer('s', {
                 Boosts <span style="color:#C4BC86">${tmp.o.upgrades[33].title}</span>'s effects<br>\
                 Ore upgrades boost ore regeneration`;
 
-                let formula = '2√(ore upgrades + 1)';
+                let formula = '3√(ore upgrades + 1)';
 
                 return `Formula: ${formula}`;
             },
-            effect() { return D.root(player.o.upgrades.length + 1, 2).max(1); },
+            effect() { return D.root(player.o.upgrades.length + 1, 3).max(1); },
             effectDisplay() { return `*${format(this.effect())}`; },
             cost: D(400),
             fullDisplay() {
@@ -566,14 +665,6 @@ addLayer('s', {
         if (inChallenge('b', 12)) return D(2);
         return D(8);
     },
-    /**
-     * TODO:
-     * - Stocks?
-     *  - buy low, sell high
-     * - Upgrades
-     *  - automation, keep, etc...
-     *  - also more stuff
-     */
     coin_types: [
         ['copper', '#B87333'],
         ['bronze', '#CD7F32'],
@@ -589,7 +680,7 @@ addLayer('s', {
         const list = coins.map(/**@returns {[string,number]}*/(c, i) => [c, i])
             .filter(([c]) => c != '0')
             .map(([c, i]) => span ?
-                `<span style="color:${coin_types[i][1]};text-shadow:#9F9F5F 0 0 10px;font-size:1.5em;">${c}</span> ${coin_types[i][0]} coins` :
+                `<span style="color:${coin_types[i][1]};text-shadow:${coin_types[i][1]} 0 0 10px;font-size:1.5em;">${c}</span> ${coin_types[i][0]} coins` :
                 `${c} ${coin_types[i][0]} coins`
             ).reverse();
         if (!list.length) list.push(span ?

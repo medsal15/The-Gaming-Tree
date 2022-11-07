@@ -4,6 +4,7 @@ addLayer('ach', {
     startData() {
         return {
             unlocked: true,
+            short_mode: false,
         };
     },
     color: '#ffff00',
@@ -13,13 +14,32 @@ addLayer('ach', {
         'Achievements': {
             content: [
                 ['display-text', () => `You have ${formatWhole(layers.ach.ownedAchievements())} / ${formatWhole(layers.ach.totalAchievements())} achievements`],
+                ['row', [
+                    ['display-text', 'Short tooltip mode'],
+                    'blank',
+                    ['toggle', ['ach', 'short_mode']]
+                ]],
                 'blank',
                 ['achievements', () => layers.ach.getAchievementsRows()],
             ],
         },
+        'Bonus': {
+            content: [
+                ['display-text', () => `You have ${formatWhole(layers.ach.ownedAchievements('bonus'))} / ${formatWhole(layers.ach.totalAchievements('bonus'))} bonus achievements`],
+                'blank',
+                ['achievements', () => layers.ach.getAchievementsRows('bonus')],
+            ],
+            unlocked() {
+                return layers.ach.totalAchievements('bonus').gte(1);
+            },
+            buttonStyle: {
+                'border-color': 'rgb(0,127,255)',
+            },
+            name: 'Bonus Achievements',
+        },
         'Secrets': {
             content: [
-                ['display-text', () => `You have ${formatWhole(layers.ach.ownedAchievements('secret'))} secrets`],
+                ['display-text', () => `You have ${formatWhole(layers.ach.ownedAchievements('secret'))} secret achievements`],
                 'blank',
                 ['achievements', () => layers.ach.getAchievementsRows('secret')],
             ],
@@ -29,6 +49,7 @@ addLayer('ach', {
             buttonStyle: {
                 'border-color': 'rgb(127,0,255)',
             },
+            name: 'Secret Achievements',
         },
     },
     achievements: {
@@ -102,7 +123,7 @@ addLayer('ach', {
         },
         22: {
             name: 'Better than a coin flip',
-            done() { return Object.values(tmp.lo.items).some(v => typeof v == 'object' && v.chance.gte(.5) && v.unlocked); },
+            done() { return Object.values(tmp.lo.items).some(v => typeof v == 'object' && 'chance' in v && v.chance.gte(.5) && v.unlocked); },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, layers.lo.color); },
             tooltip: 'Get an item\'s chance above 50%',
             style() {
@@ -126,7 +147,7 @@ addLayer('ach', {
         },
         24: {
             name: 'All the time',
-            done() { return Object.values(tmp.lo.items).some(v => typeof v == 'object' && v.chance.gte(1) && v.unlocked); },
+            done() { return Object.values(tmp.lo.items).some(v => typeof v == 'object' && 'chance' in v && v.chance.gte(1) && v.unlocked); },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, layers.lo.color); },
             tooltip: 'Get an item\'s chance above 100%',
             style() {
@@ -400,7 +421,129 @@ addLayer('ach', {
             },
             unlocked() { return player.lo.shown; },
         },
+        91: {
+            name: 'Money',
+            done() { return player.s.points.gte(1); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, layers.s.color); },
+            tooltip: 'Sell some of your crafted items',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.s.color;
+                return s;
+            },
+            unlocked() { return tmp.s.layerShown; },
+        },
+        92: {
+            name: 'Less debts',
+            done() { return player.s.upgrades.some(id => id <= 51); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, layers.s.color); },
+            tooltip: 'Pay a debt off',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.s.color;
+                return s;
+            },
+            unlocked() { return tmp.s.layerShown; },
+        },
+        93: {
+            name: 'More items',
+            done() { return hasUpgrade('s', 72) && hasUpgrade('lo', 11); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, layers.s.color); },
+            tooltip: 'Buy a second lootbag',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.s.color;
+                return s;
+            },
+            unlocked() { return tmp.s.layerShown; },
+        },
+        94: {
+            name: 'Bronze',
+            done() { return player.s.points.gte(100); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, layers.s.color); },
+            tooltip: 'Get a bronze coin',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.s.color;
+                return s;
+            },
+            unlocked() { return tmp.s.layerShown; },
+        },
+        95: {
+            name: 'Another anvil',
+            done() { return hasUpgrade('s', 83); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, layers.s.color); },
+            tooltip: 'Buy a better anvil',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = layers.s.color;
+                return s;
+            },
+            unlocked() { return tmp.s.layerShown; },
+        },
         //#endregion
+        //#region Bonus achievements
+        101: {
+            name: 'Overslime',
+            done() { return hasChallenge('b', 21); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, '#BB0000'); },
+            tooltip: 'Beat the Slime Queen',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = '#BB0000';
+                return s;
+            },
+            unlocked() { return tmp.b.challenges[21].unlocked; },
+        },
+        102: {
+            name: '???',
+            done() { return false; },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, '#BB0000'); },
+            tooltip: '???',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = '#BB0000';
+                return s;
+            },
+            unlocked() { return false; },
+        },
+        103: {
+            name: '???',
+            done() { return false; },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, '#BB0000'); },
+            tooltip: '???',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = '#BB0000';
+                return s;
+            },
+            unlocked() { return false; },
+        },
+        104: {
+            name: '???',
+            done() { return false; },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, '#BB0000'); },
+            tooltip: '???',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = '#BB0000';
+                return s;
+            },
+            unlocked() { return false; },
+        },
+        105: {
+            name: '???',
+            done() { return false; },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, '#BB0000'); },
+            tooltip: '???',
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = '#BB0000';
+                return s;
+            },
+            unlocked() { return false; },
+        },
+        //#endregion Bonus achievements
         //#region Secret achievements
         71: {
             name: 'Why did I even bother',
@@ -443,23 +586,45 @@ addLayer('ach', {
     type: 'none',
     position: 1,
     tooltip() {
-        let lines = [
-            `<span style="white-space: nowrap">${formatWhole(layers.ach.ownedAchievements())} / ${formatWhole(layers.ach.totalAchievements())} achievements</span>`
-        ];
+        if (player.ach.short_mode) {
+            let pieces = [
+                layerColor('ach', `${formatWhole(layers.ach.ownedAchievements())} / ${formatWhole(layers.ach.totalAchievements())}`),
+            ];
+            if (tmp.ach.tabFormat['Bonus'].unlocked) {
+                const color = tmp.ach.tabFormat['Bonus'].buttonStyle['border-color'];
+                pieces.push(`<span style="color:${color};text-shadow:${color} 0 0 10px";>${formatWhole(layers.ach.ownedAchievements('bonus'))} / ${formatWhole(layers.ach.totalAchievements('bonus'))}</span>`);
+            }
+            if (layers.ach.ownedAchievements('secret').gte(1)) {
+                const color = tmp.ach.tabFormat['Secrets'].buttonStyle['border-color'];
+                pieces.push(`<span style="color:${color};text-shadow:${color} 0 0 10px;">${formatWhole(layers.ach.ownedAchievements('secret'))}</span>`);
+            }
+            return pieces.join(' | ');
+        } else {
+            let lines = [
+                `<span style="white-space: nowrap">${formatWhole(layers.ach.ownedAchievements())} / ${formatWhole(layers.ach.totalAchievements())} achievements</span>`
+            ];
 
-        if (layers.ach.ownedAchievements('secret').gte(1)) {
-            lines.push(`${formatWhole(layers.ach.ownedAchievements('secret'))} secrets`);
+            if (tmp.ach.tabFormat['Bonus'].unlocked) {
+                lines.push(`<span style="white-space: nowrap">${formatWhole(layers.ach.ownedAchievements('bonus'))} / ${formatWhole(layers.ach.totalAchievements('bonus'))} bonus achievements</span>`)
+            }
+            if (layers.ach.ownedAchievements('secret').gte(1)) {
+                lines.push(`${formatWhole(layers.ach.ownedAchievements('secret'))} secrets`);
+            }
+
+            return lines.join('<br />');
         }
-
-        return lines.join('<br />')
     },
+    /** @param {AchievementTypes} [type] */
     getAchievementsRows(type = 'normal') {
         let rows = [];
 
         switch (type) {
             case 'normal':
             default:
-                rows = [1, 5, 2, 6, 3, 4];
+                rows = [1, 5, 2, 6, 3, 4, 9];
+                break;
+            case 'bonus':
+                rows = [10];
                 break;
             case 'secret':
                 rows = [7, 8];
@@ -468,6 +633,7 @@ addLayer('ach', {
 
         return rows;
     },
+    /** @param {AchievementTypes} [type] */
     getAchievements(type = 'normal') {
         let rows = layers.ach.getAchievementsRows(type);
 
@@ -483,9 +649,11 @@ addLayer('ach', {
 
         return achievements;
     },
+    /** @param {AchievementTypes} [type] */
     totalAchievements(type = 'normal') {
         return D(this.getAchievements(type).length);
     },
+    /** @param {AchievementTypes} [type] */
     ownedAchievements(type = 'normal') {
         return D(this.getAchievements(type).filter(id => hasAchievement('ach', id)).length);
     },
