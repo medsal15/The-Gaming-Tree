@@ -330,6 +330,7 @@ addLayer('xp', {
             textStyle: { 'color': 'black' },
         },
     },
+    autoUpgrade() { return hasChallenge('b', 21); },
     update(diff) {
         let passive_damage = D.dZero;
 
