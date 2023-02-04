@@ -77,13 +77,3 @@ function milestoneShown(layer, id) {
 	}
 	return false;
 }
-
-const CHANCE_MODE = {
-	'NEVER': 'never',
-	'BELOW 1': 'below 100%',
-	'BELOW 0.5': 'below 50%',
-};
-function switchChanceMode() {
-	const modes = Object.keys(CHANCE_MODE);
-	options.chanceMode = modes[(modes.indexOf(options.chanceMode) + 1) % modes.length];
-}

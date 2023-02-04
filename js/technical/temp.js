@@ -1,3 +1,4 @@
+/** @type {Temp} */
 var tmp = {}
 var temp = tmp // Proxy for tmp
 var funcs = {}

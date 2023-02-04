@@ -168,7 +168,6 @@ var systemComponents = {
 			</tr>
             <tr>
                 <td><button class="opt" onclick="toggleOpt('colorLevels'); needsCanvasUpdate = true">Color levels: {{ options.colorLevels?"ON":"OFF" }}</button></td>
-                <td><button class="opt" onclick="switchChanceMode(); needsCanvasUpdate = true">Chance display mode: {{ CHANCE_MODE[options.chanceMode] }}</button></td>
 			</tr>
         </table>`
 	},

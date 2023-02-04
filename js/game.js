@@ -1,3 +1,4 @@
+/** @type {Player} */
 var player;
 var needCanvasUpdate = true;
 

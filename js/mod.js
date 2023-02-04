@@ -25,10 +25,8 @@ let modInfo = {
 	 */
 	modFiles: [
 		'moreutils.js', 'tree.js',
-		'layers/automation.js', 'layers/achievements.js',
-		'layers/experience.js', 'layers/ore.js',
-		'layers/level.js', 'layers/loot.js',
-		'layers/boss.js', 'layers/shop.js',
+		'layers/side/achievements.js',
+		'layers/0/experience.js',
 
 		'devtools.js',
 	],
@@ -64,36 +62,20 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: '0.4',
+	num: 'R0.1',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
-	name: 'Indebted',
+	name: 'Reset',
 };
 
 /**
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
-	<h3>v0.4</h3><br>
-		- Changed the boss hotkey effect.<br>
-		- Added an option to change the items chance display.<br>
-		- Added short tooltip mode for achievements.<br>
-		- Added another boss, a miniboss, and the shop.<br>
-		- Update endgame: Beat the 2nd boss<br>
-	<h3>v0.3</h3><br>
-		- Added Boss.<br>
-		- Update endgame: Beat the boss<br>
-	<h3>v0.2</h3><br>
-		- Buff attack holding.<br>
-		- Buff <span style="color:#7FBF7F">Kiting</span><br>
-		- Added Levels and Loot.<br>
-		- Update endgame: 1000 kills<br>
-	<h3>v0.1.1</h3><br>
-		- Fix memory error in experience with enemy color enabled.<br>
 	<h3>v0.1</h3><br>
 		- Added XP.<br>
-		- Update endgame: 9 XP upgrades.`;
+		- Update endgame: 9th XP upgrades.`;
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`;
 
@@ -162,12 +144,6 @@ function addedPlayerData() {
  */
 var displayThings = [
 	() => isEndgame() ? '<span style="color:#60C0F0">You are past endgame. Content may not be balanced.</span>' : '',
-	() => {
-		let id = player.b.activeChallenge;
-		if (!id) return '';
-
-		return `In Boss challenge: ${layerColor('b', layers['b'].challenges[id].name)}`;
-	},
 ];
 
 /**
@@ -176,7 +152,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return hasChallenge('b', 12);
+	return hasUpgrade('xp', 33);
 }
 
 
