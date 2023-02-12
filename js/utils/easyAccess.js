@@ -141,7 +141,7 @@ function challengeEffect(layer, id) {
  * @returns {any}
  */
 function buyableEffect(layer, id) {
-	return (tmp[layer].buyables[id].effect)
+	return (tmp[layer].buyables?.[id].effect)
 }
 
 /**

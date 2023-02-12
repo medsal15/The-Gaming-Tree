@@ -3,21 +3,23 @@
 addLayer('xp', {
     name: 'Experience Points',
     symbol: 'XP',
+    /** @returns {Player['xp']} */
     startData() {
         return {
             unlocked: true,
-            points: D(0),
-            health: {},
-            kills: {},
+            points: D.dZero,
+            health: Object.fromEntries(layers.xp?.enemy.types().map(id => [id, D.dZero]) ?? []),
+            kills: Object.fromEntries(layers.xp?.enemy.types().map(id => [id, D.dZero]) ?? []),
             type: 'slime',
             ignore_type_warning: false,
             clicked: false,
+            last_drops: Object.fromEntries(layers.xp?.enemy.types().map(id => [id, []]) ?? []),
         };
     },
     tooltip() {
         return `${formatWhole(player.xp.points)} experience<br>${formatWhole(tmp.xp.total.kills)} kills`;
     },
-    color: '#7FBF7F',
+    color() { return tmp.xp.enemy.color; },
     row: 0,
     position: 0,
     resource: 'experience',
@@ -68,8 +70,10 @@ addLayer('xp', {
                     'display-text',
                     () => {
                         const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`,
-                            kill_text = tmp.xp.enemy.kills.neq(1) ? ` (${kill_style(`+${format(tmp.xp.enemy.kills)}`)})` : '';
-                        return `You have ${layerColor('xp', format(player.xp.points, 0), 'font-size:1.5em;')} (${layerColor('xp', `+${format(tmp.xp.enemy.experience)}`)}) experience
+                            kill_text = tmp.xp.enemy.kills.neq(1) ? ` (${kill_style(`+${format(tmp.xp.enemy.kills)}`)})` : '',
+                            capped = !tmp.l.canBuyMax && player.xp.points.gte(getNextAt('l')),
+                            xp_text = capped ? 'hardcapped' : layerColor('xp', `+${format(tmp.xp.enemy.experience)}`);
+                        return `You have ${layerColor('xp', format(player.xp.points, 0), 'font-size:1.5em;')} (${xp_text}) experience
                             and ${kill_style(format(player.xp.kills[player.xp.type], 0), 'font-size:1.5em')}${kill_text} kills`;
                     },
                 ],
@@ -78,7 +82,7 @@ addLayer('xp', {
                 ['display-text', () => {
                     let text = '';
                     if (options.colorLevels) {
-                        text = tmp.xp.enemy.color;
+                        text = tmp.xp.enemy.color_level.replace(/^(.)/, s => s.toUpperCase());
                     } else {
                         text = `Level ${formatWhole(tmp.xp.enemy.level)}`;
                     }
@@ -91,6 +95,17 @@ addLayer('xp', {
                     ['toggle', ['xp', 'ignore_type_warning']],
                 ]] : '',
                 ['display-text', () => `Current damage: ${format(tmp.xp.clickDamage)}`],
+                'blank',
+                ['display-text', () => {
+                    const type = player.xp.type;
+                    if (!layers.lo.items["*"].can_drop('enemy:') || player.xp.kills[type].lte(0)) return;
+
+                    let drops = 'nothing';
+                    const last_drops = player.xp.last_drops[type];
+                    if (last_drops.length) drops = listFormat.format(last_drops.map(([item, amount]) => `${format(amount)} ${layers.lo.items[item].name}`));
+
+                    return `${layers.xp.enemy.name(type).replace(/^./, s => s.toUpperCase())} dropped ${drops}`;
+                }],
             ],
         },
         'Upgrades': {
@@ -162,12 +177,12 @@ addLayer('xp', {
             effect() {
                 let base = D(2);
 
-                if (hasUpgrade('xp', 32)) base = base.pow(2);
+                if (hasUpgrade('xp', 32)) base = base.pow(upgradeEffect('xp', 32));
 
                 return base;
             },
             effectDisplay() { return `*${format(this.effect())}`; },
-            unlocked() { return tmp.xp.total.kills.gte(5); },
+            unlocked() { return tmp.xp.total.kills.gte(5) || hasUpgrade(this.layer, this.id); },
             cost: D(5),
         },
         12: {
@@ -179,8 +194,8 @@ addLayer('xp', {
                 };
 
                 if (hasUpgrade('xp', 32)) {
-                    effect.health = effect.health.times(2);
-                    effect.experience = effect.experience.pow(2);
+                    effect.health = effect.health.times(upgradeEffect('xp', 32));
+                    effect.experience = effect.experience.pow(upgradeEffect('xp', 32));
                 }
 
                 return effect;
@@ -190,7 +205,7 @@ addLayer('xp', {
                 const { health, experience } = this.effect();
                 return `+${format(health)} health, *${format(experience)} xp`;
             },
-            unlocked() { return tmp.xp.total.kills.gte(10); },
+            unlocked() { return tmp.xp.total.kills.gte(10) || hasUpgrade(this.layer, this.id); },
             cost: D(10),
         },
         13: {
@@ -205,14 +220,16 @@ addLayer('xp', {
                 }
             },
             effect() {
-                let base = tmp.xp.total.kills.add(10).log10();
+                let effect = tmp.xp.total.kills.add(10).log10();
 
-                if (hasUpgrade('xp', 32)) base = base.pow(2);
+                effect = effect.times(tmp.l.skills.vampirism.effect);
 
-                return base;
+                if (hasUpgrade('xp', 32)) effect = effect.pow(upgradeEffect('xp', 32));
+
+                return effect;
             },
             effectDisplay() { return `*${format(this.effect())}`; },
-            unlocked() { return tmp.xp.total.kills.gte(15); },
+            unlocked() { return tmp.xp.total.kills.gte(15) || hasUpgrade(this.layer, this.id); },
             cost: D(15),
         },
         21: {
@@ -226,9 +243,15 @@ addLayer('xp', {
                     return `Formula: ${formula}`;
                 }
             },
-            effect() { return tmp.xp.enemy.health.add(1).root(10).minus(1); },
+            effect() {
+                let effect = tmp.xp.enemy.health.add(1).root(10).minus(1);
+
+                effect = effect.times(tmp.l.skills.vampirism.effect);
+
+                return effect;
+            },
             effectDisplay() { return `+${format(this.effect())}`; },
-            unlocked() { return tmp.xp.total.kills.gte(30); },
+            unlocked() { return tmp.xp.total.kills.gte(30) || hasUpgrade(this.layer, this.id); },
             cost: D(50),
         },
         22: {
@@ -236,15 +259,21 @@ addLayer('xp', {
             description: 'Passively deal 25% of your damage every second',
             effect() { return D(.25); },
             effectDisplay() { return `${format(tmp.xp.clickDamage.times(this.effect()))} /s`; },
-            unlocked() { return tmp.xp.total.kills.gte(50); },
+            unlocked() { return tmp.xp.total.kills.gte(50) || hasUpgrade(this.layer, this.id); },
             cost: D(150),
         },
         23: {
             title: 'Notebook',
             description: 'Double experience gain',
-            effect() { return D(2); },
+            effect() {
+                let effect = D.dTwo;
+
+                effect = effect.times(tmp.l.skills.reading.effect);
+
+                return effect;
+            },
             effectDisplay() { return `*${format(this.effect())}`; },
-            unlocked() { return tmp.xp.total.kills.gte(70); },
+            unlocked() { return tmp.xp.total.kills.gte(70) || hasUpgrade(this.layer, this.id); },
             cost: D(250),
         },
         31: {
@@ -260,13 +289,21 @@ addLayer('xp', {
             },
             effect() { return player.xp.points.add(5).log(5); },
             effectDisplay() { return `*${format(this.effect())}`; },
-            unlocked() { return tmp.xp.total.kills.gte(100); },
+            unlocked() { return tmp.xp.total.kills.gte(100) || hasUpgrade(this.layer, this.id); },
             cost: D(400),
         },
         32: {
             title: 'Book of numbers',
             description: 'Reapply first row upgrades effects',
-            unlocked() { return tmp.xp.total.kills.gte(125); },
+            unlocked() { return tmp.xp.total.kills.gte(125) || hasUpgrade(this.layer, this.id); },
+            effect() {
+                let effect = D.dTwo;
+
+                effect = effect.times(tmp.l.skills.reading.effect);
+
+                return effect;
+            },
+            effectDisplay() { return `+${format(this.effect().minus(1))} times`; },
             cost: D(600),
         },
         33: {
@@ -274,7 +311,7 @@ addLayer('xp', {
             description: 'Unlock 2 new layers<br>Deal 50% more damage',
             effect() { return D(1.5); },
             effectDisplay() { return `*${format(this.effect())}`; },
-            unlocked() { return tmp.xp.total.kills.gte(150); },
+            unlocked() { return tmp.xp.total.kills.gte(150) || hasUpgrade(this.layer, this.id); },
             cost: D(900),
         },
     },
@@ -299,6 +336,7 @@ addLayer('xp', {
         if (hasUpgrade('xp', 22)) passive_damage = passive_damage.add(upgradeEffect('xp', 22));
 
         if (passive_damage.gt(0)) {
+            player.xp.clicked = true;
             /** @type {Decimal} */
             let damage = tmp.xp.clickDamage.times(passive_damage).times(diff);
 
@@ -309,6 +347,7 @@ addLayer('xp', {
         const type = player.xp.type;
         if (D.gt(player.xp.health[type], tmp.xp.enemy.health)) player.xp.health[type] = tmp.xp.enemy.health;
         while (D.lte(player.xp.health[type], 0)) {
+            let kills = D.dOne;
             if (player.xp.clicked) {
                 //workaround for starting at undefined
                 const xp_gain = tmp.xp.enemy.experience,
@@ -318,6 +357,14 @@ addLayer('xp', {
                 player.xp.total = D.add(player.xp.total, xp_gain);
                 player.xp.best = D.max(player.xp.best, player.xp.points);
                 player.xp.kills[type] = D.add(player.xp.kills[type], kills_gain);
+
+                kills = kills_gain;
+
+                if (layers.lo.items["*"].can_drop('enemy:')) {
+                    const drops = layers.lo.items["*"].get_drops(`enemy:${type}`, kills);
+                    player.xp.last_drops[type] = drops;
+                    drops.forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.add(amount));
+                }
             }
 
             player.xp.health[type] = D.add(player.xp.health[type], layers.xp.enemy.health());
@@ -334,7 +381,7 @@ addLayer('xp', {
 
             return level.floor();
         },
-        color(type = player.xp.type) {
+        color_level(type = player.xp.type) {
             const level = layers.xp.enemy.level(type);
             if (format(level) == 'NaN') return 'unknown';
             if (level.gte(Number.MAX_VALUE)) return 'rainbow';
@@ -353,6 +400,13 @@ addLayer('xp', {
 
             return color.join(' ');
         },
+        color(type = player.xp.type) {
+            switch (type) {
+                default:
+                case 'slime':
+                    return '#7FBF7F';
+            };
+        },
         health(type = player.xp.type) {
             let health;
             switch (type) {
@@ -363,6 +417,8 @@ addLayer('xp', {
             }
 
             if (hasUpgrade('xp', 12)) health = health.add(upgradeEffect('xp', 12).health);
+
+            health = health.div(buyableEffect('lo', 13));
 
             return health;
         },
@@ -379,12 +435,29 @@ addLayer('xp', {
             if (hasUpgrade('xp', 13)) xp_gain = xp_gain.times(upgradeEffect('xp', 13));
             if (hasUpgrade('xp', 23)) xp_gain = xp_gain.times(upgradeEffect('xp', 23));
 
+            xp_gain = xp_gain.times(tmp.l.skills.learning.effect);
+
+            /** @type {Decimal} */
+            let lo_11_mult = buyableEffect('lo', 11);
+            if (type == 'slime') lo_11_mult.pow(1.1);
+            xp_gain = xp_gain.times(lo_11_mult);
+
+            if (!tmp.l.canBuyMax) {
+                xp_gain = xp_gain.min(getNextAt('l').minus(player.xp.points));
+            }
+
             return xp_gain;
         },
         kills(type = player.xp.type) {
             let kills = D.dOne;
 
             return kills;
+        },
+        name(type) {
+            switch (type) {
+                default: return '';
+                case 'slime': return 'slime';
+            }
         },
     },
     /** @type {typeof layers.xp.total} */
@@ -402,13 +475,19 @@ addLayer('xp', {
         if (hasUpgrade('xp', 31)) damage = damage.times(upgradeEffect('xp', 31));
         if (hasUpgrade('xp', 31)) damage = damage.times(upgradeEffect('xp', 31));
 
+        damage = damage.times(tmp.l.skills.attacking.effect);
+
         return damage.max(1);
     },
     doReset(layer, force = false) {
         if (!force && layers[layer].row <= this.row) return;
 
-        let keep = ['type', 'ignore_type_warning'];
+        let keep = ['type', 'ignore_type_warning'],
+            kept_ups = [...player.xp.upgrades];
+
+        kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 12).xp_hold).toNumber();
 
         layerDataReset(this.layer, keep);
+        player.xp.upgrades.push(...kept_ups);
     },
 });

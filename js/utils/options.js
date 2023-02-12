@@ -77,3 +77,14 @@ function milestoneShown(layer, id) {
 	}
 	return false;
 }
+
+const CHANCE_MODE = {
+	'NEVER': 'never',
+	'LESS_HALF': 'below 50%',
+	'NOT_GUARANTEED': 'below 100%',
+};
+
+function changeLootChance() {
+	const modes = Object.keys(CHANCE_MODE);
+	options.chanceMode = modes[(modes.indexOf(options.chanceMode) + 1) % modes.length];
+}

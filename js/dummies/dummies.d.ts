@@ -478,7 +478,8 @@ declare class Layer<T extends LayerData> {
          * A function determining whether or not to show the button, if `masterButtonPress` is defined. Defaults to true if absent.
          */
         showMasterButton?(): boolean,
-        [id: number]: Clickable,
+    } & {
+        [id: number | string]: Clickable,
     }
     /**
      * An area that functions like a set of subtabs,
@@ -1852,94 +1853,196 @@ declare class LayerData {
     activeChallenge?: number | null
 }
 
+type drop_sources = 'enemy';
+
 declare let layers: {
     // Side
-    ach: Layer<any> & {
+    ach: Layer<Player['ach']> & {
         getAchievementsRows(type?: AchievementTypes): number[],
         getAchievements(type?: AchievementTypes): string[],
         totalAchievements(type?: AchievementTypes): Decimal,
         ownedAchievements(type?: AchievementTypes): Decimal,
-    },
+    }
     // Row 0
-    xp: Layer<any> & {
+    xp: Layer<Player['xp']> & {
         enemy: {
             types(): string[]
             level(type?: string): Decimal
+            color_level(type?: string): string
             color(type?: string): string
             health(type?: string): Decimal
             experience(type?: string): Decimal
             kills(type?: string): Decimal
+            name(type: string): string
         }
         total: {
             kills(): Decimal
         }
         clickDamage(): Decimal
-    },
+    }
+    // Row 1
+    l: Layer<Player['l']> & {
+        regex: RegExp
+        skills: {
+            '*': {
+                max(): Decimal
+                left(): Decimal
+                showSkill(id: string): ['row', [['bar', string], ['clickable', `add_${string}`], ['clickable', `remove_${string}`]]]
+            }
+            [skill: string]: {
+                readonly id: string
+                effect(): Decimal
+                needed(): Decimal
+                unlocked(): boolean
+                text(): string
+                name: string
+            }
+        }
+    }
+    lo: Layer<Player['lo']> & {
+        items: {
+            '*': {
+                grid_to_item: ((id: number) => string | false) & { cache: { [k: number]: string | false } }
+                global_chance_multiplier(): Decimal
+                get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: Decimal): [string, Decimal][]
+                format_chance(chance: Decimal): string
+                type_name(type: `${drop_sources}:${string}`): string
+                can_drop(type: `${drop_sources}:${string}`): boolean
+                amount(): Decimal
+            }
+        } & {
+            [id: string]: {
+                readonly id: string
+                readonly grid: number
+                chances(): { [type: string]: Decimal }
+                style?: Computable<CSSStyles>
+                name: Computable<string>
+            }
+        }
+    }
 };
 type Temp = {
-    displayThings: (string | (() => string))[],
-    gameEnded: boolean,
+    displayThings: (string | (() => string))[]
+    gameEnded: boolean
     other: {
         lastPoints: Decimal,
         oomps: Decimal,
         screenWidth: number,
         screenHeight: number,
-    },
-    pointGen: Decimal,
-    scrolled: boolean,
+    }
+    pointGen: Decimal
+    scrolled: boolean
     // Side
     ach: TempLayer & {
         getAchievementsRows: number[],
         getAchievements: string[],
         totalAchievements: Decimal,
         ownedAchievements: Decimal,
-    },
+    }
     // Row 0
     xp: TempLayer & {
         enemy: {
             types: string[]
             level: Decimal
+            color_level: string
             color: string
             health: Decimal
             experience: Decimal
             kills: Decimal
+            name: ''
         }
         total: {
             kills: Decimal
         }
         clickDamage: Decimal
-    },
+    }
+    // Row 1
+    l: TempLayer & {
+        regex: RegExp
+        skills: {
+            '*': {
+                max: Decimal
+                left: Decimal
+                showSkill(id: string): ['row', [['bar', string], ['clickable', `add_${string}`], ['clickable', `remove_${string}`]]]
+            }
+            [skill: string]: {
+                readonly id: string
+                effect: Decimal
+                needed: Decimal
+                unlocked: boolean
+                text: string
+                name: string
+            }
+        }
+    }
+    lo: TempLayer & {
+        items: {
+            '*': {
+                grid_to_item(id: number): string | false
+                global_chance_multiplier: Decimal
+                get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: Decimal): [string, Decimal][]
+                format_chance(chance: Decimal): string
+                type_name(type: `${drop_sources}:${string}`): string
+                can_drop(type: `${drop_sources}:${string}`): boolean
+                amount: Decimal
+            }
+        } & {
+            [id: string]: {
+                readonly id: string
+                readonly grid: number
+                chances: { [type: string]: Decimal }
+                style?: CSSStyles
+                name: string
+            }
+        }
+    }
 };
 type Player = {
-    devSpeed: string,
-    hasNaN: boolean,
-    keepGoing: boolean,
-    lastSafeTab: string,
-    navTab: string,
+    devSpeed: string
+    hasNaN: boolean
+    keepGoing: boolean
+    lastSafeTab: string
+    navTab: string
     offTime: {
         remain: number,
-    },
-    points: Decimal,
+    }
+    points: Decimal
     subtabs: {
         [key: string]: {
             mainTabs: string,
         },
-    },
-    tab: string,
-    time: number,
-    timePlayed: number,
-    version: string,
-    versionType: string,
+    }
+    tab: string
+    time: number
+    timePlayed: number
+    version: string
+    versionType: string
     // Side
     ach: LayerData & {
-        short_mode: boolean,
-    },
+        short_mode: boolean
+    }
     // Row 0
     xp: LayerData & {
-        health: { [enemy: string]: ?Decimal },
-        kills: { [enemy: string]: ?Decimal },
-        type: string,
-        ignore_type_warning: boolean,
-        clicked: boolean,
-    },
+        health: { [enemy: string]: Decimal }
+        kills: { [enemy: string]: Decimal }
+        type: string
+        ignore_type_warning: boolean
+        clicked: boolean
+        last_drops: { [enemy: string]: [string, Decimal][] }
+    }
+    // Row 1
+    l: LayerData & {
+        change: Decimal
+        skills: {
+            [skill: string]: {
+                points: Decimal
+                level: Decimal
+                progress: Decimal
+            }
+        }
+    }
+    lo: LayerData & {
+        shown: boolean
+        items: { [id: string]: { amount: Decimal, } }
+    }
 };

@@ -6,7 +6,8 @@ var needCanvasUpdate = true;
 const TMT_VERSION = {
 	tmtNum: "2.6.6.2",
 	tmtName: "Fixed Reality"
-}
+};
+const listFormat = new Intl.ListFormat('en');
 
 /**
  * @param {String} layer

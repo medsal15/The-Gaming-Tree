@@ -27,8 +27,7 @@ let modInfo = {
 		'moreutils.js', 'tree.js',
 		'layers/side/achievements.js',
 		'layers/0/experience.js',
-
-		'devtools.js',
+		'layers/1/level.js', 'layers/1/loot.js',
 	],
 
 	/**
@@ -62,7 +61,7 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.1',
+	num: 'R0.2',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
@@ -73,6 +72,9 @@ let VERSION = {
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.2</h3><br>
+	- Added Levels and Loot.<br>
+	- Update endgame: 1000 slime kills.<br>
 	<h3>v0.1</h3><br>
 		- Added XP.<br>
 		- Update endgame: 9th XP upgrades.`;
@@ -90,7 +92,7 @@ let winText = `Congratulations! You have reached the end and beaten this game, b
  * var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything"]
  * ```
  */
-var doNotCallTheseFunctionsEveryTick = ['enemyColor', 'onKill', 'skill_row', 'itemId', 'formatCoins', 'canGet'];
+var doNotCallTheseFunctionsEveryTick = ['show_skill', 'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop'];
 
 /**
  * A function to determine the amount of points the player starts with after a reset.
@@ -152,7 +154,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return hasUpgrade('xp', 33);
+	return player.xp.kills.slime.gte(1_000);
 }
 
 

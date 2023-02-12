@@ -7,7 +7,7 @@ var mouseY = 0;
  * @template {Particle} T
  * @param {T} data
  * @param {number} [amount]
- * @param {keyof newParticles} [type]
+ * @param {keyof typeof newParticles} [type]
  */
 function makeParticles(data, amount = 1, type = "normal") {
     for (let x = 0; x < amount; x++) {

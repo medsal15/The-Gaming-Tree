@@ -442,7 +442,7 @@ function focused(x) {
 
 /**
  * @param {any} obj
- * @returns {Boolean}
+ * @returns {obj is (...args: any) => any}
  */
 function isFunction(obj) {
 	return !!(obj && obj.constructor && obj.call && obj.apply);
