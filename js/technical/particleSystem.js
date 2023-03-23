@@ -12,7 +12,7 @@ var mouseY = 0;
 function makeParticles(data, amount = 1, type = "normal") {
     for (let x = 0; x < amount; x++) {
         let particle = newParticles[type]()
-        for (thing in data) {
+        for (const thing in data) {
 
             switch (thing) {
                 case 'onClick': // Functions that should be copied over
@@ -51,7 +51,7 @@ function makeShinies(data, amount = 1) {
 
 
 function updateParticles(diff) {
-    for (p in particles) {
+    for (const p in particles) {
         let particle = particles[p]
         particle.time -= diff;
         particle.fadeInTimer -= diff;
@@ -178,7 +178,7 @@ function constructParticleStyle(particle) {
 function clearParticles(check) {
     if (!check) check = true
 
-    for (p in particles) {
+    for (const p in particles) {
         if (run(check, particles[p], particles[p])) {
             Vue.delete(particles, p)
         }

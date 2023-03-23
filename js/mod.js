@@ -74,12 +74,12 @@ let VERSION = {
  */
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.3</h3><br>
-	- Added 2 new layers.<br>
-	- Added a boss, miniboss and a relic.<br>
-	- Update endgame: Beat the boss.<br>
+		- Added 2 new layers.<br>
+		- Added a boss, miniboss and a relic.<br>
+		- Update endgame: Beat the boss.<br>
 	<h3>v0.2</h3><br>
-	- Added Levels and Loot.<br>
-	- Update endgame: 1000 slime kills.<br>
+		- Added Levels and Loot.<br>
+		- Update endgame: 1000 slime kills.<br>
 	<h3>v0.1</h3><br>
 		- Added XP.<br>
 		- Update endgame: 9th XP upgrades.`;

@@ -3,7 +3,7 @@ function save(force) {
 	NaNcheck(player)
 	if (NaNalert && !force) return
 	localStorage.setItem(modInfo.id, btoa(unescape(encodeURIComponent(JSON.stringify(player)))));
-	localStorage.setItem(modInfo.id+"_options", btoa(unescape(encodeURIComponent(JSON.stringify(options)))));
+	localStorage.setItem(modInfo.id + "_options", btoa(unescape(encodeURIComponent(JSON.stringify(options)))));
 
 }
 function startPlayerBase() {
@@ -29,12 +29,12 @@ function getStartPlayer() {
 
 	if (addedPlayerData) {
 		extradata = addedPlayerData();
-		for (thing in extradata)
+		for (const thing in extradata)
 			playerdata[thing] = extradata[thing];
 	}
 
 	playerdata.infoboxes = {};
-	for (layer in layers) {
+	for (const layer in layers) {
 		playerdata[layer] = getStartLayerData(layer);
 
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
@@ -44,13 +44,13 @@ function getStartPlayer() {
 		if (layers[layer].microtabs) {
 			if (playerdata.subtabs[layer] == undefined)
 				playerdata.subtabs[layer] = {};
-			for (item in layers[layer].microtabs)
+			for (const item in layers[layer].microtabs)
 				playerdata.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0];
 		}
 		if (layers[layer].infoboxes) {
 			if (playerdata.infoboxes[layer] == undefined)
 				playerdata.infoboxes[layer] = {};
-			for (item in layers[layer].infoboxes)
+			for (const item in layers[layer].infoboxes)
 				playerdata.infoboxes[layer][item] = false;
 		}
 
@@ -91,7 +91,7 @@ function getStartLayerData(layer) {
 function getStartBuyables(layer) {
 	let data = {};
 	if (layers[layer].buyables) {
-		for (id in layers[layer].buyables)
+		for (const id in layers[layer].buyables)
 			if (isPlainObject(layers[layer].buyables[id]))
 				data[id] = decimalZero;
 	}
@@ -100,7 +100,7 @@ function getStartBuyables(layer) {
 function getStartClickables(layer) {
 	let data = {};
 	if (layers[layer].clickables) {
-		for (id in layers[layer].clickables)
+		for (const id in layers[layer].clickables)
 			if (isPlainObject(layers[layer].clickables[id]))
 				data[id] = "";
 	}
@@ -109,7 +109,7 @@ function getStartClickables(layer) {
 function getStartChallenges(layer) {
 	let data = {};
 	if (layers[layer].challenges) {
-		for (id in layers[layer].challenges)
+		for (const id in layers[layer].challenges)
 			if (isPlainObject(layers[layer].challenges[id]))
 				data[id] = 0;
 	}
@@ -117,13 +117,13 @@ function getStartChallenges(layer) {
 }
 function getStartGrid(layer) {
 	let data = {};
-	if (! layers[layer].grid) return data
-	if (layers[layer].grid.maxRows === undefined) layers[layer].grid.maxRows=layers[layer].grid.rows
-	if (layers[layer].grid.maxCols === undefined) layers[layer].grid.maxCols=layers[layer].grid.cols
+	if (!layers[layer].grid) return data
+	if (layers[layer].grid.maxRows === undefined) layers[layer].grid.maxRows = layers[layer].grid.rows
+	if (layers[layer].grid.maxCols === undefined) layers[layer].grid.maxCols = layers[layer].grid.cols
 
 	for (let y = 1; y <= layers[layer].grid.maxRows; y++) {
 		for (let x = 1; x <= layers[layer].grid.maxCols; x++) {
-			data[100*y + x] = layers[layer].grid.getStartData(100*y + x)
+			data[100 * y + x] = layers[layer].grid.getStartData(100 * y + x)
 		}
 	}
 	return data;
@@ -133,7 +133,7 @@ function fixSave() {
 	defaultData = getStartPlayer();
 	fixData(defaultData, player);
 
-	for (layer in layers) {
+	for (const layer in layers) {
 		if (player[layer].best !== undefined)
 			player[layer].best = new Decimal(player[layer].best);
 		if (player[layer].total !== undefined)
@@ -145,14 +145,14 @@ function fixSave() {
 				player.subtabs[layer].mainTabs = Object.keys(layers[layer].tabFormat)[0];
 		}
 		if (layers[layer].microtabs) {
-			for (item in layers[layer].microtabs)
+			for (const item in layers[layer].microtabs)
 				if (!Object.keys(layers[layer].microtabs[item]).includes(player.subtabs[layer][item]))
 					player.subtabs[layer][item] = Object.keys(layers[layer].microtabs[item])[0];
 		}
 	}
 }
 function fixData(defaultData, newData) {
-	for (item in defaultData) {
+	for (const item in defaultData) {
 		if (defaultData[item] == null) {
 			if (newData[item] === undefined)
 				newData[item] = null;
@@ -217,7 +217,7 @@ function load() {
 }
 
 function loadOptions() {
-	let get2 = localStorage.getItem(modInfo.id+"_options");
+	let get2 = localStorage.getItem(modInfo.id + "_options");
 	if (get2)
 		options = Object.assign(getStartOptions(), JSON.parse(decodeURIComponent(escape(atob(get2)))));
 	else
@@ -241,10 +241,10 @@ function fixNaNs() {
  * @param {Object} data
  * @param {string} [path=''] Path to the NaN
  */
-function NaNcheck(data, path='') {
+function NaNcheck(data, path = '') {
 	if (path.length > 0) path += '.'
 	for (let item in data) {
-		if (data[item] == null) {}
+		if (data[item] == null) { }
 		else if (Array.isArray(data[item])) {
 			NaNcheck(data[item], `${path}${item}`);
 		}
@@ -256,7 +256,7 @@ function NaNcheck(data, path='') {
 				return
 			}
 		}
-		else if (data[item] instanceof Decimal) {}
+		else if (data[item] instanceof Decimal) { }
 		else if ((!!data[item]) && (data[item].constructor === Object)) {
 			NaNcheck(data[item], `${path}${item}`);
 		}
@@ -321,7 +321,7 @@ var saveInterval = setInterval(function () {
 }, 5000);
 
 window.onbeforeunload = () => {
-    if (player.autosave) {
-        save();
-    }
+	if (player.autosave) {
+		save();
+	}
 };

@@ -264,13 +264,13 @@ function prestigeNotify(layer) {
 	if (layers[layer].prestigeNotify) return layers[layer].prestigeNotify()
 
 	if (isPlainObject(tmp[layer].tabFormat)) {
-		for (subtab in tmp[layer].tabFormat) {
+		for (const subtab in tmp[layer].tabFormat) {
 			if (subtabResetNotify(layer, 'mainTabs', subtab))
 				return true
 		}
 	}
-	for (family in tmp[layer].microtabs) {
-		for (subtab in tmp[layer].microtabs[family]) {
+	for (const family in tmp[layer].microtabs) {
+		for (const subtab in tmp[layer].microtabs[family]) {
 			if (subtabResetNotify(layer, family, subtab))
 				return true
 		}
@@ -355,7 +355,7 @@ function toNumber(x) {
  */
 function updateMilestones(layer) {
 	if (tmp[layer].deactivated) return
-	for (id in layers[layer].milestones) {
+	for (const id in layers[layer].milestones) {
 		if (!(hasMilestone(layer, id)) && layers[layer].milestones[id].done()) {
 			player[layer].milestones.push(id)
 			if (layers[layer].milestones[id].onComplete) layers[layer].milestones[id].onComplete()
@@ -370,7 +370,7 @@ function updateMilestones(layer) {
  */
 function updateAchievements(layer) {
 	if (tmp[layer].deactivated) return
-	for (id in layers[layer].achievements) {
+	for (const id in layers[layer].achievements) {
 		if (isPlainObject(layers[layer].achievements[id]) && !(hasAchievement(layer, id)) && layers[layer].achievements[id].done()) {
 			player[layer].achievements.push(id)
 			if (layers[layer].achievements[id].onComplete) layers[layer].achievements[id].onComplete()
@@ -516,7 +516,7 @@ function doPopup(type = "none", text = "This is a test popup.", title = "", time
  * @param {Number} diff in seconds
  */
 function adjustPopupTime(diff) {
-	for (popup in activePopups) {
+	for (const popup in activePopups) {
 		activePopups[popup].time -= diff;
 		if (activePopups[popup]["time"] < 0) {
 			activePopups.splice(popup, 1); // Remove popup when time hits 0

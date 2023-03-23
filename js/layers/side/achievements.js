@@ -509,7 +509,7 @@ addLayer('ach', {
             unlocked() { return hasChallenge('b', 31); },
         },
         93: {
-            name: '???',
+            name: 'Wizardry',
             tooltip: '???',
             done() { return false; },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },

@@ -16,7 +16,7 @@ var activeFunctions = [
 ]
 
 var noCall = doNotCallTheseFunctionsEveryTick
-for (item in noCall) {
+for (const item in noCall) {
 	activeFunctions.push(noCall[item])
 }
 
@@ -33,7 +33,7 @@ function setupTemp() {
 	funcs = {}
 
 	setupTempData(layers, tmp, funcs)
-	for (layer in layers) {
+	for (const layer in layers) {
 		tmp[layer].resetGain = {}
 		tmp[layer].nextAt = {}
 		tmp[layer].nextAtDisp = {}
@@ -60,7 +60,7 @@ function setupTemp() {
 const boolNames = ["unlocked", "deactivated"]
 
 function setupTempData(layerData, tmpData, funcsData) {
-	for (item in layerData) {
+	for (const item in layerData) {
 		if (layerData[item] == null) {
 			tmpData[item] = null
 		}
@@ -99,7 +99,7 @@ function updateTemp() {
 
 	updateTempData(layers, tmp, funcs)
 
-	for (layer in layers) {
+	for (const layer in layers) {
 		tmp[layer].resetGain = getResetGain(layer)
 		tmp[layer].nextAt = getNextAt(layer)
 		tmp[layer].nextAtDisp = getNextAt(layer, true)
@@ -115,7 +115,7 @@ function updateTemp() {
 	tmp.backgroundStyle = readData(backgroundStyle)
 
 	tmp.displayThings = []
-	for (thing in displayThings) {
+	for (const thing in displayThings) {
 		let text = displayThings[thing]
 		if (isFunction(text)) text = text()
 		tmp.displayThings.push(text)
@@ -123,7 +123,7 @@ function updateTemp() {
 }
 
 function updateTempData(layerData, tmpData, funcsData, useThis) {
-	for (item in funcsData) {
+	for (const item in funcsData) {
 		if (Array.isArray(layerData[item])) {
 			if (item !== "tabFormat" && item !== "content") // These are only updated when needed
 				updateTempData(layerData[item], tmpData[item], funcsData[item], useThis)
@@ -155,7 +155,7 @@ function updateClickableTemp(layer) {
 }
 
 function setupBuyables(layer) {
-	for (id in layers[layer].buyables) {
+	for (const id in layers[layer].buyables) {
 		if (isPlainObject(layers[layer].buyables[id])) {
 			let b = layers[layer].buyables[id]
 			b.actualCostFunction = b.cost

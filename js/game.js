@@ -101,7 +101,7 @@ function softcap(value, cap, power = 0.5) {
  * @returns {Boolean}
  */
 function shouldNotify(layer) {
-	for (id in tmp[layer].upgrades) {
+	for (const id in tmp[layer].upgrades) {
 		if (isPlainObject(layers[layer].upgrades[id])) {
 			if (canAffordUpgrade(layer, id) && !hasUpgrade(layer, id) && tmp[layer].upgrades[id].unlocked) {
 				return true
@@ -116,7 +116,7 @@ function shouldNotify(layer) {
 		return true
 
 	if (isPlainObject(tmp[layer].tabFormat)) {
-		for (subtab in tmp[layer].tabFormat) {
+		for (const subtab in tmp[layer].tabFormat) {
 			if (subtabShouldNotify(layer, 'mainTabs', subtab)) {
 				tmp[layer].trueGlowColor = tmp[layer].tabFormat[subtab].glowColor || defaultGlow
 
@@ -125,8 +125,8 @@ function shouldNotify(layer) {
 		}
 	}
 
-	for (family in tmp[layer].microtabs) {
-		for (subtab in tmp[layer].microtabs[family]) {
+	for (const family in tmp[layer].microtabs) {
+		for (const subtab in tmp[layer].microtabs[family]) {
 			if (subtabShouldNotify(layer, family, subtab)) {
 				tmp[layer].trueGlowColor = tmp[layer].microtabs[family][subtab].glowColor
 				return true
@@ -158,7 +158,7 @@ function canReset(layer) {
  * @param {String} layer
  */
 function rowReset(row, layer) {
-	for (lr in ROW_LAYERS[row]) {
+	for (const lr in ROW_LAYERS[row]) {
 		if (layers[lr].doReset) {
 			if (!isNaN(row)) Vue.set(player[lr], "activeChallenge", null) // Exit challenges on any row reset on an equal or higher row
 			run(layers[lr].doReset, layers[lr], layer)
@@ -175,7 +175,7 @@ function rowReset(row, layer) {
 function layerDataReset(layer, keep = []) {
 	let storedData = { unlocked: player[layer].unlocked, forceTooltip: player[layer].forceTooltip, noRespecConfirm: player[layer].noRespecConfirm, prevTab: player[layer].prevTab } // Always keep these
 
-	for (thing in keep) {
+	for (const thing in keep) {
 		if (player[layer][keep[thing]] !== undefined)
 			storedData[keep[thing]] = player[layer][keep[thing]]
 	}
@@ -190,7 +190,7 @@ function layerDataReset(layer, keep = []) {
 	player[layer].milestones = []
 	player[layer].achievements = []
 
-	for (thing in storedData) {
+	for (const thing in storedData) {
 		player[layer][thing] = storedData[thing]
 	}
 }
@@ -247,7 +247,7 @@ function doReset(layer, force = false) {
 
 			if (tmp[layer].increaseUnlockOrder) {
 				lrs = tmp[layer].increaseUnlockOrder
-				for (lr in lrs)
+				for (const lr in lrs)
 					if (!player[lrs[lr]].unlocked) player[lrs[lr]].unlockOrder++
 			}
 		}
@@ -258,14 +258,14 @@ function doReset(layer, force = false) {
 	tmp[layer].baseAmount = decimalZero // quick fix
 
 
-	for (layerResetting in layers) {
+	for (const layerResetting in layers) {
 		if (row >= layers[layerResetting].row && (!force || layerResetting != layer)) completeChallenge(layerResetting)
 	}
 
 	player.points = (row == 0 ? decimalZero : getStartPoints())
 
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
-	for (r in OTHER_LAYERS) {
+	for (const r in OTHER_LAYERS) {
 		rowReset(r, layer)
 	}
 
@@ -369,7 +369,7 @@ function completeChallenge(layer, x) {
 	updateChallengeTemp(layer)
 }
 
-VERSION.withoutName = "v" + VERSION.num + (VERSION.pre ? " Pre-Release " + VERSION.pre : VERSION.pre ? " Beta " + VERSION.beta : "")
+VERSION.withoutName = "v" + VERSION.num + (VERSION.pre ? " Pre-Release " + VERSION.pre : VERSION.beta ? " Beta " + VERSION.beta : "")
 VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "")
 
 
@@ -378,7 +378,7 @@ VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "
  */
 function autobuyUpgrades(layer) {
 	if (!tmp[layer].upgrades) return
-	for (id in tmp[layer].upgrades)
+	for (const id in tmp[layer].upgrades)
 		if (isPlainObject(tmp[layer].upgrades[id]) && (layers[layer].upgrades[id].canAfford === undefined || layers[layer].upgrades[id].canAfford() === true))
 			buyUpg(layer, id)
 }
@@ -408,7 +408,7 @@ function gameLoop(diff) {
 	player.points = player.points.add(tmp.pointGen.times(diff)).max(0)
 
 	for (let x = 0; x <= maxRow; x++) {
-		for (item in TREE_LAYERS[x]) {
+		for (const item in TREE_LAYERS[x]) {
 			let layer = TREE_LAYERS[x][item]
 			player[layer].resetTime += diff
 			if (tmp[layer].passiveGeneration) generatePoints(layer, diff * tmp[layer].passiveGeneration);
@@ -416,8 +416,8 @@ function gameLoop(diff) {
 		}
 	}
 
-	for (row in OTHER_LAYERS) {
-		for (item in OTHER_LAYERS[row]) {
+	for (const row in OTHER_LAYERS) {
+		for (const item in OTHER_LAYERS[row]) {
 			let layer = OTHER_LAYERS[row][item]
 			player[layer].resetTime += diff
 			if (tmp[layer].passiveGeneration) generatePoints(layer, diff * tmp[layer].passiveGeneration);
@@ -426,7 +426,7 @@ function gameLoop(diff) {
 	}
 
 	for (let x = maxRow; x >= 0; x--) {
-		for (item in TREE_LAYERS[x]) {
+		for (const item in TREE_LAYERS[x]) {
 			let layer = TREE_LAYERS[x][item]
 			if (tmp[layer].autoPrestige && tmp[layer].canReset) doReset(layer);
 			if (layers[layer].automate) layers[layer].automate();
@@ -434,8 +434,8 @@ function gameLoop(diff) {
 		}
 	}
 
-	for (row in OTHER_LAYERS) {
-		for (item in OTHER_LAYERS[row]) {
+	for (const row in OTHER_LAYERS) {
+		for (const item in OTHER_LAYERS[row]) {
 			let layer = OTHER_LAYERS[row][item]
 			if (tmp[layer].autoPrestige && tmp[layer].canReset) doReset(layer);
 			if (layers[layer].automate) layers[layer].automate();
@@ -444,7 +444,7 @@ function gameLoop(diff) {
 		}
 	}
 
-	for (layer in layers) {
+	for (const layer in layers) {
 		if (layers[layer].milestones) updateMilestones(layer);
 		if (layers[layer].achievements) updateAchievements(layer)
 	}
