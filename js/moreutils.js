@@ -117,3 +117,21 @@ function formatCoins(decimal, coin_types) {
 const D = new Proxy(val => new Decimal(val), {
     get(_, prop) { return Decimal[prop]; },
 });
+/**
+ * Same as `player.<layer>.activeChallenge ?? false`
+ *
+ * @param {string} layer
+ * @returns {number|false}
+ */
+function activeChallenge(layer) {
+    return player[layer].activeChallenge ?? false;
+}
+/**
+ * Capitalizes the first letter
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+function capitalize(text) {
+    return text.replace(/^./, s => s.toUpperCase());
+}

@@ -15,8 +15,9 @@ addLayer('l', {
             ),
         };
     },
-    layerShown() { return player.l.unlocked || hasUpgrade('xp', 33); },
-    color: '#6E92B7',
+    layerShown() { return (player.l.unlocked || hasUpgrade('xp', 33)) && !tmp[this.layer].deactivated; },
+    deactivated() { return inChallenge('b', 31); },
+    color: '#6699BB',
     row: 1,
     position: 0,
     resource: 'levels',
@@ -40,6 +41,16 @@ addLayer('l', {
                 'main-display',
                 'prestige-button',
                 'blank',
+                () => {
+                    const speed = layers.clo.time_speed('l');
+
+                    if (speed.neq(1)) return [
+                        'column', [
+                            ['display-text', `Time speed: *${format(speed)}`],
+                            'blank',
+                        ],
+                    ];
+                },
                 ['display-text', () => `Skill points: ${layerColor('l', format(tmp.l.skills["*"].left))} / ${layerColor('l', format(tmp.l.skills["*"].max))}`],
                 ['text-input', 'change'],
                 'blank',
@@ -163,13 +174,25 @@ addLayer('l', {
                     ['clickable', `add_${skill}`],
                     ['clickable', `remove_${skill}`],
                 ]];
-            }
+            },
+            speed() {
+                let speed = D.dOne;
+
+                if (hasUpgrade('m', 31)) speed = speed.times(upgradeEffect('m', 31));
+
+                speed = speed.times(buyableEffect('lo', 33));
+
+                return speed;
+            },
         },
         attacking: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(2).times(25); },
-            effect() { return D(1.15).pow(player.l.skills[this.id].level); },
+            effect() {
+                if (tmp.l.deactivated) return D.dOne;
+                return D(1.15).pow(player.l.skills[this.id].level);
+            },
             unlocked() { return hasMilestone('l', 1); },
             text() {
                 return `Attacking level ${formatWhole(player.l.skills[this.id].level)}<br>\
@@ -182,7 +205,10 @@ addLayer('l', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(1.9).times(60); },
-            effect() { return D(1.1).pow(player.l.skills[this.id].level); },
+            effect() {
+                if (tmp.l.deactivated) return D.dOne;
+                return D(1.1).pow(player.l.skills[this.id].level);
+            },
             unlocked() { return hasMilestone('l', 2); },
             text() {
                 return `Learning level ${formatWhole(player.l.skills[this.id].level)}<br>\
@@ -191,24 +217,14 @@ addLayer('l', {
             },
             name: 'learning',
         },
-        reading: {
-            _id: null,
-            get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
-            needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(130); },
-            effect() { return D(.125).times(player.l.skills[this.id].level).add(1); },
-            unlocked() { return hasMilestone('l', 3); },
-            text() {
-                return `Reading level ${formatWhole(player.l.skills[this.id].level)}<br>\
-                ${format(player.l.skills[this.id].points)} points assigned to reading<br>\
-                ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects *${format(this.effect())}`;
-            },
-            name: 'reading',
-        },
         vampirism: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(270); },
-            effect() { return D(.25).times(player.l.skills[this.id].level).add(1); },
+            effect() {
+                if (tmp.l.deactivated) return D.dOne;
+                return D(.25).times(player.l.skills[this.id].level).add(1);
+            },
             unlocked() { return hasMilestone('l', 3); },
             text() {
                 return `Vampirism level ${formatWhole(player.l.skills[this.id].level)}<br>\
@@ -217,12 +233,32 @@ addLayer('l', {
             },
             name: 'vampirism',
         },
+        reading: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
+            needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(130); },
+            effect() {
+                if (tmp.l.deactivated) return D.dOne;
+                return D(.125).times(player.l.skills[this.id].level).add(1);
+            },
+            unlocked() { return hasMilestone('l', 4); },
+            text() {
+                return `Reading level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                ${format(player.l.skills[this.id].points)} points assigned to reading<br>\
+                ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects *${format(this.effect())}`;
+            },
+            name: 'reading',
+        },
     },
     update(diff) {
+        diff = D.times(diff, layers.clo.time_speed(this.layer));
+
+        let skill_speed = D.times(diff, tmp.l.skills["*"].speed);
+
         Object.values(player.l.skills)
             .filter(({ points }) => points.gt(0))
             .forEach(skill => {
-                skill.progress = skill.progress.add(skill.points.pow(2).times(diff));
+                skill.progress = skill.progress.add(skill.points.pow(2).times(skill_speed));
             });
     },
     automate() {

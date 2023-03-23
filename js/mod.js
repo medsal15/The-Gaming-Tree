@@ -25,9 +25,10 @@ let modInfo = {
 	 */
 	modFiles: [
 		'moreutils.js', 'tree.js',
-		'layers/side/achievements.js',
-		'layers/0/experience.js',
+		'layers/side/achievements.js', 'layers/side/clock.js',
+		'layers/0/experience.js', 'layers/0/mining.js',
 		'layers/1/level.js', 'layers/1/loot.js',
+		'layers/2/boss.js',
 	],
 
 	/**
@@ -61,17 +62,21 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.2',
+	num: 'R0.3',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
-	name: 'Reset',
+	name: 'Anger',
 };
 
 /**
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.3</h3><br>
+	- Added 2 new layers.<br>
+	- Added a boss, miniboss and a relic.<br>
+	- Update endgame: Beat the boss.<br>
 	<h3>v0.2</h3><br>
 	- Added Levels and Loot.<br>
 	- Update endgame: 1000 slime kills.<br>
@@ -92,7 +97,7 @@ let winText = `Congratulations! You have reached the end and beaten this game, b
  * var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything"]
  * ```
  */
-var doNotCallTheseFunctionsEveryTick = ['show_skill', 'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop'];
+var doNotCallTheseFunctionsEveryTick = ['show_skill', 'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop', 'gain_drops'];
 
 /**
  * A function to determine the amount of points the player starts with after a reset.
@@ -146,6 +151,11 @@ function addedPlayerData() {
  */
 var displayThings = [
 	() => isEndgame() ? '<span style="color:#60C0F0">You are past endgame. Content may not be balanced.</span>' : '',
+	() => {
+		const id = activeChallenge('b');
+		if (!id) return '';
+		return `In boss challenge: ${layerColor('b', layers.b.challenges[id].name)}`;
+	},
 ];
 
 /**
@@ -154,7 +164,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return player.xp.kills.slime.gte(1_000);
+	return hasChallenge('b', 11);
 }
 
 

@@ -168,7 +168,7 @@ var systemComponents = {
 			</tr>
             <tr>
                 <td><button class="opt" onclick="toggleOpt('colorLevels'); needsCanvasUpdate = true">Color Levels: {{ options.colorLevels?"ON":"OFF" }}</button></td>
-                <td><button v-if="tmp.lo.layerShown" class="opt" onclick="changeLootChance(); needsCanvasUpdate = true">Fractional Loot Chance Mode: {{ CHANCE_MODE[options.chanceMode] }}</button></td>
+                <td><button v-if="tmp.lo.layerShown" class="opt" onclick="changeLootChance(); needsCanvasUpdate = true">Fractional Chance Mode: {{ CHANCE_MODE[options.chanceMode] }}</button></td>
 			</tr>
         </table>`
 	},

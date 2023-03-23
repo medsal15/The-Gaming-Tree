@@ -858,7 +858,7 @@ declare class Layer<T extends LayerData> {
      * similar to calculate what your next at would be under another prestige type
      * (provided you have all of the required features in the layer).
      */
-    getNextat?(canMax: boolean): Decimal
+    getNextAt?(canMax: boolean): Decimal
     /**
      * Return true only if you have the resources required to do a prestige here.
      */
@@ -1853,20 +1853,25 @@ declare class LayerData {
     activeChallenge?: number | null
 }
 
-type drop_sources = 'enemy';
+type drop_sources = 'enemy' | 'mining';
 
 declare let layers: {
     // Side
     ach: Layer<Player['ach']> & {
-        getAchievementsRows(type?: AchievementTypes): number[],
-        getAchievements(type?: AchievementTypes): string[],
-        totalAchievements(type?: AchievementTypes): Decimal,
-        ownedAchievements(type?: AchievementTypes): Decimal,
+        getAchievementsRows(type?: AchievementTypes): number[]
+        getAchievements(type?: AchievementTypes): string[]
+        totalAchievements(type?: AchievementTypes): Decimal
+        ownedAchievements(type?: AchievementTypes): Decimal
+    }
+    clo: Layer<Player['clo']> & {
+        upgrades: { [id: number]: Upgrade & { price: [string, Decimal][] } }
+        time_speed(layer?: string, visual?: boolean): Decimal
     }
     // Row 0
     xp: Layer<Player['xp']> & {
         enemy: {
             types(): string[]
+            all_types: string[]
             level(type?: string): Decimal
             color_level(type?: string): string
             color(type?: string): string
@@ -1874,11 +1879,21 @@ declare let layers: {
             experience(type?: string): Decimal
             kills(type?: string): Decimal
             name(type: string): string
+            //todo damage(type?: string): Decimal
         }
         total: {
             kills(): Decimal
         }
         clickDamage(): Decimal
+    }
+    m: Layer<Player['m']> & {
+        ore: {
+            health(): Decimal
+            regen(): Decimal
+            chance(): Decimal
+            mode(mode?: Player['m']['mode']): string
+            get_drops(amount: DecimalSource): [string, Decimal][]
+        }
     }
     // Row 1
     l: Layer<Player['l']> & {
@@ -1888,6 +1903,7 @@ declare let layers: {
                 max(): Decimal
                 left(): Decimal
                 showSkill(id: string): ['row', [['bar', string], ['clickable', `add_${string}`], ['clickable', `remove_${string}`]]]
+                speed(): Decimal
             }
             [skill: string]: {
                 readonly id: string
@@ -1905,21 +1921,29 @@ declare let layers: {
                 grid_to_item: ((id: number) => string | false) & { cache: { [k: number]: string | false } }
                 global_chance_multiplier(): Decimal
                 get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: Decimal): [string, Decimal][]
+                gain_drops(drops: [string, Decimal][]): void
                 format_chance(chance: Decimal): string
                 type_name(type: `${drop_sources}:${string}`): string
                 can_drop(type: `${drop_sources}:${string}`): boolean
                 amount(): Decimal
+                weight(type?: `${drop_sources}:${string}`): type extends string ? Decimal : { [key: `${drop_sources}:${string}`]: Decimal }
+                has_anvil(): boolean
             }
         } & {
             [id: string]: {
                 readonly id: string
                 readonly grid: number
-                chances(): { [type: string]: Decimal }
+                chances?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
+                weights?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
+                other_sources?: Computable<`${drop_sources}:${string}`[]>
                 style?: Computable<CSSStyles>
                 name: Computable<string>
+                unlocked?: Computable<boolean>
             }
         }
     }
+    // Row 2
+    b: Layer<Player['b']> & {}
 };
 type Temp = {
     displayThings: (string | (() => string))[]
@@ -1939,10 +1963,14 @@ type Temp = {
         totalAchievements: Decimal,
         ownedAchievements: Decimal,
     }
+    clo: TempLayer & {
+        time_speed: Decimal
+    }
     // Row 0
     xp: TempLayer & {
         enemy: {
             types: string[]
+            all_types: string[]
             level: Decimal
             color_level: string
             color: string
@@ -1956,6 +1984,15 @@ type Temp = {
         }
         clickDamage: Decimal
     }
+    m: TempLayer & {
+        ore: {
+            health: Decimal
+            regen: Decimal
+            chance: Decimal
+            mode: string
+            get_drops(amount: DecimalSource): [string, Decimal][]
+        }
+    }
     // Row 1
     l: TempLayer & {
         regex: RegExp
@@ -1964,6 +2001,7 @@ type Temp = {
                 max: Decimal
                 left: Decimal
                 showSkill(id: string): ['row', [['bar', string], ['clickable', `add_${string}`], ['clickable', `remove_${string}`]]]
+                speed: Decimal
             }
             [skill: string]: {
                 readonly id: string
@@ -1981,21 +2019,29 @@ type Temp = {
                 grid_to_item(id: number): string | false
                 global_chance_multiplier: Decimal
                 get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: Decimal): [string, Decimal][]
+                gain_drops(drops: [string, Decimal][]): void
                 format_chance(chance: Decimal): string
                 type_name(type: `${drop_sources}:${string}`): string
                 can_drop(type: `${drop_sources}:${string}`): boolean
                 amount: Decimal
+                weight: { [key: `${drop_sources}:${string}`]: Decimal }
+                has_anvil: boolean
             }
         } & {
             [id: string]: {
                 readonly id: string
                 readonly grid: number
-                chances: { [type: string]: Decimal }
+                chances?: { [type: `${drop_sources}:${string}`]: Decimal }
+                weights?: { [type: `${drop_sources}:${string}`]: Decimal }
+                other_sources?: `${drop_sources}:${string}`[]
                 style?: CSSStyles
                 name: string
+                unlocked?: boolean
             }
         }
     }
+    // Row 2
+    b: TempLayer & {}
 };
 type Player = {
     devSpeed: string
@@ -2021,14 +2067,20 @@ type Player = {
     ach: LayerData & {
         short_mode: boolean
     }
+    clo: LayerData & {}
     // Row 0
     xp: LayerData & {
         health: { [enemy: string]: Decimal }
         kills: { [enemy: string]: Decimal }
         type: string
-        ignore_type_warning: boolean
         clicked: boolean
         last_drops: { [enemy: string]: [string, Decimal][] }
+    }
+    m: LayerData & {
+        health: Decimal
+        last_drops: [string, Decimal][]
+        short_mode: boolean
+        mode: 'shallow'
     }
     // Row 1
     l: LayerData & {
@@ -2044,5 +2096,9 @@ type Player = {
     lo: LayerData & {
         shown: boolean
         items: { [id: string]: { amount: Decimal, } }
+    }
+    // Row 2
+    b: LayerData & {
+        auto_start: boolean
     }
 };
