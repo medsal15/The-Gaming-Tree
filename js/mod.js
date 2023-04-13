@@ -25,12 +25,12 @@ let modInfo = {
 	 */
 	modFiles: [
 		'moreutils.js', 'tree.js',
+		'layers/hotkeys.js',
 		'layers/side/achievements.js', 'layers/side/clock.js',
 		'layers/0/experience.js', 'layers/0/mining.js',
 		'layers/1/level.js', 'layers/1/loot.js',
-		'layers/2/boss.js',
+		'layers/2/boss.js', 'layers/2/shop.js',
 	],
-
 	/**
 	 * If you have a Discord server or other discussion place, you can add a link to it.
 	 *
@@ -62,17 +62,21 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.3',
+	num: 'R0.4',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
-	name: 'Anger',
+	name: 'Greed',
 };
 
 /**
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.4</h3><br>
+		- Added 2 new layers.<br>
+		- Added the 2nd boss, 2nd miniboss, and 2nd relic.<br>
+		- Update endgame: Beat the 2nd boss.<br>
 	<h3>v0.3</h3><br>
 		- Added 2 new layers.<br>
 		- Added a boss, miniboss and a relic.<br>
@@ -164,7 +168,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return hasChallenge('b', 11);
+	return hasChallenge('b', 12);
 }
 
 

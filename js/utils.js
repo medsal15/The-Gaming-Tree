@@ -526,7 +526,7 @@ function adjustPopupTime(diff) {
 
 /**
  * @template T, E
- * @param {(args: T) => E} func
+ * @param {E|(args: T) => E} func
  * @param {any} target bound to the function
  * @param {T} args
  * @returns {E} returns `func` if it's not a valid function

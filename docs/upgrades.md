@@ -37,6 +37,8 @@ Individual upgrades can have these features:
 
 - cost: **sort of optional** A Decimal for the cost of the upgrade. By default, upgrades cost the main prestige currency for the layer.
 
+- costDisplay(): **OVERRIDE** Overrides the cost display without overriding anything else.
+
 - unlocked(): **optional**. A function returning a bool to determine if the upgrade is visible or not. Default is unlocked.
 
 - onPurchase(): **optional**. This function will be called when the upgrade is purchased. Good for upgrades like "makes this layer act like it was unlocked first".

@@ -1,9 +1,10 @@
 'use strict';
 
+//todo 32 & 52
 addLayer('b', {
     name: 'boss',
     symbol: 'B',
-    /** @returns {Player['b']} */
+    /** @returns {typeof player.b} */
     startData() {
         return {
             unlocked: false,
@@ -14,7 +15,8 @@ addLayer('b', {
     tooltipLocked() { return 'Danger approaches'; },
     layerShown() { return player.b.unlocked || tmp.xp.total.kills.gte(500); },
     color: '#AA5555',
-    row: 2,
+    row: 3, // The shop exits the challenge otherwise
+    displayRow: 2,
     position: 0,
     resource: 'bosses',
     hotkeys: [
@@ -97,7 +99,7 @@ addLayer('b', {
         11: {
             name: 'Slime King\'s Wrath',
             challengeDescription: 'Slime health is multiplied by 5, unlock a new layer.',
-            goalDescription: 'Kill another thousand slimes',
+            goalDescription: 'Kill another thousand slimes.',
             canComplete() { return player.xp.kills.slime.gte(1_000); },
             rewardDescription() {
                 if (!hasChallenge(this.layer, this.id)) {
@@ -107,6 +109,20 @@ addLayer('b', {
                 }
             },
             unlocked() { return player.b.points.gte(1); },
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    style = {};
+                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
+        },
+        12: {
+            name: 'The goblin CEO',
+            challengeDescription: 'All resource gains are divided by log10(amount + 10), unlock a new layer.',
+            goalDescription: 'Pay off your loan.',
+            canComplete() { return hasUpgrade('s', 51); },
+            rewardDescription() { return `Unlock zombies and keep the new layer. Your mining upgrades are always visible and ${layerColor('xp', tmp.xp.upgrades[22].title, 'text-shadow:#000 0 0 10px')} also affects all enemies at half its amount.`; },
+            unlocked() { return player.b.points.gte(2); },
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = {};
@@ -155,27 +171,28 @@ addLayer('b', {
     },
     type: 'custom',
     getResetGain() {
-        /** @type {[string, DecimalSource][]} */
-        const thresholds = [['slime', 1e3]];
-
-        let amount = D(thresholds.filter(([type, kills]) => player.xp.kills[type].gte(kills)).length);
-
-        return amount.minus(player.b.points).min(1);
+        if (player.b.points.lt(1)) return D(+player.xp.kills.slime.gte(1_000));
+        if (player.b.points.lt(2)) return D(+player.xp.kills.goblin.gte(1_000));
+        return D.dZero;
     },
     baseAmount() {
         if (player.b.points.lt(1)) return player.xp.kills.slime;
+        if (player.b.points.lt(2)) return player.xp.kills.goblin;
         return D.dZero;
     },
     getNextAt() {
-        if (player.b.points.lt(1)) return D(1000);
+        if (player.b.points.lt(1)) return D(1_000);
+        if (player.b.points.lt(2)) return D(1_000);
         return D.dInf;
     },
     canReset() {
-        if (player.b.points.lt(1)) return player.xp.kills.slime.gte(1000);
+        if (player.b.points.lt(1)) return player.xp.kills.slime.gte(1_000);
+        if (player.b.points.lt(2)) return player.xp.kills.goblin.gte(1_000);
         return false;
     },
     prestigeButtonText() {
-        if (player.b.points.eq(0)) return `Your next boss will be at ${format(1e3)} slime kills`;
+        if (player.b.points.eq(0)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemy.name('slime')} kills`;
+        if (player.b.points.eq(1)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemy.name('goblin')} kills`;
         return 'There are no more bosses to fight';
     },
     prestigeNotify() { return tmp.b.getResetGain.gte(1); },

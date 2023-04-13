@@ -20,7 +20,7 @@ var maxRow = 0;
 function updateHotkeys() {
     hotkeys = {};
     for (const layer in layers) {
-        hk = layers[layer].hotkeys
+        let hk = layers[layer].hotkeys
         if (hk) {
             for (const id in hk) {
                 hotkeys[hk[id].key] = hk[id]

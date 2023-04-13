@@ -1778,6 +1778,12 @@ declare class Upgrade {
      */
     cost?: Computable<Decimal>
     /**
+     * **OVERRIDE**
+     *
+     * Overrides the cost display without overriding anything else.
+     */
+    costDisplay?(): string
+    /**
      * A function returning a bool to determine if the upgrade is visible or not. Default is unlocked.
      */
     unlocked?: Computable<boolean>
@@ -1879,20 +1885,25 @@ declare let layers: {
             experience(type?: string): Decimal
             kills(type?: string): Decimal
             name(type: string): string
-            //todo damage(type?: string): Decimal
+            damage(type?: string): Decimal
+            dps(type?: string): Decimal
+            regen(type?: string): Decimal
         }
         total: {
             kills(): Decimal
         }
-        clickDamage(): Decimal
     }
     m: Layer<Player['m']> & {
+        upgrades: {
+            [id: number]: Upgrade & { item: string }
+        }
         ore: {
             health(): Decimal
             regen(): Decimal
-            chance(): Decimal
+            chance(mode?: Player['m']['mode']): Decimal
             mode(mode?: Player['m']['mode']): string
             get_drops(amount: DecimalSource): [string, Decimal][]
+            items: string[]
         }
     }
     // Row 1
@@ -1916,6 +1927,9 @@ declare let layers: {
         }
     }
     lo: Layer<Player['lo']> & {
+        buyables: Layer<any>['buyables'] & {
+            [id: number]: Buyable & { value(): Decimal }
+        }
         items: {
             '*': {
                 grid_to_item: ((id: number) => string | false) & { cache: { [k: number]: string | false } }
@@ -1928,6 +1942,8 @@ declare let layers: {
                 amount(): Decimal
                 weight(type?: `${drop_sources}:${string}`): type extends string ? Decimal : { [key: `${drop_sources}:${string}`]: Decimal }
                 has_anvil(): boolean
+                value: Computable<Decimal>
+                gain_multiplier: Computable<Decimal>
             }
         } & {
             [id: string]: {
@@ -1944,6 +1960,18 @@ declare let layers: {
     }
     // Row 2
     b: Layer<Player['b']> & {}
+    s: Layer<Player['s']> & {
+        coins: {
+            types: [string, string][]
+            format(amount?: DecimalSource, color?: boolean, split?: false): string
+            format(amount?: DecimalSource, color?: boolean, split: true): string[]
+        }
+        investloans: {
+            amount(real?: boolean): Decimal
+            is_loans(): boolean
+            type(): string
+        }
+    }
 };
 type Temp = {
     displayThings: (string | (() => string))[]
@@ -1978,19 +2006,25 @@ type Temp = {
             experience: Decimal
             kills: Decimal
             name: ''
+            damage: Decimal
+            dps: Decimal
+            regen: Decimal
         }
         total: {
             kills: Decimal
         }
-        clickDamage: Decimal
     }
     m: TempLayer & {
+        upgrades: {
+            [id: number]: Upgrade & { item: string }
+        }
         ore: {
             health: Decimal
             regen: Decimal
             chance: Decimal
             mode: string
             get_drops(amount: DecimalSource): [string, Decimal][]
+            items: string[]
         }
     }
     // Row 1
@@ -2014,6 +2048,9 @@ type Temp = {
         }
     }
     lo: TempLayer & {
+        buyables: Layer<any>['buyables'] & {
+            [id: number]: Buyable & { value: Decimal }
+        }
         items: {
             '*': {
                 grid_to_item(id: number): string | false
@@ -2026,6 +2063,8 @@ type Temp = {
                 amount: Decimal
                 weight: { [key: `${drop_sources}:${string}`]: Decimal }
                 has_anvil: boolean
+                value: Decimal
+                gain_multiplier: Decimal
             }
         } & {
             [id: string]: {
@@ -2042,6 +2081,17 @@ type Temp = {
     }
     // Row 2
     b: TempLayer & {}
+    s: TempLayer & {
+        coins: {
+            types: [string, string][]
+            format: string
+        }
+        investloans: {
+            amount: Decimal
+            is_loans: boolean
+            type: string
+        }
+    }
 };
 type Player = {
     devSpeed: string
@@ -2080,7 +2130,7 @@ type Player = {
         health: Decimal
         last_drops: [string, Decimal][]
         short_mode: boolean
-        mode: 'shallow'
+        mode: 'shallow' | 'deep'
     }
     // Row 1
     l: LayerData & {
@@ -2100,5 +2150,8 @@ type Player = {
     // Row 2
     b: LayerData & {
         auto_start: boolean
+    }
+    s: LayerData & {
+        short_mode: boolean,
     }
 };

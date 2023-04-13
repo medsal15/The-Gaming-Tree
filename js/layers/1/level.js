@@ -3,6 +3,7 @@
 addLayer('l', {
     name: 'Level',
     symbol: 'L',
+    /** @returns {typeof player.l} */
     startData() {
         return {
             unlocked: false,
@@ -165,7 +166,13 @@ addLayer('l', {
     /** @type {typeof layers.l.skills} */
     skills: {
         '*': {
-            max() { return player.l.points; },
+            max() {
+                let max = player.l.points;
+
+                max = max.add(buyableEffect('lo', 43));
+
+                return max;
+            },
             left() { return tmp.l.skills["*"].max.minus(Object.values(player.l.skills).reduce((u, { points }) => u.add(points), D.dZero)); },
             show_skill(skill) {
                 if (!(skill in layers.l.skills)) return [];
@@ -258,7 +265,11 @@ addLayer('l', {
         Object.values(player.l.skills)
             .filter(({ points }) => points.gt(0))
             .forEach(skill => {
-                skill.progress = skill.progress.add(skill.points.pow(2).times(skill_speed));
+                let { points } = skill;
+
+                if (hasUpgrade('s', 73)) points = points.times(upgradeEffect('s', 73));
+
+                skill.progress = skill.progress.add(points.pow(2).times(skill_speed));
             });
     },
     automate() {
@@ -270,6 +281,16 @@ addLayer('l', {
                 pdata.level = pdata.level.add(1);
             }
         });
+    },
+    gainMult() {
+        let div = D.dOne;
+
+        if (inChallenge('b', 12) && !hasUpgrade('s', 13)) div = div.div(player.l.points.add(10).log10());
+        if (hasUpgrade('s', 13)) div = div.div(upgradeEffect('s', 13));
+
+        if (hasUpgrade('s', 82)) div = div.div(upgradeEffect('s', 82));
+
+        return div;
     },
     type: 'static',
     baseResource: 'experience points',

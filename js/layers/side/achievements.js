@@ -1,6 +1,7 @@
 'use strict';
 
-//todo add goblin achievements?
+//todo deep mining achievements?
+//todo tree achievements
 addLayer('ach', {
     name: 'Achievements',
     symbol: '⭐',
@@ -268,7 +269,10 @@ addLayer('ach', {
         },
         73: {
             name: 'Stonks',
-            tooltip: 'Defeat ???',
+            tooltip() {
+                if (player.b.points.lt(2)) return 'Defeat ???';
+                return 'Defeat the goblin CEO';
+            },
             done() { return hasChallenge('b', 12); },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.b.color); },
             style() {
@@ -422,6 +426,66 @@ addLayer('ach', {
             },
             unlocked() { return tmp.m.layerShown; },
         },
+        131: {
+            name: 'Real money',
+            tooltip: 'Get a coin',
+            done() { return player.s.points.gte(1); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.s.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.s.color;
+                return s;
+            },
+            unlocked() { return tmp.s.layerShown; },
+        },
+        132: {
+            name: 'Scammer',
+            tooltip: 'Start a MLM',
+            done() { return hasUpgrade('s', 62); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.s.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.s.color;
+                return s;
+            },
+            unlocked() { return tmp.s.layerShown; },
+        },
+        133: {
+            name: 'Keep on crafting',
+            tooltip: 'Buy crafting tools',
+            done() { return hasUpgrade('s', 72); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.s.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.s.color;
+                return s;
+            },
+            unlocked() { return tmp.s.layerShown; },
+        },
+        134: {
+            name: 'Trickled Down',
+            tooltip: 'Get your cheaper levels',
+            done() { return hasUpgrade('s', 82); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.s.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.s.color;
+                return s;
+            },
+            unlocked() { return tmp.s.layerShown; },
+        },
+        135: {
+            name: 'More Investments',
+            tooltip: 'Get the strongest investment',
+            done() { return !inChallenge('b', 12) && !inChallenge('b', 32) && hasUpgrade('s', 51); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.s.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.s.color;
+                return s;
+            },
+            unlocked() { return tmp.s.layerShown; },
+        },
         //#endregion Normal achievements
         //#region Bonus achievements
         81: {
@@ -438,7 +502,11 @@ addLayer('ach', {
         },
         82: {
             name: 'Second in power',
-            tooltip: '???',
+            tooltip() {
+                if (!hasChallenge('b', 12)) return 'Defeat ???';
+
+                return 'Defeat the goblin president';
+            },
             done() { return false; },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
@@ -494,11 +562,11 @@ addLayer('ach', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(0,127,255)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 31); },
+            unlocked() { return [31, 32, 41, 42].some(id => hasChallenge('b', id)); },
         },
         92: {
             name: 'Roll the dice',
-            tooltip: '???',
+            tooltip: 'Unlock the Casino',
             done() { return false; },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
@@ -506,7 +574,7 @@ addLayer('ach', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(0,127,255)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 31); },
+            unlocked() { return [31, 32, 41, 42].some(id => hasChallenge('b', id)); },
         },
         93: {
             name: 'Wizardry',
@@ -518,7 +586,7 @@ addLayer('ach', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(0,127,255)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 31); },
+            unlocked() { return [31, 32, 41, 42].some(id => hasChallenge('b', id)); },
         },
         94: {
             name: '???',
@@ -530,7 +598,7 @@ addLayer('ach', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(0,127,255)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 31); },
+            unlocked() { return [31, 32, 41, 42].some(id => hasChallenge('b', id)); },
         },
         95: {
             name: 'Relic Star',
@@ -542,7 +610,7 @@ addLayer('ach', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(0,127,255)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 31); },
+            unlocked() { return [31, 32, 41, 42].some(id => hasChallenge('b', id)); },
         },
         //#endregion Bonus achievements
         //#region Secret achievements
@@ -590,6 +658,22 @@ addLayer('ach', {
             style: { 'background-color': 'rgb(127,0,255)' },
             unlocked() { return hasAchievement(this.layer, this.id); },
         },
+        141: {
+            name: 'Nullified',
+            tooltip: 'Pay off all your debts in the goblin CEO',
+            done() { return player.s.upgrades.filter(id => id <= 51).length >= 13 && inChallenge('b', 12); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
+            style: { 'background-color': 'rgb(127,0,255)' },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+        },
+        142: {
+            name: 'Direct',
+            tooltip: 'Pay off only the boss debt',
+            done() { return player.s.upgrades.filter(id => id <= 51) == 1 && hasUpgrade('s', 51) && inChallenge('b', 12); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
+            style: { 'background-color': 'rgb(127,0,255)' },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+        },
         //#endregion Secret achievements
     },
     tooltip() {
@@ -628,13 +712,13 @@ addLayer('ach', {
         switch (type) {
             case 'normal':
             default:
-                rows = [1, 3, 5, 12, 7, 11];
+                rows = [1, 3, 5, 12, 7, 11, 13];
                 break;
             case 'bonus':
                 rows = [8, 9];
                 break;
             case 'secret':
-                rows = [2, 4, 6, 10];
+                rows = [2, 4, 6, 10, 14];
                 break;
         }
 

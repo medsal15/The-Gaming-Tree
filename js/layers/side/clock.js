@@ -1,5 +1,6 @@
 'use strict';
 
+//todo shop/deep mining/zombie/tree buyables
 addLayer('clo', {
     name: 'Clock',
     symbol: '⏲',
@@ -47,12 +48,7 @@ addLayer('clo', {
             description: 'Applies time speed to experience layer',
             effectDisplay() { return `*${format(layers.clo.time_speed('xp', true))}`; },
             price: [['slime_goo', D(32)], ['slime_core_shard', D(8)], ['slime_core', D.dOne]],
-            fullDisplay() {
-                return `<span><h3>${this.title}</h3></span><br>\
-                <span>${this.description}</span><br>\
-                <span>Currently: ${this.effectDisplay()}</span><br><br>\
-                Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`;
-            },
+            costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
             pay() { this.price.forEach(([item, cost]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(cost)); },
             branches: [21, 22],
@@ -68,12 +64,7 @@ addLayer('clo', {
             description: 'Applies time speed to mining layer',
             effectDisplay() { return `*${format(layers.clo.time_speed('m', true))}`; },
             price: [['stone', D(32)], ['copper_ore', D(8)], ['tin_ore', D.dOne]],
-            fullDisplay() {
-                return `<span><h3>${this.title}</h3></span><br>\
-                <span>${this.description}</span><br>\
-                <span>Currently: ${this.effectDisplay()}</span><br><br>\
-                Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`;
-            },
+            costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
             pay() { this.price.forEach(([item, cost]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(cost)); },
             branches: [22],
@@ -88,12 +79,7 @@ addLayer('clo', {
             title: '??? connector',
             description: 'Applies time speed to ??? layer',
             effectDisplay() { return `*${format(D.dOne)}`; },
-            fullDisplay() {
-                return `<span><h3>${this.title}</h3></span><br>\
-                <span>${this.description}</span><br>\
-                <span>Currently: ${this.effectDisplay()}</span><br><br>\
-                Cost: Unknown`;
-            },
+            costDisplay() { return 'Cost: Unknown'; },
             canAfford: false,
             pay() { },
             unlocked() { return hasChallenge('b', 51) && false; },
@@ -103,12 +89,7 @@ addLayer('clo', {
             title: 'Level connector',
             description: 'Applies time speed to level layer',
             effectDisplay() { return `*${format(layers.clo.time_speed('l', true))}`; },
-            fullDisplay() {
-                return `<span><h3>${this.title}</h3></span><br>\
-                <span>${this.description}</span><br>\
-                <span>Currently: ${this.effectDisplay()}</span><br><br>\
-                Requires: ${formatWhole(5)} levels`;
-            },
+            costDisplay() { return `Requires: ${formatWhole(5)} levels`; },
             canAfford() { return player.l.points.gte(5); },
             pay() { },
             branches: [31],
@@ -124,12 +105,7 @@ addLayer('clo', {
             description: 'Applies time speed to loot layer',
             effectDisplay() { return `*${format(layers.clo.time_speed('lo', true))}`; },
             price: [['slime_goo', D(32)], ['copper_ore', D(8)], ['rusty_gear', D.dOne]],
-            fullDisplay() {
-                return `<span><h3>${this.title}</h3></span><br>\
-                <span>${this.description}</span><br>\
-                <span>Currently: ${this.effectDisplay()}</span><br><br>\
-                Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`;
-            },
+            costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
             pay() { this.price.forEach(([item, cost]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(cost)); },
             style() {
@@ -144,12 +120,7 @@ addLayer('clo', {
             title: '??? connector',
             description: 'Applies time speed to ??? layer',
             effectDisplay() { return `*${format(D.dOne)}`; },
-            fullDisplay() {
-                return `<span><h3>${this.title}</h3></span><br>\
-                <span>${this.description}</span><br>\
-                <span>Currently: ${this.effectDisplay()}</span><br><br>\
-                Cost: Unknown`;
-            },
+            costDisplay() { return 'Cost: Unknown'; },
             canAfford: false,
             pay() { },
             unlocked() { return hasChallenge('b', 51) && false; },
@@ -159,12 +130,7 @@ addLayer('clo', {
             title: 'Boss connector',
             description: 'Applies time speed to boss layer',
             effectDisplay() { return `*${format(layers.clo.time_speed('b', true))}`; },
-            fullDisplay() {
-                return `<span><h3>${this.title}</h3></span><br>\
-                <span>${this.description}</span><br>\
-                <span>Currently: ${this.effectDisplay()}</span><br><br>\
-                Cost: Free!`;
-            },
+            costDisplay: 'Cost: Free!',
             canAfford() { return !inChallenge('b', 51); },
             pay() { },
             style() {
@@ -175,29 +141,30 @@ addLayer('clo', {
             unlocked() { return hasChallenge('b', 51) && tmp.b.layerShown; },
         },
         32: {
-            title: '??? connector',
-            description: 'Applies time speed to ??? layer',
-            effectDisplay() { return `*${format(D.dOne)}`; },
-            fullDisplay() {
-                return `<span><h3>${this.title}</h3></span><br>\
-                <span>${this.description}</span><br>\
-                <span>Currently: ${this.effectDisplay()}</span><br><br>\
-                Cost: Unknown`;
+            title() {
+                if (!player.s.unlocked) return '??? connector';
+                return 'Shop connector';
             },
-            canAfford: false,
-            pay() { },
-            unlocked() { return hasChallenge('b', 51) && false; },
+            description() {
+                if (!player.s.unlocked) return 'Applies time speed to ??? layer';
+                return 'Applies time speed to shop layer';
+            },
+            effectDisplay() { return `*${format(layers.clo.time_speed('s', true))}`; },
+            costDisplay() {
+                if (!player.s.unlocked) return 'Cost: Unknown';
+
+                return layers.s.coins.format(this.cost, false);
+            },
+            cost: D(100),
+            canAfford() { return !inChallenge('b', 51) && player.s.points.gte(this.cost); },
+            pay() { player.s.points = player.s.points.minus(this.cost); },
+            unlocked() { return hasChallenge('b', 51) && tmp.s.layerShown; },
         },
         33: {
             title: '??? connector',
             description: 'Applies time speed to ??? layer',
             effectDisplay() { return `*${format(D.dOne)}`; },
-            fullDisplay() {
-                return `<span><h3>${this.title}</h3></span><br>\
-                <span>${this.description}</span><br>\
-                <span>Currently: ${this.effectDisplay()}</span><br><br>\
-                Cost: Unknown`;
-            },
+            costDisplay() { return 'Cost: Unknown'; },
             canAfford: false,
             pay() { },
             unlocked() { return hasChallenge('b', 51) && false; },
@@ -438,13 +405,14 @@ addLayer('clo', {
             const links = {
                 'xp': 11, 'm': 12,
                 'l': 21, 'lo': 22,
-                'b': 31,
+                'b': 31, 's': 32,
             };
             if (layer in links && !hasUpgrade(this.layer, links[layer])) return speed;
         }
 
-        let row = tmp[layer]?.row ?? 0;
-        if (isNaN(row)) row = 0;
+        /** @type {number|'side'} */
+        let row = tmp[layer]?.displayRow ?? tmp[layer]?.row ?? 0;
+        if (row == 'side') row = 0;
 
         speed = speed.times(buyableEffect('clo', 11));
         speed = speed.times(buyableEffect('clo', 12));

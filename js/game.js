@@ -70,7 +70,8 @@ function getNextAt(layer, canMax = false, useType = null) {
 		if (tmp[layer].roundUpCost) cost = cost.ceil()
 		return cost;
 	} else if (type == "normal") {
-		let next = tmp[layer].resetGain.add(1).div(tmp[layer].directMult)
+		// tmp[layer].resetGain can initialize as an empty object, this ensures it doesn't happen
+		let next = (tmp[layer].resetGain instanceof Decimal ? tmp[layer].resetGain : D.dOne).add(1).div(tmp[layer].directMult);
 		if (next.gte(tmp[layer].softcap)) next = next.div(tmp[layer].softcap.pow(decimalOne.sub(tmp[layer].softcapPower))).pow(decimalOne.div(tmp[layer].softcapPower))
 		next = next.root(tmp[layer].gainExp).div(tmp[layer].gainMult).root(tmp[layer].exponent).times(tmp[layer].requires).max(tmp[layer].requires)
 		if (tmp[layer].roundUpCost) next = next.ceil()

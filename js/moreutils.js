@@ -87,14 +87,14 @@ function layerColor(layer, text, style = "") {
  * If the highest coin type is above 1e9, it will be the only one returned.
  *
  * @param {DecimalSource} decimal
- * @param {string[]} coin_types
+ * @param {number} coin_types Amount of coin types
  * @returns {string[]}
  */
 function formatCoins(decimal, coin_types) {
-    if (!coin_types?.length) return [format(decimal)];
+    if (!coin_types) return [format(decimal)];
 
     let d = new Decimal(decimal);
-    const limit = new Decimal(100).pow(coin_types.length).times(1e9);
+    const limit = new Decimal(100).pow(coin_types).times(1e9);
 
     if (d.gte(limit)) {
         const arr = new Array(coin_types.length - 1).fill("0");
@@ -102,8 +102,8 @@ function formatCoins(decimal, coin_types) {
         return arr;
     }
 
-    return new Array(coin_types.length).fill(0).map((_, i) => {
-        if (i == coin_types.length - 1) return formatWhole(d);
+    return new Array(coin_types).fill(0).map((_, i) => {
+        if (i == coin_types - 1) return formatWhole(d);
         let c = d.toNumber() % 100;
         d = d.div(100).floor();
         return formatWhole(c);
@@ -133,5 +133,23 @@ function activeChallenge(layer) {
  * @returns {string}
  */
 function capitalize(text) {
-    return text.replace(/^./, s => s.toUpperCase());
+    return `${text}`.replace(/^./, s => s.toUpperCase());
+}
+/**
+ * Rounds a number to a multiple of a power of `pow`
+ *
+ * Exemple:
+ * ```js
+ * powerRound(333, 100).eq(300); //true
+ * ```
+ *
+ * @param {DecimalSource} decimal
+ * @param {DecimalSource} pow
+ * @returns {Decimal}
+ */
+function powerRound(decimal, pow) {
+    let base = D.pow(pow, D.log(decimal, pow).floor()),
+        mult = D.div(decimal, base).round();
+
+    return base.times(mult);
 }
