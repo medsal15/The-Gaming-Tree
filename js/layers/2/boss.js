@@ -199,7 +199,7 @@ addLayer('b', {
         }
     },
     update(diff) {
-        diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
         if (inChallenge('b', 32)) {
             const get_loss = amount => {
                 const loss = D.div(amount, 100).floor().times(diff);

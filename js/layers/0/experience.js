@@ -455,18 +455,17 @@ addLayer('xp', {
         },
     },
     update(diff) {
-        diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
 
         for (const type of tmp.xp.enemy.types) {
             const dps = layers.xp.enemy.dps(type),
-                regen = layers.xp.enemy.regen(type),
-                health = player.xp.health[type];
+                regen = layers.xp.enemy.regen(type);
             if (dps.gt(0)) {
                 player.xp.clicked = true;
-                player.xp.health[type] = D.minus(health, dps.times(diff));
+                player.xp.health[type] = D.minus(player.xp.health[type], dps.times(diff));
             }
-            if (regen.gt(0) && health.lt(layers.xp.enemy.health(type))) {
-                player.xp.health[type] = D.add(health, regen.times(diff)).min(layers.xp.enemy.health(type));
+            if (regen.gt(0) && player.xp.health[type].lt(layers.xp.enemy.health(type))) {
+                player.xp.health[type] = D.add(player.xp.health[type], regen.times(diff)).min(layers.xp.enemy.health(type));
             }
         }
     },

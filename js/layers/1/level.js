@@ -258,7 +258,7 @@ addLayer('l', {
         },
     },
     update(diff) {
-        diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
 
         let skill_speed = D.times(diff, tmp.l.skills["*"].speed);
 

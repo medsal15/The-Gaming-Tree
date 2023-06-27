@@ -454,7 +454,10 @@ addLayer('m', {
             style() {
                 const style = { 'border-radius': 0, };
 
-                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+                    style['color'] = tmp.lo.items[this.item].style['color'];
+                }
 
                 return style;
             },
@@ -523,7 +526,10 @@ addLayer('m', {
             style() {
                 const style = { 'border-radius': 0, };
 
-                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+                    style['color'] = tmp.lo.items[this.item].style['color'];
+                }
 
                 return style;
             },
@@ -593,7 +599,10 @@ addLayer('m', {
             style() {
                 const style = { 'border-radius': 0, };
 
-                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+                    style['color'] = tmp.lo.items[this.item].style['color'];
+                }
 
                 return style;
             },
@@ -751,7 +760,7 @@ addLayer('m', {
         ],
     },
     update(diff) {
-        diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
 
         if (player.m.health.lt(tmp.m.ore.health)) {
             const regen = tmp.m.ore.regen.times(diff);

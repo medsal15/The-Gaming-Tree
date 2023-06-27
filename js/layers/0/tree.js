@@ -308,7 +308,7 @@ addLayer('t', {
     update(diff) {
         if (!player.t.unlocked || !tmp.t.layerShown) return;
 
-        diff = D.times(diff, layers.clo.time_speed('t'));
+        if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed('t'));
 
         // Grow trees
         tmp.t.trees.trees.forEach(tree => {
@@ -318,7 +318,7 @@ addLayer('t', {
             player.t.trees[tree].amount = player.t.trees[tree].amount.add(regen);
         });
 
-        //todo Convert logs to planks
+        //todo convert logs to planks
     },
     automate() {
         if (player.t.health.lte(0)) {
@@ -326,7 +326,7 @@ addLayer('t', {
             const type = player.t.current,
                 drops = layers.t.trees.get_drops(type, layers.t.trees.size(type));
 
-            player.t.last_drops.push(drops);
+            player.t.last_drops = drops;
 
             player.t.current = false;
         }
