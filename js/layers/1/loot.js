@@ -1234,7 +1234,7 @@ addLayer('lo', {
             },
             gain_drops(drops) { drops.forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.add(amount)); },
             format_chance(chance) {
-                if (chance.gte(1)) return `+${format(chance)}`;
+                if (chance.gte(1) || options.noRNG) return `+${format(chance)}`;
 
                 const fractional = options.chanceMode == 'NOT_GUARANTEED' || (options.chanceMode == 'LESS_HALF' && chance.lt(.5));
 
