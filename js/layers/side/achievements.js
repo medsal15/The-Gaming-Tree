@@ -1,7 +1,10 @@
 'use strict';
 
+//todo goblin achievements?
+//todo zombie achievements?
 //todo deep mining achievements?
 //todo tree achievements
+//todo forge achievements
 addLayer('ach', {
     name: 'Achievements',
     symbol: '⭐',
@@ -507,7 +510,7 @@ addLayer('ach', {
 
                 return 'Defeat the goblin president';
             },
-            done() { return false; },
+            done() { return hasChallenge('b', 32); },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
                 let s = {};
@@ -554,7 +557,11 @@ addLayer('ach', {
         },
         91: {
             name: 'In strides',
-            tooltip: 'Unlock the Clock',
+            tooltip() {
+                if (!hasChallenge('b', 31)) return 'Unlock ???';
+
+                return 'Unlock the Clock';
+            },
             done() { return hasChallenge('b', 51); },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
@@ -566,8 +573,12 @@ addLayer('ach', {
         },
         92: {
             name: 'Roll the dice',
-            tooltip: 'Unlock the Casino',
-            done() { return false; },
+            tooltip() {
+                if (!hasChallenge('b', 32)) return 'Unlock ???';
+
+                return 'Unlock the Casino';
+            },
+            done() { return hasChallenge('b', 52); },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
                 let s = {};
@@ -578,7 +589,7 @@ addLayer('ach', {
         },
         93: {
             name: 'Wizardry',
-            tooltip: '???',
+            tooltip: 'Unlock ???',
             done() { return false; },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
@@ -590,7 +601,7 @@ addLayer('ach', {
         },
         94: {
             name: '???',
-            tooltip: '???',
+            tooltip: 'Unlock ???',
             done() { return false; },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
@@ -660,16 +671,24 @@ addLayer('ach', {
         },
         141: {
             name: 'Nullified',
-            tooltip: 'Pay off all your debts in the goblin CEO',
-            done() { return player.s.upgrades.filter(id => id <= 51).length >= 13 && inChallenge('b', 12); },
+            tooltip: 'Pay off all your debts/loans in the goblin CEO',
+            done() { return player.s.upgrades.filter(layers.s.investloans.is_loan).length >= 13 && (inChallenge('b', 12) || inChallenge('b', 32)); },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
             style: { 'background-color': 'rgb(127,0,255)' },
             unlocked() { return hasAchievement(this.layer, this.id); },
         },
         142: {
             name: 'Direct',
-            tooltip: 'Pay off only the boss debt',
-            done() { return player.s.upgrades.filter(id => id <= 51) == 1 && hasUpgrade('s', 51) && inChallenge('b', 12); },
+            tooltip: 'Pay off only the boss debt/loan',
+            done() { return player.s.upgrades.filter(layers.s.investloans.is_loan) == 1 && hasUpgrade('s', 51) && (inChallenge('b', 12) || inChallenge('b', 32)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
+            style: { 'background-color': 'rgb(127,0,255)' },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+        },
+        143: {
+            name: 'Another Level',
+            tooltip: 'Lose a level to your loans',
+            done() { return inChallenge('b', 32) && player.l.points.gt(100); },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
             style: { 'background-color': 'rgb(127,0,255)' },
             unlocked() { return hasAchievement(this.layer, this.id); },

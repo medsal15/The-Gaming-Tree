@@ -15,10 +15,11 @@ function getStartOptions() {
 		showStory: true,
 		forceOneTab: false,
 		oldStyle: false,
-		tooltipForcing: true,
+		forceTooltips: true,
 		colorLevels: false,
 		/** @type {keyof typeof CHANCE_MODE} */
 		chanceMode: 'NEVER',
+		noRNG: false,
 	}
 }
 
@@ -60,8 +61,8 @@ function adjustMSDisp() {
 	options.msDisplay = MS_SETTINGS[(MS_SETTINGS.indexOf(options.msDisplay) + 1) % 5];
 }
 function milestoneShown(layer, id) {
-	complete = player[layer].milestones.includes(id);
-	auto = layers[layer].milestones[id].toggles;
+	const complete = player[layer].milestones.includes(id);
+	const auto = layers[layer].milestones[id].toggles;
 
 	switch (options.msDisplay) {
 		case "always":

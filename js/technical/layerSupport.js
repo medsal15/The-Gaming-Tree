@@ -13,21 +13,29 @@ function layerShown(layer) {
 
 var LAYERS = Object.keys(layers);
 
+/** @type {{[key: string]: Hotkey[]}} */
 var hotkeys = {};
+/** @type {{[layer: string]: Hotkey[]}} Ensures that hotkeys are grouped by layers */
+let layered_hotkeys = {};
 
 var maxRow = 0;
 
 function updateHotkeys() {
     hotkeys = {};
+    layered_hotkeys = {};
     for (const layer in layers) {
-        let hk = layers[layer].hotkeys
+        /** @type {Hotkey[]} */
+        const hk = layers[layer].hotkeys
         if (hk) {
+            layered_hotkeys[layer] = hk;
             for (const id in hk) {
-                hotkeys[hk[id].key] = hk[id]
-                hotkeys[hk[id].key].layer = layer
-                hotkeys[hk[id].key].id = id
-                if (hk[id].unlocked === undefined)
-                    hk[id].unlocked = true
+                const hotkey = hk[id],
+                    key = hotkey.key;
+                if (!(key in hotkeys)) hotkeys[key] = [];
+                hotkeys[key].push(hotkey);
+                hotkey.layer = layer;
+                hotkey.id = id;
+                if (hotkey.unlocked === undefined) hotkey.unlocked = true;
             }
         }
     }

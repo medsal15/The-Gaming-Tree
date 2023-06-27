@@ -1,6 +1,7 @@
 'use strict';
 
-//todo 32 & 52
+//todo implement 52 (through Casino)
+//todo exception for 32: final "enemy" drop
 addLayer('b', {
     name: 'boss',
     symbol: 'B',
@@ -117,7 +118,7 @@ addLayer('b', {
             },
         },
         12: {
-            name: 'The goblin CEO',
+            name: 'The Goblin CEO',
             challengeDescription: 'All resource gains are divided by log10(amount + 10), unlock a new layer.',
             goalDescription: 'Pay off your loan.',
             canComplete() { return hasUpgrade('s', 51); },
@@ -145,10 +146,24 @@ addLayer('b', {
                 return style;
             },
         },
+        32: {
+            name: 'The Goblin President',
+            challengeDescription: 'Lose 1% (rounded down) of your lower rows resources every second.<br>Get new debts to pay off.<br>Double price of final debt.',
+            goalDescription: 'Pay off your debt',
+            canComplete() { return hasUpgrade('s', 51); },
+            rewardDescription: 'Your portfolio grows, goblin item drops are doubled.',
+            unlocked() { return hasChallenge('b', 12); },
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    style = { 'background-color': '#CC6666', };
+                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
+        },
         // Relics
         51: {
             name: 'The Broken Clock',
-            challengeDescription: 'Time is much slower. All passive content is affected.',
+            challengeDescription: 'Time is much slower. This affects all passive content.',
             goalDescription: 'Fix The Clock',
             canComplete() { return [41, 42, 43].every(id => hasUpgrade('clo', id)); },
             rewardDescription: 'Unlock The Clock, a special layer to speed time up.',
@@ -162,11 +177,55 @@ addLayer('b', {
             // Removes repair upgrades
             onEnter() { player.clo.upgrades = player.clo.upgrades.filter(id => Math.floor(id / 10) != 4); },
         },
+        52: {
+            name: 'Misfortune',
+            challengeDescription: 'Item drops are changed (only affects unlocked items)',
+            goalDescription: '???',
+            canComplete: false,
+            rewardDescription: 'Unlock The Casino, a special layer to change your luck.',
+            unlocked() { return hasChallenge('b', 32); },
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    style = { 'background-color': '#7777EE', };
+                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
+        },
     },
     automate() {
         if (player.b.auto_start && !player.b.activeChallenge) {
             const id = [11, 12, 21, 22].find(id => tmp.b.challenges[id]?.unlocked && !hasChallenge('b', id));
             if (id) startChallenge('b', id);
+        }
+    },
+    update(diff) {
+        diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (inChallenge('b', 32)) {
+            const get_loss = amount => {
+                const loss = D.div(amount, 100).floor().times(diff);
+                if (isNaN(loss.mag) || isNaN(loss.sign) || isNaN(loss.layer)) return D.dZero;
+                return loss;
+            };
+
+            if (!hasUpgrade('s', 11)) {
+                player.xp.points = player.xp.points.minus(get_loss(player.xp.points)).max(0);
+            }
+            if (!hasUpgrade('s', 12)) {
+                const total = tmp.xp.total.kills,
+                    loss = get_loss(total);
+                if (loss.gt(0)) Object.entries(player.xp.kills).forEach(([type, kills]) => {
+                    const l = kills.div(total).times(loss);
+                    player.xp.kills[type] = kills.minus(l).max(0);
+                });
+            }
+            if (!hasUpgrade('s', 13)) {
+                player.l.points = player.l.points.minus(get_loss(player.l.points));
+            }
+            // Items
+            Object.entries(player.lo.items).forEach(([item, { amount }]) => {
+                const upg = layers.s.investloans.item_upgrade[item] ?? false;
+                if (!upg || !hasUpgrade('s', upg)) player.lo.items[item].amount = amount.minus(get_loss(amount));
+            });
         }
     },
     type: 'custom',

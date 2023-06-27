@@ -1,6 +1,6 @@
 'use strict';
 
-//todo shop/deep mining/zombie/tree buyables
+//todo tree buyables
 addLayer('clo', {
     name: 'Clock',
     symbol: '⏲',
@@ -36,7 +36,7 @@ addLayer('clo', {
             content: [
                 ['display-text', () => `Base time speed: ${format(tmp.clo.time_speed)} seconds/s`],
                 'blank',
-                ['buyables', [1, 2]],
+                ['buyables', [1, 2, 3, 4]],
             ],
             unlocked() { return hasChallenge('b', 51); },
         },
@@ -76,13 +76,20 @@ addLayer('clo', {
             unlocked() { return hasChallenge('b', 51) && tmp.m.layerShown; },
         },
         13: {
-            title: '??? connector',
-            description: 'Applies time speed to ??? layer',
+            title() {
+                if (!player.t.unlocked) return '??? connector';
+                return 'Tree connector';
+            },
+            description() {
+                if (!player.t.unlocked) return 'Applies time speed to ??? layer';
+                return 'Applies time speed to tree layer';
+            },
             effectDisplay() { return `*${format(D.dOne)}`; },
-            costDisplay() { return 'Cost: Unknown'; },
-            canAfford: false,
-            pay() { },
-            unlocked() { return hasChallenge('b', 51) && false; },
+            price: [['soaked_log', D(32)], ['normal_log', D(8)]],
+            costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
+            canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
+            pay() { this.price.forEach(([item, cost]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(cost)); },
+            unlocked() { return hasChallenge('b', 51) && player.t.unlocked; },
             branches: [23],
         },
         21: {
@@ -307,6 +314,45 @@ addLayer('clo', {
             },
             unlocked() { return hasChallenge('b', 51); },
         },
+        13: {
+            title: 'Zombie Gear',
+            display() {
+                /** @type {{[item: string]: Decimal}} */
+                const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
+
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} zombie gears\
+                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                Cost: ${cost}`;
+            },
+            cost(x) {
+                return {
+                    rotten_flesh: D(1.5).pow(x).times(32),
+                    iron_ore: D(1.5).pow(x).times(8),
+                    brain: D(1.5).pow(x),
+                };
+            },
+            effect(x) {
+                return D(.1 / 1.5).times(x).add(1);
+            },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('zombie');
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 51) && hasChallenge('b', 12); },
+        },
         // mining
         21: {
             title: 'Stone Gear',
@@ -387,6 +433,112 @@ addLayer('clo', {
             },
             unlocked() { return hasChallenge('b', 51); },
         },
+        // shop
+        31: {
+            title: 'Money Gear',
+            display() {
+                /** @type {Decimal} */
+                const cost = this.cost(getBuyableAmount(this.layer, this.id));
+
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} money gears\
+                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                Cost: ${layers.s.coins.format(cost, false)}`;
+            },
+            cost(x) { return D.dTwo.pow(x).times(100); },
+            effect(x) { return D(1 / 15).times(x).add(1); },
+            canAfford() { return this.cost(getBuyableAmount(this.layer, this.id)).lte(player.s.points); },
+            buy() {
+                player.s.points = player.s.points.minus(this.cost(getBuyableAmount(this.layer, this.id)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = layers.s.color;
+
+                return style;
+            },
+            unlocked() { return player.s.unlocked; },
+        },
+        // deep mining
+        41: {
+            title: 'Iron Gear',
+            display() {
+                /** @type {{[item: string]: Decimal}} */
+                const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} iron gears\
+                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                ${anvil_req}\
+                Cost: ${cost}`;
+            },
+            cost(x) {
+                return {
+                    iron_ore: D(2).pow(x).times(25),
+                };
+            },
+            effect(x) {
+                return D(.1).times(x).add(1);
+            },
+            canAfford() {
+                return tmp.lo.items['*'].has_anvil && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = '#888888';
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 51) && hasChallenge('b', 12); },
+        },
+        42: {
+            title: 'Gold Gear',
+            display() {
+                /** @type {{[item: string]: Decimal}} */
+                const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+
+                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} gold gears\
+                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                ${anvil_req}\
+                Cost: ${cost}`;
+            },
+            cost(x) {
+                return {
+                    gold_ore: D(3).pow(x).times(5),
+                };
+            },
+            effect(x) {
+                return D(.05).times(x).add(1);
+            },
+            canAfford() {
+                return tmp.lo.items['*'].has_anvil && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = 'gold';
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 51) && player.m.show_deep; },
+        },
     },
     tooltip() { return `Time speed: *${format(tmp.clo.time_speed)}`; },
     /** @type {typeof layers.clo.time_speed} */
@@ -401,13 +553,13 @@ addLayer('clo', {
             if (hasUpgrade('clo', 43)) speed = speed.times(upgradeEffect('clo', 43));
         }
 
-        if (!visual) {
+        if (!visual && layer) {
             const links = {
-                'xp': 11, 'm': 12,
+                'xp': 11, 'm': 12, 't': 13,
                 'l': 21, 'lo': 22,
                 'b': 31, 's': 32,
             };
-            if (layer in links && !hasUpgrade(this.layer, links[layer])) return speed;
+            if (!(layer in links) || !hasUpgrade(this.layer, links[layer])) return speed;
         }
 
         /** @type {number|'side'} */
@@ -416,8 +568,12 @@ addLayer('clo', {
 
         speed = speed.times(buyableEffect('clo', 11));
         speed = speed.times(buyableEffect('clo', 12));
+        speed = speed.times(buyableEffect('clo', 13));
         speed = speed.times(buyableEffect('clo', 21));
         speed = speed.times(buyableEffect('clo', 22));
+        speed = speed.times(buyableEffect('clo', 31));
+        speed = speed.times(buyableEffect('clo', 41));
+        speed = speed.times(buyableEffect('clo', 42));
 
         speed = speed.root(D.dTwo.pow(row));
 

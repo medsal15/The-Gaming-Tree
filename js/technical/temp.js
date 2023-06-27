@@ -157,6 +157,7 @@ function updateClickableTemp(layer) {
 function setupBuyables(layer) {
 	for (const id in layers[layer].buyables) {
 		if (isPlainObject(layers[layer].buyables[id])) {
+			/** @type {Buyable} */
 			let b = layers[layer].buyables[id]
 			b.actualCostFunction = b.cost
 			b.cost = function (x) {
@@ -165,7 +166,7 @@ function setupBuyables(layer) {
 			}
 			b.actualEffectFunction = b.effect
 			b.effect = function (x) {
-				x = (x === undefined ? player[this.layer].buyables[this.id] : x)
+				x = (x === undefined ? player[this.layer].buyables[this.id].add(tmp[this.layer].buyables[this.id]?.bonusAmount ?? 0) : x)
 				return layers[this.layer].buyables[this.id].actualEffectFunction(x)
 			}
 		}

@@ -2,6 +2,7 @@ type CompareResult = -1 | 0 | 1;
 type DecimalSource = string | number | Decimal;
 type Computable<T> = T | (() => T);
 type Computed<T> = T extends (...args: any) => any ? ReturnType<T> : T;
+type RComputed<T> = { [k in keyof T]: T[k] extends (...args: any) => any ? ReturnType<T[k]> : RComputed<T[k]> };
 type CSSStyles = { [k in keyof CSSStyleDeclaration]?: CSSStyleDeclaration[k] };
 type AchievementTypes = 'normal' | 'bonus' | 'secret';
 
@@ -1202,6 +1203,8 @@ declare class Buyable {
      * If this returns an empty value, that also disables the tooltip.
      */
     tooltip?: Computable<string>
+    /** Additionnal amount to be added to the buyable amount to compute the effects */
+    bonusAmount?(): Decimal
     /**
      * Called when the button is pressed.
      * The standard use would be to decrease the amount of the buyable,
@@ -1505,7 +1508,7 @@ declare class Hotkey {
     /**
      * Determines if you can use the hotkey.
      */
-    unlocked?(): boolean
+    unlocked?: Computable<boolean>
 }
 
 declare class Milestone {
@@ -1859,7 +1862,7 @@ declare class LayerData {
     activeChallenge?: number | null
 }
 
-type drop_sources = 'enemy' | 'mining';
+type drop_sources = 'enemy' | 'mining' | 'tree';
 
 declare let layers: {
     // Side
@@ -1876,10 +1879,13 @@ declare let layers: {
     // Row 0
     xp: Layer<Player['xp']> & {
         enemy: {
+            /** Unlocked enemy types */
             types(): string[]
+            /** Full list of enemy types */
             all_types: string[]
             level(type?: string): Decimal
-            color_level(type?: string): string
+            color_level(level?: DecimalSource): string
+            /** Color of an enemy type */
             color(type?: string): string
             health(type?: string): Decimal
             experience(type?: string): Decimal
@@ -1904,6 +1910,35 @@ declare let layers: {
             mode(mode?: Player['m']['mode']): string
             get_drops(amount: DecimalSource): [string, Decimal][]
             items: string[]
+        }
+    }
+    t: Layer<Player['t']> & {
+        upgrades: {
+            [id: number]: Upgrade & { item: string }
+        }
+        trees: {
+            /** Tracked items for display */
+            items: string[]
+            /** Unlocked trees */
+            trees(): string[]
+            /** All existing trees */
+            all_trees: string[]
+            health(type?: string | false): Decimal
+            /** Chance to get wood when hitting a tree */
+            chance(type?: string | false): Decimal
+            name(type?: string | false): string
+            /** Amount of trees regenerated every second */
+            regen(type?: string | false): Decimal
+            damage(type?: string | false): Decimal
+            get_drops(type?: string | false, amount: DecimalSource): [string, Decimal][]
+            /** Amount of wood when felling a tree */
+            size(type?: string | false): Decimal
+            /** Gets a random existing tree */
+            random(): string | false
+            /** Total amount of logs */
+            logs(): Decimal
+        }
+        convertion: {
         }
     }
     // Row 1
@@ -1940,7 +1975,7 @@ declare let layers: {
                 type_name(type: `${drop_sources}:${string}`): string
                 can_drop(type: `${drop_sources}:${string}`): boolean
                 amount(): Decimal
-                weight(type?: `${drop_sources}:${string}`): type extends string ? Decimal : { [key: `${drop_sources}:${string}`]: Decimal }
+                weight(type?: `${drop_sources}:${string}`): typeof type extends string ? Decimal : { [key: `${drop_sources}:${string}`]: Decimal }
                 has_anvil(): boolean
                 value: Computable<Decimal>
                 gain_multiplier: Computable<Decimal>
@@ -1951,6 +1986,7 @@ declare let layers: {
                 readonly grid: number
                 chances?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
                 weights?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
+                per_second?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
                 other_sources?: Computable<`${drop_sources}:${string}`[]>
                 style?: Computable<CSSStyles>
                 name: Computable<string>
@@ -1969,7 +2005,9 @@ declare let layers: {
         investloans: {
             amount(real?: boolean): Decimal
             is_loans(): boolean
-            type(): string
+            type(): 'loan' | 'debt' | 'investment'
+            item_upgrade: { [item: string]: number | undefined }
+            is_loan(id?: number): boolean
         }
     }
 };
@@ -1985,113 +2023,18 @@ type Temp = {
     pointGen: Decimal
     scrolled: boolean
     // Side
-    ach: TempLayer & {
-        getAchievementsRows: number[],
-        getAchievements: string[],
-        totalAchievements: Decimal,
-        ownedAchievements: Decimal,
-    }
-    clo: TempLayer & {
-        time_speed: Decimal
-    }
+    ach: TempLayer & RComputed<typeof layers.ach>
+    clo: TempLayer & RComputed<typeof layers.clo>
     // Row 0
-    xp: TempLayer & {
-        enemy: {
-            types: string[]
-            all_types: string[]
-            level: Decimal
-            color_level: string
-            color: string
-            health: Decimal
-            experience: Decimal
-            kills: Decimal
-            name: ''
-            damage: Decimal
-            dps: Decimal
-            regen: Decimal
-        }
-        total: {
-            kills: Decimal
-        }
-    }
-    m: TempLayer & {
-        upgrades: {
-            [id: number]: Upgrade & { item: string }
-        }
-        ore: {
-            health: Decimal
-            regen: Decimal
-            chance: Decimal
-            mode: string
-            get_drops(amount: DecimalSource): [string, Decimal][]
-            items: string[]
-        }
-    }
+    xp: TempLayer & RComputed<typeof layers.xp>
+    m: TempLayer & RComputed<typeof layers.m>
+    t: RComputed<typeof layers.t>
     // Row 1
-    l: TempLayer & {
-        regex: RegExp
-        skills: {
-            '*': {
-                max: Decimal
-                left: Decimal
-                showSkill(id: string): ['row', [['bar', string], ['clickable', `add_${string}`], ['clickable', `remove_${string}`]]]
-                speed: Decimal
-            }
-            [skill: string]: {
-                readonly id: string
-                effect: Decimal
-                needed: Decimal
-                unlocked: boolean
-                text: string
-                name: string
-            }
-        }
-    }
-    lo: TempLayer & {
-        buyables: Layer<any>['buyables'] & {
-            [id: number]: Buyable & { value: Decimal }
-        }
-        items: {
-            '*': {
-                grid_to_item(id: number): string | false
-                global_chance_multiplier: Decimal
-                get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: Decimal): [string, Decimal][]
-                gain_drops(drops: [string, Decimal][]): void
-                format_chance(chance: Decimal): string
-                type_name(type: `${drop_sources}:${string}`): string
-                can_drop(type: `${drop_sources}:${string}`): boolean
-                amount: Decimal
-                weight: { [key: `${drop_sources}:${string}`]: Decimal }
-                has_anvil: boolean
-                value: Decimal
-                gain_multiplier: Decimal
-            }
-        } & {
-            [id: string]: {
-                readonly id: string
-                readonly grid: number
-                chances?: { [type: `${drop_sources}:${string}`]: Decimal }
-                weights?: { [type: `${drop_sources}:${string}`]: Decimal }
-                other_sources?: `${drop_sources}:${string}`[]
-                style?: CSSStyles
-                name: string
-                unlocked?: boolean
-            }
-        }
-    }
+    l: TempLayer & RComputed<typeof layers.l>
+    lo: TempLayer & RComputed<typeof layers.lo>
     // Row 2
-    b: TempLayer & {}
-    s: TempLayer & {
-        coins: {
-            types: [string, string][]
-            format: string
-        }
-        investloans: {
-            amount: Decimal
-            is_loans: boolean
-            type: string
-        }
-    }
+    b: TempLayer & RComputed<typeof layers.b>
+    s: TempLayer & RComputed<typeof layers.s>
 };
 type Player = {
     devSpeed: string
@@ -2131,6 +2074,15 @@ type Player = {
         last_drops: [string, Decimal][]
         short_mode: boolean
         mode: 'shallow' | 'deep'
+        show_deep: boolean
+    }
+    t: LayerData & {
+        short_mode: boolean
+        last_drops: [string, Decimal][]
+        trees: { [id: string]: { amount: Decimal, } }
+        current: string | false
+        health: Decimal
+        convert: boolean
     }
     // Row 1
     l: LayerData & {

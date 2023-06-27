@@ -139,7 +139,10 @@ var systemComponents = {
 		<br><br>
         Time Played: {{ formatTime(player.timePlayed) }}<br><br>
         <h3>Hotkeys</h3><br>
-        <span v-for="key in hotkeys" v-if="player[key.layer].unlocked && tmp[key.layer].hotkeys[key.id].unlocked"><br>{{key.description}}</span></div>
+		<span v-for="keys in layered_hotkeys">
+		<span v-for="key in keys" v-if="player[key.layer].unlocked && tmp[key.layer].hotkeys[key.id].unlocked"><br>{{key.description}}</span>
+		</span>
+		</div>
     `
 	},
 
@@ -167,6 +170,7 @@ var systemComponents = {
 				<td><button class="opt" onclick="toggleOpt('forceTooltips'); needsCanvasUpdate = true">Shift-Click to Toggle Tooltips: {{ options.forceTooltips?"ON":"OFF" }}</button></td>
 			</tr>
             <tr>
+                <td><button class="opt" onclick="toggleOpt('noRNG'); needsCanvasUpdate = true">Disable Luck: {{ options.noRNG?"ON":"OFF" }}</button></td>
                 <td><button class="opt" onclick="toggleOpt('colorLevels'); needsCanvasUpdate = true">Color Levels: {{ options.colorLevels?"ON":"OFF" }}</button></td>
                 <td><button v-if="tmp.lo.layerShown" class="opt" onclick="changeLootChance(); needsCanvasUpdate = true">Fractional Chance Mode: {{ CHANCE_MODE[options.chanceMode] }}</button></td>
 			</tr>

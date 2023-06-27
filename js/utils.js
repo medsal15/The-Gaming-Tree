@@ -420,9 +420,9 @@ document.onkeydown = function (e) {
 	if (onFocused) return
 	if (ctrlDown && hotkeys[key]) e.preventDefault()
 	if (hotkeys[key]) {
-		let k = hotkeys[key]
-		if (player[k.layer].unlocked && tmp[k.layer].hotkeys[k.id].unlocked)
-			k.onPress()
+		hotkeys[key].forEach(/**@param {Hotkey & {layer: string, id: string}} k*/k => {
+			if (player[k.layer].unlocked && tmp[k.layer].hotkeys[k.id].unlocked) k.onPress();
+		});
 	}
 }
 

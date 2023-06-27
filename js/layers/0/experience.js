@@ -1,7 +1,6 @@
 'use strict';
 
 //todo add Tree damage for type 'ent' (in enemy.damage)
-//todo improve enemy.color_level to use Decimals
 addLayer('xp', {
     name: 'Experience Points',
     symbol: 'XP',
@@ -30,6 +29,32 @@ addLayer('xp', {
             description: 'Shift + X: Display experience points layer',
             unlocked() { return player.xp.unlocked; },
             onPress() { if (player.xp.unlocked) showTab('xp'); },
+        },
+        {
+            key: 'ArrowUp',
+            description: '↑ (in XP): Switch to previous enemy',
+            unlocked() { return tmp.xp.enemy.types.length > 1; },
+            onPress() {
+                const types = tmp.xp.enemy.types;
+                if (player.tab == 'xp' && player.xp.type != types[0]) {
+                    const i = types.indexOf(player.xp.type);
+                    if (i == -1) player.xp.type = types[0];
+                    else player.xp.type = types[i - 1];
+                };
+            },
+        },
+        {
+            key: 'ArrowDown',
+            description: '↓ (in XP): Switch to next enemy',
+            unlocked() { return tmp.xp.enemy.types.length > 1; },
+            onPress() {
+                const types = tmp.xp.enemy.types;
+                if (player.tab == 'xp' && player.xp.type != types[types.length - 1]) {
+                    const i = types.indexOf(player.xp.type);
+                    if (i == -1) player.xp.type = types[0];
+                    else player.xp.type = types[i + 1];
+                };
+            },
         },
     ],
     tabFormat: {
@@ -68,9 +93,10 @@ addLayer('xp', {
                 'blank',
                 ['bar', 'health'],
                 ['display-text', () => {
+                    const level = tmp.xp.enemy.level;
                     let text = '';
                     if (options.colorLevels) {
-                        text = tmp.xp.enemy.color_level.replace(/^(.)/, s => s.toUpperCase());
+                        text = capitalize(layers.xp.enemy.color_level(level));
                     } else {
                         text = `Level ${formatWhole(tmp.xp.enemy.level)}`;
                     }
@@ -135,13 +161,13 @@ addLayer('xp', {
                         row = type => {
                             const kills = layers.xp.enemy.kills(type),
                                 kill_text = kills.neq(1) ? ` (+${kill_style(format(kills))})` : '',
-                                dps = show_dps ? `<td>${type == player.xp.type ? '<b>' : ''}${layers.xp.enemy.dps(type)}${type == player.xp.type ? '</b>' : ''}</td>` : '';
+                                dps = show_dps ? `<td>${type == player.xp.type ? '<u>' : ''}${format(layers.xp.enemy.dps(type))}${type == player.xp.type ? '</u>' : ''}</td>` : '';
                             return `<tr>\
                                 <td>${capitalize(layers.xp.enemy.name(type))}</td>\
                                 <td>${format(player.xp.health[type])} / ${format(layers.xp.enemy.health(type))}</td>\
                                 <td>${enemy_style(type, `+${format(layers.xp.enemy.experience(type))}`)}</td>\
                                 <td>${kill_style(format(player.xp.kills[type]))}${kill_text}</td>\
-                                <td>${options.colorLevels ? layers.xp.enemy.color_level(type) : formatWhole(layers.xp.enemy.level(type))}</td>\
+                                <td>${options.colorLevels ? capitalize(layers.xp.enemy.color_level(layers.xp.enemy.level(type))) : formatWhole(layers.xp.enemy.level(type))}</td>\
                                 ${dps}\
                             </tr>`;
                         };
@@ -155,7 +181,7 @@ addLayer('xp', {
                             <th>${options.colorLevels ? 'Color' : 'Level'}</th>
                             ${show_dps ? '<th>DPS</th>' : ''}
                         </tr>
-                        ${tmp.xp.enemy.types.map(type => row(type)).join('')}
+                        ${tmp.xp.enemy.types.map(row).join('')}
                     </table>`;
                 }],
             ],
@@ -285,7 +311,7 @@ addLayer('xp', {
                 let amount = '25%';
                 if (hasChallenge('b', 11)) amount = '50%';
                 let text = `Passively deal ${amount} of your damage every second`;
-                if (hasChallenge('b', 12)) text += `<br>Passively deal 25% of your damage to <b>every</b> monsters every second (see Info tab for actual DPS)`;
+                if (hasChallenge('b', 12)) text += `<br>Passively deal 25% of your damage to <u>every</u> monsters every second (see Info tab for current DPS)`;
 
                 return text;
             },
@@ -299,7 +325,10 @@ addLayer('xp', {
 
                 return { active, global };
             },
-            effectDisplay() { return `${format(tmp.xp.enemy.damage.times(this.effect().active))} /s`; },
+            effectDisplay() {
+                if (hasChallenge('b', 12)) return '';
+                return `${format(tmp.xp.enemy.damage.times(this.effect().active))} /s`;
+            },
             unlocked() { return tmp.xp.total.kills.gte(50) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(150),
         },
@@ -390,8 +419,13 @@ addLayer('xp', {
         43: {
             title: 'Cryptoslime',
             description: 'Goblins can also drop slime items at 10% of the rate.<br>Slime level *1.1',
-            effect() { return D(1.1); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effect() {
+                let level_mult = D(1.1),
+                    chance_mult = D(.1);
+
+                return { level_mult, chance_mult };
+            },
+            effectDisplay() { return `level *${format(this.effect().level_mult)}, chance *${format(this.effect().chance_mult)}`; },
             unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
             cost: D(2222),
         },
@@ -405,7 +439,16 @@ addLayer('xp', {
                 const max = tmp.xp.enemy.health;
                 return D.div(player.xp.health[player.xp.type] ?? max, max);
             },
-            display() { return `${format(player.xp.health[player.xp.type])} / ${format(tmp.xp.enemy.health)}`; },
+            display() {
+                let text = `${format(player.xp.health[player.xp.type])} / ${format(tmp.xp.enemy.health)}`;
+
+                const regen = tmp.xp.enemy.regen;
+                if (regen.gt(0)) {
+                    text += `<br>(+${format(regen)}/s)`;
+                }
+
+                return text;
+            },
             baseStyle: { 'background-color': 'red' },
             fillStyle: { 'background-color': 'lime' },
             textStyle: { 'color': 'black' },
@@ -470,27 +513,120 @@ addLayer('xp', {
 
             let level = D.div(kills, 10).root(2);
 
-            if (type == 'slime' && hasUpgrade('xp', 43)) level = level.times(upgradeEffect('xp', 43));
+            if (type == 'slime' && hasUpgrade('xp', 43)) level = level.times(upgradeEffect('xp', 43).level_mult);
 
             return level.floor();
         },
-        color_level(type = player.xp.type) {
-            const level = layers.xp.enemy.level(type);
-            if (format(level) == 'NaN') return 'unknown';
-            if (level.gte(Number.MAX_VALUE)) return 'rainbow';
+        color_level(level = 0) {
+            const l = D(level);
+            if (format(l) == 'NaN') return 'unknown';
+            /** @type {{[k in number|'e'|'F'|'.']: (len: number) => string}} */
+            const map = {
+                0: len => [
+                    'black',
+                    'ebony',
+                    'dark',
+                    'grim',
+                    'inky',
+                    'vantablack',
+                    'onyx',
+                ][len - 1] ?? 'black',
+                1: len => [
+                    'gray',
+                    'dusty',
+                    'light gray',
+                    'ashen',
+                    'grey',
+                    'slate',
+                    'light grey',
+                    'silver',
+                ][len - 1] ?? 'gray',
+                2: len => [
+                    'red',
+                    'carmine',
+                    'carnelian',
+                    'cardinal',
+                    'crimson',
+                    'coquelicot',
+                    'scarlet',
+                    'ruby',
+                ][len - 1] ?? 'red',
+                3: len => [
+                    'orange',
+                    'carrot',
+                    'fulvous',
+                    'flame',
+                    'ginger',
+                    'sunset',
+                    'tangerine',
+                    'amber',
+                ][len - 1] ?? 'orange',
+                4: len => [
+                    'yellow',
+                    'sunglow',
+                    'mustard',
+                    'jonquil',
+                    'mango',
+                    'jasmine',
+                    'lemon',
+                    'gold',
+                ][len - 1] ?? 'yellow',
+                5: len => [
+                    'green',
+                    'volt',
+                    'mint',
+                    'chartreuse',
+                    'harlequin',
+                    'olive',
+                    'moss',
+                    'jade',
+                ][len - 1] ?? 'green',
+                6: len => [
+                    'blue',
+                    'zaffre',
+                    'verdigris',
+                    'ultramarine',
+                    'glaucous',
+                    'azure',
+                    'cerulean',
+                    'sapphire',
+                ][len - 1] ?? 'blue',
+                7: len => [
+                    'magenta',
+                    'purple',
+                    'violet',
+                    'lavender',
+                    'orchid',
+                    'lilac',
+                    'plum',
+                    'amethyst',
+                ][len - 1] ?? 'magenta',
+                8: len => [
+                    'brown',
+                    'beige',
+                    'chestnut',
+                    'chocolate',
+                    'coffee',
+                    'tan',
+                    'sepia',
+                    'bronze',
+                ][len - 1] ?? 'brown',
+                9: len => [
+                    'white',
+                    'snow',
+                    'pale',
+                    'bleached',
+                    'ghostly',
+                    'cream',
+                    'light',
+                    'ivory',
+                ][len - 1] ?? 'white',
+                'e': len => 'shifted through',
+                'F': len => 'tainted by',
+                '.': len => 'covered by',
+            };
 
-            const colors = ['black', 'red', 'yellow', 'green', 'cyan', 'blue', 'magenta', 'white'];
-
-            let color = [],
-                l = level.toNumber();
-            do {
-                const c = l % colors.length;
-
-                l = Math.floor(l / colors.length);
-                color.push(colors[c]);
-            } while (l > 0)
-
-            return color.join(' ');
+            return formatWhole(l).replaceAll(/(.)\1*/g, s => `${map[s[0]](s.length)} `);
         },
         color(type = player.xp.type) {
             switch (type) {

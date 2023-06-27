@@ -1,7 +1,6 @@
 'use strict';
 
-//todo coal upgrades
-//todo gold upgrades
+//todo implement 61 (unlock forge)
 addLayer('m', {
     name: 'Mining',
     symbol: 'M',
@@ -14,13 +13,15 @@ addLayer('m', {
             short_mode: false,
             last_drops: [],
             mode: 'shallow',
+            show_deep: false,
         };
     },
     tooltip() {
         if (player.m.short_mode) {
             const style = item => {
-                const color = tmp.lo.items[item].style['background-color'];
-                return `<span style="color:${color};text-shadow:${color} 0 0 10px;">${formatWhole(player.lo.items[item].amount)}</span>`;
+                const color = tmp.lo.items[item].style['background-color'],
+                    shadow = tmp.lo.items[item].style['color'] ?? color;
+                return `<span style="color:${color};text-shadow:${shadow} 0 0 10px;">${formatWhole(player.lo.items[item].amount)}</span>`;
             };
 
             return layers.m.ore.items.filter(item => tmp.lo.items[item].unlocked).map(style).join(', ');
@@ -32,7 +33,13 @@ addLayer('m', {
     },
     layerShown() { return (hasChallenge('b', 11) || inChallenge('b', 11)) && !tmp[this.layer].deactivated; },
     deactivated() { return inChallenge('b', 31); },
-    color: '#DDDDDD',
+    color() {
+        switch (player.m.mode) {
+            case 'deep': return '#BBBBBB';
+            default:
+            case "shallow": return '#DDDDDD';
+        }
+    },
     row: 0,
     position: 1,
     resource: 'ores',
@@ -42,6 +49,30 @@ addLayer('m', {
             description: 'Shift + M: Display mining layer',
             unlocked() { return tmp.m.layerShown; },
             onPress() { showTab('m'); },
+        },
+        {
+            key: 'ArrowUp',
+            description: '↑ (in M): Mine shallower',
+            unlocked() { return hasUpgrade('m', 52); },
+            onPress() {
+                if (player.tab == 'm' && player.m.mode != 'shallow') {
+                    player.m.mode = {
+                        'deep': 'shallow',
+                    }[player.m.mode] ?? 'shallow';
+                };
+            },
+        },
+        {
+            key: 'ArrowDown',
+            description: '↓ (in M): Mine deeper',
+            unlocked() { return hasUpgrade('m', 52); },
+            onPress() {
+                if (player.tab == 'm' && player.m.mode != 'deep') {
+                    player.m.mode = {
+                        'shallow': 'deep',
+                    }[player.m.mode] ?? 'deep';
+                };
+            },
         },
     ],
     tabFormat: {
@@ -60,8 +91,9 @@ addLayer('m', {
                 ['display-text', () => {
                     const line = item => {
                         const itemp = tmp.lo.items[item],
-                            color = itemp.style['background-color'];
-                        return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">${formatWhole(player.lo.items[item].amount)}</span> ${itemp.name}`;
+                            color = itemp.style['background-color'],
+                            shadow = itemp.style['color'] ?? color;
+                        return `<span style="color:${color};text-shadow:${shadow} 0 0 10px;font-size:1.5em;">${formatWhole(player.lo.items[item].amount)}</span> ${itemp.name}`;
                     };
 
                     return `You have ${listFormat.format(layers.m.ore.items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
@@ -69,12 +101,12 @@ addLayer('m', {
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
                     'blank',
-                    ['toggle', ['m', 'short_mode']]
+                    ['toggle', ['m', 'short_mode']],
                 ]],
                 'blank',
                 ['bar', 'health'],
                 ['clickables', [1]],
-                () => { if (hasUpgrade('m', 25)) return ['display-text', `Mining ${tmp.m.ore.mode}`]; },
+                () => { if (player.m.show_deep) return ['display-text', `Mining ${tmp.m.ore.mode}`]; },
                 'blank',
                 ['display-text', () => `Chance to mine something: ${layers.lo.items["*"].format_chance(tmp.m.ore.chance)}`],
                 ['display-text', () => {
@@ -92,8 +124,9 @@ addLayer('m', {
                 ['display-text', () => {
                     const line = item => {
                         const itemp = tmp.lo.items[item],
-                            color = itemp.style['background-color'];
-                        return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">${formatWhole(player.lo.items[item].amount)}</span> ${itemp.name}`;
+                            color = itemp.style['background-color'],
+                            shadow = itemp.style['color'] ?? color;
+                        return `<span style="color:${color};text-shadow:${shadow} 0 0 10px;font-size:1.5em;">${formatWhole(player.lo.items[item].amount)}</span> ${itemp.name}`;
                     };
 
                     return `You have ${listFormat.format(layers.m.ore.items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
@@ -127,14 +160,18 @@ addLayer('m', {
                     'deep': 'shallow',
                 }[player.m.mode] ?? 'shallow';
             },
-            unlocked() { return hasUpgrade('m', 25); },
+            unlocked() { return hasUpgrade('m', 52); },
         },
         12: {
             style: { 'background-image': `url('./resources/images/pickaxe.svg')`, },
             canClick() { return player.m.health.gte(1); },
             onClick() {
                 player.m.health = player.m.health.minus(1);
-                if (tmp.m.ore.chance.gt(Math.random())) {
+
+                if (options.noRNG) {
+                    const drops = player.m.last_drops = layers.m.ore.get_drops(tmp.m.ore.chance);
+                    layers.lo.items["*"].gain_drops(drops);
+                } else if (tmp.m.ore.chance.gt(Math.random())) {
                     const drops = player.m.last_drops = layers.m.ore.get_drops(1);
                     layers.lo.items["*"].gain_drops(drops);
                 } else {
@@ -143,7 +180,10 @@ addLayer('m', {
             },
             onHold() {
                 player.m.health = player.m.health.minus(1);
-                if (tmp.m.ore.chance.gt(Math.random())) {
+                if (options.noRNG) {
+                    const drops = player.m.last_drops = layers.m.ore.get_drops(tmp.m.ore.chance);
+                    layers.lo.items["*"].gain_drops(drops);
+                } else if (tmp.m.ore.chance.gt(Math.random())) {
                     const drops = player.m.last_drops = layers.m.ore.get_drops(1);
                     layers.lo.items["*"].gain_drops(drops);
                 } else {
@@ -162,7 +202,7 @@ addLayer('m', {
                     'shallow': 'deep',
                 }[player.m.mode] ?? 'deep';
             },
-            unlocked() { return hasUpgrade('m', 25); },
+            unlocked() { return hasUpgrade('m', 52); },
         },
     },
     /** @type {typeof layers.m.upgrades} */
@@ -223,13 +263,25 @@ addLayer('m', {
                 return `Formula: ${formula}`;
             },
             effect() {
-                let effect = tmp.xp.total.kills.add(3).log(3);
+                let ore_chance = D.dOne,
+                    mine_chance = D.dOne,
+                    effect = tmp.xp.total.kills.add(3).log(3);
 
-                if (hasUpgrade('m', 32)) effect = effect.root(2);
+                if (hasUpgrade('m', 32)) {
+                    mine_chance = effect.root(2);
+                } else {
+                    ore_chance = effect;
+                }
 
-                return effect;
+                return {
+                    mine_chance,
+                    ore_chance,
+                };
             },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() {
+                const k = hasUpgrade('m', 32) ? 'mine_chance' : 'ore_chance';
+                return `*${format(this.effect()[k])}`;
+            },
             cost: D(1),
             item: 'tin_ore',
             currencyInternalName: 'amount',
@@ -242,31 +294,6 @@ addLayer('m', {
 
                 return style;
             },
-        },
-        15: {
-            title: 'Iron Pickaxe',
-            description() {
-                if (!shiftDown) return 'Kills boost ore health';
-
-                let formula = 'log100(kills + 100)';
-
-                return `Formula: ${formula}`;
-            },
-            effect() { return tmp.xp.total.kills.add(100).log(100); },
-            effectDisplay() { return `*${format(this.effect())}`; },
-            cost: D(1),
-            item: 'iron_ore',
-            currencyInternalName: 'amount',
-            currencyDisplayName() { return tmp.lo.items[this.item].name; },
-            currencyLocation() { return player.lo.items[this.item]; },
-            style() {
-                const style = { 'border-radius': 0, };
-
-                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
-
-                return style;
-            },
-            unlocked() { return hasChallenge('b', 12); },
         },
         21: {
             title: 'Stone Sword',
@@ -334,25 +361,6 @@ addLayer('m', {
 
                 return style;
             },
-        },
-        25: {
-            title: 'Iron Shaft',
-            description: 'Allows deep mining<br>Doubles stone gain',
-            effect() { return D.dTwo; },
-            effectDisplay() { return `*${format(this.effect())}`; },
-            cost: D(5),
-            item: 'iron_ore',
-            currencyInternalName: 'amount',
-            currencyDisplayName() { return tmp.lo.items[this.item].name; },
-            currencyLocation() { return player.lo.items[this.item]; },
-            style() {
-                const style = { 'border-radius': 0, };
-
-                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
-
-                return style;
-            },
-            unlocked() { return hasChallenge('b', 12); },
         },
         31: {
             title: 'Stone Tablet',
@@ -433,9 +441,168 @@ addLayer('m', {
                 return style;
             },
         },
-        35: {
+        41: {
+            title: 'Coal Pickaxe',
+            description: 'How does this thing even stay intact?<br>Double mining chance',
+            effect() { return D.dTwo; },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            cost: D(1),
+            item: 'coal',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = { 'border-radius': 0, };
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
+        42: {
+            title: 'Iron Pickaxe',
+            description() {
+                if (!shiftDown) return 'Kills boost ore health';
+
+                let formula = 'log100(kills + 100)';
+
+                return `Formula: ${formula}`;
+            },
+            effect() { return tmp.xp.total.kills.add(100).log(100); },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            cost: D(1),
+            item: 'iron_ore',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = { 'border-radius': 0, };
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 12); },
+        },
+        43: {
+            title: 'Gold Pickaxe',
+            description: 'Increases amount of mined ores',
+            effect() { return D(1.1); },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            cost: D(1),
+            item: 'gold_ore',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = { 'border-radius': 0, };
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
+        51: {
+            title: 'Fire Axe',
+            description() {
+                if (!shiftDown) return 'Coal boosts tree damage';
+
+                let formula = '7√(coal)';
+
+                return `Formula: ${formula}`;
+            },
+            effect() { return player.lo.items.coal.amount.root(7); },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            cost: D(7),
+            item: 'coal',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = { 'border-radius': 0, };
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
+        52: {
+            title: 'Iron Shaft',
+            description: 'Allows deep mining<br>Doubles stone gain',
+            effect() { return D.dTwo; },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            cost: D(5),
+            item: 'iron_ore',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = { 'border-radius': 0, };
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 12); },
+            onPurchase() { player.m.show_deep = true; },
+        },
+        53: {
+            title: 'Gold Collector',
+            description() {
+                if (!shiftDown) return 'Gold boosts drop chances';
+
+                let formula = 'log18(gold ore + 18)';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                let gold = player.lo.items.gold_ore.amount;
+
+                gold = gold.add(buyableEffect('lo', 53));
+
+                return gold.add(18).log(18);
+            },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            cost: D(3),
+            item: 'gold_ore',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = { 'border-radius': 0, };
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
+        61: {
+            title: 'Coal Forge',
+            description() { return `Unlock the forge<br>Square ${layerColor('lo', tmp.lo.buyables[21].title)} effect`; },
+            effect() { return D.dTwo; },
+            effectDisplay() { return `^${format(this.effect())}`; },
+            cost: D(49),
+            item: 'coal',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = { 'border-radius': 0, };
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
+        62: {
             title: 'Iron Axe',
             description: 'Unlock a new layer<br>Increase tree damage',
+            onPurchase() { player.t.unlocked = true; },
             effect() { return D.dOne; },
             effectDisplay() { return `+${format(this.effect())}`; },
             cost: D(25),
@@ -452,6 +619,37 @@ addLayer('m', {
             },
             unlocked() { return hasChallenge('b', 12); },
         },
+        63: {
+            title: 'Gold Coins',
+            description() {
+                if (!shiftDown) return 'Gold boosts coin gain';
+
+                let formula = 'log9(gold ore + 9)';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                let gold = player.lo.items.gold_ore.amount;
+
+                gold = gold.add(buyableEffect('lo', 53));
+
+                return gold.add(9).log(9);
+            },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            cost: D(9),
+            item: 'gold_ore',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = { 'border-radius': 0, };
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
     },
     bars: {
         health: {
@@ -462,7 +660,7 @@ addLayer('m', {
                 const max = tmp.m.ore.health;
                 return D.div(player.m.health ?? max, max);
             },
-            display() { return `${format(player.m.health)} / ${format(tmp.m.ore.health)}`; },
+            display() { return `${format(player.m.health)} / ${format(tmp.m.ore.health)}<br />(+${format(tmp.m.ore.regen)}/s)`; },
             baseStyle: { 'background-color': '#222222', },
             fillStyle: { 'background-color': '#DDDDDD', },
             textStyle: { 'color': 'gray', },
@@ -476,7 +674,7 @@ addLayer('m', {
             if (hasUpgrade('m', 33)) health = health.add(upgradeEffect('m', 33));
 
             if (hasUpgrade('m', 11)) health = health.times(upgradeEffect('m', 11));
-            if (hasUpgrade('m', 14)) health = health.times(upgradeEffect('m', 14));
+            if (hasUpgrade('m', 42)) health = health.times(upgradeEffect('m', 42));
 
             health = health.times(buyableEffect('lo', 21));
 
@@ -503,7 +701,8 @@ addLayer('m', {
             }
 
             if (hasUpgrade('m', 12)) chance = chance.times(upgradeEffect('m', 12));
-            if (hasUpgrade('m', 32) && hasUpgrade('m', 13)) chance = chance.times(upgradeEffect('m', 13));
+            if (hasUpgrade('m', 13)) chance = chance.times(upgradeEffect('m', 13).mine_chance);
+            if (hasUpgrade('m', 41)) chance = chance.times(upgradeEffect('m', 41));
 
             chance = chance.times(buyableEffect('lo', 22));
             chance = chance.times(buyableEffect('lo', 23).chance_mult);
@@ -517,12 +716,14 @@ addLayer('m', {
             switch (mode) {
                 default:
                 case 'shallow':
-                    return hasUpgrade('m', 25) ? 'shallow' : '';
+                    return player.m.show_deep ? 'shallow' : '';
                 case 'deep':
                     return 'deep';
             };
         },
         get_drops(amount) {
+            if (hasUpgrade('m', 43)) amount = D.times(amount, upgradeEffect('m', 43));
+
             const drops = layers.lo.items["*"].get_drops(`mining:${player.m.mode}`, D(amount));
 
             if (hasUpgrade('m', 32)) {
@@ -535,18 +736,18 @@ addLayer('m', {
                 if (entry) entry[1] = stone;
                 else drops.push(['stone', stone]);
             }
-            if (hasUpgrade('m', 25)) {
+            if (hasUpgrade('m', 52)) {
                 const stone = drops.find(([item]) => item == 'stone');
                 if (stone) {
-                    stone[1] = stone[1].times(upgradeEffect('m', 25));
+                    stone[1] = stone[1].times(upgradeEffect('m', 52));
                 }
             }
 
             return drops;
         },
         items: [
-            'stone', 'copper_ore', 'tin_ore',
-            'coal', 'iron_ore', 'gold_ore',
+            'stone', 'copper_ore', 'tin_ore', // T0
+            'coal', 'iron_ore', 'gold_ore', // T1
         ],
     },
     update(diff) {
@@ -570,14 +771,15 @@ addLayer('m', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
-        const keep = [],
+        const keep = ['show_deep'],
             kept_ups = [...player.m.upgrades];
 
         kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 23).m_hold).toNumber();
 
         layerDataReset(this.layer, keep);
-        ['stone', 'copper_ore', 'tin_ore'].forEach(item => player.lo.items[item].amount = D.dZero);
+        layers.m.ore.items.forEach(item => player.lo.items[item].amount = D.dZero);
         player.m.upgrades.push(...kept_ups);
     },
     branches: ['lo'],
+    prestigeNotify() { return !hasUpgrade('m', 22) && player.m.health.gte(tmp.m.ore.health); },
 });

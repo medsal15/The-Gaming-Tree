@@ -1,6 +1,7 @@
 'use strict';
 
-//todo zombie/deep mining loans/investments
+//todo tree loans/investments
+//todo forge loans/investments
 addLayer('s', {
     name: 'Shop',
     symbol: 'S',
@@ -71,7 +72,7 @@ addLayer('s', {
                 ['display-text', () => `<span style="color:#AA5555;">Buying a${tmp.s.investloans.is_loans ? ' loan' : 'n investment'} increases the price of all the others</span>`],
                 'blank',
                 ['clickable', 11],
-                ['upgrades', [1, 2, 3, 4, 5]],
+                ['upgrades', [1, 2, 3, 4, 9, 10, 5]],
             ],
             name() { return `${capitalize(tmp.s.investloans.type)}s`; },
         },
@@ -107,8 +108,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.xp.points, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.xp.points, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -130,8 +134,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 100).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(tmp.xp.total.kills, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(tmp.xp.total.kills, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -153,8 +160,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 5).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `/${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `cost *${format(D.add(player.l.points, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.l.points, 100).floor())}/s`;
+                    case 'investment': return `cost /${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -176,8 +186,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.slime_goo.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.slime_goo.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -199,8 +212,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.slime_core_shard.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.slime_core_shard.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -222,8 +238,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.slime_core.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.slime_core.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -245,8 +264,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.stone.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.stone.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -268,8 +290,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.copper_ore.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.copper_ore.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -291,8 +316,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.tin_ore.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.tin_ore.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -314,8 +342,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.red_fabric.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.red_fabric.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -337,8 +368,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.pyrite_coin.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.pyrite_coin.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -360,8 +394,11 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
-                return `*${format(this.effect())}`;
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.rusty_gear.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.rusty_gear.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
@@ -386,15 +423,156 @@ addLayer('s', {
                 if (tmp.s.investloans.is_loans) return '';
                 return `+${format(this.effect())}`;
             },
-            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true).add(4)), 100); },
+            cost() {
+                let cost = D(1.5).pow(layers.s.investloans.amount(true).add(4));
+
+                if (inChallenge('b', 32)) cost = cost.times(2);
+
+                return powerRound(cost, 100);
+            },
             style() {
                 let width = '360px';
 
-                if (inChallenge('b', 32) || hasChallenge('b', 32)) width = '480px';
+                if (inChallenge('b', 32) || hasChallenge('b', 32)) width = '600px';
 
                 return { width };
             },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+        },
+        91: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Rotten Flesh ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Rotten Flesh';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate rotten flesh challenge penality';
+                if (!shiftDown) return 'Boost rotten flesh gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.rotten_flesh.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.rotten_flesh.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return hasChallenge('b', 32) || inChallenge('b', 32); },
+        },
+        92: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Brain ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Brains';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate brain challenge penality';
+                if (!shiftDown) return 'Boost brain gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.brain.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.brain.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return hasChallenge('b', 32) || inChallenge('b', 32); },
+        },
+        101: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Coal ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Coal';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate coal challenge penality';
+                if (!shiftDown) return 'Boost coal gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.coal.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.coal.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.m.show_deep; },
+        },
+        102: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Iron Ore ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Iron Ore';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate iron ore challenge penality';
+                if (!shiftDown) return 'Boost iron ore gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.iron_ore.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.iron_ore.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return hasChallenge('b', 32) || inChallenge('b', 32); },
+        },
+        103: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Gold Ore ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Gold Ore';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate gold ore challenge penality';
+                if (!shiftDown) return 'Boost gold ore gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.gold_ore.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.gold_ore.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.m.show_deep; },
         },
         //#endregion Loans/Investments
         //#region Normal upgrades
@@ -567,6 +745,18 @@ addLayer('s', {
             if (inChallenge('b', 32)) return 'debt';
             return 'investment';
         },
+        item_upgrade: {
+            'slime_goo': 21, 'slime_core_shard': 22, 'slime_core': 23,
+            'stone': 31, 'copper_ore': 32, 'tin_ore': 33,
+            'red_fabric': 41, 'pyrite_coin': 42, 'rusty_gear': 43,
+            'rotten_flesh': 91, 'brain': 92,
+            'coal': 101, 'iron_ore': 102, 'gold_ore': 103,
+        },
+        is_loan(id) {
+            if (!id) return false;
+
+            return id <= 51 || (id >= 91 && id <= 103);
+        },
     },
     branches: ['lo'],
     gainMult() {
@@ -575,6 +765,8 @@ addLayer('s', {
         if (hasUpgrade('s', 62)) mult = mult.times(upgradeEffect('s', 62));
 
         mult = mult.times(buyableEffect('lo', 32).coin_mult);
+
+        if (hasUpgrade('m', 63)) mult = mult.times(upgradeEffect('m', 63));
 
         return mult;
     },
