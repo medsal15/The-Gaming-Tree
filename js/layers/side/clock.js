@@ -1,6 +1,6 @@
 'use strict';
 
-//todo tree buyables
+//todo forge buyables?
 addLayer('clo', {
     name: 'Clock',
     symbol: '⏲',
@@ -36,7 +36,7 @@ addLayer('clo', {
             content: [
                 ['display-text', () => `Base time speed: ${format(tmp.clo.time_speed)} seconds/s`],
                 'blank',
-                ['buyables', [1, 2, 3, 4]],
+                ['buyables', [1, 2, 3, 4, 5]],
             ],
             unlocked() { return hasChallenge('b', 51); },
         },
@@ -661,6 +661,63 @@ addLayer('clo', {
             },
             unlocked() { return hasChallenge('b', 51) && player.m.show_deep; },
         },
+        // tree
+        51: {
+            title: 'Wooden Gear',
+            display() {
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} wooden gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 20 + 1',
+                        cost_formula_soaked = '(1.5 ^ amount) * 32',
+                        cost_formula_normal = '(1.5 ^ amount) * 8',
+                        cost_formula_plank = '1.5 ^ amount';
+
+                    const cost_list = [
+                        `[${cost_formula_soaked}] ${tmp.lo.items.soaked_log.name}`,
+                        `[${cost_formula_normal}] ${tmp.lo.items.normal_log.name}`,
+                        `[${cost_formula_plank}] ${tmp.lo.items.plank.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} wooden gears\
+                    multiply time speed by [${effect_formula}]<br><br>\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                return {
+                    soaked_log: D(1.5).pow(x).times(32),
+                    normal_log: D(1.5).pow(x).times(8),
+                    plank: D(1.5).pow(x),
+                };
+            },
+            effect(x) {
+                return D(1 / 20).times(x).add(1);
+            },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = layers.t.color;
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 51) && tmp.t.layerShown; },
+        },
     },
     tooltip() { return `Time speed: *${format(tmp.clo.time_speed)}`; },
     /** @type {typeof layers.clo.time_speed} */
@@ -696,6 +753,7 @@ addLayer('clo', {
         speed = speed.times(buyableEffect('clo', 31));
         speed = speed.times(buyableEffect('clo', 41));
         speed = speed.times(buyableEffect('clo', 42));
+        speed = speed.times(buyableEffect('clo', 51));
 
         speed = speed.root(D.dTwo.pow(row));
 

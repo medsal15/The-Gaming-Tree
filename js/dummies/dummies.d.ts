@@ -1930,6 +1930,7 @@ declare let layers: {
             /** Amount of trees regenerated every second */
             regen(type?: string | false): Decimal
             damage(type?: string | false): Decimal
+            passive_damage(type?: string | false): Decimal
             get_drops(type?: string | false, amount: DecimalSource): [string, Decimal][]
             /** Amount of wood when felling a tree */
             size(type?: string | false): Decimal
@@ -1988,6 +1989,7 @@ declare let layers: {
                 has_anvil(): boolean
                 value: Computable<Decimal>
                 gain_multiplier: Computable<Decimal>
+                craft_consumption: Computable<Decimal>
             }
         } & {
             [id: string]: {

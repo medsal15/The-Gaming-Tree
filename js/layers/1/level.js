@@ -288,6 +288,30 @@ addLayer('l', {
             },
             name: 'reading',
         },
+        bartering: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
+            needed() { return player.l.skills[this.id].level.add(1).pow(2).times(100); },
+            effect() {
+                if (tmp.l.deactivated) return D.dOne;
+                return D(1.01).pow(player.l.skills[this.id].level);
+            },
+            unlocked() { return hasUpgrade('t', 32); },
+            text() {
+                if (!shiftDown) {
+                    return `Bartering level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to bartering<br>\
+                    Coins gain *${format(this.effect())}`;
+                } else {
+                    let effect_formula = '1.01 ^ level';
+
+                    return `Bartering level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to bartering<br>\
+                    Coins gain *[${effect_formula}]`;
+                }
+            },
+            name: 'bartering',
+        },
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));

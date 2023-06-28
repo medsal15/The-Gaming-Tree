@@ -1,7 +1,5 @@
 'use strict';
 
-//todo upgrades
-//todo convertion
 addLayer('t', {
     name: 'Tree',
     symbol: 'T',
@@ -204,10 +202,10 @@ addLayer('t', {
             },
         },
         12: {
-            title: 'Sawmill',
+            title: 'Saw',
             description: 'Convert 1% of your logs into planks',
             effect() { return D(.01); },
-            effectDisplay() { return `${this.effect().times(100)}%`; },
+            effectDisplay() { return `${format(this.effect().times(100))}%`; },
             cost: D(20),
             item: 'normal_log',
             currencyInternalName: 'amount',
@@ -227,6 +225,137 @@ addLayer('t', {
             effect() { return D.dTwo; },
             effectDisplay() { return `*${format(this.effect())}`; },
             cost: D(30),
+            item: 'plank',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+        },
+        21: {
+            title: 'Wet Weapon',
+            description() {
+                if (!shiftDown) {
+                    return 'Soaked Logs boost damage';
+                }
+
+                let formula = '7√(soaked logs + 1)';
+
+                return `Formula: ${formula}`;
+            },
+            effect() { return player.lo.items.soaked_log.amount.add(1).root(7); },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10); },
+            cost: D(25),
+            item: 'soaked_log',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+        },
+        22: {
+            title: 'Mechanical Sawmill',
+            description: 'Passively cut the current tree with 25% of your damage',
+            effect() { return D(.25); },
+            effectDisplay() { return `${format(D.times(this.effect(), tmp.t.trees.damage))} dps`; },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10); },
+            cost: D(80),
+            item: 'normal_log',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+        },
+        23: {
+            title: 'Mineshaft',
+            description() {
+                if (!shiftDown) {
+                    return 'Planks increase mined amount';
+                }
+
+                let formula = '2√(planks) / 25 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() { return player.lo.items.plank.amount.root(2).div(25).add(1); },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10); },
+            cost: D(100),
+            item: 'plank',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+        },
+        31: {
+            title: 'Driftwood Destroyer',
+            description: 'Multiplies damage by driftwood health when chopping driftwood',
+            effect() {
+                if (player.t.current != 'driftwood') return D.dOne;
+                return layers.t.trees.health('driftwood');
+            },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10); },
+            cost: D(100),
+            item: 'soaked_log',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+        },
+        32: {
+            title: 'Bartering Station',
+            description: 'Unlock a new skill to earn more coins',
+            unlocked() { return hasUpgrade(this.layer, this.id - 10); },
+            cost: D(320),
+            item: 'normal_log',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+        },
+        33: {
+            title: 'Crafting Table',
+            description: 'Crafting now consumes 90% of costs',
+            effect() { return D(.9); },
+            effectDisplay() { return `*${format(D.times(this.effect(), 100))}%`; },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10); },
+            cost: D(444),
             item: 'plank',
             currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -273,9 +402,17 @@ addLayer('t', {
 
             let health = D.dZero;
             switch (type) {
-                case 'driftwood': health = D(5); break;
-                case 'oak': health = D(15); break;
-                case 'birch': health = D(10); break;
+                case 'driftwood':
+                    health = D(5);
+
+                    health = health.add(buyableEffect('lo', 61).soaked);
+                    break;
+                case 'oak':
+                    health = D(15);
+                    break;
+                case 'birch':
+                    health = D(10);
+                    break;
             }
 
             if (hasUpgrade('t', 11)) health = health.times(upgradeEffect('t', 11).health);
@@ -328,7 +465,18 @@ addLayer('t', {
 
             if (hasUpgrade('m', 51)) damage = damage.times(upgradeEffect('m', 51));
 
+            if (hasUpgrade('t', 31)) damage = damage.times(upgradeEffect('t', 31));
+
             return damage;
+        },
+        passive_damage(type = player.t.current) {
+            if (!type) return D.dZero;
+
+            let passive = D.dZero;
+
+            if (hasUpgrade('t', 22)) passive = passive.add(upgradeEffect('t', 22));
+
+            return passive.times(this.damage(type));
         },
         get_drops(type = player.t.current, amount = 1) {
             const drops = layers.lo.items["*"].get_drops(`tree:${type}`, D(amount));
@@ -340,6 +488,8 @@ addLayer('t', {
             switch (type) {
                 case 'driftwood':
                     size = D(5);
+
+                    size = size.add(buyableEffect('lo', 61).soaked);
                     break;
                 case 'oak':
                     size = D(20);
@@ -384,7 +534,9 @@ addLayer('t', {
                 case 'birch': cap = D(100); break;
             }
 
-            return cap;
+            cap = cap.times(buyableEffect('lo', 62).cap);
+
+            return cap.floor();
         },
     },
     /** @type {typeof layers.t.convertion} */
@@ -407,9 +559,11 @@ addLayer('t', {
             let efficiency = D.dZero;
 
             switch (item) {
-                case 'soaked_log': efficiency = D.dOne; break;
-                case 'normal_log': efficiency = D(5); break;
+                case 'soaked_log': efficiency = D(.25); break;
+                case 'normal_log': efficiency = D(1); break;
             }
+
+            efficiency = efficiency.add(buyableEffect('lo', 63).plank);
 
             return efficiency;
         },
@@ -446,6 +600,19 @@ addLayer('t', {
                 player.lo.items[item].amount = player.lo.items[item].amount.add(gain.times(diff));
             });
         }
+
+        // Cut tree
+        if (tmp.t.trees.passive_damage.gt(0)) {
+            const damage = tmp.t.trees.passive_damage.times(diff),
+                drops = layers.t.trees.get_drops(player.t.current, damage);
+
+            if (drops.length) {
+                layers.lo.items['*'].gain_drops(drops);
+                player.t.last_drops = drops;
+            }
+
+            player.t.health = player.t.health.minus(damage);
+        }
     },
     automate() {
         if (player.t.health.lte(0)) {
@@ -475,10 +642,14 @@ addLayer('t', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
-        const keep = ['convert'];
+        const keep = ['convert'],
+            kept_ups = [...player.t.upgrades];
+
+        kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 62).t_hold).toNumber();
 
         layerDataReset(this.layer, keep);
         layers.t.trees.items.forEach(item => player.lo.items[item].amount = D.dZero);
+        player.t.upgrades.push(...kept_ups);
     },
     branches: [() => false && player.f.unlocked ? 'f' : 'lo'],
 });

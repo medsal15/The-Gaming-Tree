@@ -1,9 +1,5 @@
 'use strict';
 
-//todo goblin achievements?
-//todo zombie achievements?
-//todo deep mining achievements?
-//todo tree achievements
 //todo forge achievements
 addLayer('ach', {
     name: 'Achievements',
@@ -489,6 +485,126 @@ addLayer('ach', {
             },
             unlocked() { return tmp.s.layerShown; },
         },
+        151: {
+            name: 'Deeper down',
+            tooltip: 'Go deeper in the earth',
+            done() { return player.m.mode == 'deep'; },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.m.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.m.color;
+                return s;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
+        152: {
+            name: 'Carbon mining',
+            tooltip: 'Get a coal pickaxe',
+            done() { return hasUpgrade('m', 41); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.m.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.m.color;
+                return s;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
+        153: {
+            name: 'Fake coins',
+            tooltip: 'Get some more fake coins to sell',
+            done() { return hasUpgrade('m', 63); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.m.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.m.color;
+                return s;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
+        154: {
+            name: 'Gold pile (empty)',
+            tooltip: 'Get a free pile of gold',
+            done() { return getBuyableAmount('lo', 53).gt(0); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.m.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.m.color;
+                return s;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
+        155: {
+            name: 'Free crafts',
+            tooltip: 'Get bonus levels to crafted items',
+            done() { return Object.keys(layers.lo.buyables).filter(id => !isNaN(id)).some(id => tmp.lo.buyables[+id].bonusAmount?.gt(0)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.m.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.m.color;
+                return s;
+            },
+            unlocked() { return player.m.show_deep; },
+        },
+        161: {
+            name: 'Bigger trees',
+            tooltip: 'Increase tree sizes',
+            done() { return hasUpgrade('t', 11); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.t.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.t.color;
+                return s;
+            },
+            unlocked() { return tmp.t.layerShown; },
+        },
+        162: {
+            name: 'I hope it\'s a ratio of 1:4', // No it's not
+            tooltip: 'Start making planks',
+            done() { return hasUpgrade('t', 12); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.t.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.t.color;
+                return s;
+            },
+            unlocked() { return tmp.t.layerShown; },
+        },
+        163: {
+            name: 'Safety first',
+            tooltip: 'Build a mineshaft',
+            done() { return hasUpgrade('t', 23); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.t.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.t.color;
+                return s;
+            },
+            unlocked() { return tmp.t.layerShown; },
+        },
+        164: {
+            name: 'Professionnal swindler',
+            tooltip: 'Get bartering to level 10',
+            done() { return player.l.skills.bartering.level.gte(10); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.l.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.l.color;
+                return s;
+            },
+            unlocked() { return tmp.t.layerShown; },
+        },
+        165: {
+            name: 'Just like a monarchy',
+            tooltip: 'Make a plank ruler',
+            done() { return getBuyableAmount('lo', 63).gte(1); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.t.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.t.color;
+                return s;
+            },
+            unlocked() { return tmp.t.layerShown; },
+        },
         //#endregion Normal achievements
         //#region Bonus achievements
         81: {
@@ -600,7 +716,7 @@ addLayer('ach', {
             unlocked() { return [31, 32, 41, 42].some(id => hasChallenge('b', id)); },
         },
         94: {
-            name: '???',
+            name: 'SP',
             tooltip: 'Unlock ???',
             done() { return false; },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
@@ -731,7 +847,7 @@ addLayer('ach', {
         switch (type) {
             case 'normal':
             default:
-                rows = [1, 3, 5, 12, 7, 11, 13];
+                rows = [1, 3, 5, 12, 7, 11, 15, 13, 16];
                 break;
             case 'bonus':
                 rows = [8, 9];

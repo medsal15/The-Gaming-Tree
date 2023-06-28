@@ -201,6 +201,7 @@ addLayer('b', {
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
         if (inChallenge('b', 32)) {
+            /** @param {DecimalSource} amount */
             const get_loss = amount => {
                 const loss = D.div(amount, 100).floor().times(diff);
                 if (isNaN(loss.mag) || isNaN(loss.sign) || isNaN(loss.layer)) return D.dZero;

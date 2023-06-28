@@ -733,6 +733,8 @@ addLayer('m', {
         get_drops(amount) {
             if (hasUpgrade('m', 43)) amount = D.times(amount, upgradeEffect('m', 43));
 
+            if (hasUpgrade('t', 23)) amount = D.times(amount, upgradeEffect('t', 23));
+
             const drops = layers.lo.items["*"].get_drops(`mining:${player.m.mode}`, D(amount));
 
             if (hasUpgrade('m', 32)) {

@@ -725,6 +725,8 @@ addLayer('xp', {
 
             if (hasUpgrade('m', 21)) damage = damage.times(upgradeEffect('m', 21));
 
+            if (hasUpgrade('t', 21)) damage = damage.times(upgradeEffect('t', 21));
+
             damage = damage.times(tmp.l.skills.attacking.effect);
 
             damage = damage.times(buyableEffect('lo', 31));

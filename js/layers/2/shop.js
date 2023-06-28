@@ -1,6 +1,5 @@
 'use strict';
 
-//todo tree loans/investments
 //todo forge loans/investments
 addLayer('s', {
     name: 'Shop',
@@ -72,7 +71,7 @@ addLayer('s', {
                 ['display-text', () => `<span style="color:#AA5555;">Buying a${tmp.s.investloans.is_loans ? ' loan' : 'n investment'} increases the price of all the others</span>`],
                 'blank',
                 ['clickable', 11],
-                ['upgrades', [1, 2, 3, 4, 9, 10, 5]],
+                ['upgrades', [1, 2, 3, 4, 9, 10, 11, 5]],
             ],
             name() { return `${capitalize(tmp.s.investloans.type)}s`; },
         },
@@ -574,6 +573,87 @@ addLayer('s', {
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.m.show_deep; },
         },
+        111: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Soaked Log ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Soaked Logs';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate soaked log challenge penality';
+                if (!shiftDown) return 'Boost soaked log gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.soaked_log.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.soaked_log.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.t.layerShown; },
+        },
+        112: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Normal Log ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Normal Logs';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate normal log challenge penality';
+                if (!shiftDown) return 'Boost normal log gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.normal_log.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.normal_log.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.t.layerShown; },
+        },
+        113: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Plank ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Planks';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate plank challenge penality';
+                if (!shiftDown) return 'Boost plank gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.plank.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.plank.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.t.layerShown; },
+        },
         //#endregion Loans/Investments
         //#region Normal upgrades
         61: {
@@ -751,6 +831,7 @@ addLayer('s', {
             'red_fabric': 41, 'pyrite_coin': 42, 'rusty_gear': 43,
             'rotten_flesh': 91, 'brain': 92,
             'coal': 101, 'iron_ore': 102, 'gold_ore': 103,
+            'soaked_log': 111, 'normal_log': 112, 'plank': 113,
         },
         is_loan(id) {
             if (!id) return false;
@@ -767,6 +848,8 @@ addLayer('s', {
         mult = mult.times(buyableEffect('lo', 32).coin_mult);
 
         if (hasUpgrade('m', 63)) mult = mult.times(upgradeEffect('m', 63));
+
+        mult = mult.times(tmp.l.skills.bartering.effect);
 
         return mult;
     },

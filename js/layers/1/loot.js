@@ -1,6 +1,5 @@
 'use strict';
 
-//todo Tree items and buyables (6X)
 //todo Forge items and buyables (7X)
 addLayer('lo', {
     name: 'Loot',
@@ -173,7 +172,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -262,7 +261,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -342,7 +341,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -438,7 +437,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -531,7 +530,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -634,7 +633,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -722,7 +721,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -813,7 +812,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -902,7 +901,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -990,7 +989,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1084,7 +1083,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1171,7 +1170,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1258,7 +1257,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1348,7 +1347,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1430,7 +1429,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1443,6 +1442,270 @@ addLayer('lo', {
             unlocked() { return tmp.lo.items.gold_ore.unlocked; },
             value() {
                 let value = D(15);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        // tree
+        61: {
+            title: 'Tiny Dam',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id);
+
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} tiny dams\
+                        add ${format(this.effect().soaked)} size and health to driftwood<br><br>\
+                        ${value}\
+                        Cost: ${cost}`;
+                } else {
+                    let effect_formula_soaked = '1.2 ^ amount',
+                        cost_formula_soaked = '(1.5 ^ amount) * 10',
+                        cost_formula_normal = '(1.125 ^ amount) * 20',
+                        value_formula = '4 * amount';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_soaked = `(${cost_formula_soaked}) * ${effect}`;
+                        cost_formula_normal += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_soaked}] ${tmp.lo.items.soaked_log.name}`,
+                        `[${cost_formula_normal}] ${tmp.lo.items.normal_log.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} tiny dams\
+                    add [${effect_formula_soaked}] size and health to driftwood<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                const cost = {
+                    soaked_log: D(1.5).pow(x).times(10),
+                    normal_log: D(1.125).pow(x).times(20),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+                return {
+                    soaked: D(1.2).pow(x),
+                };
+            },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.lo.items.soaked_log.style['background-color'];
+
+                return style;
+            },
+            unlocked() { return tmp.t.layerShown || getBuyableAmount(this.layer, this.id).gte(1); },
+            value() {
+                let value = D(4);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        62: {
+            title: 'Wood Box',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id);
+
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '',
+                        /** @type {{cap: Decimal, t_hold: Decimal}} */
+                        effect = buyableEffect(this.layer, this.id);
+
+                    return `Your ${formatWhole(amount)} wood boxes\
+                    multiply tree cap by ${format(effect.cap)} and keep ${formatWhole(effect.t_hold)} tree upgrades through resets<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula_cap = '1.1 ^ amount',
+                        effect_formula_hold = 'amount',
+                        cost_formula_normal = '(1.25 ^ amount) * 10',
+                        cost_formula_plank = '(1.5 ^ amount) * 20',
+                        value_formula = 'amount * 5';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_normal += ` * ${effect}`;
+                        cost_formula_plank += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_normal}] ${tmp.lo.items.normal_log.name}`,
+                        `[${cost_formula_plank}] ${tmp.lo.items.plank.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} wood boxes\
+                    multiply tree cap by [${effect_formula_cap}] and keep ${effect_formula_hold} tree upgrades through resets<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                const cost = {
+                    normal_log: D(1.25).pow(x).times(10),
+                    plank: D(1.5).pow(x).times(20),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+                return {
+                    cap: D(1.1).pow(x),
+                    t_hold: x,
+                };
+            },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.lo.items.normal_log.style['background-color'];
+
+                return style;
+            },
+            unlocked() { return tmp.t.layerShown || getBuyableAmount(this.layer, this.id).gte(1); },
+            value() {
+                let value = D(5);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        63: {
+            title: 'Plank Ruler',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id);
+
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} plank rulers\
+                    increase plank gains by ${D.times(buyableEffect(this.layer, this.id).plank, 100)}%<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula_plank = 'amount / 100',
+                        cost_formula_plank = '(1.5 ^ amount) * 50',
+                        cost_formula_coal = '(1.2 ^ amount) * 3',
+                        cost_formula_gold = '(1.1 ^ amount) / 10',
+                        value_formula = 'amount * 7';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_plank += ` * ${effect}`;
+                        cost_formula_coal += ` * ${effect}`;
+                        cost_formula_gold += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_plank}] ${tmp.lo.items.plank.name}`,
+                        `[${cost_formula_coal}] ${tmp.lo.items.coal.name}`,
+                        `[${cost_formula_gold}] ${tmp.lo.items.gold_ore.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} plank rulers\
+                    increase plank gains by [${effect_formula_plank}]%<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                const cost = {
+                    plank: D(1.5).pow(x).times(50),
+                    coal: D(1.2).pow(x).times(3),
+                    gold_ore: D(1.1).pow(x).div(10),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+                return {
+                    plank: D(.01).times(x),
+                };
+            },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.lo.items.plank.style['background-color'];
+
+                return style;
+            },
+            unlocked() { return tmp.t.layerShown || getBuyableAmount(this.layer, this.id).gte(1); },
+            value() {
+                let value = D(7);
 
                 if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
 
@@ -1735,6 +1998,13 @@ addLayer('lo', {
                 let mult = D.dOne;
 
                 if (hasUpgrade('lo', 11)) mult = mult.times(upgradeEffect('lo', 11));
+
+                return mult;
+            },
+            craft_consumption() {
+                let mult = D.dOne;
+
+                if (hasUpgrade('t', 33)) mult = mult.times(upgradeEffect('t', 33));
 
                 return mult;
             },
