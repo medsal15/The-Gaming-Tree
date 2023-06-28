@@ -72,7 +72,7 @@ addLayer('t', {
                     'blank',
                     ['toggle', ['t', 'short_mode']]
                 ]],
-                () => false ? ['row', [
+                () => hasUpgrade('t', 12) ? ['row', [
                     ['display-text', 'Convert wood'],
                     'blank',
                     ['toggle', ['t', 'convert']],
@@ -176,6 +176,69 @@ addLayer('t', {
     },
     /** @type {typeof layers.t.upgrades} */
     upgrades: {
+        11: {
+            title: 'Soaked Axe',
+            description: 'Double tree health,<br>+50% tree size',
+            effect() {
+                return {
+                    health: D.dTwo,
+                    size: D(1.5),
+                };
+            },
+            effectDisplay() {
+                /** @type {{health: Decimal, size: Decimal}} */
+                const effect = this.effect();
+                return `*${format(effect.health)} tree health, *${format(effect.size)} tree size`;
+            },
+            cost: D(10),
+            item: 'soaked_log',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+        },
+        12: {
+            title: 'Sawmill',
+            description: 'Convert 1% of your logs into planks',
+            effect() { return D(.01); },
+            effectDisplay() { return `${this.effect().times(100)}%`; },
+            cost: D(20),
+            item: 'normal_log',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+        },
+        13: {
+            title: 'Wood Chips',
+            description: 'Double tree growth speed',
+            effect() { return D.dTwo; },
+            effectDisplay() { return `*${format(this.effect())}`; },
+            cost: D(30),
+            item: 'plank',
+            currencyInternalName: 'amount',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
+
+                return style;
+            },
+        },
     },
     bars: {
         health: {
@@ -215,6 +278,8 @@ addLayer('t', {
                 case 'birch': health = D(10); break;
             }
 
+            if (hasUpgrade('t', 11)) health = health.times(upgradeEffect('t', 11).health);
+
             return health;
         },
         chance(type = player.t.current) {
@@ -230,7 +295,7 @@ addLayer('t', {
                 case 'driftwood': return 'driftwood';
                 case 'oak': return 'oak';
                 case 'birch': return 'birch';
-                case 'upgrade': return 'upgrade';
+                case 'convertion': return 'convertion';
             }
         },
         regen(type = player.t.current) {
@@ -249,6 +314,8 @@ addLayer('t', {
                     regen = player.t.trees.birch.amount.add(1).root(2).div(35);
                     break;
             }
+
+            if (hasUpgrade('t', 13)) regen = regen.times(upgradeEffect('t', 13));
 
             return regen;
         },
@@ -281,6 +348,8 @@ addLayer('t', {
                     size = D(10);
                     break;
             }
+
+            if (hasUpgrade('t', 11)) size = size.times(upgradeEffect('t', 11).size);
 
             return size;
         },
@@ -320,7 +389,41 @@ addLayer('t', {
     },
     /** @type {typeof layers.t.convertion} */
     convertion: {
+        from: ['soaked_log', 'normal_log'],
+        rate(item) {
+            if (!item || !this.from.includes(item)) return D.dZero;
+
+            let percent = D.dZero;
+
+            if (hasUpgrade('t', 12)) percent = percent.add(upgradeEffect('t', 12));
+
+            let amount = player.lo.items[item].amount;
+
+            return amount.times(percent);
+        },
+        efficiency(item) {
+            if (!item || !this.from.includes(item)) return D.dZero;
+
+            let efficiency = D.dZero;
+
+            switch (item) {
+                case 'soaked_log': efficiency = D.dOne; break;
+                case 'normal_log': efficiency = D(5); break;
+            }
+
+            return efficiency;
+        },
+        per_second(item = 'plank') {
+            if (item == 'plank') {
+                return this.from.map(item => this.rate(item).times(this.efficiency(item))).reduce(D.add, 0);
+            }
+
+            if (!this.from.includes(item)) return D.dZero;
+
+            return layers.t.convertion.rate(item).neg();
+        },
     },
+    /** @this {typeof layers.t} */
     update(diff) {
         if (!player.t.unlocked || !tmp.t.layerShown) return;
 
@@ -334,7 +437,15 @@ addLayer('t', {
             player.t.trees[tree].amount = player.t.trees[tree].amount.add(regen);
         });
 
-        //todo convert logs to planks
+        // Convert logs to planks
+        if (player.t.convert && tmp.t.convertion.per_second.gt(0)) {
+            ['plank', ...layers.t.convertion.from].forEach(item => {
+                const gain = layers.t.convertion.per_second(item);
+                if (gain.eq(0)) return;
+
+                player.lo.items[item].amount = player.lo.items[item].amount.add(gain.times(diff));
+            });
+        }
     },
     automate() {
         if (player.t.health.lte(0)) {
@@ -342,7 +453,7 @@ addLayer('t', {
             const type = player.t.current,
                 drops = layers.t.trees.get_drops(type, layers.t.trees.size(type));
 
-            player.t.last_drops = drops;
+            player.t.last_drops.push(...drops);
             layers.lo.items['*'].gain_drops(drops);
 
             player.t.current = false;

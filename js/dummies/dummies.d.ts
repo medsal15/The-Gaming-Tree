@@ -1940,6 +1940,14 @@ declare let layers: {
             cap(type?: string | false): Decimal
         }
         convertion: {
+            /** Items that can be converted to planks */
+            from: string[]
+            /** Amount of an item being converted at once */
+            rate(item?: string): Decimal
+            /** Multiplier to plamks produced from an item */
+            efficiency(item?: string): Decimal
+            /** Actual amount of an item consumed/produced each second by convertion */
+            per_second(item?: string): Decimal
         }
     }
     // Row 1

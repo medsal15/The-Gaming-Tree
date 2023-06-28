@@ -2028,11 +2028,11 @@ addLayer('lo', {
 
                 return chances;
             },
-            /*per_second() {
+            per_second() {
                 const per_second = layers.t.convertion.per_second(this.id);
 
-                if (per_second.neq(0)) return { ['tree:']: per_second, };
-            },*/
+                if (per_second.neq(0)) return { ['tree:convertion']: per_second, };
+            },
             name: 'soaked log',
             style: {
                 'background-image': `url('./resources/images/log.svg')`,
@@ -2052,11 +2052,11 @@ addLayer('lo', {
 
                 return chances;
             },
-            /*per_second() {
+            per_second() {
                 const per_second = layers.t.convertion.per_second(this.id);
 
-                if (per_second.neq(0)) return { ['tree:']: per_second, };
-            },*/
+                if (per_second.neq(0)) return { ['tree:convertion']: per_second, };
+            },
             name: 'normal log',
             style: {
                 'background-image': `url('./resources/images/log.svg')`,
@@ -2068,11 +2068,11 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 603,
-            /*per_second() {
+            per_second() {
                 const per_second = layers.t.convertion.per_second(this.id);
 
-                if (per_second.neq(0)) return { ['tree:']: per_second, };
-            },*/
+                if (per_second.neq(0)) return { ['tree:convertion']: per_second, };
+            },
             name: 'plank',
             style: {
                 'background-image': `url('./resources/images/planks.svg')`,
