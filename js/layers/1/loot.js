@@ -1692,6 +1692,7 @@ addLayer('lo', {
 
                 if (from == 'enemy') return hasUpgrade('lo', 11) || hasUpgrade('s', 72);
                 if (from == 'mining') return tmp.m.layerShown;
+                if (from == 'tree') return tmp.t.layerShown;
                 return false;
             },
             amount() { return Object.values(player.lo.items).reduce((sum, { amount }) => D.add(sum, amount), D.dZero); },

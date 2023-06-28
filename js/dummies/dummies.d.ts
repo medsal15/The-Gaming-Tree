@@ -1937,6 +1937,7 @@ declare let layers: {
             random(): string | false
             /** Total amount of logs */
             logs(): Decimal
+            cap(type?: string | false): Decimal
         }
         convertion: {
         }

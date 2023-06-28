@@ -1,7 +1,5 @@
 'use strict';
 
-//todo chopping doesn't work
-//todo show what's being chopped
 //todo upgrades
 //todo convertion
 addLayer('t', {
@@ -74,11 +72,11 @@ addLayer('t', {
                     'blank',
                     ['toggle', ['t', 'short_mode']]
                 ]],
-                /*['row', [
+                () => false ? ['row', [
                     ['display-text', 'Convert wood'],
                     'blank',
                     ['toggle', ['t', 'convert']],
-                ]],*/
+                ]] : undefined,
                 'blank',
                 ['bar', 'health'],
                 ['clickables', [1]],
@@ -99,7 +97,7 @@ addLayer('t', {
                         const regen = layers.t.trees.regen(tree);
                         return `<tr>\
                             <td>${capitalize(layers.t.trees.name(tree))}</td>\
-                            <td>${format(player.t.trees[tree].amount)} ${regen.gt(0) ? `(+${format(regen)}/s)` : ''}</td>\
+                            <td>${format(player.t.trees[tree].amount)} / ${format(layers.t.trees.cap(tree))} ${regen.gt(0) ? `(+${format(regen)}/s)` : ''}</td>\
                             <td>${format(layers.t.trees.size(tree))}</td>\
                         </tr>`;
                     };
@@ -189,7 +187,10 @@ addLayer('t', {
                 if (max.lte(0)) return 0;
                 return D.div(player.t.health ?? max, max);
             },
-            display() { return `${format(player.t.health)} / ${format(tmp.t.trees.health)}`; },
+            display() {
+                return `${capitalize(tmp.t.trees.name)}<br>\
+                ${format(player.t.health)} / ${format(tmp.t.trees.health)}`;
+            },
             baseStyle: { 'background-color': 'brown' },
             fillStyle: { 'background-color': 'lime' },
             textStyle: { 'color': 'black' },
@@ -209,9 +210,9 @@ addLayer('t', {
 
             let health = D.dZero;
             switch (type) {
-                case 'driftwood': health = D(5);
-                case 'oak': health = D(15);
-                case 'birch': health = D(10)
+                case 'driftwood': health = D(5); break;
+                case 'oak': health = D(15); break;
+                case 'birch': health = D(10); break;
             }
 
             return health;
@@ -233,11 +234,13 @@ addLayer('t', {
             }
         },
         regen(type = player.t.current) {
+            if (!(type in player.t.trees) || player.t.trees[type].amount.gte(layers.t.trees.cap(type))) return D.dZero;
+
             let regen = D.dZero;
             switch (type) {
                 default: return D.dZero;
                 case 'driftwood':
-                    if (player.t.trees.driftwood.amount.lt(1)) regen = D(1 / 20);
+                    regen = D(1 / 20);
                     break;
                 case 'oak':
                     regen = player.t.trees.oak.amount.add(1).root(2).div(50);
@@ -254,9 +257,9 @@ addLayer('t', {
 
             if (hasUpgrade('m', 62)) damage = damage.add(upgradeEffect('m', 62));
 
-            if (hasUpgrade('m', 51)) damage = damage.times(upgradeEffect('m', 51));
+            damage = damage.add(buyableEffect('lo', 42).tree_damage);
 
-            damage = damage.times(buyableEffect('lo', 42).tree_damage);
+            if (hasUpgrade('m', 51)) damage = damage.times(upgradeEffect('m', 51));
 
             return damage;
         },
@@ -303,6 +306,17 @@ addLayer('t', {
                 .map(item => player.lo.items[item].amount)
                 .reduce(D.add, D.dZero);
         },
+        cap(type = false) {
+            let cap = D.dZero;
+
+            switch (type) {
+                case 'driftwood': cap = D.dOne; break;
+                case 'oak': cap = D(100); break;
+                case 'birch': cap = D(100); break;
+            }
+
+            return cap;
+        },
     },
     /** @type {typeof layers.t.convertion} */
     convertion: {
@@ -329,6 +343,7 @@ addLayer('t', {
                 drops = layers.t.trees.get_drops(type, layers.t.trees.size(type));
 
             player.t.last_drops = drops;
+            layers.lo.items['*'].gain_drops(drops);
 
             player.t.current = false;
         }
@@ -355,5 +370,4 @@ addLayer('t', {
         layers.t.trees.items.forEach(item => player.lo.items[item].amount = D.dZero);
     },
     branches: [() => false && player.f.unlocked ? 'f' : 'lo'],
-    prestigeNotify() { return player.t.health.gte(tmp.t.trees.health); },
 });
