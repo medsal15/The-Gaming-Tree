@@ -113,16 +113,43 @@ addLayer('lo', {
         11: {
             title: 'Book of Slimes',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const amount = getBuyableAmount(this.layer, this.id),
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                const amount = getBuyableAmount(this.layer, this.id);
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)} books of slimes\
-                multiply experience gain by ${format(buyableEffect(this.layer, this.id))} (^1.1 for slimes)<br><br>\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} books of slimes\
+                    multiply experience gain by ${format(buyableEffect(this.layer, this.id))} (^1.1 for slimes)<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = '1.25 ^ amount',
+                        cost_formula_goo = '(1.5 ^ amount) * 10',
+                        cost_formula_shard = '1.1 ^ amount',
+                        value_formula = 'amount';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_goo += ` * ${effect}`;
+                        cost_formula_shard = `(${cost_formula_shard}) * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_goo}] ${tmp.lo.items.slime_goo.name}`,
+                        `[${cost_formula_shard}] ${tmp.lo.items.slime_core_shard.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} books of slimes\
+                    multiply experience gain by [${effect_formula}] (^1.1 for slimes)<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -167,19 +194,48 @@ addLayer('lo', {
         12: {
             title: 'Storage Slime',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const amount = getBuyableAmount(this.layer, this.id),
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    /** @type {{xp_hold: Decimal, chance_mult: Decimal}} */
-                    effect = buyableEffect(this.layer, this.id),
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                const amount = getBuyableAmount(this.layer, this.id);
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        /** @type {{xp_hold: Decimal, chance_mult: Decimal}} */
+                        effect = buyableEffect(this.layer, this.id),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)} storage slimes\
-                hold ${formatWhole(effect.xp_hold)} experience upgrades\
-                and multiply drop chances by ${format(effect.chance_mult)}<br><br>\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} storage slimes\
+                    hold ${formatWhole(effect.xp_hold)} experience upgrades\
+                    and multiply drop chances by ${format(effect.chance_mult)}<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula_hold = 'amount',
+                        effect_formula_mult = 'amount / 20 + 1',
+                        cost_formula_goo = '(1.25 ^ amount) * 10',
+                        cost_formula_shard = '(1.2 ^ amount) * 3',
+                        value_formula = 'amount * 5';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_goo += ` * ${effect}`;
+                        cost_formula_shard += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_goo}] ${tmp.lo.items.slime_goo.name}`,
+                        `[${cost_formula_shard}] ${tmp.lo.items.slime_core_shard.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} storage slimes\
+                    hold [${effect_formula_hold}] experience upgrades\
+                    and multiply drop chances by [${effect_formula_mult}]<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -227,16 +283,42 @@ addLayer('lo', {
         13: {
             title: 'Sticky Trap',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const amount = getBuyableAmount(this.layer, this.id),
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                const amount = getBuyableAmount(this.layer, this.id);
+                if (!shiftDown) {/** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)} sticky traps\
-                divide enemy health by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} sticky traps\
+                    divide enemy health by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = '1.1 ^ amount',
+                        cost_formula_goo = '(1.5 ^ amount) * 30',
+                        cost_formula_core = '1.1 ^ amount',
+                        value_formula = 'amount * 3';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_goo += ` * ${effect}`;
+                        cost_formula_core = `(${cost_formula_core}) * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_goo}] ${tmp.lo.items.slime_goo.name}`,
+                        `[${cost_formula_core}] ${tmp.lo.items.slime_core.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} sticky traps\
+                    divide enemy health by [${effect_formula}]<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -285,18 +367,50 @@ addLayer('lo', {
                 const amount = getBuyableAmount(this.layer, this.id),
                     /** @type {Decimal} */
                     bonus = this.bonusAmount(),
-                    amount_bonus = bonus.gt(0) ? `+${format(bonus)}` : '',
+                    amount_bonus = bonus.gt(0) ? `+${formatWhole(bonus)}` : '',
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)}${amount_bonus} stone furnace\
-                multiply ore health by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                ${anvil_req}\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)}${amount_bonus} stone furnace\
+                    multiply ore health by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = '1.125 ^ amount',
+                        cost_formula_stone = '(1.5 ^ amount) * 10',
+                        cost_formula_copper = '(1.25 ^ amount) * 5',
+                        value_formula = 'amount * 4';
+
+                    if (hasUpgrade('m', 61)) {
+                        effect_formula = `(${effect_formula}) ^ ${format(upgradeEffect('m', 61))}`;
+                    }
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_stone += ` * ${effect}`;
+                        cost_formula_copper += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_stone}] ${tmp.lo.items.stone.name}`,
+                        `[${cost_formula_copper}] ${tmp.lo.items.copper_ore.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)}${amount_bonus} stone furnace\
+                    multiply ore health by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -351,21 +465,49 @@ addLayer('lo', {
         22: {
             title: 'Copper Golem',
             display() {
-                /** @type {{[item: string]: Decimal}} */
                 const amount = getBuyableAmount(this.layer, this.id),
                     /** @type {Decimal} */
                     bonus = this.bonusAmount(),
-                    amount_bonus = bonus.gt(0) ? `+${format(bonus)}` : '',
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                    amount_bonus = bonus.gt(0) ? `+${formatWhole(bonus)}` : '',
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)}${amount_bonus} copper golems\
-                multiply mining chance by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                ${anvil_req}\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)}${amount_bonus} copper golems\
+                    multiply mining chance by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 6 + 1',
+                        cost_formula_copper = '(1.3 ^ amount) * 25',
+                        cost_formula_core = '(1.125 ^ amount) * 5',
+                        value_formula = 'amount * 7';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_copper += ` * ${effect}`;
+                        cost_formula_core += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_copper}] ${tmp.lo.items.copper_ore.name}`,
+                        `[${cost_formula_core}] ${tmp.lo.items.slime_core.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)}${amount_bonus} copper golems\
+                    multiply mining chance by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -420,19 +562,51 @@ addLayer('lo', {
                 const amount = getBuyableAmount(this.layer, this.id),
                     /** @type {Decimal} */
                     bonus = this.bonusAmount(),
-                    amount_bonus = bonus.gt(0) ? `+${format(bonus)}` : '',
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
-                    /** @type {{m_hold: Decimal, chance_mult: Decimal}} */
-                    effect = buyableEffect(this.layer, this.id),
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                    amount_bonus = bonus.gt(0) ? `+${formatWhole(bonus)}` : '',
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        /** @type {{m_hold: Decimal, chance_mult: Decimal}} */
+                        effect = buyableEffect(this.layer, this.id),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)}${amount_bonus} tin chests\
-                multiply drop and mining chance by ${format(effect.chance_mult)} and keep ${formatWhole(effect.m_hold)} mining upgrades through resets<br><br>\
-                ${anvil_req}\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)}${amount_bonus} tin chests\
+                    multiply drop and mining chance by ${format(effect.chance_mult)} and keep ${formatWhole(effect.m_hold)} mining upgrades through resets<br><br>\
+                    ${anvil_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula_hold = 'amount',
+                        effect_formula_mult = 'amount / 20 + 1',
+                        cost_formula_tin = '(1.25 ^ amount) * 2',
+                        cost_formula_copper = '(1.125 ^ amount) * 50',
+                        cost_formula_goo = '(1.5 ^ amount) * 20',
+                        value_formula = 'amount * 5';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_tin += ` * ${effect}`;
+                        cost_formula_copper += ` * ${effect}`;
+                        cost_formula_goo += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_copper}] ${tmp.lo.items.copper_ore.name}`,
+                        `[${cost_formula_tin}] ${tmp.lo.items.tin_ore.name}`,
+                        `[${cost_formula_goo}] ${tmp.lo.items.slime_goo.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)}${amount_bonus} tin chests\
+                    multiply drop and mining chance by [${effect_formula_mult}] and keep [${effect_formula_hold}] mining upgrades through resets<br><br>\
+                    ${anvil_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -488,16 +662,43 @@ addLayer('lo', {
         31: {
             title: 'Red Slime',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const amount = getBuyableAmount(this.layer, this.id),
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                const amount = getBuyableAmount(this.layer, this.id);
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)} red slimes\
-                multiply damage by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} red slimes\
+                    multiply damage by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 20 + 1',
+                        cost_formula_fabric = '(1.25 ^ amount) * 10',
+                        cost_formula_goo = '(1.5 ^ amount) * 25',
+                        value_formula = 'amount * 4';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_fabric += ` * ${effect}`;
+                        cost_formula_goo += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_fabric}] ${tmp.lo.items.red_fabric.name}`,
+                        `[${cost_formula_goo}] ${tmp.lo.items.slime_goo.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} red slimes\
+                    multiply damage by [${effect_formula}]<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -543,19 +744,48 @@ addLayer('lo', {
         32: {
             title: 'Coin Bag',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const amount = getBuyableAmount(this.layer, this.id),
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    /** @type {{chance_mult: Decimal, coin_mult: Decimal}} */
-                    effect = buyableEffect(this.layer, this.id),
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '',
-                    coin_mult = tmp.s.layerShown ? ` and multiply coins gain by ${format(effect.coin_mult)}` : '';
+                const amount = getBuyableAmount(this.layer, this.id);
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        /** @type {{chance_mult: Decimal, coin_mult: Decimal}} */
+                        effect = buyableEffect(this.layer, this.id),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '',
+                        coin_mult = tmp.s.layerShown ? ` and multiply coins gain by ${format(effect.coin_mult)}` : '';
 
-                return `Your ${formatWhole(amount)} coin bags\
-                multiply drop chances by ${format(effect.chance_mult)}${coin_mult}<br><br>\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} coin bags\
+                    multiply drop chances by ${format(effect.chance_mult)}${coin_mult}<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula_chance = 'amount / 20 + 1',
+                        effect_formula_coin = '1.01 ^ amount',
+                        cost_formula_fabric = '(1.5 ^ amount) * 10',
+                        cost_formula_pyrite = '1.23 ^ amount',
+                        value_formula = 'amount * 10';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_fabric += ` * ${effect}`;
+                        cost_formula_pyrite = `(${cost_formula_pyrite}) * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_fabric}] ${tmp.lo.items.red_fabric.name}`,
+                        `[${cost_formula_pyrite}] ${tmp.lo.items.pyrite_coin.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} coin bags\
+                    multiply drop chances by [${effect_formula_chance}]\
+                    ${tmp.s.layerShown ? ` and multiply coins gain by [${effect_formula_coin}]` : ''}<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -605,18 +835,49 @@ addLayer('lo', {
         33: {
             title: 'Gear Golems',
             display() {
-                /** @type {{[item: string]: Decimal}} */
                 const amount = getBuyableAmount(this.layer, this.id),
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)} gear golems\
-                multiply skill speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                ${anvil_req}\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} gear golems\
+                    multiply skill speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = '1.1 ^ amount',
+                        cost_formula_copper = '(1.5 ^ amount) * 100',
+                        cost_formula_tin = '(1.5 ^ amount) * 25',
+                        cost_formula_gear = '1.23 ^ amount',
+                        value_formula = 'amount * 10';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_copper += ` * ${effect}`;
+                        cost_formula_tin += ` * ${effect}`;
+                        cost_formula_gear = `(${cost_formula_gear}) * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_copper}] ${tmp.lo.items.copper_ore.name}`,
+                        `[${cost_formula_tin}] ${tmp.lo.items.tin_ore.name}`,
+                        `[${cost_formula_gear}] ${tmp.lo.items.rusty_gear.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} gear golems\
+                    multiply skill speed by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -664,18 +925,45 @@ addLayer('lo', {
         41: {
             title: 'Rotten Bag',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const amount = getBuyableAmount(this.layer, this.id),
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '',
-                    /** @type {{chance_mult: Decimal,}} */
-                    effect = buyableEffect(this.layer, this.id);
+                const amount = getBuyableAmount(this.layer, this.id);
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '',
+                        /** @type {{chance_mult: Decimal,}} */
+                        effect = buyableEffect(this.layer, this.id);
 
-                return `Your ${formatWhole(amount)} rotten bags\
-                multiply drop chances by ${format(effect.chance_mult)}<br><br>\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} rotten bags\
+                    multiply drop chances by ${format(effect.chance_mult)}<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 20 + 1',
+                        cost_formula_rotten = '(1.75 ^ amount) * 7.5',
+                        cost_formula_fabric = '(1.25 ^ amount) * 2',
+                        value_formula = 'amount * 2';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_rotten += ` * ${effect}`;
+                        cost_formula_fabric += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_rotten}] ${tmp.lo.items.rotten_flesh.name}`,
+                        `[${cost_formula_fabric}] ${tmp.lo.items.red_fabric.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} rotten bags\
+                    multiply drop chances by [${effect_formula}]<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -724,21 +1012,51 @@ addLayer('lo', {
         42: {
             title: 'Iron Battle Axe',
             display() {
-                /** @type {{[item: string]: Decimal}} */
                 const amount = getBuyableAmount(this.layer, this.id),
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '',
-                    /** @type {{xp_damage_mult: Decimal, tree_damage: Decimal,}} */
-                    effect = buyableEffect(this.layer, this.id);
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '',
+                        /** @type {{xp_damage_mult: Decimal, tree_damage: Decimal,}} */
+                        effect = buyableEffect(this.layer, this.id);
 
-                return `Your ${formatWhole(amount)} iron battle axes\
-                multiply enemy damage by ${format(effect.xp_damage_mult)}\
-                ${tmp.t.layerShown ? `and add ${format(effect.tree_damage)} tree damage` : ''}<br><br>\
-                ${anvil_req}\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} iron battle axes\
+                    multiply enemy damage by ${format(effect.xp_damage_mult)}\
+                    ${tmp.t.layerShown ? `and add ${format(effect.tree_damage)} tree damage` : ''}<br><br>\
+                    ${anvil_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula_mult = '1.05 ^ amount',
+                        effect_formula_damage = 'amount / 5',
+                        cost_formula_iron = '(1.5 ^ amount) * 2.5',
+                        cost_fprmula_goo = '(1.75 ^ amount) * 20',
+                        value_formula = 'amount * 13';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_iron += ` * ${effect}`;
+                        cost_fprmula_goo += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_iron}] ${tmp.lo.items.iron_ore.name}`,
+                        `[${cost_fprmula_goo}] ${tmp.lo.items.slime_goo.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} iron battle axes\
+                    multiply enemy damage by [${effect_formula_mult}]\
+                    ${tmp.t.layerShown ? `and add [${effect_formula_damage}] tree damage` : ''}<br><br>\
+                    ${anvil_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -788,16 +1106,46 @@ addLayer('lo', {
         43: {
             title: 'Knowledge Ball',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const amount = getBuyableAmount(this.layer, this.id),
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                const amount = getBuyableAmount(this.layer, this.id);
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)} knowledge balls\
-                add ${format(buyableEffect(this.layer, this.id))} skill points<br><br>\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} knowledge balls\
+                    add ${format(buyableEffect(this.layer, this.id))} skill points<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount',
+                        cost_formula_core = '2 ^ amount',
+                        cost_formula_gear = '1.75 ^ amount',
+                        cost_formula_brain = '1.5 ^ amount',
+                        value_formula = 'amount * 7';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_core = `(${cost_formula_core}) * ${effect}`;
+                        cost_formula_gear = `(${cost_formula_gear}) * ${effect}`;
+                        cost_formula_brain = `(${cost_formula_brain}) * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_core}] ${tmp.lo.items.slime_core.name}`,
+                        `[${cost_formula_gear}] ${tmp.lo.items.rusty_gear.name}`,
+                        `[${cost_formula_brain}] ${tmp.lo.items.brain.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} knowledge balls\
+                    add [${effect_formula}] skill points<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -847,17 +1195,45 @@ addLayer('lo', {
             title: 'Coal Brazier',
             display() {
                 const amount = getBuyableAmount(this.layer, this.id),
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)} coal braziers\
-                give ${format(buyableEffect(this.layer, this.id))} effective levels to ${layerColor('lo', tmp.lo.buyables[21].title)} and ${layerColor('lo', tmp.lo.buyables[22].title)}<br><br>\
-                ${anvil_req}\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} coal braziers\
+                    give ${format(buyableEffect(this.layer, this.id))} effective levels to ${layerColor('lo', tmp.lo.buyables[21].title)} and ${layerColor('lo', tmp.lo.buyables[22].title)}<br><br>\
+                    ${anvil_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount',
+                        cost_formula_stone = '(2.5 ^ amount) * 10',
+                        cost_formula_coal = '(1.5 ^ amount) * 5',
+                        value_formula = 'amount * 3';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_stone += ` * ${effect}`;
+                        cost_formula_coal += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_stone}] ${tmp.lo.items.stone.name}`,
+                        `[${cost_formula_coal}] ${tmp.lo.items.coal.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} coal braziers\
+                    give [${effect_formula}] effective levels to ${layerColor('lo', tmp.lo.buyables[21].title)} and ${layerColor('lo', tmp.lo.buyables[22].title)}<br><br>\
+                    ${anvil_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -905,17 +1281,48 @@ addLayer('lo', {
             title: 'Iron Chest',
             display() {
                 const amount = getBuyableAmount(this.layer, this.id),
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
-                return `Your ${formatWhole(amount)} iron chests\
-                give ${format(buyableEffect(this.layer, this.id))} effective levels to ${layerColor('lo', tmp.lo.buyables[23].title)}<br><br>\
-                ${anvil_req}\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} iron chests\
+                    give ${format(buyableEffect(this.layer, this.id))} effective levels to ${layerColor('lo', tmp.lo.buyables[23].title)}<br><br>\
+                    ${anvil_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount * 2',
+                        cost_formula_iron = '(1.5 ^ amount) * 20',
+                        cost_formula_copper = '(1.5 ^ amount) * 50',
+                        cost_formula_tin = '(1.5 ^ amount) * 25',
+                        value_formula = 'amount * 9';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_iron += ` * ${effect}`;
+                        cost_formula_copper += ` * ${effect}`;
+                        cost_formula_tin += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_iron}] ${tmp.lo.items.iron_ore.name}`,
+                        `[${cost_formula_copper}] ${tmp.lo.items.copper_ore.name}`,
+                        `[${cost_formula_tin}] ${tmp.lo.items.tin_ore.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} iron chests\
+                    give [${effect_formula}] effective levels to ${layerColor('lo', tmp.lo.buyables[23].title)}<br><br>\
+                    ${anvil_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -947,7 +1354,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.coal.style['background-color'];
+                if (this.canAfford()) style['background-color'] = tmp.lo.items.iron_ore.style['background-color'];
 
                 return style;
             },
@@ -964,17 +1371,42 @@ addLayer('lo', {
             title: 'Gold Pile',
             display() {
                 const amount = getBuyableAmount(this.layer, this.id),
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
-                    cost_obj = this.cost(amount),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
-                    value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
 
-                return `Your ${formatWhole(amount)} gold piles\
-                represent ${format(buyableEffect(this.layer, this.id))} gold for ${layerColor('m', tmp.m.upgrades[53].title)}<br><br>\
-                ${anvil_req}\
-                ${value}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(amount)} gold piles\
+                    represent ${format(buyableEffect(this.layer, this.id))} gold for ${layerColor('m', tmp.m.upgrades[53].title)}<br><br>\
+                    ${anvil_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = '2√(amount * 10)',
+                        cost_formula_gold = '(amount ^ 2) * 5',
+                        value_formula = 'amount * 15';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_gold += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_gold}] ${tmp.lo.items.gold_ore.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} gold piles\
+                    represent [${effect_formula}] gold for ${layerColor('m', tmp.m.upgrades[53].title)}<br><br>\
+                    ${anvil_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 const cost = {
@@ -1449,7 +1881,12 @@ addLayer('lo', {
                 return weights;
             },
             other_sources() {
-                if (hasUpgrade('m', 32)) return ['mining:shallow'];
+                const sources = [];
+
+                if (hasUpgrade('m', 32)) sources.push('mining:shallow');
+                if (hasUpgrade('m', 52)) sources.push('mining:deep');
+
+                return sources;
             },
             name: 'stone',
             style: {
@@ -1530,8 +1967,8 @@ addLayer('lo', {
             name: 'coal',
             style: {
                 'background-image': `url('./resources/images/rock.svg')`,
-                'background-color': '#000000',
-                'color': '#777777',
+                'background-color': '#444444',
+                'color': '#888888',
             },
             unlocked() { return player.m.show_deep; },
         },
@@ -1635,7 +2072,7 @@ addLayer('lo', {
 
                 if (per_second.neq(0)) return { ['tree:']: per_second, };
             },*/
-            name: 'normal log',
+            name: 'plank',
             style: {
                 'background-image': `url('./resources/images/planks.svg')`,
                 'background-color': '#997744',

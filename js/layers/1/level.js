@@ -121,7 +121,7 @@ addLayer('l', {
                 return obj[prop] ??= {
                     direction: RIGHT,
                     width: 300,
-                    height: 50,
+                    height: 70,
                     unlocked() { return tmp.l?.skills?.[prop]?.unlocked; },
                     progress() { return D.div(player.l.skills[prop].progress, tmp.l?.skills?.[prop]?.needed); },
                     display() { return tmp.l?.skills?.[prop]?.text; },
@@ -202,9 +202,17 @@ addLayer('l', {
             },
             unlocked() { return hasMilestone('l', 1); },
             text() {
-                return `Attacking level ${formatWhole(player.l.skills[this.id].level)}<br>\
-                ${format(player.l.skills[this.id].points)} points assigned to attacking<br>\
-                Damage *${format(this.effect())}`;
+                if (!shiftDown) {
+                    return `Attacking level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to attacking<br>\
+                    Damage *${format(this.effect())}`;
+                } else {
+                    let effect_formula = '1.15 ^ level';
+
+                    return `Attacking level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to attacking<br>\
+                    Damage *[${effect_formula}]`;
+                }
             },
             name: 'attacking',
         },
@@ -218,9 +226,17 @@ addLayer('l', {
             },
             unlocked() { return hasMilestone('l', 2); },
             text() {
-                return `Learning level ${formatWhole(player.l.skills[this.id].level)}<br>\
-                ${format(player.l.skills[this.id].points)} points assigned to learning<br>\
-                Experience gain *${format(this.effect())}`;
+                if (!shiftDown) {
+                    return `Learning level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to learning<br>\
+                    Experience gain *${format(this.effect())}`;
+                } else {
+                    let effect_formula = '1.1 ^ level';
+
+                    return `Learning level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to learning<br>\
+                    Experience gain *[${effect_formula}]`;
+                }
             },
             name: 'learning',
         },
@@ -230,13 +246,21 @@ addLayer('l', {
             needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(270); },
             effect() {
                 if (tmp.l.deactivated) return D.dOne;
-                return D(.25).times(player.l.skills[this.id].level).add(1);
+                return D(1 / 5).times(player.l.skills[this.id].level).add(1);
             },
             unlocked() { return hasMilestone('l', 3); },
             text() {
-                return `Vampirism level ${formatWhole(player.l.skills[this.id].level)}<br>\
-                ${format(player.l.skills[this.id].points)} points assigned to vampirism<br>\
-                ${layerColor('xp', tmp.xp.upgrades[13].title)} and ${layerColor('xp', tmp.xp.upgrades[21].title)} effects *${format(this.effect())}`;
+                if (!shiftDown) {
+                    return `Vampirism level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to vampirism<br>\
+                    ${layerColor('xp', tmp.xp.upgrades[13].title)} and ${layerColor('xp', tmp.xp.upgrades[21].title)} effects *${format(this.effect())}`;
+                } else {
+                    let effect_formula = 'level / 5 + 1';
+
+                    return `Vampirism level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to vampirism<br>\
+                    ${layerColor('xp', tmp.xp.upgrades[13].title)} and ${layerColor('xp', tmp.xp.upgrades[21].title)} effects *[${effect_formula}]`;
+                }
             },
             name: 'vampirism',
         },
@@ -246,13 +270,21 @@ addLayer('l', {
             needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(130); },
             effect() {
                 if (tmp.l.deactivated) return D.dOne;
-                return D(.125).times(player.l.skills[this.id].level).add(1);
+                return D(1 / 8).times(player.l.skills[this.id].level).add(1);
             },
             unlocked() { return hasMilestone('l', 4); },
             text() {
-                return `Reading level ${formatWhole(player.l.skills[this.id].level)}<br>\
-                ${format(player.l.skills[this.id].points)} points assigned to reading<br>\
-                ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects *${format(this.effect())}`;
+                if (!shiftDown) {
+                    return `Reading level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to reading<br>\
+                    ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects *${format(this.effect())}`;
+                } else {
+                    let effect_formula = 'level / 8 + 1';
+
+                    return `Reading level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to reading<br>\
+                    ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects *[${effect_formula}]`;
+                }
             },
             name: 'reading',
         },

@@ -512,11 +512,11 @@ addLayer('m', {
             description() {
                 if (!shiftDown) return 'Coal boosts tree damage';
 
-                let formula = '7√(coal)';
+                let formula = '7√(coal + 1)';
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.lo.items.coal.amount.root(7); },
+            effect() { return player.lo.items.coal.amount.add(1).root(7); },
             effectDisplay() { return `*${format(this.effect())}`; },
             cost: D(7),
             item: 'coal',

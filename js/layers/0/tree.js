@@ -1,5 +1,7 @@
 'use strict';
 
+//todo chopping doesn't work
+//todo show what's being chopped
 //todo upgrades
 //todo convertion
 addLayer('t', {
@@ -65,18 +67,18 @@ addLayer('t', {
                         return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">${formatWhole(player.lo.items[item].amount)}</span> ${itemp.name}`;
                     };
 
-                    return `You have ${listFormat.format(tmp.t.trees.trees.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
+                    return `You have ${listFormat.format(tmp.t.trees.items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
                 }],
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
                     'blank',
                     ['toggle', ['t', 'short_mode']]
                 ]],
-                ['row', [
+                /*['row', [
                     ['display-text', 'Convert wood'],
                     'blank',
                     ['toggle', ['t', 'convert']],
-                ]],
+                ]],*/
                 'blank',
                 ['bar', 'health'],
                 ['clickables', [1]],
@@ -88,7 +90,7 @@ addLayer('t', {
                     const last_drops = player.t.last_drops;
                     if (last_drops.length) drops = listFormat.format(last_drops.map(([item, amount]) => `${format(amount)} ${layers.lo.items[item].name}`));
 
-                    return `Mined ${drops}`;
+                    return `Cut ${drops}`;
                 }],
                 'blank',
                 ['display-text', () => {
@@ -108,7 +110,7 @@ addLayer('t', {
                             <td>Amount</td>\
                             <td>Size</td>\
                         </tr>\
-                        ${tmp.t.trees.trees.map(row)}\
+                        ${tmp.t.trees.trees.map(row).join('')}\
                     </table>`;
                 }],
             ],
@@ -122,7 +124,7 @@ addLayer('t', {
                         return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">${formatWhole(player.lo.items[item].amount)}</span> ${itemp.name}`;
                     };
 
-                    return `You have ${listFormat.format(tmp.t.trees.trees.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
+                    return `You have ${listFormat.format(tmp.t.trees.items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
                 }],
                 'blank',
                 ['upgrades', [1, 2, 3]],

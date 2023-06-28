@@ -239,13 +239,30 @@ addLayer('clo', {
         11: {
             title: 'Slime Gear',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
 
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime gears\
-                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 30 + 1',
+                        cost_formula_goo = '(1.5 ^ amount) * 32',
+                        cost_formula_shard = '(1.5 ^ amount) * 8',
+                        cost_formula_core = '1.5 ^ amount';
+
+                    const cost_list = [
+                        `[${cost_formula_goo}] ${tmp.lo.items.slime_goo.name}`,
+                        `[${cost_formula_shard}] ${tmp.lo.items.slime_core_shard.name}`,
+                        `[${cost_formula_core}] ${tmp.lo.items.slime_core.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} slime gears\
+                    multiply time speed by [${effect_formula}]<br><br>\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 return {
@@ -255,7 +272,7 @@ addLayer('clo', {
                 };
             },
             effect(x) {
-                return D(.1 / 3).times(x).add(1);
+                return D(1 / 30).times(x).add(1);
             },
             canAfford() {
                 return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
@@ -278,13 +295,30 @@ addLayer('clo', {
         12: {
             title: 'Goblin Gear',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
 
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} goblin gears\
-                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} goblin gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 20 + 1',
+                        cost_formula_fabric = '(1.5 ^ amount) * 32',
+                        cost_formula_coin = '(1.5 ^ amount) * 8',
+                        cost_formula_gear = '(1.5 ^ amount)';
+
+                    const cost_list = [
+                        `[${cost_formula_fabric}] ${tmp.lo.items.red_fabric.name}`,
+                        `[${cost_formula_coin}] ${tmp.lo.items.pyrite_coin.name}`,
+                        `[${cost_formula_gear}] ${tmp.lo.items.rusty_gear.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} goblin gears\
+                        multiply time speed by [${effect_formula}]<br><br>\
+                        Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 return {
@@ -294,7 +328,7 @@ addLayer('clo', {
                 };
             },
             effect(x) {
-                return D(.1 / 2).times(x).add(1);
+                return D(1 / 20).times(x).add(1);
             },
             canAfford() {
                 return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
@@ -317,13 +351,30 @@ addLayer('clo', {
         13: {
             title: 'Zombie Gear',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
 
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} zombie gears\
-                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} zombie gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 15 + 1',
+                        cost_formula_flesh = '(1.5 ^ amount) * 32',
+                        cost_formula_iron = '(1.5 ^ amount) * 8',
+                        cost_formula_brain = '1.5 ^ amount';
+
+                    const cost_list = [
+                        `[${cost_formula_flesh}] ${tmp.lo.items.rotten_flesh.name}`,
+                        `[${cost_formula_iron}] ${tmp.lo.items.iron_ore.name}`,
+                        `[${cost_formula_brain}] ${tmp.lo.items.brain.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} zombie gears\
+                    multiply time speed by [${effect_formula}]<br><br>\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 return {
@@ -333,7 +384,7 @@ addLayer('clo', {
                 };
             },
             effect(x) {
-                return D(.1 / 1.5).times(x).add(1);
+                return D(1 / 15).times(x).add(1);
             },
             canAfford() {
                 return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
@@ -357,15 +408,29 @@ addLayer('clo', {
         21: {
             title: 'Stone Gear',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                const anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
 
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} stone gears\
-                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                ${anvil_req}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} stone gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 20 + 1',
+                        cost_formula = '(2 ^ amount) * 100';
+
+                    const cost_list = [
+                        `[${cost_formula}] ${tmp.lo.items.stone.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} stone gears\
+                    multiply time speed by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 return {
@@ -373,7 +438,7 @@ addLayer('clo', {
                 };
             },
             effect(x) {
-                return D(.1 / 2).times(x).add(1);
+                return D(1 / 20).times(x).add(1);
             },
             canAfford() {
                 return tmp.lo.items['*'].has_anvil && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
@@ -396,15 +461,31 @@ addLayer('clo', {
         22: {
             title: 'Bronze Gear',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                const anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
 
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} bronze gears\
-                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                ${anvil_req}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} bronze gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount * 3 / 40 + 1',
+                        cost_formula_copper = '(1.75 ^ amount) * 50',
+                        cost_formula_tin = '(1.75 ^ amount) * 5';
+
+                    const cost_list = [
+                        `[${cost_formula_copper}] ${tmp.lo.items.copper_ore.name}`,
+                        `[${cost_formula_tin}] ${tmp.lo.items.tin_ore.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} bronze gears\
+                    multiply time speed by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 return {
@@ -413,7 +494,7 @@ addLayer('clo', {
                 };
             },
             effect(x) {
-                return D(.075).times(x).add(1);
+                return D(3 / 40).times(x).add(1);
             },
             canAfford() {
                 return tmp.lo.items['*'].has_anvil && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
@@ -437,12 +518,25 @@ addLayer('clo', {
         31: {
             title: 'Money Gear',
             display() {
-                /** @type {Decimal} */
-                const cost = this.cost(getBuyableAmount(this.layer, this.id));
+                if (!shiftDown) {
+                    /** @type {Decimal} */
+                    const cost = this.cost(getBuyableAmount(this.layer, this.id));
 
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} money gears\
-                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                Cost: ${layers.s.coins.format(cost, false)}`;
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} money gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    Cost: ${layers.s.coins.format(cost, false)}`;
+                } else {
+                    let effect_formula = 'amount / 15 + 1',
+                        cost_formula = '(2 ^ amount) * 100';
+
+                    const cost_list = [
+                        `[${cost_formula}] copper coins`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} money gears\
+                    multiply time speed by [${effect_formula}]<br><br>\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) { return D.dTwo.pow(x).times(100); },
             effect(x) { return D(1 / 15).times(x).add(1); },
@@ -464,15 +558,29 @@ addLayer('clo', {
         41: {
             title: 'Iron Gear',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                const anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
 
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} iron gears\
-                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                ${anvil_req}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} iron gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 10 + 1',
+                        cost_formula = '(2 ^ amount) * 25';
+
+                    const cost_list = [
+                        `[${cost_formula}] ${tmp.lo.items.iron_ore.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} iron gears\
+                    multiply time speed by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 return {
@@ -480,7 +588,7 @@ addLayer('clo', {
                 };
             },
             effect(x) {
-                return D(.1).times(x).add(1);
+                return D(1 / 10).times(x).add(1);
             },
             canAfford() {
                 return tmp.lo.items['*'].has_anvil && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
@@ -503,15 +611,29 @@ addLayer('clo', {
         42: {
             title: 'Gold Gear',
             display() {
-                /** @type {{[item: string]: Decimal}} */
-                const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
-                    cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
-                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                const anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
 
-                return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} gold gears\
-                multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                ${anvil_req}\
-                Cost: ${cost}`;
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} gold gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 20 + 1',
+                        cost_formula = '(3 ^ amount) * 5';
+
+                    const cost_list = [
+                        `[${cost_formula}] ${tmp.lo.items.gold_ore.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} gold gears\
+                    multiply time speed by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
             },
             cost(x) {
                 return {
@@ -519,7 +641,7 @@ addLayer('clo', {
                 };
             },
             effect(x) {
-                return D(.05).times(x).add(1);
+                return D(1 / 20).times(x).add(1);
             },
             canAfford() {
                 return tmp.lo.items['*'].has_anvil && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
