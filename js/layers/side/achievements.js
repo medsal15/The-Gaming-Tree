@@ -637,7 +637,7 @@ addLayer('ach', {
         },
         83: {
             name: 'Amalgam',
-            tooltip: '???',
+            tooltip: 'Defeat ???',
             done() { return false; },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
@@ -648,8 +648,8 @@ addLayer('ach', {
             unlocked() { return hasChallenge('b', 11); },
         },
         84: {
-            name: '???',
-            tooltip: '???',
+            name: 'Going global',
+            tooltip: 'Destroy ???',
             done() { return false; },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {

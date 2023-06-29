@@ -1,6 +1,5 @@
 'use strict';
 
-//todo implement 61 (unlock forge)
 addLayer('m', {
     name: 'Mining',
     symbol: 'M',
@@ -109,6 +108,7 @@ addLayer('m', {
                 () => { if (player.m.show_deep) return ['display-text', `Mining ${tmp.m.ore.mode}`]; },
                 'blank',
                 ['display-text', () => `Chance to mine something: ${layers.lo.items["*"].format_chance(tmp.m.ore.chance)}`],
+                () => { if (tmp.m.ore.mine_mult.neq(1)) return ['display-text', `Mining *${format(tmp.m.ore.mine_mult)} ore`]; },
                 ['display-text', () => {
                     let drops = 'nothing';
 
@@ -218,7 +218,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -242,7 +242,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -288,7 +288,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -313,7 +313,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -330,7 +330,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -355,7 +355,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -380,7 +380,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -397,7 +397,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -434,7 +434,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -452,7 +452,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
                     style['background-color'] = tmp.lo.items[this.item].style['background-color'];
@@ -480,7 +480,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -491,7 +491,7 @@ addLayer('m', {
         43: {
             title: 'Gold Pickaxe',
             description: 'Increases amount of mined ores',
-            effect() { return D(1.1); },
+            effect() { return D(1.5); },
             effectDisplay() { return `*${format(this.effect())}`; },
             cost: D(1),
             item: 'gold_ore',
@@ -499,7 +499,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -524,7 +524,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
                     style['background-color'] = tmp.lo.items[this.item].style['background-color'];
@@ -546,7 +546,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -578,7 +578,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -588,8 +588,8 @@ addLayer('m', {
         },
         61: {
             title: 'Coal Forge',
-            description() { return `Unlock the forge<br>Square ${layerColor('lo', tmp.lo.buyables[21].title)} effect`; },
-            effect() { return D.dTwo; },
+            description() { return `Unlock the forge<br>Boost ${layerColor('lo', tmp.lo.buyables[21].title)} effect`; },
+            effect() { return D(1.1); },
             effectDisplay() { return `^${format(this.effect())}`; },
             cost: D(49),
             item: 'coal',
@@ -597,7 +597,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
                     style['background-color'] = tmp.lo.items[this.item].style['background-color'];
@@ -607,6 +607,7 @@ addLayer('m', {
                 return style;
             },
             unlocked() { return player.m.show_deep; },
+            onPurchase() { player.f.unlocked = true; },
         },
         62: {
             title: 'Iron Axe',
@@ -620,7 +621,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -651,7 +652,7 @@ addLayer('m', {
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
-                const style = { 'border-radius': 0, };
+                const style = {};
 
                 if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.items[this.item].style['background-color'];
 
@@ -731,9 +732,7 @@ addLayer('m', {
             };
         },
         get_drops(amount) {
-            if (hasUpgrade('m', 43)) amount = D.times(amount, upgradeEffect('m', 43));
-
-            if (hasUpgrade('t', 23)) amount = D.times(amount, upgradeEffect('t', 23));
+            amount = D.times(amount, tmp.m.ore.mine_mult);
 
             const drops = layers.lo.items["*"].get_drops(`mining:${player.m.mode}`, D(amount));
 
@@ -760,6 +759,15 @@ addLayer('m', {
             'stone', 'copper_ore', 'tin_ore', // T0
             'coal', 'iron_ore', 'gold_ore', // T1
         ],
+        mine_mult() {
+            let mult = D.dOne;
+
+            if (hasUpgrade('m', 43)) mult = D.times(mult, upgradeEffect('m', 43));
+
+            if (hasUpgrade('t', 23)) mult = D.times(mult, upgradeEffect('t', 23));
+
+            return mult;
+        },
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
@@ -777,12 +785,14 @@ addLayer('m', {
             layers.lo.items["*"].gain_drops(drops);
             player.m.health = D.dZero;
         }
+
+        if (player.m.mode == 'deep' && !hasUpgrade('m', 52)) player.m.mode = 'shallow';
     },
     type: 'none',
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
-        const keep = ['show_deep'],
+        const keep = ['show_deep', 'mode', 'short_mode'],
             kept_ups = [...player.m.upgrades];
 
         kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 23).m_hold).toNumber();
@@ -793,4 +803,9 @@ addLayer('m', {
     },
     branches: ['lo'],
     prestigeNotify() { return !hasUpgrade('m', 22) && player.m.health.gte(tmp.m.ore.health); },
+    componentStyles: {
+        upgrade: {
+            'border-radius': 0,
+        }
+    },
 });

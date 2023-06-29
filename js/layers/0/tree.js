@@ -432,7 +432,10 @@ addLayer('t', {
                 case 'driftwood': return 'driftwood';
                 case 'oak': return 'oak';
                 case 'birch': return 'birch';
-                case 'convertion': return 'convertion';
+                case 'convertion':
+                    let text = 'convertion';
+                    if (!player.t.convert) text += ' (disabled)';
+                    return text;
             }
         },
         regen(type = player.t.current) {
@@ -569,7 +572,11 @@ addLayer('t', {
         },
         per_second(item = 'plank') {
             if (item == 'plank') {
-                return this.from.map(item => this.rate(item).times(this.efficiency(item))).reduce(D.add, 0);
+                let gain = this.from.map(item => this.rate(item).times(this.efficiency(item))).reduce(D.add, D.dZero);
+
+                if (inChallenge('b', 12)) gain = gain.div(player.lo.items.plank.amount.add(10).log10());
+
+                return gain;
             }
 
             if (!this.from.includes(item)) return D.dZero;
@@ -642,7 +649,7 @@ addLayer('t', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
-        const keep = ['convert'],
+        const keep = ['convert', 'short_mode'],
             kept_ups = [...player.t.upgrades];
 
         kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 62).t_hold).toNumber();
@@ -651,5 +658,6 @@ addLayer('t', {
         layers.t.trees.items.forEach(item => player.lo.items[item].amount = D.dZero);
         player.t.upgrades.push(...kept_ups);
     },
-    branches: [() => false && player.f.unlocked ? 'f' : 'lo'],
+    branches: [() => player.f.unlocked ? 'f' : 'lo'],
+    prestigeNotify() { return !hasUpgrade('t', 22) && player.t.current; },
 });

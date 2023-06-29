@@ -86,7 +86,7 @@ addLayer('xp', {
 
                         const kill_text = kill_pieces.length ? ` (${kill_pieces.join(', ')})` : '';
 
-                        return `You have ${layerColor('xp', format(player.xp.points, 0), 'font-size:1.5em;')} (${xp_text}) experience
+                        return `You have ${layerColor('xp', format(player.xp.points, player.xp.points.gte('1e9') ? 2 : 0), 'font-size:1.5em;')} (${xp_text}) experience
                             and ${kill_style(format(tmp.xp.total.kills, 0), 'font-size:1.5em')}${kill_text} kills`;
                     },
                 ],
@@ -125,7 +125,7 @@ addLayer('xp', {
                     'display-text',
                     () => {
                         const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`;
-                        return `You have ${layerColor('xp', format(player.xp.points, 0), 'font-size:1.5em;')} experience
+                        return `You have ${layerColor('xp', format(player.xp.points, player.xp.points.gte('1e9') ? 2 : 0), 'font-size:1.5em;')} experience
                             and ${kill_style(format(tmp.xp.total.kills, 0), 'font-size:1.5em')} kills`;
                     },
                 ],
@@ -146,7 +146,7 @@ addLayer('xp', {
                     'display-text',
                     () => {
                         const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`;
-                        return `You have ${layerColor('xp', format(player.xp.points, 0), 'font-size:1.5em;')} experience
+                        return `You have ${layerColor('xp', format(player.xp.points, player.xp.points.gte('1e9') ? 2 : 0), 'font-size:1.5em;')} experience
                             and ${kill_style(format(tmp.xp.total.kills, 0), 'font-size:1.5em')} kills`;
                     },
                 ],

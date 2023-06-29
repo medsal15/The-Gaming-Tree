@@ -58,7 +58,7 @@ function getStartPlayer() {
 	return playerdata;
 }
 function getStartLayerData(layer) {
-	layerdata = {};
+	let layerdata = {};
 	if (layers[layer].startData)
 		layerdata = layers[layer].startData();
 
