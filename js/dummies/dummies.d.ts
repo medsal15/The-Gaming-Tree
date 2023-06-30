@@ -1860,9 +1860,10 @@ declare class LayerData {
     resetTime?: number
     upgrades?: number[]
     activeChallenge?: number | null
+    buyables: { [id: number]: Decimal }
 }
 
-type drop_sources = 'enemy' | 'mining' | 'tree';
+type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge';
 
 declare let layers: {
     // Side
@@ -1910,6 +1911,7 @@ declare let layers: {
             mode(mode?: Player['m']['mode']): string
             get_drops(amount: DecimalSource): [string, Decimal][]
             items: string[]
+            mine_mult(): Decimal
         }
     }
     t: Layer<Player['t']> & {
@@ -1958,7 +1960,7 @@ declare let layers: {
             '*': {
                 max(): Decimal
                 left(): Decimal
-                showSkill(id: string): ['row', [['bar', string], ['clickable', `add_${string}`], ['clickable', `remove_${string}`]]]
+                show_skill(id: string): ['row', [['bar', string], ['clickable', `add_${string}`], ['clickable', `remove_${string}`]]]
                 speed(): Decimal
             }
             [skill: string]: {
@@ -2005,6 +2007,84 @@ declare let layers: {
             }
         }
     }
+    f: Layer<Player['f']> & {
+        fuels: {
+            '*': {
+                regex: RegExp
+                show_fuel(fuel: string): ['row', [['clickable', `fuel_display_${string}`], ['display-text', string], ['clickable', `fuel_toggle_${string}`]]]
+                /** Maximum amount of a fuel that can be consumed per second */
+                size(): Decimal
+                consuming(item: string): Decimal
+            }
+            [fuel: string]: {
+                readonly id: string
+                heat: Computable<Decimal>
+                /** @default true */
+                unlocked?: Computable<boolean>
+                item: string
+                /** Currently consuming amount of fuel */
+                consuming: Computable<Decimal>
+                /** Currently producing amount of heat */
+                producing: Computable<Decimal>
+            }
+        }
+        recipes: {
+            '*': {
+                regexes: {
+                    bar: RegExp
+                    display: RegExp
+                    amount: RegExp
+                }
+                show_recipe(recipe: string): ['row', []]
+                /** Maximum amount of items produced at once */
+                size(): Decimal
+                /**
+                 * **Not implemented**
+                 *
+                 * Collates the values of passive recipes into a single method to know how much is produced
+                 *
+                 * May return a negative value if more is being consumed than produced
+                 */
+                producing(item: string): Decimal
+                default_amount(recipe: string, amount?: Decimal): Decimal
+            }
+            [recipe: string]: {
+                readonly id: string
+                /** Required heat to start producing */
+                heat: Computable<Decimal>
+                /** @default true */
+                unlocked?: Computable<boolean>
+                /**
+                 * A recipe will not run if it can't consume everything
+                 * @param amount Target amount to produce
+                 *
+                 * Defaults to currently being produced, or wanted produced
+                 */
+                consumes(amount?: Decimal): [item: string, amount: Decimal][]
+                /** Produced item */
+                produces: string
+                /**
+                 * Time it takes to produce the item in seconds
+                 * @param amount Target amount to produce
+                 *
+                 * Defaults to currently being produced, or wanted produced
+                 */
+                time(amount?: Decimal): Decimal
+                /** Formulas that determine amounts consumed **and** time */
+                formulas: Computable<{ [key: string | 'time']: string }>
+                /**
+                 * **Not implemented**
+                 *
+                 * If true, the recipe will run passively
+                 * consuming ??? of the materials required
+                 * divided by the time it would takes for the same amount
+                 *
+                 * @default false
+                 */
+                passive?: Computable<boolean>
+            }
+        }
+    }
     // Row 2
     b: Layer<Player['b']> & {}
     s: Layer<Player['s']> & {
@@ -2043,6 +2123,7 @@ type Temp = {
     // Row 1
     l: TempLayer & RComputed<typeof layers.l>
     lo: TempLayer & RComputed<typeof layers.lo>
+    f: TempLayer & RComputed<typeof layers.f>
     // Row 2
     b: TempLayer & RComputed<typeof layers.b>
     s: TempLayer & RComputed<typeof layers.s>
@@ -2109,6 +2190,39 @@ type Player = {
     lo: LayerData & {
         shown: boolean
         items: { [id: string]: { amount: Decimal, } }
+    }
+    f: LayerData & {
+        /**
+         * List of fuels
+         *
+         * If `true`, the fuel is consumed to produce heat
+         */
+        fuels: { [fuel: string]: boolean }
+        recipes: {
+            [recipe: string]: {
+                /**
+                 * **Not implemented**
+                 *
+                 * Whether the recipe is running passively
+                 */
+                enabled: boolean
+                /**
+                 * Current amount being smelted
+                 *
+                 * 0 if not being smelted
+                 */
+                amount_smelting: Decimal
+                /** Current input value */
+                amount_target: Decimal
+                /**
+                 * Progress in seconds since the recipe was started
+                 *
+                 * If amount_smelting > 0, increase this one until >= tmp.f.recipes.time(amount_smelting)
+                 */
+                progress: Decimal
+            }
+        }
+        alloys: boolean
     }
     // Row 2
     b: LayerData & {

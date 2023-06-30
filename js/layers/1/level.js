@@ -85,11 +85,14 @@ addLayer('l', {
             // Required to not break the auto stuff
             if (prop == 'constructor') return obj.constructor;
             if (prop == 'layer') return 'l';
+
+            if (prop in obj) return obj[prop];
+
             const matches = layers.l.regex.exec(prop);
             if (matches) {
                 /** @type {[string, 'add'|'remove', string]} */
                 const [, mode, skill] = matches;
-                return {
+                return obj[prop] ??= {
                     canClick() { return player.l.change.lte(mode == 'add' ? tmp.l.skills["*"].left : player.l.skills[skill].points); },
                     onClick() { player.l.skills[skill].points = player.l.skills[skill].points[mode == 'add' ? 'add' : 'minus'](player.l.change); },
                     display() { return `${mode == 'add' ? 'Add' : 'Remove'} ${format(player.l.change)} skills points ${mode == 'add' ? 'to' : 'from'} ${tmp.l.skills[skill].name}`; },
@@ -117,6 +120,9 @@ addLayer('l', {
             // Required to not break the auto stuff
             if (prop == 'constructor') return obj.constructor;
             if (prop == 'layer') return 'l';
+
+            if (prop in obj) return obj[prop];
+
             if (prop in layers.l.skills && prop != '*') {
                 return obj[prop] ??= {
                     direction: RIGHT,
@@ -246,7 +252,7 @@ addLayer('l', {
             needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(270); },
             effect() {
                 if (tmp.l.deactivated) return D.dOne;
-                return D(1 / 5).times(player.l.skills[this.id].level).add(1);
+                return D(1 / 50).times(player.l.skills[this.id].level).add(1);
             },
             unlocked() { return hasMilestone('l', 3); },
             text() {
@@ -255,7 +261,7 @@ addLayer('l', {
                     ${format(player.l.skills[this.id].points)} points assigned to vampirism<br>\
                     ${layerColor('xp', tmp.xp.upgrades[13].title)} and ${layerColor('xp', tmp.xp.upgrades[21].title)} effects *${format(this.effect())}`;
                 } else {
-                    let effect_formula = 'level / 5 + 1';
+                    let effect_formula = 'level / 50 + 1';
 
                     return `Vampirism level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to vampirism<br>\
@@ -270,20 +276,20 @@ addLayer('l', {
             needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(130); },
             effect() {
                 if (tmp.l.deactivated) return D.dOne;
-                return D(1 / 8).times(player.l.skills[this.id].level).add(1);
+                return D(1 / 100).times(player.l.skills[this.id].level);
             },
             unlocked() { return hasMilestone('l', 4); },
             text() {
                 if (!shiftDown) {
                     return `Reading level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to reading<br>\
-                    ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects *${format(this.effect())}`;
+                    ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects +${format(this.effect())}`;
                 } else {
-                    let effect_formula = 'level / 8 + 1';
+                    let effect_formula = 'level / 100';
 
                     return `Reading level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to reading<br>\
-                    ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects *[${effect_formula}]`;
+                    ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects +[${effect_formula}]`;
                 }
             },
             name: 'reading',
@@ -356,4 +362,13 @@ addLayer('l', {
     exponent: D.dTwo,
     roundUpCost: true,
     branches: ['xp'],
+    doReset(layer) {
+        if (layers[layer].row <= this.row) return;
+
+        const keep = [];
+
+        layerDataReset(this.layer, keep);
+
+        if (hasUpgrade('f', 31)) Object.values(player.l.skills).forEach(skill => skill.level = skill.level.max(1));
+    },
 });

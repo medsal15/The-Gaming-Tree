@@ -1,6 +1,6 @@
 'use strict';
 
-//todo forge buyables?
+//todo forge buyables
 addLayer('clo', {
     name: 'Clock',
     symbol: '⏲',
@@ -84,13 +84,13 @@ addLayer('clo', {
                 if (!player.t.unlocked) return 'Applies time speed to ??? layer';
                 return 'Applies time speed to tree layer';
             },
-            effectDisplay() { return `*${format(D.dOne)}`; },
-            price: [['soaked_log', D(32)], ['normal_log', D(8)]],
+            effectDisplay() { return `*${format(layers.clo.time_speed('t', true))}`; },
+            price: [['soaked_log', D(32)], ['normal_log', D(8)], ['plank', D.dOne]],
             costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
             pay() { this.price.forEach(([item, cost]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(cost)); },
             unlocked() { return hasChallenge('b', 51) && player.t.unlocked; },
-            branches: [23],
+            branches() { return [player.f.unlocked ? 23 : 22]; },
         },
         21: {
             title: 'Level connector',
@@ -124,14 +124,26 @@ addLayer('clo', {
             branches: [23, 32],
         },
         23: {
-            title: '??? connector',
-            description: 'Applies time speed to ??? layer',
-            effectDisplay() { return `*${format(D.dOne)}`; },
-            costDisplay() { return 'Cost: Unknown'; },
-            canAfford: false,
-            pay() { },
-            unlocked() { return hasChallenge('b', 51) && false; },
-            branches: [33],
+            title() {
+                if (!player.f.unlocked) return '??? connector';
+                return 'Forge connector';
+            },
+            description() {
+                if (!player.f.unlocked) return 'Applies time speed to ??? layer';
+                return 'Applies time speed to forge layer';
+            },
+            effectDisplay() { return `*${format(layers.clo.time_speed('f', true))}`; },
+            price: [['stone_brick', D(64)], ['copper_ingot', D(16)], ['tin_ingot', D.dTwo]],
+            costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
+            canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
+            pay() { this.price.forEach(([item, cost]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(cost)); },
+            style() {
+                const style = {};
+                if (hasUpgrade(this.layer, this.id)) style['background-color'] = tmp.f.color;
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 51) && player.f.unlocked; },
+            branches: [22],
         },
         31: {
             title: 'Boss connector',
@@ -365,11 +377,19 @@ addLayer('clo', {
                         cost_formula_iron = '(1.5 ^ amount) * 8',
                         cost_formula_brain = '1.5 ^ amount';
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_iron += ` / ${format(D.pow(upgradeEffect('f', 11)['iron_ingot'], -1))}`;
+                    }
+
                     const cost_list = [
                         `[${cost_formula_flesh}] ${tmp.lo.items.rotten_flesh.name}`,
                         `[${cost_formula_iron}] ${tmp.lo.items.iron_ore.name}`,
                         `[${cost_formula_brain}] ${tmp.lo.items.brain.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[1] = `[${cost_formula_iron}] ${tmp.lo.items.iron_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} zombie gears\
                     multiply time speed by [${effect_formula}]<br><br>\
@@ -377,11 +397,18 @@ addLayer('clo', {
                 }
             },
             cost(x) {
-                return {
+                const cost = {
                     rotten_flesh: D(1.5).pow(x).times(32),
                     iron_ore: D(1.5).pow(x).times(8),
                     brain: D(1.5).pow(x),
                 };
+
+                if (hasUpgrade('f', 11)) {
+                    cost['iron_ingot'] = cost['iron_ore'].times(upgradeEffect('f', 11)['iron_ingot']);
+                    delete cost['iron_ore'];
+                }
+
+                return cost;
             },
             effect(x) {
                 return D(1 / 15).times(x).add(1);
@@ -422,9 +449,17 @@ addLayer('clo', {
                     let effect_formula = 'amount / 20 + 1',
                         cost_formula = '(2 ^ amount) * 100';
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula += ` / ${format(D.pow(upgradeEffect('f', 11)['stone_brick'], -1))}`;
+                    }
+
                     const cost_list = [
                         `[${cost_formula}] ${tmp.lo.items.stone.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula}] ${tmp.lo.items.stone_brick.name}`;
+                    }
 
                     return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} stone gears\
                     multiply time speed by [${effect_formula}]<br><br>\
@@ -433,9 +468,16 @@ addLayer('clo', {
                 }
             },
             cost(x) {
-                return {
+                const cost = {
                     stone: D(2).pow(x).times(100),
                 };
+
+                if (hasUpgrade('f', 11)) {
+                    cost['stone_brick'] = cost['stone'].times(upgradeEffect('f', 11)['stone_brick']);
+                    delete cost['stone'];
+                }
+
+                return cost;
             },
             effect(x) {
                 return D(1 / 20).times(x).add(1);
@@ -476,10 +518,20 @@ addLayer('clo', {
                         cost_formula_copper = '(1.75 ^ amount) * 50',
                         cost_formula_tin = '(1.75 ^ amount) * 5';
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
+                        cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
+                    }
+
                     const cost_list = [
                         `[${cost_formula_copper}] ${tmp.lo.items.copper_ore.name}`,
                         `[${cost_formula_tin}] ${tmp.lo.items.tin_ore.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula_copper}] ${tmp.lo.items.copper_ingot.name}`;
+                        cost_list[1] = `[${cost_formula_tin}] ${tmp.lo.items.tin_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} bronze gears\
                     multiply time speed by [${effect_formula}]<br><br>\
@@ -488,10 +540,19 @@ addLayer('clo', {
                 }
             },
             cost(x) {
-                return {
+                const cost = {
                     copper_ore: D(1.75).pow(x).times(50),
                     tin_ore: D(1.75).pow(x).times(5),
                 };
+
+                if (hasUpgrade('f', 11)) {
+                    cost['copper_ingot'] = cost['copper_ore'].times(upgradeEffect('f', 11)['copper_ingot']);
+                    delete cost['copper_ore'];
+                    cost['tin_ingot'] = cost['tin_ore'].times(upgradeEffect('f', 11)['tin_ingot']);
+                    delete cost['tin_ore'];
+                }
+
+                return cost;
             },
             effect(x) {
                 return D(3 / 40).times(x).add(1);
@@ -572,9 +633,17 @@ addLayer('clo', {
                     let effect_formula = 'amount / 10 + 1',
                         cost_formula = '(2 ^ amount) * 25';
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula += ` / ${format(D.pow(upgradeEffect('f', 11)['iron_ingot'], -1))}`;
+                    }
+
                     const cost_list = [
                         `[${cost_formula}] ${tmp.lo.items.iron_ore.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula}] ${tmp.lo.items.iron_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} iron gears\
                     multiply time speed by [${effect_formula}]<br><br>\
@@ -583,9 +652,16 @@ addLayer('clo', {
                 }
             },
             cost(x) {
-                return {
+                const cost = {
                     iron_ore: D(2).pow(x).times(25),
                 };
+
+                if (hasUpgrade('f', 11)) {
+                    cost['iron_ingot'] = cost['iron_ore'].times(upgradeEffect('f', 11)['iron_ingot']);
+                    delete cost['iron_ore'];
+                }
+
+                return cost;
             },
             effect(x) {
                 return D(1 / 10).times(x).add(1);
@@ -625,9 +701,17 @@ addLayer('clo', {
                     let effect_formula = 'amount / 20 + 1',
                         cost_formula = '(3 ^ amount) * 5';
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula += ` / ${format(D.pow(upgradeEffect('f', 11)['gold_ingot'], -1))}`;
+                    }
+
                     const cost_list = [
                         `[${cost_formula}] ${tmp.lo.items.gold_ore.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula}] ${tmp.lo.items.gold_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} gold gears\
                     multiply time speed by [${effect_formula}]<br><br>\
@@ -636,9 +720,16 @@ addLayer('clo', {
                 }
             },
             cost(x) {
-                return {
+                const cost = {
                     gold_ore: D(3).pow(x).times(5),
                 };
+
+                if (hasUpgrade('f', 11)) {
+                    cost['gold_ingot'] = cost['gold_ore'].times(upgradeEffect('f', 11)['gold_ingot']);
+                    delete cost['gold_ore'];
+                }
+
+                return cost;
             },
             effect(x) {
                 return D(1 / 20).times(x).add(1);

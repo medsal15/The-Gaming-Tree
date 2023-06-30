@@ -508,16 +508,10 @@ addLayer('m', {
             unlocked() { return player.m.show_deep; },
         },
         51: {
-            title: 'Fire Axe',
-            description() {
-                if (!shiftDown) return 'Coal boosts tree damage';
-
-                let formula = '7√(coal + 1)';
-
-                return `Formula: ${formula}`;
-            },
-            effect() { return player.lo.items.coal.amount.add(1).root(7); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            title: 'Coal Forge',
+            description() { return `Unlock the forge<br>Boost ${layerColor('lo', tmp.lo.buyables[21].title)} effect`; },
+            effect() { return D(1.1); },
+            effectDisplay() { return `^${format(this.effect())}`; },
             cost: D(7),
             item: 'coal',
             currencyInternalName: 'amount',
@@ -534,6 +528,7 @@ addLayer('m', {
                 return style;
             },
             unlocked() { return player.m.show_deep; },
+            onPurchase() { player.f.unlocked = true; },
         },
         52: {
             title: 'Iron Shaft',
@@ -587,10 +582,16 @@ addLayer('m', {
             unlocked() { return player.m.show_deep; },
         },
         61: {
-            title: 'Coal Forge',
-            description() { return `Unlock the forge<br>Boost ${layerColor('lo', tmp.lo.buyables[21].title)} effect`; },
-            effect() { return D(1.1); },
-            effectDisplay() { return `^${format(this.effect())}`; },
+            title: 'Fire Axe',
+            description() {
+                if (!shiftDown) return 'Coal boosts tree damage';
+
+                let formula = '7√(coal + 1)';
+
+                return `Formula: ${formula}`;
+            },
+            effect() { return player.lo.items.coal.amount.add(1).root(7); },
+            effectDisplay() { return `*${format(this.effect())}`; },
             cost: D(49),
             item: 'coal',
             currencyInternalName: 'amount',
@@ -607,7 +608,6 @@ addLayer('m', {
                 return style;
             },
             unlocked() { return player.m.show_deep; },
-            onPurchase() { player.f.unlocked = true; },
         },
         62: {
             title: 'Iron Axe',
@@ -761,6 +761,8 @@ addLayer('m', {
         ],
         mine_mult() {
             let mult = D.dOne;
+
+            if (hasUpgrade('f', 22)) mult = D.add(mult, upgradeEffect('f', 22));
 
             if (hasUpgrade('m', 43)) mult = D.times(mult, upgradeEffect('m', 43));
 

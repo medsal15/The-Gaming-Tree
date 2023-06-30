@@ -1,6 +1,6 @@
 'use strict';
 
-//todo Forge items and buyables (7X)
+//todo Forge buyables (7X) (req heat)
 addLayer('lo', {
     name: 'Loot',
     image: './resources/images/swap-bag.svg',
@@ -56,10 +56,27 @@ addLayer('lo', {
 
                     if (mult.neq(1)) return [
                         'column', [
-                            ['display-text', `Item gain multiplier: *${format(mult)}`],
+                            ['display-text', `Global gain multiplier (does not apply to chances): *${format(mult)}`],
                             'blank',
                         ],
                     ];
+                },
+                () => {
+                    const mult = tmp.lo.items["*"].global_chance_multiplier;
+
+                    if (mult.neq(1)) return [
+                        'column', [
+                            ['display-text', `Global chance multiplier: *${format(mult)}`],
+                            'blank',
+                        ],
+                    ];
+                },
+                () => {
+                    if (
+                        Object.keys(tmp.lo.items).some(item => item != '*' &&
+                            (tmp.lo.items[item].unlocked ?? true) &&
+                            'per_second' in tmp.lo.items[item])
+                    ) return ['display-text', 'Production per second depends on the layer doing it'];
                 },
                 'blank',
                 'grid',
@@ -385,14 +402,19 @@ addLayer('lo', {
                         cost_formula_copper = '(1.25 ^ amount) * 5',
                         value_formula = 'amount * 4';
 
-                    if (hasUpgrade('m', 61)) {
-                        effect_formula = `(${effect_formula}) ^ ${format(upgradeEffect('m', 61))}`;
+                    if (hasUpgrade('m', 51)) {
+                        effect_formula = `(${effect_formula}) ^ ${format(upgradeEffect('m', 51))}`;
                     }
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_stone += ` * ${effect}`;
                         cost_formula_copper += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_stone += ` / ${format(D.pow(upgradeEffect('f', 11)['stone_brick'], -1))}`;
+                        cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
                     }
 
                     if (hasUpgrade('s', 81)) {
@@ -403,6 +425,11 @@ addLayer('lo', {
                         `[${cost_formula_stone}] ${tmp.lo.items.stone.name}`,
                         `[${cost_formula_copper}] ${tmp.lo.items.copper_ore.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula_stone}] ${tmp.lo.items.stone_brick.name}`;
+                        cost_list[1] = `[${cost_formula_copper}] ${tmp.lo.items.copper_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(amount)}${amount_bonus} stone furnace\
                     multiply ore health by [${effect_formula}]<br><br>\
@@ -421,13 +448,20 @@ addLayer('lo', {
                     cost[item] = amount.times(upgradeEffect('s', 63));
                 });
 
+                if (hasUpgrade('f', 11)) {
+                    cost['stone_brick'] = cost['stone'].times(upgradeEffect('f', 11)['stone_brick']);
+                    delete cost['stone'];
+                    cost['copper_ingot'] = cost['copper_ore'].times(upgradeEffect('f', 11)['copper_ingot']);
+                    delete cost['copper_ore'];
+                }
+
                 return cost;
             },
             effect(x) {
                 if (tmp.l.deactivated) x = D.dZero;
                 let mult = D(1.125).pow(x);
 
-                if (hasUpgrade('m', 61)) mult = mult.pow(upgradeEffect('m', 61));
+                if (hasUpgrade('m', 51)) mult = mult.pow(upgradeEffect('m', 51));
 
                 return mult;
             },
@@ -492,6 +526,10 @@ addLayer('lo', {
                         cost_formula_core += ` * ${effect}`;
                     }
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
+                    }
+
                     if (hasUpgrade('s', 81)) {
                         value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
@@ -500,6 +538,10 @@ addLayer('lo', {
                         `[${cost_formula_copper}] ${tmp.lo.items.copper_ore.name}`,
                         `[${cost_formula_core}] ${tmp.lo.items.slime_core.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula_copper}] ${tmp.lo.items.copper_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(amount)}${amount_bonus} copper golems\
                     multiply mining chance by [${effect_formula}]<br><br>\
@@ -517,6 +559,11 @@ addLayer('lo', {
                 if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
                     cost[item] = amount.times(upgradeEffect('s', 63));
                 });
+
+                if (hasUpgrade('f', 11)) {
+                    cost['copper_ingot'] = cost['copper_ore'].times(upgradeEffect('f', 11)['copper_ingot']);
+                    delete cost['copper_ore'];
+                }
 
                 return cost;
             },
@@ -590,6 +637,11 @@ addLayer('lo', {
                         cost_formula_goo += ` * ${effect}`;
                     }
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
+                        cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
+                    }
+
                     if (hasUpgrade('s', 81)) {
                         value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
@@ -599,6 +651,11 @@ addLayer('lo', {
                         `[${cost_formula_tin}] ${tmp.lo.items.tin_ore.name}`,
                         `[${cost_formula_goo}] ${tmp.lo.items.slime_goo.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula_copper}] ${tmp.lo.items.copper_ingot.name}`;
+                        cost_list[1] = `[${cost_formula_tin}] ${tmp.lo.items.tin_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(amount)}${amount_bonus} tin chests\
                     multiply drop and mining chance by [${effect_formula_mult}] and keep [${effect_formula_hold}] mining upgrades through resets<br><br>\
@@ -614,9 +671,21 @@ addLayer('lo', {
                     slime_goo: D(1.5).pow(x).times(20)
                 };
 
+                if (hasUpgrade('f', 11)) {
+                    cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
+                    cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
+                }
+
                 if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
                     cost[item] = amount.times(upgradeEffect('s', 63));
                 });
+
+                if (hasUpgrade('f', 11)) {
+                    cost['copper_ingot'] = cost['copper_ore'].times(upgradeEffect('f', 11)['copper_ingot']);
+                    delete cost['copper_ore'];
+                    cost['tin_ingot'] = cost['tin_ore'].times(upgradeEffect('f', 11)['tin_ingot']);
+                    delete cost['tin_ore'];
+                }
 
                 return cost;
             },
@@ -1029,7 +1098,7 @@ addLayer('lo', {
                     Cost: ${cost}`;
                 } else {
                     let effect_formula_mult = '1.05 ^ amount',
-                        effect_formula_damage = 'amount / 5',
+                        effect_formula_damage = '5√(amount)',
                         cost_formula_iron = '(1.5 ^ amount) * 2.5',
                         cost_fprmula_goo = '(1.75 ^ amount) * 20',
                         value_formula = 'amount * 13';
@@ -1040,6 +1109,10 @@ addLayer('lo', {
                         cost_fprmula_goo += ` * ${effect}`;
                     }
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_iron += ` / ${format(D.pow(upgradeEffect('f', 11)['iron_ingot'], -1))}`;
+                    }
+
                     if (hasUpgrade('s', 81)) {
                         value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
@@ -1048,6 +1121,10 @@ addLayer('lo', {
                         `[${cost_formula_iron}] ${tmp.lo.items.iron_ore.name}`,
                         `[${cost_fprmula_goo}] ${tmp.lo.items.slime_goo.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula_iron}] ${tmp.lo.items.iron_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(amount)} iron battle axes\
                     multiply enemy damage by [${effect_formula_mult}]\
@@ -1066,6 +1143,11 @@ addLayer('lo', {
                 if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
                     cost[item] = amount.times(upgradeEffect('s', 63));
                 });
+
+                if (hasUpgrade('f', 11)) {
+                    cost['iron_ingot'] = cost['iron_ore'].times(upgradeEffect('f', 11)['iron_ingot']);
+                    delete cost['iron_ore'];
+                }
 
                 return cost;
             },
@@ -1218,6 +1300,11 @@ addLayer('lo', {
                         cost_formula_coal += ` * ${effect}`;
                     }
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_stone += ` / ${format(D.pow(upgradeEffect('f', 11)['stone_brick'], -1))}`;
+                        cost_formula_coal += ` / ${format(D.pow(upgradeEffect('f', 11)['coal'], -1))}`;
+                    }
+
                     if (hasUpgrade('s', 81)) {
                         value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
@@ -1226,6 +1313,10 @@ addLayer('lo', {
                         `[${cost_formula_stone}] ${tmp.lo.items.stone.name}`,
                         `[${cost_formula_coal}] ${tmp.lo.items.coal.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula_stone}] ${tmp.lo.items.stone_brick.name}`;
+                    }
 
                     return `Your ${formatWhole(amount)} coal braziers\
                     give [${effect_formula}] effective levels to ${layerColor('lo', tmp.lo.buyables[21].title)} and ${layerColor('lo', tmp.lo.buyables[22].title)}<br><br>\
@@ -1243,6 +1334,12 @@ addLayer('lo', {
                 if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
                     cost[item] = amount.times(upgradeEffect('s', 63));
                 });
+
+                if (hasUpgrade('f', 11)) {
+                    cost['stone_brick'] = cost['stone'].times(upgradeEffect('f', 11)['stone_brick']);
+                    delete cost['stone'];
+                    cost['coal'] = cost['coal'].times(upgradeEffect('f', 11)['coal']);
+                }
 
                 return cost;
             },
@@ -1306,6 +1403,12 @@ addLayer('lo', {
                         cost_formula_tin += ` * ${effect}`;
                     }
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_iron += ` / ${format(D.pow(upgradeEffect('f', 11)['iron_ingot'], -1))}`;
+                        cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
+                        cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
+                    }
+
                     if (hasUpgrade('s', 81)) {
                         value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
@@ -1315,6 +1418,12 @@ addLayer('lo', {
                         `[${cost_formula_copper}] ${tmp.lo.items.copper_ore.name}`,
                         `[${cost_formula_tin}] ${tmp.lo.items.tin_ore.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula_iron}] ${tmp.lo.items.iron_ingot.name}`;
+                        cost_list[0] = `[${cost_formula_copper}] ${tmp.lo.items.copper_ingot.name}`;
+                        cost_list[0] = `[${cost_formula_tin}] ${tmp.lo.items.tin_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(amount)} iron chests\
                     give [${effect_formula}] effective levels to ${layerColor('lo', tmp.lo.buyables[23].title)}<br><br>\
@@ -1333,6 +1442,15 @@ addLayer('lo', {
                 if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
                     cost[item] = amount.times(upgradeEffect('s', 63));
                 });
+
+                if (hasUpgrade('f', 11)) {
+                    cost['iron_ingot'] = cost['iron_ore'].times(upgradeEffect('f', 11)['iron_ingot']);
+                    delete cost['iron_ore'];
+                    cost['copper_ingot'] = cost['copper_ore'].times(upgradeEffect('f', 11)['copper_ingot']);
+                    delete cost['copper_ore'];
+                    cost['tin_ingot'] = cost['tin_ore'].times(upgradeEffect('f', 11)['tin_ingot']);
+                    delete cost['tin_ore'];
+                }
 
                 return cost;
             },
@@ -1392,6 +1510,10 @@ addLayer('lo', {
                         cost_formula_gold += ` * ${effect}`;
                     }
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_gold += ` / ${format(D.pow(upgradeEffect('f', 11)['gold_ingot'], -1))}`;
+                    }
+
                     if (hasUpgrade('s', 81)) {
                         value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
@@ -1399,6 +1521,10 @@ addLayer('lo', {
                     const cost_list = [
                         `[${cost_formula_gold}] ${tmp.lo.items.gold_ore.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula_gold}] ${tmp.lo.items.gold_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(amount)} gold piles\
                     represent [${effect_formula}] gold for ${layerColor('m', tmp.m.upgrades[53].title)}<br><br>\
@@ -1415,6 +1541,11 @@ addLayer('lo', {
                 if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
                     cost[item] = amount.times(upgradeEffect('s', 63));
                 });
+
+                if (hasUpgrade('f', 11)) {
+                    cost['gold_ingot'] = cost['gold_ore'].times(upgradeEffect('f', 11)['gold_ingot']);
+                    delete cost['gold_ore'];
+                }
 
                 return cost;
             },
@@ -1635,7 +1766,7 @@ addLayer('lo', {
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} plank rulers\
-                    increase plank gains by ${D.times(buyableEffect(this.layer, this.id).plank, 100)}%<br><br>\
+                    increase plank gains by ${format(D.times(buyableEffect(this.layer, this.id).plank, 100))}%<br><br>\
                     ${value}\
                     Cost: ${cost}`;
                 } else {
@@ -1714,7 +1845,7 @@ addLayer('lo', {
         },
     },
     grid: {
-        rows: 6,
+        rows: 8,
         cols: 6,
         getStartData(_) { return {}; },
         getStyle(_, id) {
@@ -1795,7 +1926,7 @@ addLayer('lo', {
             }
 
             if (!lines.length) lines.push('No sources');
-            return lines.join('<br>');
+            return lines.join('<hr>');
         },
     },
     /** @type {typeof layers.lo.items} */
@@ -1946,6 +2077,11 @@ addLayer('lo', {
                     case 'enemy': return layers.xp.enemy.name(sub);
                     case 'mining': return `${layers.m.ore.mode(sub)} ${tmp.m.name.toLowerCase()}`.trim();
                     case 'tree': return `Chopping ${layers.t.trees.name(sub)}`;
+                    case 'forge':
+                        let text = 'Forge: ';
+                        if (sub == 'fuel') text += 'fueling';
+                        if (sub == 'smelt') text += 'smelting';
+                        return text;
                 }
             },
             can_drop(type) {
@@ -1956,6 +2092,7 @@ addLayer('lo', {
                 if (from == 'enemy') return hasUpgrade('lo', 11) || hasUpgrade('s', 72);
                 if (from == 'mining') return tmp.m.layerShown;
                 if (from == 'tree') return tmp.t.layerShown;
+                if (from == 'forge') return tmp.f.layerShown;
                 return false;
             },
             amount() { return Object.values(player.lo.items).reduce((sum, { amount }) => D.add(sum, amount), D.dZero); },
@@ -1998,6 +2135,8 @@ addLayer('lo', {
                 let mult = D.dOne;
 
                 if (hasUpgrade('lo', 11)) mult = mult.times(upgradeEffect('lo', 11));
+
+                if (hasUpgrade('f', 32)) mult = mult.times(upgradeEffect('f', 32));
 
                 return mult;
             },
@@ -2235,6 +2374,20 @@ addLayer('lo', {
 
                 return { 'mining:deep': deep, };
             },
+            per_second() {
+                const per_second = {};
+
+                if (tmp.f.layerShown) {
+                    const forge_consume = layers.f.fuels['*'].consuming(this.id);
+
+                    if (forge_consume.gt(0)) {
+                        per_second['forge:fuel'] = forge_consume.neg();
+                    }
+                }
+
+                return per_second;
+            },
+            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
             name: 'coal',
             style: {
                 'background-image': `url('./resources/images/rock.svg')`,
@@ -2288,20 +2441,118 @@ addLayer('lo', {
             },
             unlocked() { return player.m.show_deep; },
         },
+        // Forge
+        stone_brick: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 601,
+            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
+            name: 'stone brick',
+            style: {
+                'background-image': `url('./resources/images/clay-brick.svg')`,
+                'background-color': '#BBBBBB',
+            },
+            unlocked() { return tmp.f.layerShown; },
+        },
+        copper_ingot: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 602,
+            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
+            name: 'copper ingot',
+            style: {
+                'background-image': `url('./resources/images/metal-bar.svg')`,
+                'background-color': '#BB7733',
+            },
+            unlocked() { return tmp.f.layerShown; },
+        },
+        tin_ingot: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 603,
+            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
+            name: 'tin ingot',
+            style: {
+                'background-image': `url('./resources/images/metal-bar.svg')`,
+                'background-color': '#CCBB88',
+            },
+            unlocked() { return tmp.f.layerShown; },
+        },
+        iron_ingot: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 604,
+            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
+            name: 'iron ingot',
+            style: {
+                'background-image': `url('./resources/images/metal-bar.svg')`,
+                'background-color': '#888888',
+            },
+            unlocked() { return tmp.f.layerShown; },
+        },
+        gold_ingot: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 605,
+            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
+            name: 'gold ingot',
+            style: {
+                'background-image': `url('./resources/images/metal-bar.svg')`,
+                'background-color': 'gold',
+            },
+            unlocked() { return tmp.f.layerShown; },
+        },
+        // Forge alloys
+        bronze_ingot: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 701,
+            other_sources() { if (player.f.alloys) return ['forge:smelt']; },
+            name: 'bronze ingot',
+            style: {
+                'background-image': `url('./resources/images/metal-bar.svg')`,
+                'background-color': '#BB8844',
+            },
+            unlocked() { return player.f.alloys; },
+        },
+        steel_ingot: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 702,
+            other_sources() { if (player.f.alloys) return ['forge:smelt']; },
+            name: 'steel ingot',
+            style: {
+                'background-image': `url('./resources/images/metal-bar.svg')`,
+                'background-color': '#777777',
+            },
+            unlocked() { return player.f.alloys; },
+        },
         // Trees
         soaked_log: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 601,
+            grid: 801,
             chances() {
                 const chances = { 'tree:driftwood': D(1), };
 
                 return chances;
             },
             per_second() {
-                const per_second = layers.t.convertion.per_second(this.id);
+                const per_second = {};
 
-                if (per_second.neq(0)) return { ['tree:convertion']: per_second, };
+                const tree_consume = layers.t.convertion.per_second(this.id);
+
+                if (tree_consume.neq(0)) per_second['tree:convertion'] = tree_consume;
+
+                if (tmp.f.layerShown) {
+                    const forge_consume = layers.f.fuels['*'].consuming(this.id);
+
+                    if (forge_consume.gt(0)) {
+                        per_second['forge:fuel'] = forge_consume.neg();
+                    }
+                }
+
+                return per_second;
             },
             name: 'soaked log',
             style: {
@@ -2313,7 +2564,7 @@ addLayer('lo', {
         normal_log: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 602,
+            grid: 802,
             chances() {
                 const chances = {
                     'tree:oak': D(1),
@@ -2323,10 +2574,23 @@ addLayer('lo', {
                 return chances;
             },
             per_second() {
-                const per_second = layers.t.convertion.per_second(this.id);
+                const per_second = {};
 
-                if (per_second.neq(0)) return { ['tree:convertion']: per_second, };
+                const tree_consume = layers.t.convertion.per_second(this.id);
+
+                if (tree_consume.neq(0)) per_second['tree:convertion'] = tree_consume;
+
+                if (tmp.f.layerShown) {
+                    const forge_consume = layers.f.fuels['*'].consuming(this.id);
+
+                    if (forge_consume.gt(0)) {
+                        per_second['forge:fuel'] = forge_consume.neg();
+                    }
+                }
+
+                return per_second;
             },
+            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
             name: 'normal log',
             style: {
                 'background-image': `url('./resources/images/log.svg')`,
@@ -2337,11 +2601,23 @@ addLayer('lo', {
         plank: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 603,
+            grid: 803,
             per_second() {
-                const per_second = layers.t.convertion.per_second(this.id);
+                const per_second = {};
 
-                if (per_second.neq(0)) return { ['tree:convertion']: per_second, };
+                const tree_consume = layers.t.convertion.per_second(this.id);
+
+                if (tree_consume.neq(0)) per_second['tree:convertion'] = tree_consume;
+
+                if (tmp.f.layerShown) {
+                    const forge_consume = layers.f.fuels['*'].consuming(this.id);
+
+                    if (forge_consume.gt(0)) {
+                        per_second['forge:fuel'] = forge_consume.neg();
+                    }
+                }
+
+                return per_second;
             },
             name: 'plank',
             style: {

@@ -173,7 +173,7 @@ addLayer('ach', {
         35: {
             name: 'Advanced reading techniques',
             tooltip() { return `Get 10 levels of ${tmp.l.skills.reading.unlocked ? 'reading' : '???'}`; },
-            done() { return player.l.skills.reading.level.gte(1); },
+            done() { return player.l.skills.reading.level.gte(10); },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.l.color); },
             style() {
                 let s = {};

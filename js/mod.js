@@ -1,4 +1,4 @@
-//todo layers/side/casino, layers/1/forge.js
+//todo layers/side/casino
 /**
  * Where most of the basic configuration for the mod is.
  */
@@ -29,7 +29,7 @@ let modInfo = {
 		'layers/hotkeys.js',
 		'layers/side/achievements.js', 'layers/side/clock.js',
 		'layers/0/experience.js', 'layers/0/mining.js', 'layers/0/tree.js',
-		'layers/1/level.js', 'layers/1/loot.js',
+		'layers/1/level.js', 'layers/1/loot.js', 'layers/1/forge.js',
 		'layers/2/boss.js', 'layers/2/shop.js',
 	],
 	/**
@@ -75,7 +75,7 @@ let VERSION = {
  */
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.4</h3><br>
-		- Added 2 new layers.<br>
+		- Added 3 new layers.<br>
 		- Added the 2nd boss, 2nd miniboss, and 2nd relic.<br>
 		- Rewrote the enemy color algorithm.<br>
 		- Update endgame: Beat the 2nd boss.<br>
@@ -103,7 +103,7 @@ let winText = `Congratulations! You have reached the end and beaten this game, b
  * var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything"]
  * ```
  */
-var doNotCallTheseFunctionsEveryTick = ['show_skill', 'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop', 'gain_drops'];
+var doNotCallTheseFunctionsEveryTick = ['show_skill', 'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop', 'gain_drops', 'show_fuel', 'show_smelt'];
 
 /**
  * A function to determine the amount of points the player starts with after a reset.

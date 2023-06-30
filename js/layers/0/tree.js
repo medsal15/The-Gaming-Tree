@@ -466,7 +466,7 @@ addLayer('t', {
 
             damage = damage.add(buyableEffect('lo', 42).tree_damage);
 
-            if (hasUpgrade('m', 51)) damage = damage.times(upgradeEffect('m', 51));
+            if (hasUpgrade('m', 61)) damage = damage.times(upgradeEffect('m', 61));
 
             if (hasUpgrade('t', 31)) damage = damage.times(upgradeEffect('t', 31));
 
@@ -503,6 +503,8 @@ addLayer('t', {
             }
 
             if (hasUpgrade('t', 11)) size = size.times(upgradeEffect('t', 11).size);
+
+            if (hasUpgrade('f', 23)) size = size.times(upgradeEffect('f', 23));
 
             return size;
         },

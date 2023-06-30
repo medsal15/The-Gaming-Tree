@@ -175,7 +175,7 @@ function clickGrid(layer, id) {
  * @returns {boolean}
  */
 function inChallenge(layer, id) {
-	let challenge = player[layer].activeChallenge
+	let challenge = player?.[layer]?.activeChallenge
 	if (!challenge) return false
 	id = toNumber(id)
 	if (challenge == id) return true

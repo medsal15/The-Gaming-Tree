@@ -357,7 +357,7 @@ addLayer('xp', {
                     return `Formula: ${formula}`;
                 }
             },
-            effect() { return player.xp.points.add(5).log(5); },
+            effect() { return player.xp.points.max(0).add(5).log(5); },
             effectDisplay() { return `*${format(this.effect())}`; },
             unlocked() { return tmp.xp.total.kills.gte(100) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(400),
@@ -369,7 +369,7 @@ addLayer('xp', {
             effect() {
                 let effect = D.dTwo;
 
-                effect = effect.times(tmp.l.skills.reading.effect);
+                effect = effect.add(tmp.l.skills.reading.effect);
 
                 return effect;
             },
@@ -458,6 +458,8 @@ addLayer('xp', {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
 
         for (const type of tmp.xp.enemy.types) {
+            if (player.xp.health[type].lte(0)) continue;
+
             const dps = layers.xp.enemy.dps(type),
                 regen = layers.xp.enemy.regen(type);
             if (dps.gt(0)) {
@@ -472,7 +474,7 @@ addLayer('xp', {
     automate() {
         for (const type of tmp.xp.enemy.all_types) {
             if (D.gt(player.xp.health[type], layers.xp.enemy.health(type))) player.xp.health[type] = layers.xp.enemy.health(type);
-            while (D.lte(player.xp.health[type], 0)) {
+            if (D.lte(player.xp.health[type], 0)) {
                 if (player.xp.clicked) {
                     //workaround for starting at undefined
                     const xp_gain = tmp.xp.enemy.experience,
@@ -692,7 +694,7 @@ addLayer('xp', {
             if (hasUpgrade('s', 11)) xp_gain = xp_gain.times(upgradeEffect('s', 11));
 
             if (!tmp.l.canBuyMax) {
-                xp_gain = xp_gain.min(getNextAt('l').minus(player.xp.points));
+                xp_gain = xp_gain.min(getNextAt('l').minus(player.xp.points)).max(0);
             }
 
             return xp_gain;
@@ -731,6 +733,8 @@ addLayer('xp', {
 
             damage = damage.times(buyableEffect('lo', 31));
             damage = damage.times(buyableEffect('lo', 42).xp_damage_mult);
+
+            if (hasUpgrade('f', 21)) damage = damage.times(upgradeEffect('f', 21));
 
             if (hasUpgrade('s', 71)) damage = damage.times(upgradeEffect('s', 71));
 

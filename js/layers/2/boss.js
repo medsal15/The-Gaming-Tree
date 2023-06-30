@@ -200,10 +200,12 @@ addLayer('b', {
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+
         if (inChallenge('b', 32)) {
             /** @param {DecimalSource} amount */
             const get_loss = amount => {
-                const loss = D.div(amount, 100).floor().times(diff);
+                if (D.lte(amount, 0)) return D.dZero;
+                const loss = D.div(amount, 100).floor().times(diff).min(amount);
                 if (isNaN(loss.mag) || isNaN(loss.sign) || isNaN(loss.layer)) return D.dZero;
                 return loss;
             };
@@ -221,6 +223,10 @@ addLayer('b', {
             }
             if (!hasUpgrade('s', 13)) {
                 player.l.points = player.l.points.minus(get_loss(player.l.points));
+            }
+            //todo upgrade for forge
+            if (true || !hasUpgrade('s', 'unimplemented')) {
+                player.f.points = player.f.points.minus(get_loss(player.f.points));
             }
             // Items
             Object.entries(player.lo.items).forEach(([item, { amount }]) => {

@@ -1,6 +1,7 @@
 'use strict';
 
-//todo forge loans/investments
+//todo forge loan/investment
+//todo forge items loans/investments
 addLayer('s', {
     name: 'Shop',
     symbol: 'S',
