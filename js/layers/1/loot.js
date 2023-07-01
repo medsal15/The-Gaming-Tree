@@ -45,6 +45,7 @@ addLayer('lo', {
                     ];
                 },
                 ['upgrades', [1]],
+                () => { if (tmp.lo.items['*'].craft_consumption.neq(1)) return ['display-text', `Crafting consumes ${format(tmp.lo.items['*'].craft_consumption.times(100))}% of required resources`]; },
                 ['buyables', [1, 2, 3, 4, 5, 6, 7]],
             ],
         },

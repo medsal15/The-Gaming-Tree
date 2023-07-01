@@ -180,7 +180,7 @@ addLayer('b', {
         52: {
             name: 'Misfortune',
             challengeDescription: 'Item drops are changed (only affects unlocked items)',
-            goalDescription: '???',
+            goalDescription: 'Fix the items drops',
             canComplete: false,
             rewardDescription: 'Unlock The Casino, a special layer to change your luck.',
             unlocked() { return hasChallenge('b', 32); },
@@ -189,6 +189,9 @@ addLayer('b', {
                     style = { 'background-color': '#7777EE', };
                 if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
+            },
+            onEnter() {
+                //todo layers.cas.items.shuffle();
             },
         },
     },

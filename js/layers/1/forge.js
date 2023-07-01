@@ -80,7 +80,7 @@ addLayer('f', {
                 ['display-text', () => {
                     let text = `You have ${layerColor('f', format(player.f.points), 'font-size:1.5em;')}`;
 
-                    if (tmp.f.heat.gain.neq(0)) {
+                    if (tmp.f.heat.gain.abs().gt(1e-4)) {
                         text += ` (${tmp.f.heat.gain.gt(0) ? '+' : ''}${layerColor('f', format(tmp.f.heat.gain))} /s)`;
                     }
 
@@ -89,6 +89,7 @@ addLayer('f', {
                     return text;
                 }],
                 ['display-text', '<span style="color:#AA5555;">You lose 1% of your heat every second</span>'],
+                () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '(technically 2% because of your challenges)']; },
                 'blank',
                 ['upgrades', [1]],
             ],
@@ -108,7 +109,7 @@ addLayer('f', {
                 ['display-text', () => {
                     let text = `You have ${layerColor('f', format(player.f.points), 'font-size:1.5em;')}`;
 
-                    if (tmp.f.heat.gain.neq(0)) {
+                    if (tmp.f.heat.gain.abs().gt(1e-4)) {
                         text += ` (${tmp.f.heat.gain.gt(0) ? '+' : ''}${layerColor('f', format(tmp.f.heat.gain))} /s)`;
                     }
 
@@ -117,6 +118,7 @@ addLayer('f', {
                     return text;
                 }],
                 ['display-text', '<span style="color:#AA5555;">You lose 1% of your heat every second</span>'],
+                () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '(technically 2% because of your challenges)']; },
                 'blank',
                 ['display-text', `<span style="color:#AA5555;">You consume 1% of your fuels to produce heat every second</span>`],
                 ['display-text', () => `Your forge's prevents consuming more than ${format(tmp.f.fuels['*'].size)} of each fuel per second`],
@@ -144,7 +146,7 @@ addLayer('f', {
                 ['display-text', () => {
                     let text = `You have ${layerColor('f', format(player.f.points), 'font-size:1.5em;')}`;
 
-                    if (tmp.f.heat.gain.neq(0)) {
+                    if (tmp.f.heat.gain.abs().gt(1e-4)) {
                         text += ` (${tmp.f.heat.gain.gt(0) ? '+' : ''}${layerColor('f', format(tmp.f.heat.gain))} /s)`;
                     }
 
@@ -153,6 +155,7 @@ addLayer('f', {
                     return text;
                 }],
                 ['display-text', '<span style="color:#AA5555;">You lose 1% of your heat every second</span>'],
+                () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '(technically 2% because of your challenges)']; },
                 ['display-text', () => `Your heat divides time requirements by ${shiftDown ? `[${tmp.f.heat.speed_formula}]` : format(tmp.f.heat.speed)}`],
                 'blank',
                 ['display-text', () => `Your forge's prevents producing more than ${format(tmp.f.recipes['*'].size)} of each recipes per second`],

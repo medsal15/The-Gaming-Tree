@@ -81,10 +81,10 @@ addLayer('s', {
             onClick() {
                 if (!confirm(`Doing this will not refund your ${tmp.s.investloans.type}s and will force a Shop reset.\nAre you sure?`)) return;
 
-                player.s.upgrades = player.s.upgrades.filter(id => id >= 61);
+                player.s.upgrades = player.s.upgrades.filter(id => id >= 61 && id < 90);
                 doReset('s', true);
             },
-            canClick() { return player.s.upgrades.some(id => id < 61); },
+            canClick() { return tmp.s.investloans.amount.gt(0); },
         },
     },
     upgrades: {
@@ -915,7 +915,7 @@ addLayer('s', {
             cost: D(5),
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
             effect() {
-                let mult = D(.95).pow(player.s.upgrades.filter(id => id >= 61).length);
+                let mult = D(.95).pow(player.s.upgrades.filter(id => id > 60 && id < 90).length);
 
                 return mult;
             },
@@ -1028,7 +1028,7 @@ addLayer('s', {
     /** @type {typeof layers.s.investloans} */
     investloans: {
         amount(real = false) {
-            let amount = D(player.s.upgrades.filter(id => id < 60).length);
+            let amount = D(player.s.upgrades.filter(id => id < 60 || id >= 90).length);
 
             if (!real && hasUpgrade('s', 51)) amount = amount.add(upgradeEffect('s', 51));
 
