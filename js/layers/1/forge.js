@@ -54,7 +54,6 @@ addLayer('f', {
     row: 1,
     position: 2,
     resource: 'heat',
-    effect() { return D.dTwo.pow(D.log10(player.f.points.add(1)).div(50)); },
     layerShown() { return player[this.layer].unlocked && !tmp[this.layer].deactivated; },
     deactivated() { return inChallenge('b', 31); },
     hotkeys: [
@@ -79,16 +78,10 @@ addLayer('f', {
                     ];
                 },
                 ['display-text', () => {
-                    /** @type {Decimal} */
-                    let gain = Object.keys(layers.f.fuels)
-                        .filter(fuel => fuel != '*' && player.f.fuels[fuel])
-                        .map(fuel => tmp.f.fuels[fuel].producing)
-                        .reduce(D.add, D.dZero)
-                        .minus(player.f.points.div(100)),
-                        text = `You have ${layerColor('f', format(player.f.points), 'font-size:1.5em;')}`;
+                    let text = `You have ${layerColor('f', format(player.f.points), 'font-size:1.5em;')}`;
 
-                    if (gain.neq(0)) {
-                        text += ` (${gain.gt(0) ? '+' : ''}${layerColor('f', format(gain))} /s)`;
+                    if (tmp.f.heat.gain.neq(0)) {
+                        text += ` (${tmp.f.heat.gain.gt(0) ? '+' : ''}${layerColor('f', format(tmp.f.heat.gain))} /s)`;
                     }
 
                     text += ' heat.';
@@ -113,16 +106,10 @@ addLayer('f', {
                     ];
                 },
                 ['display-text', () => {
-                    /** @type {Decimal} */
-                    let gain = Object.keys(layers.f.fuels)
-                        .filter(fuel => fuel != '*' && player.f.fuels[fuel])
-                        .map(fuel => tmp.f.fuels[fuel].producing)
-                        .reduce(D.add, D.dZero)
-                        .minus(player.f.points.div(100)),
-                        text = `You have ${layerColor('f', format(player.f.points), 'font-size:1.5em;')}`;
+                    let text = `You have ${layerColor('f', format(player.f.points), 'font-size:1.5em;')}`;
 
-                    if (gain.neq(0)) {
-                        text += ` (${gain.gt(0) ? '+' : ''}${layerColor('f', format(gain))} /s)`;
+                    if (tmp.f.heat.gain.neq(0)) {
+                        text += ` (${tmp.f.heat.gain.gt(0) ? '+' : ''}${layerColor('f', format(tmp.f.heat.gain))} /s)`;
                     }
 
                     text += ' heat.';
@@ -155,16 +142,10 @@ addLayer('f', {
                     ];
                 },
                 ['display-text', () => {
-                    /** @type {Decimal} */
-                    let gain = Object.keys(layers.f.fuels)
-                        .filter(fuel => fuel != '*' && player.f.fuels[fuel])
-                        .map(fuel => tmp.f.fuels[fuel].producing)
-                        .reduce(D.add, D.dZero)
-                        .minus(player.f.points.div(100)),
-                        text = `You have ${layerColor('f', format(player.f.points), 'font-size:1.5em;')}`;
+                    let text = `You have ${layerColor('f', format(player.f.points), 'font-size:1.5em;')}`;
 
-                    if (gain.neq(0)) {
-                        text += ` (${gain.gt(0) ? '+' : ''}${layerColor('f', format(gain))} /s)`;
+                    if (tmp.f.heat.gain.neq(0)) {
+                        text += ` (${tmp.f.heat.gain.gt(0) ? '+' : ''}${layerColor('f', format(tmp.f.heat.gain))} /s)`;
                     }
 
                     text += ' heat.';
@@ -172,7 +153,7 @@ addLayer('f', {
                     return text;
                 }],
                 ['display-text', '<span style="color:#AA5555;">You lose 1% of your heat every second</span>'],
-                ['display-text', () => `Your heat divides time requirements by ${shiftDown ? '[2 ^ (log10(heat + 1) / 50)]' : format(tmp.f.effect)}`],
+                ['display-text', () => `Your heat divides time requirements by ${shiftDown ? `[${tmp.f.heat.speed_formula}]` : format(tmp.f.heat.speed)}`],
                 'blank',
                 ['display-text', () => `Your forge's prevents producing more than ${format(tmp.f.recipes['*'].size)} of each recipes per second`],
                 [
@@ -676,6 +657,15 @@ addLayer('f', {
                 if (precipe.amount_target.gt(0)) return precipe.amount_target;
                 return D.dOne;
             },
+            speed() {
+                let speed = D.dOne;
+
+                speed = speed.times(tmp.f.heat.speed);
+
+                speed = speed.div(buyableEffect('lo', 73));
+
+                return speed;
+            },
         },
         // Simple convertions
         normal_log: {
@@ -696,7 +686,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -711,7 +707,7 @@ addLayer('f', {
 
                 let time = D.add(20, amount);
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
@@ -738,7 +734,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -753,7 +755,7 @@ addLayer('f', {
 
                 let time = D.add(60, amount.times(5));
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
@@ -781,7 +783,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -796,7 +804,7 @@ addLayer('f', {
 
                 let time = D.add(25, amount.times(5));
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
@@ -823,7 +831,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -838,7 +852,7 @@ addLayer('f', {
 
                 let time = D.add(50, amount.times(25));
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
@@ -865,7 +879,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -880,7 +900,7 @@ addLayer('f', {
 
                 let time = D.add(30, amount.times(15));
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
@@ -907,7 +927,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -922,7 +948,7 @@ addLayer('f', {
 
                 let time = D.add(75, amount.times(25));
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
@@ -939,7 +965,7 @@ addLayer('f', {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
                 const items = {
-                    'gold_ore': amount.pow(1.25).times(200),
+                    'gold_ore': amount.pow(1.25).times(50),
                 };
 
                 if (hasUpgrade('f', 33)) {
@@ -949,7 +975,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -964,12 +996,12 @@ addLayer('f', {
 
                 let time = D.add(50, amount.times(25));
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
             formulas: {
-                'gold_ore': '(amount ^ 1.25) * 200',
+                'gold_ore': '(amount ^ 1.25) * 50',
                 'time': 'amount * 25 + 50',
             },
         },
@@ -993,7 +1025,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -1008,7 +1046,7 @@ addLayer('f', {
 
                 let time = D.pow(1.125, amount).times(25).add(120);
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
@@ -1038,7 +1076,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -1053,7 +1097,7 @@ addLayer('f', {
 
                 let time = D.times(25, amount).add(180);
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
@@ -1083,7 +1127,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -1098,7 +1148,7 @@ addLayer('f', {
 
                 let time = D.pow(1.125, amount).times(50).add(240);
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
@@ -1128,7 +1178,13 @@ addLayer('f', {
                         });
                 }
 
-                if (inChallenge('b', 12)) {
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
                             items[item] = amount.times(player.lo.items[item].amount.add(10).log10());
@@ -1143,7 +1199,7 @@ addLayer('f', {
 
                 let time = D.times(amount, 50).add(300);
 
-                time = time.div(tmp.f.effect);
+                time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
@@ -1153,6 +1209,24 @@ addLayer('f', {
                 'time': 'amount * 50 + 300',
             },
             unlocked() { return hasUpgrade('f', 12); },
+        },
+    },
+    /** @type {typeof layers.f.heat} */
+    heat: {
+        speed() {
+            return D.dTwo.pow(D.log10(player.f.points.add(1)).div(50));
+        },
+        speed_formula: '2 ^ (log10(heat + 1) / 50)',
+        gain() {
+            /** @type {Decimal} */
+            let gain = Object.keys(layers.f.fuels)
+                .filter(fuel => fuel != '*' && player.f.fuels[fuel])
+                .map(fuel => tmp.f.fuels[fuel].producing)
+                .reduce(D.add, D.dZero);
+
+            let loss = player.f.points.div(100);
+
+            return gain.minus(loss);
         },
     },
     doReset(layer) {

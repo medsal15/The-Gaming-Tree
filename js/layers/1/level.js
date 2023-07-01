@@ -347,6 +347,8 @@ addLayer('l', {
     gainMult() {
         let div = D.dOne;
 
+        div = div.div(buyableEffect('lo', 71));
+
         if (inChallenge('b', 12) && !hasUpgrade('s', 13)) div = div.div(player.l.points.add(10).log10());
         if (hasUpgrade('s', 13)) div = div.div(upgradeEffect('s', 13));
 

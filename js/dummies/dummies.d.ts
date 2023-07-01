@@ -2047,6 +2047,7 @@ declare let layers: {
                  */
                 producing(item: string): Decimal
                 default_amount(recipe: string, amount?: Decimal): Decimal
+                speed(): Decimal
             }
             [recipe: string]: {
                 readonly id: string
@@ -2083,6 +2084,11 @@ declare let layers: {
                  */
                 passive?: Computable<boolean>
             }
+        }
+        heat: {
+            speed(): Decimal
+            speed_formula: Computable<string>
+            gain(): Decimal
         }
     }
     // Row 2

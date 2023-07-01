@@ -1,6 +1,5 @@
 'use strict';
 
-//todo forge achievements
 addLayer('ach', {
     name: 'Achievements',
     symbol: '⭐',
@@ -605,6 +604,66 @@ addLayer('ach', {
             },
             unlocked() { return tmp.t.layerShown; },
         },
+        171: {
+            name: 'Fire in the hole',
+            tooltip: 'Burn something',
+            done() { return player.f.points.gt(0); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.f.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.f.color;
+                return s;
+            },
+            unlocked() { return tmp.f.layerShown; },
+        },
+        172: {
+            name: 'Better minerals',
+            tooltip: 'Smelt an ingot',
+            done() { return ['copper_ingot', 'iron_ingot', 'tin_ingot', 'gold_ingot'].some(item => player.lo.items[item].amount.gt(0)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.f.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.f.color;
+                return s;
+            },
+            unlocked() { return tmp.f.layerShown; },
+        },
+        173: {
+            name: 'Horizon',
+            tooltip: 'Make an alloy',
+            done() { return ['bronze_ingot', 'steel_ingot'].some(item => player.lo.items[item].amount.gt(0)); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.f.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.f.color;
+                return s;
+            },
+            unlocked() { return tmp.f.layerShown; },
+        },
+        174: {
+            name: 'Improved tooling',
+            tooltip: 'Make alloy tools',
+            done() { return player.f.upgrades.some(id => id > 20); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.f.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.f.color;
+                return s;
+            },
+            unlocked() { return tmp.f.layerShown; },
+        },
+        175: {
+            name: 'In the wind',
+            tooltip: 'Fuse alloys into something colder',
+            done() { return getBuyableAmount('lo', 73).gt(0); },
+            onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.f.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.f.color;
+                return s;
+            },
+            unlocked() { return tmp.f.layerShown; },
+        },
         //#endregion Normal achievements
         //#region Bonus achievements
         81: {
@@ -847,7 +906,7 @@ addLayer('ach', {
         switch (type) {
             case 'normal':
             default:
-                rows = [1, 3, 5, 12, 7, 11, 15, 13, 16];
+                rows = [1, 3, 5, 12, 7, 11, 15, 13, 16, 17];
                 break;
             case 'bonus':
                 rows = [8, 9];

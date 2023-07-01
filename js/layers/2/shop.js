@@ -1,7 +1,5 @@
 'use strict';
 
-//todo forge loan/investment
-//todo forge items loans/investments
 addLayer('s', {
     name: 'Shop',
     symbol: 'S',
@@ -72,7 +70,7 @@ addLayer('s', {
                 ['display-text', () => `<span style="color:#AA5555;">Buying a${tmp.s.investloans.is_loans ? ' loan' : 'n investment'} increases the price of all the others</span>`],
                 'blank',
                 ['clickable', 11],
-                ['upgrades', [1, 2, 3, 4, 9, 10, 11, 5]],
+                ['upgrades', [1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 5]],
             ],
             name() { return `${capitalize(tmp.s.investloans.type)}s`; },
         },
@@ -655,6 +653,222 @@ addLayer('s', {
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.t.layerShown; },
         },
+        121: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Heat ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Heat';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate heat challenge penality';
+                if (!shiftDown) return 'Boost heat gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.f.points, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.f.points, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
+        },
+        122: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Bronze Ingot ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Bronze Ingots';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate bronze ingot challenge penality';
+                if (!shiftDown) return 'Boost bronze ingot gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.bronze_ingot.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.bronze_ingot.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+        },
+        123: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Steel Ingot ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Steel Ingots';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate steel ingot challenge penality';
+                if (!shiftDown) return 'Boost steel ingot gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.steel_ingot.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.steel_ingot.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+        },
+        131: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Stone Brick ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Stone Bricks';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate stone brick challenge penality';
+                if (!shiftDown) return 'Boost stone brick gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.stone_brick.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.stone_brick.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+        },
+        132: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Copper Ingot ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Copper Ingots';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate copper ingot challenge penality';
+                if (!shiftDown) return 'Boost copper ingot gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.copper_ingot.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.copper_ingot.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+        },
+        133: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Tin Ingot ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Tin Ingots';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate tin ingot challenge penality';
+                if (!shiftDown) return 'Boost tin ingot gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.tin_ingot.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.tin_ingot.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+        },
+        141: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Iron Ingot ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Iron Ingots';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate iron ingot challenge penality';
+                if (!shiftDown) return 'Boost iron ingot gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.iron_ingot.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.iron_ingot.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+        },
+        142: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Gold Ingot ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Gold Ingots';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate gold ingot challenge penality';
+                if (!shiftDown) return 'Boost gold ingot gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.gold_ingot.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.gold_ingot.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+        },
         //#endregion Loans/Investments
         //#region Normal upgrades
         61: {
@@ -833,6 +1047,9 @@ addLayer('s', {
             'rotten_flesh': 91, 'brain': 92,
             'coal': 101, 'iron_ore': 102, 'gold_ore': 103,
             'soaked_log': 111, 'normal_log': 112, 'plank': 113,
+            'bronze_ingot': 122, 'steel_ingot': 123,
+            'stone_brick': 131, 'copper_ingot': 132, 'tin_ingot': 133,
+            'iron_ingot': 141, 'gold_ingot': 142,
         },
         is_loan(id) {
             if (!id) return false;

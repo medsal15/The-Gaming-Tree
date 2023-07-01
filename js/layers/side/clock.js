@@ -1,6 +1,5 @@
 'use strict';
 
-//todo forge buyables
 addLayer('clo', {
     name: 'Clock',
     symbol: '⏲',
@@ -36,7 +35,7 @@ addLayer('clo', {
             content: [
                 ['display-text', () => `Base time speed: ${format(tmp.clo.time_speed)} seconds/s`],
                 'blank',
-                ['buyables', [1, 2, 3, 4, 5]],
+                ['buyables', [1, 2, 3, 4, 5, 6]],
             ],
             unlocked() { return hasChallenge('b', 51); },
         },
@@ -133,7 +132,7 @@ addLayer('clo', {
                 return 'Applies time speed to forge layer';
             },
             effectDisplay() { return `*${format(layers.clo.time_speed('f', true))}`; },
-            price: [['stone_brick', D(64)], ['copper_ingot', D(16)], ['tin_ingot', D.dTwo]],
+            price: [['bronze_ingot', D(32)], ['steel_ingot', D(8)]],
             costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
             pay() { this.price.forEach(([item, cost]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(cost)); },
@@ -809,10 +808,131 @@ addLayer('clo', {
             },
             unlocked() { return hasChallenge('b', 51) && tmp.t.layerShown; },
         },
+        // forge
+        61: {
+            title: 'Bronze Gear',
+            display() {
+                const anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
+                    heat_req = `<span ${D.gt(player.f.points, this.heat) ? '' : 'style="color:#CC3333;'}">Requires ${format(this.heat)} heat</span><br>`;
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} bronze gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    ${heat_req}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 9 + 1',
+                        cost_formula = '(3 ^ amount) * 30';
+
+                    const cost_list = [
+                        `[${cost_formula}] ${tmp.lo.items.bronze_ingot.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} bronze gears\
+                    multiply time speed by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    ${heat_req}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            heat: D(1000),
+            cost(x) {
+                const cost = {
+                    bronze_ingot: D(3).pow(x).times(30),
+                };
+
+                return cost;
+            },
+            effect(x) {
+                return D(1 / 9).times(x).add(1);
+            },
+            canAfford() {
+                return tmp.lo.items['*'].has_anvil && D.gt(player.f.points, this.heat) && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.lo.items.bronze_ingot.style['background-color'];
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 51) && player.f.alloys; },
+        },
+        62: {
+            title: 'Steel Gear',
+            display() {
+                const anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
+                    heat_req = `<span ${D.gt(player.f.points, this.heat) ? '' : 'style="color:#CC3333;'}">Requires ${format(this.heat)} heat</span><br>`;
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} steel gears\
+                    multiply time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    ${heat_req}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 9 + 1',
+                        cost_formula = '(5 ^ amount) * 50';
+
+                    const cost_list = [
+                        `[${cost_formula}] ${tmp.lo.items.steel_ingot.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} steel gears\
+                    multiply time speed by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    ${heat_req}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            heat: D(2000),
+            cost(x) {
+                const cost = {
+                    steel_ingot: D(5).pow(x).times(50),
+                };
+
+                return cost;
+            },
+            effect(x) {
+                return D(1 / 9).times(x).add(1);
+            },
+            canAfford() {
+                return tmp.lo.items['*'].has_anvil && D.gt(player.f.points, this.heat) && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(amount));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.lo.items.steel_ingot.style['background-color'];
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 51) && player.f.alloys; },
+        },
     },
     tooltip() { return `Time speed: *${format(tmp.clo.time_speed)}`; },
     /** @type {typeof layers.clo.time_speed} */
     time_speed(layer, visual = false) {
+        if (!inChallenge('b', 51) || !hasChallenge('b', 51)) return D.dOne;
+
         let speed = D.dOne;
 
         if (inChallenge('b', 51)) {
@@ -826,7 +946,7 @@ addLayer('clo', {
         if (!visual && layer) {
             const links = {
                 'xp': 11, 'm': 12, 't': 13,
-                'l': 21, 'lo': 22,
+                'l': 21, 'lo': 22, 'f': 23,
                 'b': 31, 's': 32,
             };
             if (!(layer in links) || !hasUpgrade(this.layer, links[layer])) return speed;

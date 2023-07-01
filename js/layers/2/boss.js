@@ -224,8 +224,7 @@ addLayer('b', {
             if (!hasUpgrade('s', 13)) {
                 player.l.points = player.l.points.minus(get_loss(player.l.points));
             }
-            //todo upgrade for forge
-            if (true || !hasUpgrade('s', 'unimplemented')) {
+            if (!hasUpgrade('s', 121)) {
                 player.f.points = player.f.points.minus(get_loss(player.f.points));
             }
             // Items

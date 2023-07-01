@@ -1,6 +1,5 @@
 'use strict';
 
-//todo Forge buyables (7X) (req heat)
 addLayer('lo', {
     name: 'Loot',
     image: './resources/images/swap-bag.svg',
@@ -46,7 +45,7 @@ addLayer('lo', {
                     ];
                 },
                 ['upgrades', [1]],
-                ['buyables', [1, 2, 3, 4, 5, 6]],
+                ['buyables', [1, 2, 3, 4, 5, 6, 7]],
             ],
         },
         'Inventory': {
@@ -671,11 +670,6 @@ addLayer('lo', {
                     slime_goo: D(1.5).pow(x).times(20)
                 };
 
-                if (hasUpgrade('f', 11)) {
-                    cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
-                    cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
-                }
-
                 if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
                     cost[item] = amount.times(upgradeEffect('s', 63));
                 });
@@ -930,6 +924,11 @@ addLayer('lo', {
                         cost_formula_gear = `(${cost_formula_gear}) * ${effect}`;
                     }
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
+                        cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
+                    }
+
                     if (hasUpgrade('s', 81)) {
                         value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
@@ -939,6 +938,11 @@ addLayer('lo', {
                         `[${cost_formula_tin}] ${tmp.lo.items.tin_ore.name}`,
                         `[${cost_formula_gear}] ${tmp.lo.items.rusty_gear.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[0] = `[${cost_formula_copper}] ${tmp.lo.items.copper_ingot.name}`;
+                        cost_list[1] = `[${cost_formula_tin}] ${tmp.lo.items.tin_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(amount)} gear golems\
                     multiply skill speed by [${effect_formula}]<br><br>\
@@ -957,6 +961,13 @@ addLayer('lo', {
                 if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
                     cost[item] = amount.times(upgradeEffect('s', 63));
                 });
+
+                if (hasUpgrade('f', 11)) {
+                    cost['copper_ingot'] = cost['copper_ore'].times(upgradeEffect('f', 11)['copper_ingot']);
+                    delete cost['copper_ore'];
+                    cost['tin_ingot'] = cost['tin_ore'].times(upgradeEffect('f', 11)['tin_ingot']);
+                    delete cost['tin_ore'];
+                }
 
                 return cost;
             },
@@ -1783,6 +1794,11 @@ addLayer('lo', {
                         cost_formula_gold += ` * ${effect}`;
                     }
 
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_coal += ` / ${format(D.pow(upgradeEffect('f', 11)['coal'], -1))}`;
+                        cost_formula_gold += ` / ${format(D.pow(upgradeEffect('f', 11)['gold_ingot'], -1))}`;
+                    }
+
                     if (hasUpgrade('s', 81)) {
                         value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
@@ -1792,6 +1808,10 @@ addLayer('lo', {
                         `[${cost_formula_coal}] ${tmp.lo.items.coal.name}`,
                         `[${cost_formula_gold}] ${tmp.lo.items.gold_ore.name}`,
                     ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[2] = `[${cost_formula_gold}] ${tmp.lo.items.gold_ingot.name}`;
+                    }
 
                     return `Your ${formatWhole(amount)} plank rulers\
                     increase plank gains by [${effect_formula_plank}]%<br><br>\
@@ -1809,6 +1829,12 @@ addLayer('lo', {
                 if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
                     cost[item] = amount.times(upgradeEffect('s', 63));
                 });
+
+                if (hasUpgrade('f', 11)) {
+                    cost['coal'] = cost['coal'].times(upgradeEffect('f', 11)['coal']);
+                    cost['gold_ingot'] = cost['gold_ore'].times(upgradeEffect('f', 11)['gold_ingot']);
+                    delete cost['gold_ore'];
+                }
 
                 return cost;
             },
@@ -1837,6 +1863,269 @@ addLayer('lo', {
             unlocked() { return tmp.t.layerShown || getBuyableAmount(this.layer, this.id).gte(1); },
             value() {
                 let value = D(7);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        // forge
+        71: {
+            title: 'Bronze Counter',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id),
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
+                    heat_req = `<span ${D.gt(player.f.points, this.heat) ? '' : 'style="color:#CC3333;'}">Requires ${format(this.heat)} heat</span><br>`;
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} bronze counters\
+                    divide level cost by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    ${heat_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 20 + 1',
+                        cost_formula = '(1.5 ^ amount) * 10',
+                        value_formula = 'amount * 9';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula}] ${tmp.lo.items.bronze_ingot.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} bronze counters\
+                    divide level cost by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    ${heat_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            heat: D(1000),
+            cost(x) {
+                const cost = {
+                    bronze_ingot: D(1.5).pow(x).times(10),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+
+                return D.div(x, 20).add(1);
+            },
+            canAfford() {
+                return tmp.lo.items['*'].has_anvil && D.gt(player.f.points, this.heat) && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.lo.items.bronze_ingot.style['background-color'];
+
+                return style;
+            },
+            unlocked() { return tmp.lo.items.bronze_ingot.unlocked; },
+            value() {
+                let value = D(9);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        72: {
+            title: 'Steel Minecart',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id),
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
+                    heat_req = `<span ${D.gt(player.f.points, this.heat) ? '' : 'style="color:#CC3333;'}">Requires ${format(this.heat)} heat</span><br>`;
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} steel minecarts\
+                    multiply deep mining resource weights by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    ${heat_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 20 + 1',
+                        cost_formula = '(2 ^ amount) * 10',
+                        value_formula = 'amount * 9';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula}] ${tmp.lo.items.bronze_ingot.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} steel minecarts\
+                    multiply deep mining resource weights by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    ${heat_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            heat: D(2000),
+            cost(x) {
+                const cost = {
+                    steel_ingot: D(2).pow(x).times(10),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+
+                return D.div(x, 20).add(1);
+            },
+            canAfford() {
+                return tmp.lo.items['*'].has_anvil && D.gt(player.f.points, this.heat) && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.lo.items.steel_ingot.style['background-color'];
+
+                return style;
+            },
+            unlocked() { return tmp.lo.items.steel_ingot.unlocked; },
+            value() {
+                let value = D(9);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        73: {
+            title: 'Breeze Alloy',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id),
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>',
+                    heat_req = `<span ${D.gt(player.f.points, this.heat) ? '' : 'style="color:#CC3333;'}">Requires ${format(this.heat)} heat</span><br>`;
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} breeze alloys\
+                    divide smelting time by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${anvil_req}\
+                    ${heat_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 20 + 1',
+                        cost_formula_bronze = '(1.75 ^ amount) * 10',
+                        cost_formula_steel = '(2.25 ^ amount) * 10',
+                        value_formula = 'amount * 15';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_bronze += ` * ${effect}`;
+                        cost_formula_steel += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_bronze}] ${tmp.lo.items.bronze_ingot.name}`,
+                        `[${cost_formula_steel}] ${tmp.lo.items.steel_ingot.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} breeze alloys\
+                    divide smelting time by [${effect_formula}]<br><br>\
+                    ${anvil_req}\
+                    ${heat_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            heat: D(1500),
+            cost(x) {
+                const cost = {
+                    bronze_ingot: D(1.75).pow(x).times(10),
+                    steel_ingot: D(2.25).pow(x).times(10),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+
+                return D.div(x, 20).add(1);
+            },
+            canAfford() {
+                return tmp.lo.items['*'].has_anvil && D.gt(player.f.points, this.heat) && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => player.lo.items[item].amount.gte(amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background'] = `linear-gradient(to right, ${tmp.lo.items.bronze_ingot.style['background-color']}, ${tmp.lo.items.steel_ingot.style['background-color']}) no-repeat`;
+
+                return style;
+            },
+            unlocked() { return player.f.alloys; },
+            value() {
+                let value = D(15);
 
                 if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
 
@@ -2372,6 +2661,8 @@ addLayer('lo', {
 
                 if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
 
+                deep = deep.times(buyableEffect('lo', 72));
+
                 return { 'mining:deep': deep, };
             },
             per_second() {
@@ -2412,6 +2703,8 @@ addLayer('lo', {
 
                 if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
 
+                deep = deep.times(buyableEffect('lo', 72));
+
                 return { 'mining:deep': deep, };
             },
             name: 'iron ore',
@@ -2431,6 +2724,8 @@ addLayer('lo', {
                 let deep = D(1);
 
                 if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
+
+                deep = deep.times(buyableEffect('lo', 72));
 
                 return { 'mining:deep': deep, };
             },
