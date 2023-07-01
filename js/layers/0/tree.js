@@ -312,12 +312,12 @@ addLayer('t', {
         },
         31: {
             title: 'Driftwood Destroyer',
-            description: 'Multiplies damage by driftwood health when chopping driftwood',
+            description: 'Increases damage by driftwood health when chopping driftwood<br>Or by 10% of it when not',
             effect() {
-                if (player.t.current != 'driftwood') return D.dOne;
+                if (player.t.current != 'driftwood') return layers.t.trees.health('driftwood').times(.1);
                 return layers.t.trees.health('driftwood');
             },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `+${format(this.effect())}`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10); },
             cost: D(100),
             item: 'soaked_log',
@@ -464,11 +464,11 @@ addLayer('t', {
 
             if (hasUpgrade('m', 62)) damage = damage.add(upgradeEffect('m', 62));
 
+            if (hasUpgrade('t', 31)) damage = damage.add(upgradeEffect('t', 31));
+
             damage = damage.add(buyableEffect('lo', 42).tree_damage);
 
             if (hasUpgrade('m', 61)) damage = damage.times(upgradeEffect('m', 61));
-
-            if (hasUpgrade('t', 31)) damage = damage.times(upgradeEffect('t', 31));
 
             return damage;
         },

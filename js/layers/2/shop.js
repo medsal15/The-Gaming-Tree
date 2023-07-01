@@ -63,7 +63,7 @@ addLayer('s', {
         },
         'Loans': {
             content: [
-                ['display-text', () => tmp.s.coins.format],
+                ['display-text', () => `You have ${tmp.s.coins.format}`],
                 'prestige-button',
                 'blank',
                 ['display-text', () => `You have ${formatWhole(tmp.s.investloans.amount)} effective ${tmp.s.investloans.is_loans ? 'repaid loans' : 'investments'}`],
@@ -759,7 +759,7 @@ addLayer('s', {
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
-            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         132: {
             title() {
@@ -786,7 +786,7 @@ addLayer('s', {
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
-            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         133: {
             title() {
@@ -813,7 +813,7 @@ addLayer('s', {
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
-            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         141: {
             title() {
@@ -840,7 +840,7 @@ addLayer('s', {
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
-            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         142: {
             title() {
@@ -867,7 +867,7 @@ addLayer('s', {
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
-            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         //#endregion Loans/Investments
         //#region Normal upgrades

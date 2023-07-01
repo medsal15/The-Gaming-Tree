@@ -816,18 +816,21 @@ addLayer('ach', {
             style: { 'background-color': 'rgb(127,0,255)' },
             unlocked() { return hasAchievement(this.layer, this.id); },
         },
+        /**
+        // bugged
         61: {
             name: 'Pure luck',
             tooltip: 'Get all drops from an enemy at once without any chance boost',
             done() {
                 if (tmp.lo.items["*"].global_chance_multiplier.neq(1)) return false;
 
-                return tmp.lo.items["*"].global_chance_multiplier.lte(1) && [['slime', 3], ['goblin', 3]].some(([type, len]) => player.xp.last_drops[type].length == len);
+                return tmp.lo.items["*"].global_chance_multiplier.lte(1) && [['slime', 3], ['goblin', 3], ['zombie', 3]].some(([type, len]) => player.xp.last_drops[type].length == len);
             },
             onComplete() { doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
             style: { 'background-color': 'rgb(127,0,255)' },
             unlocked() { return hasAchievement(this.layer, this.id); },
         },
+        */
         101: {
             name: 'You\'re done, please stop',
             tooltip: () => `Get ${format(10_000)} kills fighting the Slime King`,

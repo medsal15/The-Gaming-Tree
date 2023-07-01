@@ -338,7 +338,7 @@ addLayer('xp', {
             effect() {
                 let effect = D.dTwo;
 
-                effect = effect.times(tmp.l.skills.reading.effect);
+                effect = effect.add(tmp.l.skills.reading.effect);
 
                 return effect;
             },
@@ -694,10 +694,14 @@ addLayer('xp', {
             if (hasUpgrade('s', 11)) xp_gain = xp_gain.times(upgradeEffect('s', 11));
 
             if (!tmp.l.canBuyMax) {
-                xp_gain = xp_gain.min(getNextAt('l').minus(player.xp.points)).max(0);
+                let cap = getNextAt('l');
+
+                if (inChallenge('b', 32)) cap = cap.times(1.05); // Allows getting a level
+
+                xp_gain = xp_gain.min(cap.minus(player.xp.points)).max(0);
             }
 
-            return xp_gain;
+            return xp_gain.max(0);
         },
         kills(type = player.xp.type) {
             let kills = D.dOne;

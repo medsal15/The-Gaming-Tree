@@ -177,7 +177,7 @@ addLayer('f', {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
 
         // Lose heat
-        if (player.f.points.gt(1e-3)) {
+        if (player.f.points.gt(0)) {
             const loss = player.f.points.div(100).times(diff);
 
             player.f.points = player.f.points.minus(loss);
@@ -1213,9 +1213,7 @@ addLayer('f', {
     },
     /** @type {typeof layers.f.heat} */
     heat: {
-        speed() {
-            return D.dTwo.pow(D.log10(player.f.points.add(1)).div(50));
-        },
+        speed() { return D.dTwo.pow(D.log10(player.f.points.add(1)).div(50)); },
         speed_formula: '2 ^ (log10(heat + 1) / 50)',
         gain() {
             /** @type {Decimal} */
