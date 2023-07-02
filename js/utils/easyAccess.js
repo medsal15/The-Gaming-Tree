@@ -4,7 +4,7 @@
  * @returns {boolean}
  */
 function hasUpgrade(layer, id) {
-	return ((player?.[layer].upgrades.includes(toNumber(id)) || player?.[layer].upgrades.includes(id.toString())) && !tmp[layer].deactivated)
+	return ((player?.[layer].upgrades.includes(toNumber(id)) || player?.[layer].upgrades.includes(id.toString())) && !tmp[layer]?.deactivated)
 }
 
 /**
@@ -123,7 +123,7 @@ function setGridData(layer, id, data) {
  * @returns {any}
  */
 function upgradeEffect(layer, id) {
-	return (tmp[layer].upgrades[id].effect)
+	return (tmp[layer]?.upgrades[id].effect)
 }
 
 /**

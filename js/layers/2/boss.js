@@ -91,7 +91,7 @@ addLayer('b', {
                 'blank',
                 ['challenges', [5, 6]],
             ],
-            unlocked() { return hasChallenge('b', 31); },
+            unlocked() { return [31, 32, 41, 42].some(id => hasChallenge('b', id)); },
             buttonStyle: { 'border-color': '#7777EE', },
         },
     },

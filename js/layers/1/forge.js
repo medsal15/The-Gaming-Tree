@@ -642,7 +642,6 @@ addLayer('f', {
                     ['clickable', `recipe_decrease_${recipe_id}`],
                     ['clickable', `recipe_display_${recipe_id}_${recipe.consumes.length}`],
                     ['clickable', `recipe_increase_${recipe_id}`],
-                    //todo start clickable
                 ]];
             },
             size() {
