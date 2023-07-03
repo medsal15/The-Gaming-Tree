@@ -1877,6 +1877,38 @@ declare let layers: {
         upgrades: { [id: number]: Upgrade & { price: [string, Decimal][] } }
         time_speed(layer?: string, visual?: boolean): Decimal
     }
+    cas: Layer<Player['cas']> & {
+        items: {
+            /** Reverse lookup for item drops */
+            sources(item: string): {
+                chances: { [source: `${drop_sources}:${string}`]: Decimal }
+                weights: { [source: `${drop_sources}:${string}`]: Decimal }
+                per_second: { [source: `${drop_sources}:${string}`]: Decimal }
+                other: `${drop_sources}:${string}`[]
+            }
+            /**
+             * Reverse lookup for items
+             *
+             * Points to the original item
+             */
+            base(item: string, type?: 'chances' | 'weights' | 'challenge'): string
+            items(source: `${drop_sources}:${string}`): {
+                chances?: { [item_id: string]: Decimal }
+                weights?: { [item_id: string]: Decimal }
+            }
+            shuffle(): Record<string, string>
+            swap_cost(): Decimal
+            swap_cost_formula(): string
+            /** Makes an item be replaced with another */
+            swap(from: string, dest: string, type?: 'chances' | 'weights' | 'challenge'): void
+            clean_swaps(): void
+            show_row(item: string): ['row', []]
+        }
+        token: {
+            chance(): Decimal
+        }
+        regex: RegExp
+    }
     // Row 0
     xp: Layer<Player['xp']> & {
         enemy: {
@@ -1992,15 +2024,21 @@ declare let layers: {
                 value: Computable<Decimal>
                 gain_multiplier: Computable<Decimal>
                 craft_consumption: Computable<Decimal>
+                items(type: `${drop_sources}:${string}`): {
+                    chances?: { [item_id: string]: Decimal }
+                    weights?: { [item_id: string]: Decimal }
+                }
             }
         } & {
             [id: string]: {
                 readonly id: string
                 readonly grid: number
-                chances?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
-                weights?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
-                per_second?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
-                other_sources?: Computable<`${drop_sources}:${string}`[]>
+                sources: {
+                    chances?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
+                    weights?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
+                    per_second?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
+                    other?: Computable<`${drop_sources}:${string}`[]>
+                }
                 style?: Computable<CSSStyles>
                 name: Computable<string>
                 unlocked?: Computable<boolean>
@@ -2089,6 +2127,7 @@ declare let layers: {
             speed(): Decimal
             speed_formula: Computable<string>
             gain(): Decimal
+            mult(): Decimal
         }
     }
     // Row 2
@@ -2122,6 +2161,7 @@ type Temp = {
     // Side
     ach: TempLayer & RComputed<typeof layers.ach>
     clo: TempLayer & RComputed<typeof layers.clo>
+    cas: TempLayer & RComputed<typeof layers.cas>
     // Row 0
     xp: TempLayer & RComputed<typeof layers.xp>
     m: TempLayer & RComputed<typeof layers.m>
@@ -2159,6 +2199,30 @@ type Player = {
         short_mode: boolean
     }
     clo: LayerData & {}
+    cas: LayerData & {
+        /**
+         * Each entry shares an `item_id` key, which points to the replacing item_id
+         *
+         * Example: With `chances['driftwood'] == 'brain'`, brains will drop instead of driftwood
+         */
+        swaps: {
+            /** Swapped values of `item.sources.chances` */
+            chances: { [item_id: string]: string }
+            /** Swapped values of `item.sources.weights` */
+            weights: { [item_id: string]: string }
+            /** Swapped values of both `item.sources.weights` and `item.sources.chances` */
+            challenge: { [item_id: string]: string }
+            count: Decimal
+        }
+        /** Items being swapped, false if none */
+        swapping: {
+            chances: string | false
+            weights: string | false
+            challenge: string | false
+        }
+        /** Amount of times swapped */
+        count: Decimal
+    }
     // Row 0
     xp: LayerData & {
         health: { [enemy: string]: Decimal }

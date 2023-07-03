@@ -91,7 +91,7 @@ addLayer('f', {
                 ['display-text', '<span style="color:#AA5555;">You lose 1% of your heat every second</span>'],
                 () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '(technically 2% because of your challenges)']; },
                 'blank',
-                ['upgrades', [1]],
+                ['upgrades', [1, 2, 3]],
             ],
         },
         'Fuel': {
@@ -337,7 +337,7 @@ addLayer('f', {
             cost() {
                 let cost = D(60);
 
-                cost = cost.times(D(6).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 2)));
+                cost = cost.times(D(6).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 2).length));
 
                 return cost;
             },
@@ -367,12 +367,12 @@ addLayer('f', {
                 return player.lo.items.bronze_ingot.amount.add(60).log(60);
             },
             effectDisplay() {
-                return `+${format(this.effect())}`;
+                return `*${format(this.effect())}`;
             },
             cost() {
                 let cost = D(60);
 
-                cost = cost.times(D(6).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 2)));
+                cost = cost.times(D(6).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 2).length));
 
                 return cost;
             },
@@ -407,7 +407,7 @@ addLayer('f', {
             cost() {
                 let cost = D(60);
 
-                cost = cost.times(D(6).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 2)));
+                cost = cost.times(D(6).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 2).length));
 
                 return cost;
             },
@@ -430,7 +430,7 @@ addLayer('f', {
             cost() {
                 let cost = D(40);
 
-                cost = cost.times(D(4).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 3)));
+                cost = cost.times(D(4).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 3).length));
 
                 return cost;
             },
@@ -453,7 +453,7 @@ addLayer('f', {
             cost() {
                 let cost = D(40);
 
-                cost = cost.times(D(4).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 3)));
+                cost = cost.times(D(4).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 3).length));
 
                 return cost;
             },
@@ -478,7 +478,7 @@ addLayer('f', {
             cost() {
                 let cost = D(40);
 
-                cost = cost.times(D(4).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 3)));
+                cost = cost.times(D(4).pow(player.f.upgrades.filter(id => Math.floor(id / 10) == 3).length));
 
                 return cost;
             },
@@ -518,6 +518,8 @@ addLayer('f', {
             size() {
                 let size = D.dTen;
 
+                if (hasUpgrade('f', 13)) size = size.add(upgradeEffect('f', 13).fuel);
+
                 return size;
             },
             consuming(item) {
@@ -534,7 +536,7 @@ addLayer('f', {
             heat() {
                 let heat = D(5);
 
-                if (inChallenge('b', 12)) heat = heat.div(player.f.points.add(10).log10());
+                heat = heat.times(tmp.f.heat.mult);
 
                 return heat;
             },
@@ -557,7 +559,7 @@ addLayer('f', {
             heat() {
                 let heat = D(.1);
 
-                if (inChallenge('b', 12)) heat = heat.div(player.f.points.add(10).log10());
+                heat = heat.times(tmp.f.heat.mult);
 
                 return heat;
             },
@@ -580,7 +582,7 @@ addLayer('f', {
             heat() {
                 let heat = D(.5);
 
-                if (inChallenge('b', 12)) heat = heat.div(player.f.points.add(10).log10());
+                heat = heat.times(tmp.f.heat.mult);
 
                 return heat;
             },
@@ -603,7 +605,7 @@ addLayer('f', {
             heat() {
                 let heat = D(.75);
 
-                if (inChallenge('b', 12)) heat = heat.div(player.f.points.add(10).log10());
+                heat = heat.times(tmp.f.heat.mult);
 
                 return heat;
             },
@@ -646,6 +648,8 @@ addLayer('f', {
             },
             size() {
                 let size = D.dTen;
+
+                if (hasUpgrade('f', 13)) size = size.add(upgradeEffect('f', 13).recipe);
 
                 return size;
             },
@@ -1228,6 +1232,14 @@ addLayer('f', {
 
             return gain.minus(loss);
         },
+        mult() {
+            let mult = D.dOne;
+
+            if (hasUpgrade('s', 121)) mult = mult.times(upgradeEffect('s', 121))
+            else if (inChallenge('b', 12)) mult = mult.div(player.f.points.add(10).log10());
+
+            return mult;
+        },
     },
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
@@ -1256,7 +1268,8 @@ addLayer('f', {
             if (fuel_matches) {
                 /** @type {[string, 'display'|'toggle', string]} */
                 const [, mode, fuel_id] = fuel_matches,
-                    fuel = () => tmp.f?.fuels[fuel_id];
+                    fuel = () => tmp.f?.fuels[fuel_id],
+                    item = () => tmp.lo?.items[fuel().item];
 
                 return obj[prop] ??= {
                     canClick: true,
@@ -1266,7 +1279,7 @@ addLayer('f', {
                             case 'toggle':
                                 return player.f.fuels[fuel_id] ? 'ON' : 'OFF';
                             case 'display':
-                                return `<h3>${capitalize(tmp.lo?.items[fuel().item].name)}</h3><br>\
+                                return `<h3>${capitalize(item().name)}</h3><br>\
                                 ${format(player.lo.items[fuel().item].amount)}`;
                         }
                     },
@@ -1279,13 +1292,13 @@ addLayer('f', {
                                     'width': '80px',
                                     'min-height': 'unset',
                                     'transform': 'unset',
-                                }, tmp.lo?.items[tmp.f?.fuels[fuel_id].item].style);
+                                }, item().style);
                             case 'toggle':
                                 return Object.assign({
                                     'height': '40px',
                                     'width': '40px',
                                     'min-height': 'unset',
-                                }, tmp.lo?.items[fuel().item].style, { 'background-image': 'none' });
+                                }, item().style, { 'background-image': 'none' });
                         }
                     },
                 };

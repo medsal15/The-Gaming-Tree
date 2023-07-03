@@ -2145,22 +2145,8 @@ addLayer('lo', {
             const item = tmp.lo.items[item_id];
             if (!(item.unlocked ?? true)) return { 'display': 'none', };
 
-            const row = Math.floor(id / 100),
-                row_style = {
-                    1: {
-                        'background-color': layers.xp.enemy.color('slime'),
-                    },
-                    2: {
-                        'background-color': layers.xp.enemy.color('goblin'),
-                    },
-                    3: {
-                        'background-color': layers.xp.enemy.color('zombie'),
-                    },
-                }[row] ?? {};
-
             return Object.assign(
                 { 'background-repeat': 'no-repeat', 'background-position': 'center', 'background-size': 'contain', },
-                row_style,
                 item.style,
             );
         },
@@ -2187,31 +2173,34 @@ addLayer('lo', {
             const item = tmp.lo.items[item_id],
                 /** @type {string[]} */
                 lines = [];
+            let sources = item.sources ?? {};
 
-            if ('chances' in item && item.chances) {
+            if (inChallenge('b', 52) || hasChallenge('b', 52)) sources = layers.cas.items.sources(item_id);
+
+            if ('chances' in sources && sources.chances) {
                 lines.push(
-                    ...Object.entries(item.chances)
+                    ...Object.entries(sources.chances)
                         .filter(([type]) => star.can_drop(type))
                         .map(([type, chance]) => `${capitalize(star.type_name(type))}: ${star.format_chance(chance.times(tmp.lo.items["*"].global_chance_multiplier))}`),
                 );
             }
-            if ('weights' in item && item.weights) {
+            if ('weights' in sources && sources.weights) {
                 lines.push(
-                    ...Object.entries(item.weights)
+                    ...Object.entries(sources.weights)
                         .filter(([type]) => star.can_drop(type))
                         .map(([type, weight]) => `${capitalize(star.type_name(type))}: ${star.format_chance(weight.div(tmp.lo.items["*"].weight[type]))} (in group)`),
                 );
             }
-            if ('per_second' in item && item.per_second) {
+            if ('per_second' in sources && sources.per_second) {
                 lines.push(
-                    ...Object.entries(item.per_second)
+                    ...Object.entries(sources.per_second)
                         .filter(([type]) => star.can_drop(type))
                         .map(([type, amount]) => `${capitalize(star.type_name(type))}: ${format(amount)}/s`),
                 );
             }
-            if ('other_sources' in item && item.other_sources) {
+            if ('other' in sources && sources.other) {
                 lines.push(
-                    ...item.other_sources.map(type => capitalize(star.type_name(type))),
+                    ...sources.other.map(type => capitalize(star.type_name(type))),
                 );
             }
 
@@ -2247,74 +2236,54 @@ addLayer('lo', {
             get_drops(type = player.xp.type, chance_multiplier = D.dOne) {
                 if (!this.can_drop(type) || chance_multiplier.lte(0)) return [];
 
-                /** @type {{[item: string]: Decimal}} */
-                const results = {},
-                    /** @type {typeof tmp.lo.items[string][]} */
-                    chance_items = Object.values(tmp.lo.items)
-                        .filter((item) => 'chances' in item && type in item.chances),
-                    /** @type {typeof tmp.lo.items[string][]} */
-                    weight_items = Object.values(tmp.lo.items)
-                        .filter((item) => 'weights' in item && type in item.weights),
-                    /** @type {typeof chance_items} */
-                    rolled = [],
-                    /** @type {(item: string, amount: Decimal) => void} */
-                    add_to_results = (item, amount) => {
-                        if (item in results) {
-                            results[item] = results[item].add(amount);
-                        } else {
-                            results[item] = amount;
-                        }
-                    };
+                const items = (inChallenge('b', 52) || hasChallenge('b', 52)) ? layers.cas.items.items(type) : this.items(type),
+                    /** @type {{[item_id: string]: Decimal}} */
+                    results = {},
+                    /** @type {[string, Decimal][]} */
+                    to_roll = [],
+                    /** @type {(item_id: string, amount: DecimalSource) => Decimal} */
+                    add_to_results = (item_id, amount) => results[item_id] = D.add(results[item_id] ?? 0, amount);
 
-                chance_items.forEach(item => {
-                    const { id } = item,
-                        chance = item.chances[type].times(chance_multiplier).times(tmp.lo.items["*"].global_chance_multiplier);
-                    if (chance.gte(1)) {
-                        add_to_results(id, chance);
+                Object.entries(items.chances ?? {}).forEach(([item_id, chance]) => {
+                    const rchance = chance.times(chance_multiplier).times(tmp.lo.items['*'].global_chance_multiplier);
+                    if (rchance.gte(1) || options.noRNG) {
+                        add_to_results(item_id, rchance);
                     } else {
-                        rolled.push(item);
+                        to_roll.push([item_id, rchance]);
                     }
                 });
 
-                if (rolled.length > 7 || options.noRNG) {
-                    // Limit to a theorical maximum of 128 loops
-                    rolled.forEach(item => {
-                        add_to_results(item.id, item.chances[type].times(chance_multiplier).times(tmp.lo.items["*"].global_chance_multiplier));
-                    });
+                if (to_roll.length > 7) {
+                    to_roll.forEach(([item_id, chance]) => add_to_results(item_id, chance));
                 } else {
                     let rng = Math.random(),
                         i = 0;
-                    for (; i < 2 ** rolled.length && rng > 0; i++) {
-                        const bin = i.toString(2).padStart(rolled.length, '0').split(''),
-                            chance = rolled.map((item, i) => {
-                                const chance = item.chances[type].times(chance_multiplier).times(tmp.lo.items["*"].global_chance_multiplier);
-                                if (bin[i] == '1') {
-                                    return chance;
-                                } else {
-                                    return D.dOne.minus(chance);
-                                }
+                    for (; i < 2 ** to_roll.length && rng > 0; i++) {
+                        const bin = i.toString(2).padStart(to_roll.length, '0').split(''),
+                            chance = to_roll.map(([, chance], i) => {
+                                if (bin[i] == '1') return chance;
+                                else return D.dOne.minus(chance);
                             }).reduce(D.times, D.dOne);
                         rng -= chance.toNumber();
                     }
-                    if (rng <= 0) i--;
-                    const bin = i.toString(2).padStart(rolled.length, '0').split('');
-                    rolled.forEach((item, i) => {
-                        if (bin[i] == '1') add_to_results(item.id, D.dOne);
+                    if (rng <= 0 && i > 0) i--;
+                    const bin = i.toString(2).padStart(to_roll.length, '0').split('');
+                    to_roll.forEach(([item], i) => {
+                        if (bin[i] == '1') add_to_results(item, 1);
                     });
                 }
 
-                if (weight_items.length) {
-                    /** @type {Decimal} */
-                    const total = layers.lo.items["*"].weight(type);
-                    if (weight_items.length == 1) {
-                        const item = weight_items[0].id;
-                        if (item in results) results[item] = results[item].add(1);
-                        else results[item] = D.dOne;
+                if (Object.keys(items.weights ?? {}).length > 0) {
+                    const entries = Object.entries(items.weights),
+                        total = entries.reduce((sum, [, weight]) => D.add(sum, weight), D.dZero);
+
+                    if (entries.length == 1) {
+                        add_to_results(entries[0][0], 1);
                     } else if (chance_multiplier.gt(10) || options.noRNG) {
-                        weight_items.forEach(item => {
-                            const amount = item.weights[type].div(total).times(chance_multiplier);
-                            if (item.id in results) results[item.id] = results[item.id].add(amount);
-                            else results[item.id] = amount;
+                        entries.forEach(([item_id, weight]) => {
+                            const amount = weight.div(total).times(chance_multiplier);
+
+                            add_to_results(item_id, amount);
                         });
                     } else {
                         // There must be a better way to do this, but it looks like a pain to figure out
@@ -2322,13 +2291,12 @@ addLayer('lo', {
                             let rng = D.times(Math.random(), total),
                                 i = 0;
                             while (rng.gt(0)) {
-                                rng = rng.minus(weight_items[i].weights[type]);
+                                rng = rng.minus(entries[i][1]);
                                 i++;
                             }
-                            if (rng.lte(0)) i--;
-                            const item = weight_items[i].id;
-                            if (item in results) results[item] = results[item].add(1);
-                            else results[item] = D.dOne;
+                            if (rng.lte(0) && i > 0) i--;
+                            const item = entries[i][0];
+                            add_to_results(item, 1);
                         }
                     }
                 }
@@ -2345,6 +2313,17 @@ addLayer('lo', {
 
                     results[item] = results[item].times(gain_mult);
                 });
+
+                if (inChallenge('b', 52) || hasChallenge('b', 52)) {
+                    // Roll for tokens
+                    const chance = tmp.cas.token.chance.times(chance_multiplier);
+
+                    if (chance.gte(1) || options.noRNG) {
+                        addPoints('cas', chance);
+                    } else if (D.gt(chance, Math.random())) {
+                        addPoints('cas', 1);
+                    }
+                }
 
                 return Object.entries(results);
             },
@@ -2392,11 +2371,11 @@ addLayer('lo', {
                     const weights = {};
 
                     Object.entries(tmp.lo.items)
-                        .filter(([id, item]) => id != '*' && 'weights' in item && item.weights)
+                        .filter(([id, item]) => id != '*' && 'weights' in item.sources && item.sources.weights)
                         .forEach(/**@param {[string, typeof tmp.lo.items[string]]}*/([, item]) => {
-                            if (item.weights instanceof Decimal) return; // Not sure why this happens, but it breaks everything
+                            if (item.sources.weights instanceof Decimal) return; // Not sure why this happens, but it breaks everything
 
-                            Object.entries(item.weights)
+                            Object.entries(item.sources.weights)
                                 .forEach(([source, amount]) => {
                                     if (source in weights) weights[source] = weights[source].add(amount);
                                     else weights[source] = amount;
@@ -2409,9 +2388,9 @@ addLayer('lo', {
                 return Object.entries(tmp.lo.items)
                     .filter(([k]) => k != '*')
                     .reduce((sum, [, item]) => {
-                        if (!('weights' in item) || !item.weights || !(type in item.weights)) return sum;
+                        if (!('sources' in item) || !('weights' in item.sources) || !item.sources.weights || !(type in item.sources.weights)) return sum;
 
-                        return sum.add(item.weights[type]);
+                        return sum.add(item.sources.weights[type]);
                     }, D.dZero);
             },
             has_anvil() { return hasUpgrade('m', 33) || hasUpgrade('s', 72); },
@@ -2437,100 +2416,151 @@ addLayer('lo', {
 
                 return mult;
             },
+            items(type) {
+                if (!type) return {};
+
+                const items = {
+                    chances: {},
+                    weights: {},
+                };
+
+                Object.values(tmp.lo.items).forEach(item => {
+                    if (!('sources' in item)) return;
+
+                    if ('chances' in item.sources && type in item.sources.chances) {
+                        items.chances[item.id] = item.sources.chances[type];
+                    }
+                    if ('weights' in item.sources && type in item.sources.weights) {
+                        items.weights[item.id] = item.sources.weights[type];
+                    }
+                });
+
+                return items;
+            },
         },
         // Slime drops
         slime_goo: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 101,
-            chances() {
-                const chances = { 'enemy:slime': D(1 / 3), };
+            sources: {
+                chances() {
+                    const chances = { 'enemy:slime': D(1 / 3), };
 
-                if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
+                    if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
 
-                if (hasUpgrade('xp', 43)) chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                    if (hasUpgrade('xp', 43)) chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
 
-                return chances;
+                    return chances;
+                },
             },
             name: 'slime goo',
-            style: { 'background-image': `url('./resources/images/spill.svg')`, },
+            style: {
+                'background-image': `url('./resources/images/spill.svg')`,
+                'background-color'() { return layers.xp.enemy.color('slime'); },
+            },
         },
         slime_core_shard: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 102,
-            chances() {
-                const chances = { 'enemy:slime': D(1 / 16), };
+            sources: {
+                chances() {
+                    const chances = { 'enemy:slime': D(1 / 16), };
 
-                if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
+                    if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
 
-                if (hasUpgrade('xp', 43)) chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                    if (hasUpgrade('xp', 43)) chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
 
-                return chances;
+                    return chances;
+                },
             },
             name: 'slime core shard',
-            style: { 'background-image': `url('./resources/images/slime_core_shard.svg')`, },
+            style: {
+                'background-image': `url('./resources/images/slime_core_shard.svg')`,
+                'background-color'() { return layers.xp.enemy.color('slime'); },
+            },
         },
         slime_core: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 103,
-            chances() {
-                const chances = { 'enemy:slime': D(1 / 125), };
+            sources: {
+                chances() {
+                    const chances = { 'enemy:slime': D(1 / 125), };
 
-                if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
+                    if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
 
-                if (hasUpgrade('xp', 43)) chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                    if (hasUpgrade('xp', 43)) chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
 
-                return chances;
+                    return chances;
+                },
             },
             name: 'slime core',
-            style: { 'background-image': `url('./resources/images/slime_core.svg')`, },
+            style: {
+                'background-image': `url('./resources/images/slime_core.svg')`,
+                'background-color'() { return layers.xp.enemy.color('slime'); },
+            },
         },
         // Goblin drops
         red_fabric: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 201,
-            chances() {
-                const chances = { 'enemy:goblin': D(1 / 4), };
+            sources: {
+                chances() {
+                    const chances = { 'enemy:goblin': D(1 / 4), };
 
-                if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
+                    if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
 
-                return chances;
+                    return chances;
+                },
             },
             name: 'red fabric',
-            style: { 'background-image': `url('./resources/images/rolled-cloth.svg')`, },
+            style: {
+                'background-image': `url('./resources/images/rolled-cloth.svg')`,
+                'background-color': () => layers.xp.enemy.color('goblin'),
+            },
             unlocked() { return hasChallenge('b', 11); },
         },
         pyrite_coin: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 202,
-            chances() {
-                const chances = { 'enemy:goblin': D(1 / 25), };
+            sources: {
+                chances() {
+                    const chances = { 'enemy:goblin': D(1 / 25), };
 
-                if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
+                    if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
 
-                return chances;
+                    return chances;
+                },
             },
             name: 'pyrite coin',
-            style: { 'background-image': `url('./resources/images/token.svg')`, },
+            style: {
+                'background-image': `url('./resources/images/token.svg')`,
+                'background-color': () => layers.xp.enemy.color('goblin'),
+            },
             unlocked() { return hasChallenge('b', 11); },
         },
         rusty_gear: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 203,
-            chances() {
-                const chances = { 'enemy:goblin': D(1 / 216), };
+            sources: {
+                chances() {
+                    const chances = { 'enemy:goblin': D(1 / 216), };
 
-                if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
+                    if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
 
-                return chances;
+                    return chances;
+                },
             },
             name: 'rusty gear',
-            style: { 'background-image': `url('./resources/images/cog.svg')`, },
+            style: {
+                'background-image': `url('./resources/images/cog.svg')`,
+                'background-color': () => layers.xp.enemy.color('goblin'),
+            },
             unlocked() { return hasChallenge('b', 11); },
         },
         // Zombie drops
@@ -2538,26 +2568,36 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 301,
-            chances() {
-                const chances = { 'enemy:zombie': D(1 / 5), };
+            sources: {
+                chances() {
+                    const chances = { 'enemy:zombie': D(1 / 5), };
 
-                return chances;
+                    return chances;
+                },
             },
             name: 'rotten flesh',
-            style: { 'background-image': `url('./resources/images/fleshy-mass.svg')`, },
+            style: {
+                'background-image': `url('./resources/images/fleshy-mass.svg')`,
+                'background-color': () => layers.xp.enemy.color('zombie'),
+            },
             unlocked() { return hasChallenge('b', 12); },
         },
         brain: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 302,
-            chances() {
-                const chances = { 'enemy:zombie': D(1 / 343), };
+            sources: {
+                chances() {
+                    const chances = { 'enemy:zombie': D(1 / 343), };
 
-                return chances;
+                    return chances;
+                },
             },
             name: 'brain',
-            style: { 'background-image': `url('./resources/images/brain.svg')`, },
+            style: {
+                'background-image': `url('./resources/images/brain.svg')`,
+                'background-color': () => layers.xp.enemy.color('zombie'),
+            },
             unlocked() { return hasChallenge('b', 12); },
         },
         // Mining
@@ -2565,28 +2605,30 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 501,
-            weights() {
-                if (hasUpgrade('m', 32)) return {};
+            sources: {
+                weights() {
+                    if (hasUpgrade('m', 32)) return {};
 
-                let shallow = D(27);
+                    let shallow = D(27);
 
-                const weights = { 'mining:shallow': shallow, };
+                    const weights = { 'mining:shallow': shallow, };
 
-                if (hasUpgrade('m', 52)) {
-                    let deep = D(46_646);
+                    if (hasUpgrade('m', 52)) {
+                        let deep = D(46_646);
 
-                    weights['mining:deep'] = deep;
-                }
+                        weights['mining:deep'] = deep;
+                    }
 
-                return weights;
-            },
-            other_sources() {
-                const sources = [];
+                    return weights;
+                },
+                other() {
+                    const sources = [];
 
-                if (hasUpgrade('m', 32)) sources.push('mining:shallow');
-                if (hasUpgrade('m', 52)) sources.push('mining:deep');
+                    if (hasUpgrade('m', 32)) sources.push('mining:shallow');
+                    if (hasUpgrade('m', 52)) sources.push('mining:deep');
 
-                return sources;
+                    return sources;
+                },
             },
             name: 'stone',
             style: {
@@ -2599,22 +2641,24 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 502,
-            weights() {
-                let shallow = D(4);
+            sources: {
+                weights() {
+                    let shallow = D(4);
 
-                if (hasUpgrade('m', 13)) shallow = shallow.times(upgradeEffect('m', 13).ore_chance);
+                    if (hasUpgrade('m', 13)) shallow = shallow.times(upgradeEffect('m', 13).ore_chance);
 
-                const weights = { 'mining:shallow': shallow, };
+                    const weights = { 'mining:shallow': shallow, };
 
-                if (hasUpgrade('m', 52)) {
-                    let deep = D(3_125);
+                    if (hasUpgrade('m', 52)) {
+                        let deep = D(3_125);
 
-                    if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
+                        if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
 
-                    weights['mining:deep'] = deep;
-                }
+                        weights['mining:deep'] = deep;
+                    }
 
-                return weights;
+                    return weights;
+                },
             },
             name: 'copper ore',
             style: {
@@ -2627,22 +2671,24 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 503,
-            weights() {
-                let shallow = D(1);
+            sources: {
+                weights() {
+                    let shallow = D(1);
 
-                if (hasUpgrade('m', 13)) shallow = shallow.times(upgradeEffect('m', 13).ore_chance);
+                    if (hasUpgrade('m', 13)) shallow = shallow.times(upgradeEffect('m', 13).ore_chance);
 
-                const weights = { 'mining:shallow': shallow, };
+                    const weights = { 'mining:shallow': shallow, };
 
-                if (hasUpgrade('m', 52)) {
-                    let deep = D(256);
+                    if (hasUpgrade('m', 52)) {
+                        let deep = D(256);
 
-                    if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
+                        if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
 
-                    weights['mining:deep'] = deep;
-                }
+                        weights['mining:deep'] = deep;
+                    }
 
-                return weights;
+                    return weights;
+                },
             },
             name: 'tin ore',
             style: {
@@ -2655,31 +2701,33 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 504,
-            weights() {
-                if (!hasUpgrade('m', 52)) return {};
+            sources: {
+                weights() {
+                    if (!hasUpgrade('m', 52)) return {};
 
-                let deep = D(27);
+                    let deep = D(27);
 
-                if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
+                    if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
 
-                deep = deep.times(buyableEffect('lo', 72));
+                    deep = deep.times(buyableEffect('lo', 72));
 
-                return { 'mining:deep': deep, };
-            },
-            per_second() {
-                const per_second = {};
+                    return { 'mining:deep': deep, };
+                },
+                per_second() {
+                    const per_second = {};
 
-                if (tmp.f.layerShown) {
-                    const forge_consume = layers.f.fuels['*'].consuming(this.id);
+                    if (tmp.f.layerShown) {
+                        const forge_consume = layers.f.fuels['*'].consuming(this.id);
 
-                    if (forge_consume.gt(0)) {
-                        per_second['forge:fuel'] = forge_consume.neg();
+                        if (forge_consume.gt(0)) {
+                            per_second['forge:fuel'] = forge_consume.neg();
+                        }
                     }
-                }
 
-                return per_second;
+                    return per_second;
+                },
+                other() { if (player.f.unlocked) return ['forge:smelt']; },
             },
-            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
             name: 'coal',
             style: {
                 'background-image': `url('./resources/images/rock.svg')`,
@@ -2692,21 +2740,23 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 505,
-            chances() {
-                const chances = { 'enemy:zombie': D(1 / 36), };
+            sources: {
+                chances() {
+                    const chances = { 'enemy:zombie': D(1 / 36), };
 
-                return chances;
-            },
-            weights() {
-                if (!hasUpgrade('m', 52)) return {};
+                    return chances;
+                },
+                weights() {
+                    if (!hasUpgrade('m', 52)) return {};
 
-                let deep = D(4);
+                    let deep = D(4);
 
-                if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
+                    if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
 
-                deep = deep.times(buyableEffect('lo', 72));
+                    deep = deep.times(buyableEffect('lo', 72));
 
-                return { 'mining:deep': deep, };
+                    return { 'mining:deep': deep, };
+                },
             },
             name: 'iron ore',
             style: {
@@ -2719,16 +2769,18 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 506,
-            weights() {
-                if (!hasUpgrade('m', 52)) return {};
+            sources: {
+                weights() {
+                    if (!hasUpgrade('m', 52)) return {};
 
-                let deep = D(1);
+                    let deep = D(1);
 
-                if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
+                    if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
 
-                deep = deep.times(buyableEffect('lo', 72));
+                    deep = deep.times(buyableEffect('lo', 72));
 
-                return { 'mining:deep': deep, };
+                    return { 'mining:deep': deep, };
+                },
             },
             name: 'gold ore',
             style: {
@@ -2742,7 +2794,9 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 601,
-            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
+            sources: {
+                other() { if (player.f.unlocked) return ['forge:smelt']; },
+            },
             name: 'stone brick',
             style: {
                 'background-image': `url('./resources/images/clay-brick.svg')`,
@@ -2754,7 +2808,9 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 602,
-            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
+            sources: {
+                other() { if (player.f.unlocked) return ['forge:smelt']; },
+            },
             name: 'copper ingot',
             style: {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
@@ -2766,7 +2822,9 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 603,
-            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
+            sources: {
+                other() { if (player.f.unlocked) return ['forge:smelt']; },
+            },
             name: 'tin ingot',
             style: {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
@@ -2778,7 +2836,9 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 604,
-            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
+            sources: {
+                other() { if (player.f.unlocked) return ['forge:smelt']; },
+            },
             name: 'iron ingot',
             style: {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
@@ -2790,7 +2850,9 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 605,
-            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
+            sources: {
+                other() { if (player.f.unlocked) return ['forge:smelt']; },
+            },
             name: 'gold ingot',
             style: {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
@@ -2803,7 +2865,9 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 701,
-            other_sources() { if (player.f.alloys) return ['forge:smelt']; },
+            sources: {
+                other() { if (player.f.alloys) return ['forge:smelt']; },
+            },
             name: 'bronze ingot',
             style: {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
@@ -2815,7 +2879,9 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 702,
-            other_sources() { if (player.f.alloys) return ['forge:smelt']; },
+            sources: {
+                other() { if (player.f.alloys) return ['forge:smelt']; },
+            },
             name: 'steel ingot',
             style: {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
@@ -2828,27 +2894,29 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 801,
-            chances() {
-                const chances = { 'tree:driftwood': D(1), };
+            sources: {
+                chances() {
+                    const chances = { 'tree:driftwood': D(1), };
 
-                return chances;
-            },
-            per_second() {
-                const per_second = {};
+                    return chances;
+                },
+                per_second() {
+                    const per_second = {};
 
-                const tree_consume = layers.t.convertion.per_second(this.id);
+                    const tree_consume = layers.t.convertion.per_second(this.id);
 
-                if (tree_consume.neq(0)) per_second['tree:convertion'] = tree_consume;
+                    if (tree_consume.neq(0)) per_second['tree:convertion'] = tree_consume;
 
-                if (tmp.f.layerShown) {
-                    const forge_consume = layers.f.fuels['*'].consuming(this.id);
+                    if (tmp.f.layerShown) {
+                        const forge_consume = layers.f.fuels['*'].consuming(this.id);
 
-                    if (forge_consume.gt(0)) {
-                        per_second['forge:fuel'] = forge_consume.neg();
+                        if (forge_consume.gt(0)) {
+                            per_second['forge:fuel'] = forge_consume.neg();
+                        }
                     }
-                }
 
-                return per_second;
+                    return per_second;
+                },
             },
             name: 'soaked log',
             style: {
@@ -2861,32 +2929,34 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 802,
-            chances() {
-                const chances = {
-                    'tree:oak': D(1),
-                    'tree:birch': D(1),
-                };
+            sources: {
+                chances() {
+                    const chances = {
+                        'tree:oak': D(1),
+                        'tree:birch': D(1),
+                    };
 
-                return chances;
-            },
-            per_second() {
-                const per_second = {};
+                    return chances;
+                },
+                per_second() {
+                    const per_second = {};
 
-                const tree_consume = layers.t.convertion.per_second(this.id);
+                    const tree_consume = layers.t.convertion.per_second(this.id);
 
-                if (tree_consume.neq(0)) per_second['tree:convertion'] = tree_consume;
+                    if (tree_consume.neq(0)) per_second['tree:convertion'] = tree_consume;
 
-                if (tmp.f.layerShown) {
-                    const forge_consume = layers.f.fuels['*'].consuming(this.id);
+                    if (tmp.f.layerShown) {
+                        const forge_consume = layers.f.fuels['*'].consuming(this.id);
 
-                    if (forge_consume.gt(0)) {
-                        per_second['forge:fuel'] = forge_consume.neg();
+                        if (forge_consume.gt(0)) {
+                            per_second['forge:fuel'] = forge_consume.neg();
+                        }
                     }
-                }
 
-                return per_second;
+                    return per_second;
+                },
+                other() { if (player.f.unlocked) return ['forge:smelt']; },
             },
-            other_sources() { if (player.f.unlocked) return ['forge:smelt']; },
             name: 'normal log',
             style: {
                 'background-image': `url('./resources/images/log.svg')`,
@@ -2898,29 +2968,31 @@ addLayer('lo', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 803,
-            per_second() {
-                const per_second = {};
+            sources: {
+                per_second() {
+                    const per_second = {};
 
-                const tree_consume = layers.t.convertion.per_second(this.id);
+                    const tree_consume = layers.t.convertion.per_second(this.id);
 
-                if (tree_consume.neq(0)) per_second['tree:convertion'] = tree_consume;
+                    if (tree_consume.neq(0)) per_second['tree:convertion'] = tree_consume;
 
-                if (tmp.f.layerShown) {
-                    const forge_consume = layers.f.fuels['*'].consuming(this.id);
+                    if (tmp.f.layerShown) {
+                        const forge_consume = layers.f.fuels['*'].consuming(this.id);
 
-                    if (forge_consume.gt(0)) {
-                        per_second['forge:fuel'] = forge_consume.neg();
+                        if (forge_consume.gt(0)) {
+                            per_second['forge:fuel'] = forge_consume.neg();
+                        }
                     }
-                }
 
-                return per_second;
+                    return per_second;
+                },
             },
             name: 'plank',
             style: {
                 'background-image': `url('./resources/images/planks.svg')`,
                 'background-color': '#997744',
             },
-            unlocked() { return tmp.t.layerShown ?? true; },
+            unlocked() { return tmp.t.layerShown; },
         },
     },
     // type none does not allow layerReset

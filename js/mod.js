@@ -1,4 +1,3 @@
-//todo layers/side/casino
 /**
  * Where most of the basic configuration for the mod is.
  */
@@ -27,7 +26,7 @@ let modInfo = {
 	modFiles: [
 		'moreutils.js', 'tree.js',
 		'layers/hotkeys.js',
-		'layers/side/achievements.js', 'layers/side/clock.js',
+		'layers/side/achievements.js', 'layers/side/clock.js', 'layers/side/casino.js',
 		'layers/0/experience.js', 'layers/0/mining.js', 'layers/0/tree.js',
 		'layers/1/level.js', 'layers/1/loot.js', 'layers/1/forge.js',
 		'layers/2/boss.js', 'layers/2/shop.js',
@@ -90,7 +89,7 @@ let changelog = `<h1>Changelog:</h1><br>
 		- Added XP.<br>
 		- Update endgame: 9th XP upgrades.`;
 
-let winText = `Congratulations! You have reached the end and beaten this game, but for now...`;
+let winText = `Congratulations! You have finished the current content in the game. Look forward for more.`;
 
 /**
  * Very important, if you are adding non-standard functions.

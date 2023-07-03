@@ -762,7 +762,7 @@ addLayer('m', {
         mine_mult() {
             let mult = D.dOne;
 
-            if (hasUpgrade('f', 22)) mult = D.add(mult, upgradeEffect('f', 22));
+            if (hasUpgrade('f', 22)) mult = D.times(mult, upgradeEffect('f', 22));
 
             if (hasUpgrade('m', 43)) mult = D.times(mult, upgradeEffect('m', 43));
 

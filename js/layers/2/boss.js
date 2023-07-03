@@ -1,6 +1,5 @@
 'use strict';
 
-//todo implement 52 (through Casino)
 //todo exception for 32: final "enemy" drop
 addLayer('b', {
     name: 'boss',
@@ -179,9 +178,9 @@ addLayer('b', {
         },
         52: {
             name: 'Misfortune',
-            challengeDescription: 'Item drops are changed (only affects unlocked items)',
+            challengeDescription: 'Item drops are shuffled (only affects unlocked items)<br>Swap cost base is decreased',
             goalDescription: 'Fix the items drops',
-            canComplete: false,
+            canComplete() { return Object.keys(player.cas.swaps.challenge).length == 0; },
             rewardDescription: 'Unlock The Casino, a special layer to change your luck.',
             unlocked() { return hasChallenge('b', 32); },
             buttonStyle() {
@@ -191,8 +190,12 @@ addLayer('b', {
                 return style;
             },
             onEnter() {
-                //todo layers.cas.items.shuffle();
+                layerDataReset('cas');
+                player.cas.swaps.challenge = layers.cas.items.shuffle();
+                layers.cas.items.clean_swaps();
             },
+            onComplete() { layerDataReset('cas'); },
+            onExit() { layerDataReset('cas'); },
         },
     },
     automate() {
