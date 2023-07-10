@@ -305,7 +305,7 @@ addLayer('m', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.lo.items.stone.amount.add(1).root(5); },
+            effect() { return D.add(player.lo.items.stone.amount, 1).root(5); },
             effectDisplay() { return `*${format(this.effect())}`; },
             cost: D(50),
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
@@ -372,7 +372,7 @@ addLayer('m', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.lo.items.stone.amount.add(10).log10(); },
+            effect() { return D.add(player.lo.items.stone.amount, 10).log10(); },
             effectDisplay() { return `*${format(this.effect())}`; },
             cost: D(250),
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
@@ -423,9 +423,9 @@ addLayer('m', {
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (!hasUpgrade('s', 72)) return player.lo.items.tin_ore.amount.root(5);
+                if (!hasUpgrade('s', 72)) return D.root(player.lo.items.tin_ore.amount, 5);
 
-                return player.lo.items.tin_ore.amount.root(3);
+                return D.root(player.lo.items.tin_ore.amount, 3);
             },
             effectDisplay() { return `+${format(this.effect())}`; },
             cost: D(9),
@@ -591,7 +591,7 @@ addLayer('m', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.lo.items.coal.amount.add(1).root(7); },
+            effect() { return D.add(player.lo.items.coal.amount, 1).root(7); },
             effectDisplay() { return `*${format(this.effect())}`; },
             cost: D(49),
             item: 'coal',
@@ -740,7 +740,7 @@ addLayer('m', {
             if (hasUpgrade('m', 32)) {
                 let stone = drops.reduce((sum, [, amount]) => D.add(sum, amount), D.dZero);
 
-                if (inChallenge('b', 12) && !hasUpgrade('s', 31)) stone = stone.div(player.lo.items.stone.amount.add(10).log10());
+                if (inChallenge('b', 12) && !hasUpgrade('s', 31)) stone = stone.div(D.add(player.lo.items.stone.amount, 10).log10());
                 if (hasUpgrade('s', 31)) stone = stone.times(upgradeEffect('s', 31));
 
                 const entry = drops.find(([item]) => item == 'stone') ?? false;

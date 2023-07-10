@@ -257,7 +257,7 @@ addLayer('t', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.lo.items.soaked_log.amount.add(1).root(7); },
+            effect() { return D.add(player.lo.items.soaked_log.amount, 1).root(7); },
             effectDisplay() { return `*${format(this.effect())}`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10); },
             cost: D(25),
@@ -303,7 +303,7 @@ addLayer('t', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.lo.items.plank.amount.root(2).div(25).add(1); },
+            effect() { return D.root(player.lo.items.plank.amount, 2).div(25).add(1); },
             effectDisplay() { return `*${format(this.effect())}`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10); },
             cost: D(100),
@@ -585,7 +585,7 @@ addLayer('t', {
             if (item == 'plank') {
                 let gain = this.from.map(item => this.rate(item).times(this.efficiency(item))).reduce(D.add, D.dZero);
 
-                if (inChallenge('b', 12)) gain = gain.div(player.lo.items.plank.amount.add(10).log10());
+                if (inChallenge('b', 12)) gain = gain.div(D.add(player.lo.items.plank.amount, 10).log10());
 
                 return gain;
             }
@@ -615,7 +615,7 @@ addLayer('t', {
                 const gain = layers.t.convertion.per_second(item);
                 if (gain.eq(0)) return;
 
-                player.lo.items[item].amount = player.lo.items[item].amount.add(gain.times(diff));
+                player.lo.items[item].amount = D.add(player.lo.items[item].amount, gain.times(diff));
             });
         }
 

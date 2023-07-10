@@ -236,7 +236,7 @@ addLayer('b', {
             // Items
             Object.entries(player.lo.items).forEach(([item, { amount }]) => {
                 const upg = layers.s.investloans.item_upgrade[item] ?? false;
-                if (!upg || !hasUpgrade('s', upg)) player.lo.items[item].amount = amount.minus(get_loss(amount));
+                if (!upg || !hasUpgrade('s', upg)) player.lo.items[item].amount = D.minus(amount, get_loss(amount));
             });
         }
     },

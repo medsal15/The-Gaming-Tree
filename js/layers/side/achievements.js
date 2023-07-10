@@ -114,7 +114,7 @@ addLayer('ach', {
         15: {
             name: 'A quarter of a thousand',
             tooltip: 'Kill 250 innocent slimes',
-            done() { return layers.xp.enemy.level('slime').gte(1); },
+            done() { return layers.xp.enemy.level('slime').gte(250); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.xp.color); },
             style() {
                 let s = {};
@@ -308,7 +308,7 @@ addLayer('ach', {
         111: {
             name: 'Rock and stone',
             tooltip: 'Mine something',
-            done() { return ['stone', 'copper_ore', 'tin_ore'].some(id => player.lo.items[id].amount.gte(1)); },
+            done() { return ['stone', 'copper_ore', 'tin_ore'].some(id => D.gte(player.lo.items[id].amount, 1)); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.m.color); },
             style() {
                 let s = {};
@@ -620,7 +620,7 @@ addLayer('ach', {
         172: {
             name: 'Better minerals',
             tooltip: 'Smelt an ingot',
-            done() { return ['copper_ingot', 'iron_ingot', 'tin_ingot', 'gold_ingot'].some(item => player.lo.items[item].amount.gt(0)); },
+            done() { return ['copper_ingot', 'iron_ingot', 'tin_ingot', 'gold_ingot'].some(item => D.gt(player.lo.items[item].amount.gt, 0)); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.f.color); },
             style() {
                 let s = {};
@@ -632,7 +632,7 @@ addLayer('ach', {
         173: {
             name: 'Horizon',
             tooltip: 'Make an alloy',
-            done() { return ['bronze_ingot', 'steel_ingot'].some(item => player.lo.items[item].amount.gt(0)); },
+            done() { return ['bronze_ingot', 'steel_ingot'].some(item => D.gt(player.lo.items[item].amount, 0)); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.f.color); },
             style() {
                 let s = {};
