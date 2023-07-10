@@ -87,8 +87,8 @@ addLayer('xp', {
 
                         const kill_text = kill_pieces.length ? ` (${kill_pieces.join(', ')})` : '';
 
-                        return `You have ${layerColor('xp', format(player.xp.points, player.xp.points.gte('1e9') ? 2 : 0), 'font-size:1.5em;')} (${xp_text}) experience
-                            and ${kill_style(format(tmp.xp.total.kills, 0), 'font-size:1.5em')}${kill_text} kills`;
+                        return `You have ${layerColor('xp', formatWhole(player.xp.points), 'font-size:1.5em;')} (${xp_text}) experience
+                            and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')}${kill_text} kills`;
                     },
                 ],
                 'blank',
@@ -127,7 +127,7 @@ addLayer('xp', {
                     () => {
                         const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`;
                         return `You have ${layerColor('xp', format(player.xp.points, player.xp.points.gte('1e9') ? 2 : 0), 'font-size:1.5em;')} experience
-                            and ${kill_style(format(tmp.xp.total.kills, 0), 'font-size:1.5em')} kills`;
+                            and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')} kills`;
                     },
                 ],
                 'blank',
@@ -148,7 +148,7 @@ addLayer('xp', {
                     () => {
                         const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`;
                         return `You have ${layerColor('xp', format(player.xp.points, player.xp.points.gte('1e9') ? 2 : 0), 'font-size:1.5em;')} experience
-                            and ${kill_style(format(tmp.xp.total.kills, 0), 'font-size:1.5em')} kills`;
+                            and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')} kills`;
                     },
                 ],
                 'blank',
@@ -694,15 +694,9 @@ addLayer('xp', {
             if (inChallenge('b', 12) && !hasUpgrade('s', 11)) xp_gain = xp_gain.div(player.xp.points.add(10).log10());
             if (hasUpgrade('s', 11)) xp_gain = xp_gain.times(upgradeEffect('s', 11));
 
-            if (!tmp.l.canBuyMax) {
-                let cap = getNextAt('l');
+            const cap = tmp.xp.enemy.cap;
 
-                if (inChallenge('b', 32)) cap = cap.times(1.05); // Allows getting a level
-
-                xp_gain = xp_gain.min(cap.minus(player.xp.points)).max(0);
-            }
-
-            return xp_gain.max(0);
+            return xp_gain.min(cap.minus(player.xp.points)).max(0);
         },
         kills(type = player.xp.type) {
             let kills = D.dOne;
@@ -762,6 +756,14 @@ addLayer('xp', {
             if (type != 'zombie') return D.dZero;
 
             return this.health('zombie').div(100);
+        },
+        cap() {
+            let cap = getNextAt('l');
+
+            if (inChallenge('b', 32)) cap = cap.times(1.05); // Allows getting a level
+
+            return cap;
+
         },
     },
     /** @type {typeof layers.xp.total} */

@@ -68,7 +68,7 @@ addLayer('f', {
         'Forge': {
             content: [
                 () => {
-                    const speed = layers.clo.time_speed('t');
+                    const speed = layers.clo.time_speed('f');
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -97,7 +97,7 @@ addLayer('f', {
         'Fuel': {
             content: [
                 () => {
-                    const speed = layers.clo.time_speed('t');
+                    const speed = layers.clo.time_speed('f');
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -134,7 +134,7 @@ addLayer('f', {
         'Smelting': {
             content: [
                 () => {
-                    const speed = layers.clo.time_speed('t');
+                    const speed = layers.clo.time_speed('f');
 
                     if (speed.neq(1)) return [
                         'column', [

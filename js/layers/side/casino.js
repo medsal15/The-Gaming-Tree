@@ -190,10 +190,13 @@ addLayer('cas', {
             if (!item_id || item_id == '*') return;
 
             const item = tmp.lo.items[item_id];
-            if (!(item.unlocked ?? true) ||
-                !('weights' in item.sources || 'chances' in item.sources)) return;
+            if (!(item.unlocked ?? true)) return;
 
-            if (inChallenge('b', 52) && !(item_id in player.cas.swaps.challenge)) return;
+            if (inChallenge('b', 52)) {
+                if (!(item_id in player.cas.swaps.challenge)) return;
+            } else {
+                if (!('weights' in item.sources || 'chances' in item.sources)) return;
+            }
 
             return ['row', [
                 ['clickable', `swap_chances_left_${item_id}`],

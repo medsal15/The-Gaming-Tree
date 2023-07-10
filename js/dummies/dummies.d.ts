@@ -1927,6 +1927,7 @@ declare let layers: {
             damage(type?: string): Decimal
             dps(type?: string): Decimal
             regen(type?: string): Decimal
+            cap(): Decimal
         }
         total: {
             kills(): Decimal
