@@ -138,6 +138,7 @@ var systemComponents = {
         <a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a><br>
 		<br><br>
         Time Played: {{ formatTime(player.timePlayed) }}<br><br>
+        Tip: All clickables can be held (for carpal tunnel prevention)<br><br>
         <h3>Hotkeys</h3><br>
 		<span v-for="keys in layered_hotkeys">
 		<span v-for="key in keys" v-if="player[key.layer].unlocked && tmp[key.layer].hotkeys[key.id].unlocked"><br>{{key.description}}</span>
