@@ -60,8 +60,12 @@ addLayer('t', {
                 ['display-text', () => {
                     const line = item => {
                         const itemp = tmp.lo.items[item],
-                            color = itemp.style['background-color'];
-                        return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">${formatWhole(player.lo.items[item].amount)}</span> ${itemp.name}`;
+                            color = itemp.style['background-color'],
+                            change = layers.t.convertion.per_second(item),
+                            change_str = change.abs().gt(.001) ? ` (<span style="color:${color};text-shadow:${color} 0 0 10px">${change.gt(0) ? '+' : ''}${format(change)}</span> /s)` : '';
+                        return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">\
+                        ${formatWhole(player.lo.items[item].amount)}\
+                        </span>${change_str} ${itemp.name}`;
                     };
 
                     return `You have ${listFormat.format(tmp.t.trees.items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
@@ -117,8 +121,12 @@ addLayer('t', {
                 ['display-text', () => {
                     const line = item => {
                         const itemp = tmp.lo.items[item],
-                            color = itemp.style['background-color'];
-                        return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">${formatWhole(player.lo.items[item].amount)}</span> ${itemp.name}`;
+                            color = itemp.style['background-color'],
+                            change = layers.t.convertion.per_second(item),
+                            change_str = change.abs().gt(.001) ? ` (<span style="color:${color};text-shadow:${color} 0 0 10px">${change.gt(0) ? '+' : ''}${format(change)}</span> /s)` : '';
+                        return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">\
+                        ${formatWhole(player.lo.items[item].amount)}\
+                        </span>${change_str} ${itemp.name}`;
                     };
 
                     return `You have ${listFormat.format(tmp.t.trees.items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
