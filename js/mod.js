@@ -74,9 +74,10 @@ let VERSION = {
  */
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.4</h3><br>
-		- Added 3 new layers.<br>
+		- Added 4 new layers.<br>
 		- Added the 2nd boss, 2nd miniboss, and 2nd relic.<br>
 		- Rewrote the enemy color algorithm.<br>
+		- Added an option to disable luck.<br>
 		- Update endgame: Beat the 2nd boss.<br>
 	<h3>v0.3</h3><br>
 		- Added 2 new layers.<br>
