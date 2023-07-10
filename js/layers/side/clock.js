@@ -3,8 +3,12 @@
 addLayer('clo', {
     name: 'Clock',
     symbol: '⏲',
+    /** @returns {typeof player.clo} */
     startData() {
-        return { unlocked: true, };
+        return {
+            unlocked: true,
+            use_advanced: false,
+        };
     },
     layerShown() { return inChallenge('b', 51) || hasChallenge('b', 51); },
     color: '#FFFFFF',
@@ -372,7 +376,7 @@ addLayer('clo', {
                         cost_formula_iron = '(1.5 ^ amount) * 8',
                         cost_formula_brain = '1.5 ^ amount';
 
-                    if (hasUpgrade('f', 11)) {
+                    if (player.clo.use_advanced) {
                         cost_formula_iron += ` / ${format(D.pow(upgradeEffect('f', 11)['iron_ingot'], -1))}`;
                     }
 
@@ -382,7 +386,7 @@ addLayer('clo', {
                         `[${cost_formula_brain}] ${tmp.lo.items.brain.name}`,
                     ];
 
-                    if (hasUpgrade('f', 11)) {
+                    if (player.clo.use_advanced) {
                         cost_list[1] = `[${cost_formula_iron}] ${tmp.lo.items.iron_ingot.name}`;
                     }
 
@@ -398,7 +402,7 @@ addLayer('clo', {
                     brain: D(1.5).pow(x),
                 };
 
-                if (hasUpgrade('f', 11)) {
+                if (player.clo.use_advanced) {
                     cost['iron_ingot'] = cost['iron_ore'].times(upgradeEffect('f', 11)['iron_ingot']);
                     delete cost['iron_ore'];
                 }
@@ -442,7 +446,7 @@ addLayer('clo', {
                     let effect_formula = 'amount / 20',
                         cost_formula = '(2 ^ amount) * 100';
 
-                    if (hasUpgrade('f', 11)) {
+                    if (player.clo.use_advanced) {
                         cost_formula += ` / ${format(D.pow(upgradeEffect('f', 11)['stone_brick'], -1))}`;
                     }
 
@@ -450,7 +454,7 @@ addLayer('clo', {
                         `[${cost_formula}] ${tmp.lo.items.stone.name}`,
                     ];
 
-                    if (hasUpgrade('f', 11)) {
+                    if (player.clo.use_advanced) {
                         cost_list[0] = `[${cost_formula}] ${tmp.lo.items.stone_brick.name}`;
                     }
 
@@ -465,7 +469,7 @@ addLayer('clo', {
                     stone: D(2).pow(x).times(100),
                 };
 
-                if (hasUpgrade('f', 11)) {
+                if (player.clo.use_advanced) {
                     cost['stone_brick'] = cost['stone'].times(upgradeEffect('f', 11)['stone_brick']);
                     delete cost['stone'];
                 }
@@ -509,7 +513,7 @@ addLayer('clo', {
                         cost_formula_copper = '(1.75 ^ amount) * 50',
                         cost_formula_tin = '(1.75 ^ amount) * 5';
 
-                    if (hasUpgrade('f', 11)) {
+                    if (player.clo.use_advanced) {
                         cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
                         cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
                     }
@@ -519,7 +523,7 @@ addLayer('clo', {
                         `[${cost_formula_tin}] ${tmp.lo.items.tin_ore.name}`,
                     ];
 
-                    if (hasUpgrade('f', 11)) {
+                    if (player.clo.use_advanced) {
                         cost_list[0] = `[${cost_formula_copper}] ${tmp.lo.items.copper_ingot.name}`;
                         cost_list[1] = `[${cost_formula_tin}] ${tmp.lo.items.tin_ingot.name}`;
                     }
@@ -536,7 +540,7 @@ addLayer('clo', {
                     tin_ore: D(1.75).pow(x).times(5),
                 };
 
-                if (hasUpgrade('f', 11)) {
+                if (player.clo.use_advanced) {
                     cost['copper_ingot'] = cost['copper_ore'].times(upgradeEffect('f', 11)['copper_ingot']);
                     delete cost['copper_ore'];
                     cost['tin_ingot'] = cost['tin_ore'].times(upgradeEffect('f', 11)['tin_ingot']);
@@ -622,7 +626,7 @@ addLayer('clo', {
                     let effect_formula = 'amount / 10',
                         cost_formula = '(2 ^ amount) * 25';
 
-                    if (hasUpgrade('f', 11)) {
+                    if (player.clo.use_advanced) {
                         cost_formula += ` / ${format(D.pow(upgradeEffect('f', 11)['iron_ingot'], -1))}`;
                     }
 
@@ -630,7 +634,7 @@ addLayer('clo', {
                         `[${cost_formula}] ${tmp.lo.items.iron_ore.name}`,
                     ];
 
-                    if (hasUpgrade('f', 11)) {
+                    if (player.clo.use_advanced) {
                         cost_list[0] = `[${cost_formula}] ${tmp.lo.items.iron_ingot.name}`;
                     }
 
@@ -645,7 +649,7 @@ addLayer('clo', {
                     iron_ore: D(2).pow(x).times(25),
                 };
 
-                if (hasUpgrade('f', 11)) {
+                if (player.clo.use_advanced) {
                     cost['iron_ingot'] = cost['iron_ore'].times(upgradeEffect('f', 11)['iron_ingot']);
                     delete cost['iron_ore'];
                 }
@@ -688,7 +692,7 @@ addLayer('clo', {
                     let effect_formula = 'amount / 20',
                         cost_formula = '(3 ^ amount) * 5';
 
-                    if (hasUpgrade('f', 11)) {
+                    if (player.clo.use_advanced) {
                         cost_formula += ` / ${format(D.pow(upgradeEffect('f', 11)['gold_ingot'], -1))}`;
                     }
 
@@ -696,7 +700,7 @@ addLayer('clo', {
                         `[${cost_formula}] ${tmp.lo.items.gold_ore.name}`,
                     ];
 
-                    if (hasUpgrade('f', 11)) {
+                    if (player.clo.use_advanced) {
                         cost_list[0] = `[${cost_formula}] ${tmp.lo.items.gold_ingot.name}`;
                     }
 
@@ -711,7 +715,7 @@ addLayer('clo', {
                     gold_ore: D(3).pow(x).times(5),
                 };
 
-                if (hasUpgrade('f', 11)) {
+                if (player.clo.use_advanced) {
                     cost['gold_ingot'] = cost['gold_ore'].times(upgradeEffect('f', 11)['gold_ingot']);
                     delete cost['gold_ore'];
                 }

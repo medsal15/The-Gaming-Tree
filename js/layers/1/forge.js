@@ -271,9 +271,13 @@ addLayer('f', {
                     .filter(id => !isNaN(id) && items.some(item => item in tmp.lo.buyables[+id].cost))
                     .forEach(id => player.lo.buyables[id] = D.dZero);
 
-                Object.keys(layers.clo.buyables)
-                    .filter(id => !isNaN(id) && items.some(item => item in tmp.clo.buyables[+id].cost))
-                    .forEach(id => player.clo.buyables[id] = D.dZero);
+                // Reset only once
+                if (!player.clo.use_advanced) {
+                    Object.keys(layers.clo.buyables)
+                        .filter(id => !isNaN(id) && items.some(item => item in tmp.clo.buyables[+id].cost))
+                        .forEach(id => player.clo.buyables[id] = D.dZero);
+                    player.clo.use_advanced = true;
+                }
             },
         },
         12: {

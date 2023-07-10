@@ -2198,7 +2198,9 @@ type Player = {
     ach: LayerData & {
         short_mode: boolean
     }
-    clo: LayerData & {}
+    clo: LayerData & {
+        use_advanced: boolean
+    }
     cas: LayerData & {
         /**
          * Each entry shares an `item_id` key, which points to the replacing item_id

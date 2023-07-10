@@ -35,6 +35,7 @@ addLayer('lo', {
         'Crafting': {
             content: [
                 () => {
+                    // I know it's irrelevant, but it's still here for consitency
                     const speed = layers.clo.time_speed('lo');
 
                     if (speed.neq(1)) return [
@@ -75,7 +76,7 @@ addLayer('lo', {
                     if (
                         Object.keys(tmp.lo.items).some(item => item != '*' &&
                             (tmp.lo.items[item].unlocked ?? true) &&
-                            'per_second' in tmp.lo.items[item])
+                            'per_second' in tmp.lo.items[item].sources)
                     ) return ['display-text', 'Production per second depends on the layer doing it'];
                 },
                 'blank',
