@@ -1,5 +1,6 @@
 'use strict';
 
+//todo "mined nothing X times"
 addLayer('m', {
     name: 'Mining',
     symbol: 'M',

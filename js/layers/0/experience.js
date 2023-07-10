@@ -1,5 +1,6 @@
 'use strict';
 
+//todo "enemy dropped nothing X times"
 //todo add Tree damage for type 'ent' (in enemy.damage)
 addLayer('xp', {
     name: 'Experience Points',

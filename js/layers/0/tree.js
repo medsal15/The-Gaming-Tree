@@ -1,5 +1,6 @@
 'use strict';
 
+//todo "cut nothing X times"
 addLayer('t', {
     name: 'Tree',
     symbol: 'T',
