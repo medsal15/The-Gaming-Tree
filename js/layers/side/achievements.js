@@ -114,7 +114,7 @@ addLayer('ach', {
         15: {
             name: 'A quarter of a thousand',
             tooltip: 'Kill 250 innocent slimes',
-            done() { return layers.xp.enemy.level('slime').gte(250); },
+            done() { return layers.xp.enemy.kills('slime').gte(250); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.xp.color); },
             style() {
                 let s = {};
