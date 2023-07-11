@@ -1,3 +1,4 @@
+//todo layers/side/magic.js
 /**
  * Where most of the basic configuration for the mod is.
  */
@@ -62,17 +63,21 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.4',
+	num: 'R0.5',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
-	name: 'Greed',
+	name: 'Sloth',
 };
 
 /**
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.5</h3><br>
+		- Added 1 new layer.<br>
+		- Added the 3rd boss, miniboss, and relic.<br>
+		- Update endgame: Beat the 3rd boss.<br>
 	<h3>v0.4</h3><br>
 		- Added 4 new layers.<br>
 		- Added the 2nd boss, 2nd miniboss, and 2nd relic.<br>
@@ -170,7 +175,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return hasChallenge('b', 12);
+	return false;
 }
 
 
