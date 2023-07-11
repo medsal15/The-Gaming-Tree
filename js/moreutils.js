@@ -153,3 +153,22 @@ function powerRound(decimal, pow) {
 
     return base.times(mult);
 }
+/**
+ * Returns the average of 2 or more hex colors
+ *
+ * @param {...string} colors
+ */
+function colors_average(...colors) {
+    if (!colors.length) return '#000000';
+    if (colors.length == 1) return colors[0];
+
+    return '#' + colors.map(color => Array.from({ length: 3 }, (_, i) => {
+        const hex = color.slice(i * 2 + 1, (i + 1) * 2 + 1),
+            val = parseInt(hex, 16);
+
+        return val / color.length;
+    }))
+        .reduce(([pr, pg, pb], [cr, cg, cb]) => [pr + cr, pg + cg, pb + cb], [0, 0, 0])
+        .map(num => Math.floor(num).toString(16).padStart(2, '0'))
+        .join('');
+}

@@ -1920,13 +1920,13 @@ declare let layers: {
             color_level(level?: DecimalSource): string
             /** Color of an enemy type */
             color(type?: string): string
-            health(type?: string): Decimal
-            experience(type?: string): Decimal
+            health(type?: string, level?: DecimalSource): Decimal
+            experience(type?: string, level?: DecimalSource): Decimal
             kills(type?: string): Decimal
             name(type: string): string
-            damage(type?: string): Decimal
+            damage(type?: string, level?: DecimalSource): Decimal
             dps(type?: string): Decimal
-            regen(type?: string): Decimal
+            regen(type?: string, level?: DecimalSource): Decimal
             cap(): Decimal
         }
         total: {
@@ -1992,9 +1992,12 @@ declare let layers: {
         skills: {
             '*': {
                 max(): Decimal
+                /** Skill points remaining for use */
                 left(): Decimal
                 show_skill(id: string): ['row', [['bar', string], ['clickable', `add_${string}`], ['clickable', `remove_${string}`]]]
                 speed(): Decimal
+                /** Bonus skill points for all skills (excluding locked ones) */
+                bonus(): Decimal
             }
             [skill: string]: {
                 readonly id: string

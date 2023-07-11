@@ -1,7 +1,6 @@
 'use strict';
 
 //todo "enemy dropped nothing X times"
-//todo add Tree damage for type 'ent' (in enemy.damage)
 addLayer('xp', {
     name: 'Experience Points',
     symbol: 'XP',
@@ -487,7 +486,21 @@ addLayer('xp', {
                     player.xp.kills[type] = D.add(player.xp.kills[type], kills_gain);
 
                     if (layers.lo.items["*"].can_drop('enemy:')) {
-                        const drops = player.xp.last_drops[type] = layers.lo.items["*"].get_drops(`enemy:${type}`, kills_gain);
+                        /** @type {[string, Decimal][]} */
+                        let drops;
+                        if (type == 'amalgam') {
+                            const all_drops = tmp.xp.enemy.types.map(type => layers.lo.items['*'].get_drops(`enemy:${type}`, kills_gain));
+                            drops = Object.fromEntries(
+                                all_drops.reduce((prev, cur) => {
+                                    cur.forEach(([item, amount]) => {
+                                        prev[item] = D.add(prev[item], amount);
+                                    });
+                                    return prev;
+                                }, {}),
+                            );
+                        } else {
+                            drops = player.xp.last_drops[type] = layers.lo.items["*"].get_drops(`enemy:${type}`, kills_gain);
+                        }
                         layers.lo.items["*"].gain_drops(drops);
                     }
                 }
@@ -505,11 +518,12 @@ addLayer('xp', {
             if (!inChallenge('b', 31)) {
                 if (hasChallenge('b', 11)) list.push('goblin');
                 if (hasChallenge('b', 12)) list.push('zombie');
+                if (hasChallenge('b', 21)) list.push('ent');
             }
 
             return list;
         },
-        all_types: ['slime', 'goblin', 'zombie'],
+        all_types: ['amalgam', 'slime', 'goblin', 'zombie', 'ent'],
         level(type = player.xp.type) {
             const kills = player.xp.kills[type] ?? D.dZero;
 
@@ -636,20 +650,32 @@ addLayer('xp', {
                 case 'slime': return '#77BB77';
                 case 'goblin': return '#33DD33';
                 case 'zombie': return '#779900';
+                case 'ent': return '#884411';
+                case 'amalgam': return colors_average(...tmp.xp.enemy.all_types.filter(type => type != 'amalgam').map(type => layers.xp.enemy.color(type)));
             };
         },
-        health(type = player.xp.type) {
+        health(type = player.xp.type, level) {
             let health;
             switch (type) {
+                case 'amalgam': {
+                    const level = layers.xp.enemy.level(type);
+                    return tmp.xp.enemy.all_types.filter(type => type != 'amalgam')
+                        .reduce((sum, type) => {
+                            return D.add(sum, layers.xp.enemy.health(type, level));
+                        }, D.dZero)
+                };
                 default:
                 case 'slime':
-                    health = D(2).pow(layers.xp.enemy.level(type)).times(10);
+                    health = D(2).pow(level ?? layers.xp.enemy.level(type)).times(10);
                     break;
                 case 'goblin':
-                    health = D(3).pow(layers.xp.enemy.level(type)).times(15);
+                    health = D(3).pow(level ?? layers.xp.enemy.level(type)).times(15);
                     break;
                 case 'zombie':
-                    health = D(2.5).pow(layers.xp.enemy.level(type)).times(20);
+                    health = D(2.5).pow(level ?? layers.xp.enemy.level(type)).times(20);
+                    break;
+                case 'ent':
+                    health = D(2.25).pow(level ?? layers.xp.enemy.level(type)).times(50);
                     break;
             }
 
@@ -664,18 +690,28 @@ addLayer('xp', {
 
             return health;
         },
-        experience(type = player.xp.type) {
+        experience(type = player.xp.type, level) {
             let xp_gain;
             switch (type) {
+                case 'amalgam': {
+                    const level = layers.xp.enemy.level(type);
+                    return tmp.xp.enemy.all_types.filter(type => type != 'amalgam')
+                        .reduce((sum, type) => {
+                            return D.add(sum, layers.xp.enemy.experience(type, level));
+                        }, D.dZero)
+                };
                 default:
                 case 'slime':
-                    xp_gain = layers.xp.enemy.level(type).add(1);
+                    xp_gain = D.add(level ?? layers.xp.enemy.level(type), 1);
                     break;
                 case 'goblin':
-                    xp_gain = layers.xp.enemy.level(type).pow(2).add(2);
+                    xp_gain = D.pow(level ?? layers.xp.enemy.level(type), 2).add(2);
                     break;
                 case 'zombie':
-                    xp_gain = layers.xp.enemy.level(type).pow(2.5).add(4);
+                    xp_gain = D.pow(level ?? layers.xp.enemy.level(type), 2.5).add(4);
+                    break;
+                case 'ent':
+                    xp_gain = D.pow(level ?? layers.xp.enemy.level(type), 3).add(8);
                     break;
             }
 
@@ -709,15 +745,21 @@ addLayer('xp', {
         name(type) {
             switch (type) {
                 default: return '';
+                case 'amalgam': return 'amalgam';
                 case 'slime': return 'slime';
                 case 'goblin': return 'goblin';
                 case 'zombie': return 'zombie';
+                case 'ent': return 'ent';
             }
         },
-        damage(type = player.xp.type) {
+        damage(type = player.xp.type, level) {
             let damage = D(1);
 
             if (hasUpgrade('xp', 21)) damage = damage.add(upgradeEffect('xp', 21));
+
+            if (type == 'ent') {
+                damage = damage.add(tmp.t.trees.damage);
+            }
 
             if (hasUpgrade('xp', 11)) damage = damage.times(upgradeEffect('xp', 11));
             if (hasUpgrade('xp', 31)) damage = damage.times(upgradeEffect('xp', 31));
@@ -752,10 +794,24 @@ addLayer('xp', {
 
             return damage.times(this.damage(type));
         },
-        regen(type = player.xp.type) {
-            if (type != 'zombie') return D.dZero;
+        regen(type = player.xp.type, level) {
+            if (type == 'amalgam') {
+                const level = layers.xp.enemy.level(type);
+                return tmp.xp.enemy.all_types.filter(type => type != 'amalgam')
+                    .reduce((sum, type) => {
+                        return D.add(sum, layers.xp.enemy.regen(type, level));
+                    }, D.dZero)
+            }
 
-            return this.health('zombie').div(100);
+            let regen = D.dZero;
+
+            if (type == 'zombie') regen = regen.add(.01);
+
+            if (type == 'ent') regen = regen.add(.02);
+
+            if (inChallenge('b', 21)) regen = regen.add(.05);
+
+            return this.health(type, level ?? this.level(type)).times(regen);
         },
         cap() {
             let cap = getNextAt('l');
