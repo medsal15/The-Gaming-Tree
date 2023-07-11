@@ -1,5 +1,7 @@
 'use strict';
 
+//todo mining skill
+//todo tree skill
 addLayer('l', {
     name: 'Level',
     symbol: 'L',
@@ -53,6 +55,9 @@ addLayer('l', {
                     ];
                 },
                 ['display-text', () => `Skill points: ${layerColor('l', format(tmp.l.skills["*"].left))} / ${layerColor('l', format(tmp.l.skills["*"].max))}`],
+                () => {
+                    if (hasChallenge('b', 21)) return ['display-text', `Every skill has an additionnal ${format(tmp.l.skills['*'].bonus)} points assigned`];
+                },
                 ['text-input', 'change'],
                 'blank',
                 [
@@ -197,6 +202,13 @@ addLayer('l', {
 
                 return speed;
             },
+            bonus() {
+                let bonus = D.dZero;
+
+                if (hasChallenge('b', 21)) bonus = this.left().div(20);
+
+                return bonus;
+            },
         },
         attacking: {
             _id: null,
@@ -324,10 +336,14 @@ addLayer('l', {
 
         let skill_speed = D.times(diff, tmp.l.skills["*"].speed);
 
-        Object.values(player.l.skills)
-            .filter(({ points }) => points.gt(0))
-            .forEach(skill => {
+        let passive_points = tmp.l.skills['*'].bonus;
+
+        Object.entries(player.l.skills)
+            .filter(([skill, { points }]) => points.gt(0) || (passive_points.gt(0) && (tmp.l.skills[skill].unlocked ?? true)))
+            .forEach(([, skill]) => {
                 let { points } = skill;
+
+                points = points.add(passive_points);
 
                 if (hasUpgrade('s', 73)) points = points.times(upgradeEffect('s', 73));
 

@@ -1,5 +1,6 @@
 'use strict';
 
+//todo ent buyables (8X)
 addLayer('lo', {
     name: 'Loot',
     image: './resources/images/swap-bag.svg',
@@ -2601,6 +2602,43 @@ addLayer('lo', {
             },
             unlocked() { return hasChallenge('b', 12); },
         },
+        // Ent drops
+        leaf: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 401,
+            sources: {
+                chances() {
+                    const chances = { 'enemy:ent': D(1 / 6), };
+
+                    return chances;
+                },
+            },
+            name: 'leaf',
+            style: {
+                'background-image': `url('./resources/images/falling-leaf.svg')`,
+                'background-color': () => layers.xp.enemy.color('ent'),
+            },
+            unlocked() { return hasChallenge('b', 21); },
+        },
+        seed: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 402,
+            sources: {
+                chances() {
+                    const chances = { 'enemy:ent': D(1 / 512), };
+
+                    return chances;
+                },
+            },
+            name: 'seed',
+            style: {
+                'background-image': `url('./resources/images/sesame.svg')`,
+                'background-color': () => layers.xp.enemy.color('ent'),
+            },
+            unlocked() { return hasChallenge('b', 21); },
+        },
         // Mining
         stone: {
             _id: null,
@@ -2936,6 +2974,8 @@ addLayer('lo', {
                         'tree:oak': D(1),
                         'tree:birch': D(1),
                     };
+
+                    if (hasChallenge('b', 21)) chances['enemy:ent'] = D(1 / 49);
 
                     return chances;
                 },

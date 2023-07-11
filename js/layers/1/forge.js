@@ -626,6 +626,29 @@ addLayer('f', {
                 return tmp.f.fuels[this.id].consuming.times(tmp.f.fuels[this.id].heat);
             },
         },
+        leaf: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.f.fuels).find(fuel => layers.f.fuels[fuel] == this); },
+            heat() {
+                let heat = D(.1);
+
+                heat = heat.times(tmp.f.heat.mult);
+
+                return heat;
+            },
+            unlocked() { return hasChallenge('b', 21); },
+            item: 'leaf',
+            consuming() {
+                if (!player.f.fuels[this.id]) return D.dZero;
+
+                return D.div(player.lo.items[this.item].amount, 100).min(tmp.f.fuels['*'].size);
+            },
+            producing() {
+                if (!player.f.fuels[this.id]) return D.dZero;
+
+                return tmp.f.fuels[this.id].consuming.times(tmp.f.fuels[this.id].heat);
+            },
+        },
     },
     /** @type {typeof layers.f.recipes} */
     recipes: {
