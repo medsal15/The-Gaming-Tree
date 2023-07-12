@@ -2147,7 +2147,12 @@ addLayer('lo', {
             if (!(item.unlocked ?? true)) return { 'display': 'none', };
 
             return Object.assign(
-                { 'background-repeat': 'no-repeat', 'background-position': 'center', 'background-size': 'contain', },
+                {
+                    'background-repeat': 'no-repeat',
+                    'background-position': 'center',
+                    'background-size': 'contain',
+                    'color': 'black',
+                },
                 item.style,
             );
         },

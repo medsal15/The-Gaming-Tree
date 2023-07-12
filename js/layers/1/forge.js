@@ -1296,12 +1296,14 @@ addLayer('f', {
                                     'width': '80px',
                                     'min-height': 'unset',
                                     'transform': 'unset',
+                                    'color': 'black',
                                 }, item().style);
                             case 'toggle':
                                 return Object.assign({
                                     'height': '40px',
                                     'width': '40px',
                                     'min-height': 'unset',
+                                    'color': 'black',
                                 }, item().style, { 'background-image': 'none' });
                         }
                     },
@@ -1354,6 +1356,7 @@ addLayer('f', {
                             'width': '80px',
                             'min-height': 'unset',
                             'transform': 'unset',
+                            'color': 'black',
                         }, tmp.lo?.items[entry()[0]].style);
                     },
                     onClick() {

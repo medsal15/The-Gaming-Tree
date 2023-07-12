@@ -347,7 +347,7 @@ addLayer('m', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.m.health.add(1).root(7); },
+            effect() { return player.m.health.max(0).add(1).root(7); },
             effectDisplay() { return `*${format(this.effect())}`; },
             cost: D(3),
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
