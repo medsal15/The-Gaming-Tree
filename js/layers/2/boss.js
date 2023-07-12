@@ -135,7 +135,7 @@ addLayer('b', {
             name: 'Slime Prince\'s Anger',
             challengeDescription: 'You can only fight slimes, and their health is multiplied by 2.5. Most other layers are disabled.',
             goalDescription: 'Kill 250 slimes',
-            canComplete() { return player.xp.kills.slime.gte(250); },
+            canComplete() { return tmp.xp.total.kills.gte(250); },
             rewardDescription: 'New XP upgrades, slime item drops are doubled.',
             unlocked() { return hasChallenge('b', 11); },
             buttonStyle() {
@@ -144,6 +144,7 @@ addLayer('b', {
                 if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
+            onEnter() { player.xp.type = 'slime'; },
         },
         32: {
             name: 'The Goblin President',
