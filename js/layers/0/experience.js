@@ -74,7 +74,7 @@ addLayer('xp', {
                     'display-text',
                     () => {
                         const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`,
-                            capped = !tmp.l.canBuyMax && player.xp.points.gte(getNextAt('l')),
+                            capped = !tmp.l.canBuyMax && D.gte(player.xp.points, tmp.xp.enemy.cap),
                             xp_text = capped ? 'hardcapped' : layerColor('xp', `+${format(tmp.xp.enemy.experience)}`),
                             kill_pieces = [];
                         if (tmp.xp.total.kills.neq(player.xp.kills[player.xp.type])) {
