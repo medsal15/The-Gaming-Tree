@@ -2615,12 +2615,12 @@ addLayer('lo', {
                 weights() {
                     if (hasUpgrade('m', 32)) return {};
 
-                    let shallow = D(27);
+                    let shallow = D(9);
 
                     const weights = { 'mining:shallow': shallow, };
 
                     if (hasUpgrade('m', 52)) {
-                        let deep = D(46_646);
+                        let deep = D(216);
 
                         weights['mining:deep'] = deep;
                     }
@@ -2656,7 +2656,7 @@ addLayer('lo', {
                     const weights = { 'mining:shallow': shallow, };
 
                     if (hasUpgrade('m', 52)) {
-                        let deep = D(3_125);
+                        let deep = D(125);
 
                         if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
 
@@ -2686,7 +2686,7 @@ addLayer('lo', {
                     const weights = { 'mining:shallow': shallow, };
 
                     if (hasUpgrade('m', 52)) {
-                        let deep = D(256);
+                        let deep = D(64);
 
                         if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
 
@@ -2755,7 +2755,7 @@ addLayer('lo', {
                 weights() {
                     if (!hasUpgrade('m', 52)) return {};
 
-                    let deep = D(4);
+                    let deep = D(8);
 
                     if (hasUpgrade('m', 13)) deep = deep.times(upgradeEffect('m', 13).ore_chance);
 
