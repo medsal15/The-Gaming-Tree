@@ -34,6 +34,11 @@ addLayer('b', {
             content: [
                 'main-display',
                 'prestige-button',
+                () => {
+                    const id = activeChallenge('b');
+                    if (!id) return;
+                    return ['display-text', `In challenge: ${layerColor('b', layers.b.challenges[id].name)}`];
+                },
                 'blank',
                 () => {
                     const speed = layers.clo.time_speed('b');
@@ -54,6 +59,11 @@ addLayer('b', {
             content: [
                 'main-display',
                 'prestige-button',
+                () => {
+                    const id = activeChallenge('b');
+                    if (!id) return;
+                    return ['display-text', `In challenge: ${layerColor('b', layers.b.challenges[id].name)}`];
+                },
                 'blank',
                 () => {
                     const speed = layers.clo.time_speed('b');
@@ -77,6 +87,11 @@ addLayer('b', {
             content: [
                 'main-display',
                 'prestige-button',
+                () => {
+                    const id = activeChallenge('b');
+                    if (!id) return;
+                    return ['display-text', `In challenge: ${layerColor('b', layers.b.challenges[id].name)}`];
+                },
                 'blank',
                 () => {
                     const speed = layers.clo.time_speed('b');
@@ -177,6 +192,8 @@ addLayer('b', {
             },
         },
         //!41: amalgam is ready for use
+        //todo onEnter set xp type to amalgam
+        //todo onExit/onComplete set xp type to slime
         // Relics
         51: {
             name: 'The Broken Clock',
@@ -227,7 +244,7 @@ addLayer('b', {
 
         if (inChallenge('b', 21)) {
             Object.entries(player.l.skills).forEach(([skill, { progress }]) => {
-                player.l.skills[skill].progress = D.minus(player.l.skills[skill].progress, progress.div(100));
+                player.l.skills[skill].progress = D.minus(player.l.skills[skill].progress, progress.div(100)).max(0);
             });
         }
         if (inChallenge('b', 32)) {

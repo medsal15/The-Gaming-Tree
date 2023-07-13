@@ -1865,7 +1865,7 @@ declare class LayerData {
 
 type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge';
 
-declare let layers: {
+type Layers = {
     // Side
     ach: Layer<Player['ach']> & {
         getAchievementsRows(type?: AchievementTypes): number[]
@@ -1874,7 +1874,9 @@ declare let layers: {
         ownedAchievements(type?: AchievementTypes): Decimal
     }
     clo: Layer<Player['clo']> & {
-        upgrades: { [id: number]: Upgrade & { price: [string, Decimal][] } }
+        upgrades: {
+            [id: number]: Upgrade & { price: [string, Decimal][] }
+        }
         time_speed(layer?: string, visual?: boolean): Decimal
     }
     cas: Layer<Player['cas']> & {
@@ -2015,7 +2017,9 @@ declare let layers: {
         }
         items: {
             '*': {
-                grid_to_item: ((id: number) => string | false) & { cache: { [k: number]: string | false } }
+                grid_to_item: ((id: number) => string | false) & {
+                    cache: { [k: number]: string | false }
+                }
                 global_chance_multiplier(): Decimal
                 get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: Decimal): [string, Decimal][]
                 gain_drops(drops: [string, Decimal][]): void
@@ -2146,7 +2150,9 @@ declare let layers: {
             amount(real?: boolean): Decimal
             is_loans(): boolean
             type(): 'loan' | 'debt' | 'investment'
-            item_upgrade: { [item: string]: number | undefined }
+            item_upgrade: {
+                [item: string]: number | undefined
+            }
             is_loan(id?: number): boolean
         }
     }
@@ -2163,20 +2169,20 @@ type Temp = {
     pointGen: Decimal
     scrolled: boolean
     // Side
-    ach: TempLayer & RComputed<typeof layers.ach>
-    clo: TempLayer & RComputed<typeof layers.clo>
-    cas: TempLayer & RComputed<typeof layers.cas>
+    ach: TempLayer & RComputed<Layers['ach']>
+    clo: TempLayer & RComputed<Layers['clo']>
+    cas: TempLayer & RComputed<Layers['cas']>
     // Row 0
-    xp: TempLayer & RComputed<typeof layers.xp>
-    m: TempLayer & RComputed<typeof layers.m>
-    t: RComputed<typeof layers.t>
+    xp: TempLayer & RComputed<Layers['xp']>
+    m: TempLayer & RComputed<Layers['m']>
+    t: RComputed<Layers['t']>
     // Row 1
-    l: TempLayer & RComputed<typeof layers.l>
-    lo: TempLayer & RComputed<typeof layers.lo>
-    f: TempLayer & RComputed<typeof layers.f>
+    l: TempLayer & RComputed<Layers['l']>
+    lo: TempLayer & RComputed<Layers['lo']>
+    f: TempLayer & RComputed<Layers['f']>
     // Row 2
-    b: TempLayer & RComputed<typeof layers.b>
-    s: TempLayer & RComputed<typeof layers.s>
+    b: TempLayer & RComputed<Layers['b']>
+    s: TempLayer & RComputed<Layers['s']>
 };
 type Player = {
     devSpeed: string

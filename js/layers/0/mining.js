@@ -704,10 +704,10 @@ addLayer('m', {
             switch (mode) {
                 default:
                 case 'shallow':
-                    chance = D(1 / 9);
+                    chance = D(1 / 3);
                     break;
                 case 'deep':
-                    chance = D(1 / 64);
+                    chance = D(1 / 16);
                     break;
             }
 
