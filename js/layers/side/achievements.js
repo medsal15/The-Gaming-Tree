@@ -136,7 +136,7 @@ addLayer('ach', {
         },
         32: {
             name: 'Trained attack',
-            tooltip() { return `Get 10 levels of ${tmp.l.skills.attacking.unlocked ? 'attacking' : '???'}`; },
+            tooltip() { return `Get 10 levels of ${(tmp.l.skills.attacking.unlocked || hasAchievement(this.layer, this.id)) ? tmp.l.skills.attacking.name : '???'}`; },
             done() { return player.l.skills.attacking.level.gte(10); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.l.color); },
             style() {
@@ -148,7 +148,7 @@ addLayer('ach', {
         },
         33: {
             name: 'Learned to learn',
-            tooltip() { return `Get 10 levels of ${tmp.l.skills.learning.unlocked ? 'learning' : '???'}`; },
+            tooltip() { return `Get 10 levels of ${(tmp.l.skills.learning.unlocked || hasAchievement(this.layer, this.id)) ? tmp.l.skills.learning.name : '???'}`; },
             done() { return player.l.skills.learning.level.gte(10); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.l.color); },
             style() {
@@ -160,7 +160,7 @@ addLayer('ach', {
         },
         34: {
             name: 'Back for blood',
-            tooltip() { return `Get 10 levels of ${tmp.l.skills.vampirism.unlocked ? 'vampirism' : '???'}`; },
+            tooltip() { return `Get 10 levels of ${(tmp.l.skills.vampirism.unlocked || hasAchievement(this.layer, this.id)) ? tmp.l.skills.vampirism.name : '???'}`; },
             done() { return player.l.skills.vampirism.level.gte(10); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.l.color); },
             style() {
@@ -172,7 +172,7 @@ addLayer('ach', {
         },
         35: {
             name: 'Advanced reading techniques',
-            tooltip() { return `Get 10 levels of ${tmp.l.skills.reading.unlocked ? 'reading' : '???'}`; },
+            tooltip() { return `Get 10 levels of ${(tmp.l.skills.reading.unlocked || hasAchievement(this.layer, this.id)) ? tmp.l.skills.reading.name : '???'}`; },
             done() { return player.l.skills.reading.level.gte(10); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.l.color); },
             style() {

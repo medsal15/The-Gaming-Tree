@@ -877,7 +877,7 @@ addLayer('s', {
             cost: D.dOne,
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
             effect() {
-                let root = D.dTwo;
+                let root = D(3);
 
                 if (hasUpgrade('s', 83)) root = root.add(upgradeEffect('s', 83));
 

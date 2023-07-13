@@ -1,3 +1,4 @@
+/** @type {Layers} */
 var layers = {}
 
 const decimalZero = new Decimal(0)
