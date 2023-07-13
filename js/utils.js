@@ -60,7 +60,7 @@ function canAffordPurchase(layer, thing, cost) {
 		}
 	}
 	else {
-		return !(player[layer].points.lt(cost))
+		return !Decimal.lt(player[layer].points, cost)
 	}
 }
 
