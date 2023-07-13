@@ -672,7 +672,7 @@ addLayer('f', {
 
                 speed = speed.times(tmp.f.heat.speed);
 
-                speed = speed.div(buyableEffect('lo', 73));
+                speed = speed.times(buyableEffect('lo', 73));
 
                 return speed;
             },
@@ -1223,7 +1223,9 @@ addLayer('f', {
     },
     /** @type {typeof layers.f.heat} */
     heat: {
-        speed() { return D.dTwo.pow(D.log10(player.f.points.add(1)).div(50)); },
+        speed() {
+            return D.dTwo.pow(D.log10(player.f.points.add(1)).div(50));
+        },
         speed_formula: '2 ^ (log10(heat + 1) / 50)',
         gain() {
             /** @type {Decimal} */
