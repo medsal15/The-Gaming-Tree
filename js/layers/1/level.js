@@ -95,10 +95,22 @@ addLayer('l', {
             const matches = layers.l.regex.exec(prop);
             if (matches) {
                 /** @type {[string, 'add'|'remove', string]} */
-                const [, mode, skill] = matches;
+                const [, mode, skill] = matches,
+                    pskill = () => player.l.skills[skill];
                 return obj[prop] ??= {
-                    canClick() { return player.l.change.lte(mode == 'add' ? tmp.l.skills["*"].left : player.l.skills[skill].points); },
-                    onClick() { player.l.skills[skill].points = player.l.skills[skill].points[mode == 'add' ? 'add' : 'minus'](player.l.change); },
+                    canClick() { return player.l.change.lte(mode == 'add' ? tmp.l.skills["*"].left : pskill().points); },
+                    onClick() {
+                        switch (mode) {
+                            case 'add':
+                                if (tmp.l.skills['*'].left.lt(player.l.change)) break;
+                                pskill().points = pskill().points.add(player.l.change);
+                                break;
+                            case 'remove':
+                                if (pskill().points.lt(player.l.change)) break;
+                                pskill().points = pskill().points.minus(player.l.change);
+                                break;
+                        }
+                    },
                     display() { return `${mode == 'add' ? 'Add' : 'Remove'} ${format(player.l.change)} skills points ${mode == 'add' ? 'to' : 'from'} ${tmp.l.skills[skill].name}`; },
                     unlocked() { return tmp.l.skills[skill].unlocked; },
                 };
@@ -414,4 +426,5 @@ addLayer('l', {
 
         layerDataReset(this.layer, keep);
     },
+    shouldNotify() { return tmp.l.skills['*'].left.gt(0); },
 });

@@ -112,6 +112,11 @@ addLayer('clo', {
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
             pay() { this.price.forEach(([item, cost]) => player.lo.items[item].amount = player.lo.items[item].amount.minus(cost)); },
             unlocked() { return hasChallenge('b', 51) && player.t.unlocked; },
+            style() {
+                const style = {};
+                if (hasUpgrade(this.layer, this.id)) style['background-color'] = tmp.t.color;
+                return style;
+            },
             branches() { return [player.f.unlocked ? 23 : 22]; },
         },
         21: {
@@ -1074,5 +1079,11 @@ addLayer('clo', {
         speed = speed.root(D.dTwo.pow(row));
 
         return speed;
+    },
+    componentStyles: {
+        'buyable': {
+            height: '150px',
+            width: '150px',
+        }
     },
 });

@@ -1049,9 +1049,9 @@ addLayer('s', {
         },
         81: {
             title: 'Crafting Quality Improvements',
-            description: 'Item values increase by their amount',
+            description: 'Increase item values',
             effect() {
-                let add = D(.1);
+                let add = D(1);
 
                 if (hasUpgrade('s', 83)) add = add.times(upgradeEffect('s', 83));
 
@@ -1078,7 +1078,7 @@ addLayer('s', {
         83: {
             title: 'Better Paper',
             description: 'Increase effects of first column of upgrades',
-            effect() { return D(.5); },
+            effect() { return D(1); },
             effectDisplay() { return `+${format(this.effect())}`; },
             cost: D(750),
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },

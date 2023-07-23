@@ -1143,7 +1143,7 @@ declare class Buyable {
      *
      * It's the "key" which the buyable was stored under, for convenient access.
      */
-    readonly id: string;
+    readonly id: number;
 
     /**
      * Displayed at the top in a larger font.

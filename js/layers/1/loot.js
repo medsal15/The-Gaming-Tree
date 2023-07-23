@@ -1,6 +1,7 @@
 'use strict';
 
 //todo keep final "enemy" drop
+//todo add buyMax to buyables
 addLayer('lo', {
     name: 'Loot',
     image: './resources/images/swap-bag.svg',
@@ -143,6 +144,7 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = '1.25 ^ amount',
                         cost_formula_goo = '(1.5 ^ amount) * 10',
                         cost_formula_shard = '1.1 ^ amount',
@@ -154,8 +156,8 @@ addLayer('lo', {
                         cost_formula_shard = `(${cost_formula_shard}) * ${effect}`;
                     }
 
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    if (value.gt(1)) {
+                        value_formula += ` * ${formatWhole(value)}`;
                     }
 
                     const cost_list = [
@@ -204,7 +206,7 @@ addLayer('lo', {
             value() {
                 let value = D.dOne;
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -227,20 +229,17 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula_hold = 'amount',
                         effect_formula_mult = 'amount / 20 + 1',
                         cost_formula_goo = '(1.25 ^ amount) * 10',
                         cost_formula_shard = '(1.2 ^ amount) * 3',
-                        value_formula = 'amount * 5';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_goo += ` * ${effect}`;
                         cost_formula_shard += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -293,7 +292,7 @@ addLayer('lo', {
             value() {
                 let value = D(5);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -312,19 +311,16 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = '1.1 ^ amount',
                         cost_formula_goo = '(1.5 ^ amount) * 30',
                         cost_formula_core = '1.1 ^ amount',
-                        value_formula = 'amount * 3';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_goo += ` * ${effect}`;
                         cost_formula_core = `(${cost_formula_core}) * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -373,7 +369,7 @@ addLayer('lo', {
             value() {
                 let value = D(3);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -399,10 +395,11 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = '1.125 ^ amount',
                         cost_formula_stone = '(1.5 ^ amount) * 10',
                         cost_formula_copper = '(1.25 ^ amount) * 5',
-                        value_formula = 'amount * 4';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('m', 51)) {
                         effect_formula = `(${effect_formula}) ^ ${format(upgradeEffect('m', 51))}`;
@@ -417,10 +414,6 @@ addLayer('lo', {
                     if (hasUpgrade('f', 11)) {
                         cost_formula_stone += ` / ${format(D.pow(upgradeEffect('f', 11)['stone_brick'], -1))}`;
                         cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -487,7 +480,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -517,10 +510,11 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount / 6 + 1',
                         cost_formula_copper = '(1.3 ^ amount) * 25',
                         cost_formula_core = '(1.125 ^ amount) * 5',
-                        value_formula = 'amount * 7';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
@@ -530,10 +524,6 @@ addLayer('lo', {
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -593,7 +583,7 @@ addLayer('lo', {
             value() {
                 let value = D(7);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -625,12 +615,13 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula_hold = 'amount',
                         effect_formula_mult = 'amount / 20 + 1',
                         cost_formula_tin = '(1.25 ^ amount) * 2',
                         cost_formula_copper = '(1.125 ^ amount) * 50',
                         cost_formula_goo = '(1.5 ^ amount) * 20',
-                        value_formula = 'amount * 5';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
@@ -642,10 +633,6 @@ addLayer('lo', {
                     if (hasUpgrade('f', 11)) {
                         cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
                         cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -713,7 +700,7 @@ addLayer('lo', {
             value() {
                 let value = D(5);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -739,19 +726,16 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount / 20 + 1',
                         cost_formula_fabric = '(1.25 ^ amount) * 10',
                         cost_formula_goo = '(1.5 ^ amount) * 25',
-                        value_formula = 'amount * 4';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_fabric += ` * ${effect}`;
                         cost_formula_goo += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -801,7 +785,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -824,20 +808,17 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula_chance = 'amount / 20 + 1',
                         effect_formula_coin = '1.01 ^ amount',
                         cost_formula_fabric = '(1.5 ^ amount) * 10',
                         cost_formula_pyrite = '1.23 ^ amount',
-                        value_formula = 'amount * 10';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_fabric += ` * ${effect}`;
                         cost_formula_pyrite = `(${cost_formula_pyrite}) * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -892,7 +873,7 @@ addLayer('lo', {
             value() {
                 let value = D(10);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -914,11 +895,12 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = '1.1 ^ amount',
                         cost_formula_copper = '(1.5 ^ amount) * 100',
                         cost_formula_tin = '(1.5 ^ amount) * 25',
                         cost_formula_gear = '1.23 ^ amount',
-                        value_formula = 'amount * 10';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
@@ -930,10 +912,6 @@ addLayer('lo', {
                     if (hasUpgrade('f', 11)) {
                         cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
                         cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -998,7 +976,7 @@ addLayer('lo', {
             value() {
                 let value = D(10);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1021,19 +999,16 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount / 20 + 1',
                         cost_formula_rotten = '(1.75 ^ amount) * 7.5',
                         cost_formula_fabric = '(1.25 ^ amount) * 2',
-                        value_formula = 'amount * 2';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_rotten += ` * ${effect}`;
                         cost_formula_fabric += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -1086,7 +1061,7 @@ addLayer('lo', {
             value() {
                 let value = D(2);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1111,11 +1086,12 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula_mult = '1.05 ^ amount',
                         effect_formula_damage = '5√(amount)',
                         cost_formula_iron = '(1.5 ^ amount) * 2.5',
                         cost_fprmula_goo = '(1.75 ^ amount) * 20',
-                        value_formula = 'amount * 13';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
@@ -1125,10 +1101,6 @@ addLayer('lo', {
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_iron += ` / ${format(D.pow(upgradeEffect('f', 11)['iron_ingot'], -1))}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -1193,7 +1165,7 @@ addLayer('lo', {
             value() {
                 let value = D(13);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1213,21 +1185,18 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount',
                         cost_formula_core = '2 ^ amount',
                         cost_formula_gear = '1.75 ^ amount',
                         cost_formula_brain = '1.5 ^ amount',
-                        value_formula = 'amount * 7';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_core = `(${cost_formula_core}) * ${effect}`;
                         cost_formula_gear = `(${cost_formula_gear}) * ${effect}`;
                         cost_formula_brain = `(${cost_formula_brain}) * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -1280,7 +1249,7 @@ addLayer('lo', {
             value() {
                 let value = D(7);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1303,10 +1272,11 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount',
                         cost_formula_stone = '(2.5 ^ amount) * 10',
                         cost_formula_coal = '(1.5 ^ amount) * 5',
-                        value_formula = 'amount * 3';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
@@ -1317,10 +1287,6 @@ addLayer('lo', {
                     if (hasUpgrade('f', 11)) {
                         cost_formula_stone += ` / ${format(D.pow(upgradeEffect('f', 11)['stone_brick'], -1))}`;
                         cost_formula_coal += ` / ${format(D.pow(upgradeEffect('f', 11)['coal'], -1))}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -1382,7 +1348,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1404,11 +1370,12 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount * 2',
                         cost_formula_iron = '(1.5 ^ amount) * 20',
                         cost_formula_copper = '(1.5 ^ amount) * 50',
                         cost_formula_tin = '(1.5 ^ amount) * 25',
-                        value_formula = 'amount * 9';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
@@ -1421,10 +1388,6 @@ addLayer('lo', {
                         cost_formula_iron += ` / ${format(D.pow(upgradeEffect('f', 11)['iron_ingot'], -1))}`;
                         cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
                         cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -1493,7 +1456,7 @@ addLayer('lo', {
             value() {
                 let value = D(9);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1515,9 +1478,10 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = '2√(amount * 10)',
                         cost_formula_gold = '(amount ^ 2) * 5',
-                        value_formula = 'amount * 15';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
@@ -1526,10 +1490,6 @@ addLayer('lo', {
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_gold += ` / ${format(D.pow(upgradeEffect('f', 11)['gold_ingot'], -1))}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -1588,7 +1548,7 @@ addLayer('lo', {
             value() {
                 let value = D(15);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1610,19 +1570,16 @@ addLayer('lo', {
                         ${value}\
                         Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula_soaked = '1.2 ^ amount',
                         cost_formula_soaked = '(1.5 ^ amount) * 10',
                         cost_formula_normal = '(1.125 ^ amount) * 20',
-                        value_formula = '4 * amount';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_soaked = `(${cost_formula_soaked}) * ${effect}`;
                         cost_formula_normal += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -1674,7 +1631,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1697,20 +1654,17 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula_cap = '1.1 ^ amount',
                         effect_formula_hold = 'amount',
                         cost_formula_normal = '(1.25 ^ amount) * 10',
                         cost_formula_plank = '(1.5 ^ amount) * 20',
-                        value_formula = 'amount * 5';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_normal += ` * ${effect}`;
                         cost_formula_plank += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -1763,7 +1717,7 @@ addLayer('lo', {
             value() {
                 let value = D(5);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1784,11 +1738,12 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula_plank = 'amount / 100',
                         cost_formula_plank = '(1.5 ^ amount) * 50',
                         cost_formula_coal = '(1.2 ^ amount) * 3',
                         cost_formula_gold = '(1.1 ^ amount) / 10',
-                        value_formula = 'amount * 7';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
@@ -1800,10 +1755,6 @@ addLayer('lo', {
                     if (hasUpgrade('f', 11)) {
                         cost_formula_coal += ` / ${format(D.pow(upgradeEffect('f', 11)['coal'], -1))}`;
                         cost_formula_gold += ` / ${format(D.pow(upgradeEffect('f', 11)['gold_ingot'], -1))}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -1867,7 +1818,7 @@ addLayer('lo', {
             value() {
                 let value = D(7);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1892,17 +1843,14 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount / 20 + 1',
                         cost_formula = '(1.5 ^ amount) * 10',
-                        value_formula = 'amount * 9';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -1954,7 +1902,7 @@ addLayer('lo', {
             value() {
                 let value = D(9);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -1978,17 +1926,14 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount / 20 + 1',
                         cost_formula = '(2 ^ amount) * 10',
-                        value_formula = 'amount * 9';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -2040,7 +1985,7 @@ addLayer('lo', {
             value() {
                 let value = D(9);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -2064,19 +2009,16 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount / 20 + 1',
                         cost_formula_bronze = '(1.75 ^ amount) * 10',
                         cost_formula_steel = '(2.25 ^ amount) * 10',
-                        value_formula = 'amount * 15';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_bronze += ` * ${effect}`;
                         cost_formula_steel += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -2130,7 +2072,7 @@ addLayer('lo', {
             value() {
                 let value = D(15);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -2152,19 +2094,16 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula_divide = 'amount / 10 + 1',
                         cost_formula_holy_water = '1.5 ^ amount',
                         cost_formula_brain = '(1.5 ^ amount) * 5',
-                        value_formula = 'amount * 5';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_holy_water = `(${cost_formula_holy_water}) * ${effect}`;
                         cost_formula_brain += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -2216,7 +2155,7 @@ addLayer('lo', {
             value() {
                 let value = D(5);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -2239,10 +2178,11 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula_divide = 'amount / 10 + 1',
                         cost_formula_holy_water = '1.5 ^ amount',
                         cost_formula_stone = '(2.5 ^ amount) * 500',
-                        value_formula = 'amount * 7';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
@@ -2252,10 +2192,6 @@ addLayer('lo', {
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_stone += ` / ${format(D.pow(upgradeEffect('f', 11)['stone_brick'], -1))}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -2317,7 +2253,7 @@ addLayer('lo', {
             value() {
                 let value = D(7);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -2338,19 +2274,16 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula_divide = 'amount / 10',
                         cost_formula_holy_water = '1.5 ^ amount',
                         cost_formula_normal_log = '(1.5 ^ amount) * 250',
-                        value_formula = 'amount * 6';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_holy_water = `(${cost_formula_holy_water}) * ${effect}`;
                         cost_formula_normal_log += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -2402,7 +2335,7 @@ addLayer('lo', {
             value() {
                 let value = D(6);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -2424,19 +2357,16 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'log5(amount + 5)',
                         cost_formula_leaf = '(1.25 ^ amount) * 10',
                         cost_formula_plank = '(1.3 ^ amount) * 50',
-                        value_formula = 'amount * 3';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_leaf += ` * ${effect}`;
                         cost_formula_plank += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -2487,7 +2417,7 @@ addLayer('lo', {
             value() {
                 let value = D(3);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -2508,19 +2438,16 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount * 10',
                         cost_formula_normal_log = '(1.2 ^ amount) * 150',
                         cost_formula_leaf = '(1.4 ^ amount) * 25',
-                        value_formula = 'amount * 4';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_normal_log += ` * ${effect}`;
                         cost_formula_leaf += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -2571,7 +2498,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
@@ -2592,19 +2519,16 @@ addLayer('lo', {
                     ${value}\
                     Cost: ${cost}`;
                 } else {
+                    const value = tmp.lo.buyables[this.id].value;
                     let effect_formula = 'amount / 20 + 1',
                         cost_formula_seed = '(1.25 ^ amount) * 3',
                         cost_formula_plank = '(1.5 ^ amount) * 100',
-                        value_formula = 'amount * 4';
+                        value_formula = `amount * ${formatWhole(value)}`;
 
                     if (hasUpgrade('s', 63)) {
                         const effect = format(upgradeEffect('s', 63));
                         cost_formula_seed += ` * ${effect}`;
                         cost_formula_plank += ` * ${effect}`;
-                    }
-
-                    if (hasUpgrade('s', 81)) {
-                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
                     }
 
                     const cost_list = [
@@ -2655,7 +2579,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
 
                 return value;
             },
