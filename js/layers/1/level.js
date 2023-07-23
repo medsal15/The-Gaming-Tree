@@ -1,6 +1,5 @@
 'use strict';
 
-//todo mining skill
 //todo tree skill
 addLayer('l', {
     name: 'Level',
@@ -56,7 +55,7 @@ addLayer('l', {
                 },
                 ['display-text', () => `Skill points: ${layerColor('l', format(tmp.l.skills["*"].left))} / ${layerColor('l', format(tmp.l.skills["*"].max))}`],
                 () => {
-                    if (hasChallenge('b', 21)) return ['display-text', `Every skill has an additionnal ${format(tmp.l.skills['*'].bonus)} points assigned`];
+                    if (tmp.l.skills['*'].bonus.gt(0)) return ['display-text', `Every skill has an additionnal ${format(tmp.l.skills['*'].bonus)} points assigned`];
                 },
                 ['text-input', 'change'],
                 'blank',
@@ -182,6 +181,8 @@ addLayer('l', {
 
                 max = max.add(buyableEffect('lo', 43));
 
+                if (hasChallenge('b', 21)) max = max.add(1);
+
                 return max;
             },
             left() { return tmp.l.skills["*"].max.minus(Object.values(player.l.skills).reduce((u, { points }) => u.add(points), D.dZero)); },
@@ -205,7 +206,7 @@ addLayer('l', {
             bonus() {
                 let bonus = D.dZero;
 
-                if (hasChallenge('b', 21)) bonus = this.left().div(20);
+                if (hasUpgrade('f', 31)) bonus = bonus.add(upgradeEffect('f', 31));
 
                 return bonus;
             },
@@ -330,6 +331,30 @@ addLayer('l', {
             },
             name: 'bartering',
         },
+        mining: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
+            needed() { return player.l.skills[this.id].level.add(1).pow(2.5).times(50); },
+            effect() {
+                if (tmp.l.deactivated) return D.dOne;
+                return D.div(player.l.skills[this.id].level, 20);
+            },
+            unlocked() { return hasChallenge('b', 21); },
+            text() {
+                if (!shiftDown) {
+                    return `Mining level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to mining<br>\
+                    Ore regeneration +${format(this.effect())}`;
+                } else {
+                    let effect_formula = 'level / 20';
+
+                    return `Mining level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to mining<br>\
+                    Ore regeneration +[${effect_formula}]`;
+                }
+            },
+            name: 'mining',
+        },
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
@@ -370,6 +395,8 @@ addLayer('l', {
 
         if (hasUpgrade('s', 82)) div = div.div(upgradeEffect('s', 82));
 
+        div = div.div(buyableEffect('lo', 81).divide);
+
         return div;
     },
     type: 'static',
@@ -386,7 +413,5 @@ addLayer('l', {
         const keep = [];
 
         layerDataReset(this.layer, keep);
-
-        if (hasUpgrade('f', 31)) Object.values(player.l.skills).forEach(skill => skill.level = skill.level.max(1));
     },
 });

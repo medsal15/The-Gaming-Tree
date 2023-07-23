@@ -48,7 +48,13 @@ addLayer('clo', {
     upgrades: {
         11: {
             title: 'Experience connector',
-            description: 'Applies time speed to experience layer',
+            description() {
+                if (!shiftDown) return 'Applies time speed to experience layer';
+
+                let formula = 'time speed';
+
+                return `Formula: ${formula}`;
+            },
             effectDisplay() { return `*${format(layers.clo.time_speed('xp', true))}`; },
             price: [['slime_goo', D(32)], ['slime_core_shard', D(8)], ['slime_core', D.dOne]],
             costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
@@ -64,7 +70,13 @@ addLayer('clo', {
         },
         12: {
             title: 'Mining connector',
-            description: 'Applies time speed to mining layer',
+            description() {
+                if (!shiftDown) return 'Applies time speed to mining layer';
+
+                let formula = 'time speed';
+
+                return `Formula: ${formula}`;
+            },
             effectDisplay() { return `*${format(layers.clo.time_speed('m', true))}`; },
             price: [['stone', D(32)], ['copper_ore', D(8)], ['tin_ore', D.dOne]],
             costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
@@ -84,8 +96,15 @@ addLayer('clo', {
                 return 'Tree connector';
             },
             description() {
-                if (!player.t.unlocked) return 'Applies time speed to ??? layer';
-                return 'Applies time speed to tree layer';
+                if (!shiftDown) {
+                    if (!player.t.unlocked) return 'Applies time speed to ??? layer';
+
+                    return 'Applies time speed to tree layer';
+                }
+
+                let formula = 'time speed';
+
+                return `Formula: ${formula}`;
             },
             effectDisplay() { return `*${format(layers.clo.time_speed('t', true))}`; },
             price: [['soaked_log', D(32)], ['normal_log', D(8)], ['plank', D.dOne]],
@@ -97,7 +116,13 @@ addLayer('clo', {
         },
         21: {
             title: 'Level connector',
-            description: 'Applies time speed to level layer',
+            description() {
+                if (!shiftDown) return 'Applies time speed to level layer';
+
+                let formula = '2√(time speed)';
+
+                return `Formula: ${formula}`;
+            },
             effectDisplay() { return `*${format(layers.clo.time_speed('l', true))}`; },
             costDisplay() { return `Requires: ${formatWhole(5)} levels`; },
             canAfford() { return player.l.points.gte(5); },
@@ -112,7 +137,13 @@ addLayer('clo', {
         },
         22: {
             title: 'Loot connector',
-            description: 'Applies time speed to loot layer',
+            description() {
+                if (!shiftDown) return 'Applies time speed to loot layer';
+
+                let formula = '2√(time speed)';
+
+                return `Formula: ${formula}`;
+            },
             effectDisplay() { return `*${format(layers.clo.time_speed('lo', true))}`; },
             price: [['slime_goo', D(32)], ['copper_ore', D(8)], ['rusty_gear', D.dOne]],
             costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
@@ -132,8 +163,15 @@ addLayer('clo', {
                 return 'Forge connector';
             },
             description() {
-                if (!player.f.unlocked) return 'Applies time speed to ??? layer';
-                return 'Applies time speed to forge layer';
+                if (!shiftDown) {
+                    if (!player.f.unlocked) return 'Applies time speed to ??? layer';
+
+                    return 'Applies time speed to forge layer';
+                }
+
+                let formula = '2√(time speed)';
+
+                return `Formula: ${formula}`;
             },
             effectDisplay() { return `*${format(layers.clo.time_speed('f', true))}`; },
             price: [['bronze_ingot', D(32)], ['steel_ingot', D(8)]],
@@ -150,7 +188,13 @@ addLayer('clo', {
         },
         31: {
             title: 'Boss connector',
-            description: 'Applies time speed to boss layer',
+            description() {
+                if (!shiftDown) return 'Applies time speed to boss layer';
+
+                let formula = '4√(time speed)';
+
+                return `Formula: ${formula}`;
+            },
             effectDisplay() { return `*${format(layers.clo.time_speed('b', true))}`; },
             costDisplay: 'Cost: Free!',
             canAfford() { return !inChallenge('b', 51); },
@@ -168,8 +212,15 @@ addLayer('clo', {
                 return 'Shop connector';
             },
             description() {
-                if (!player.s.unlocked) return 'Applies time speed to ??? layer';
-                return 'Applies time speed to shop layer';
+                if (!shiftDown) {
+                    if (!player.s.unlocked) return 'Applies time speed to ??? layer';
+
+                    return 'Applies time speed to level layer';
+                }
+
+                let formula = '4√(time speed)';
+
+                return `Formula: ${formula}`;
             },
             effectDisplay() { return `*${format(layers.clo.time_speed('s', true))}`; },
             costDisplay() {
@@ -183,8 +234,22 @@ addLayer('clo', {
             unlocked() { return hasChallenge('b', 51) && tmp.s.layerShown; },
         },
         33: {
-            title: '??? connector',
-            description: 'Applies time speed to ??? layer',
+            title() {
+                if (!false) return '??? connector';
+
+                return 'Alternator connector';
+            },
+            description() {
+                if (!shiftDown) {
+                    if (!false) return 'Applies time speed to ??? layer';
+
+                    return 'Applies time speed to alternator layer';
+                }
+
+                let formula = '4√(time speed)';
+
+                return `Formula: ${formula}`;
+            },
             effectDisplay() { return `*${format(D.dOne)}`; },
             costDisplay() { return 'Cost: Unknown'; },
             canAfford: false,
@@ -299,7 +364,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('slime');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['slime'].color;
 
                 return style;
             },
@@ -353,7 +418,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('goblin');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['goblin'].color;
 
                 return style;
             },
@@ -422,11 +487,67 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('zombie');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['zombie'].color;
 
                 return style;
             },
             unlocked() { return hasChallenge('b', 51) && hasChallenge('b', 12); },
+        },
+        14: {
+            title: 'Ent Gear',
+            display() {
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(getBuyableAmount(this.layer, this.id)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`));
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} ent gears\
+                    increase time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 15',
+                        cost_formula_leaf = '(1.5 ^ amount) * 32',
+                        cost_formula_log = '(1.5 ^ amount) * 8',
+                        cost_formula_seed = '1.5 ^ amount';
+
+                    const cost_list = [
+                        `[${cost_formula_leaf}] ${tmp.lo.items.leaf.name}`,
+                        `[${cost_formula_log}] ${tmp.lo.items.normal_log.name}`,
+                        `[${cost_formula_seed}] ${tmp.lo.items.seed.name}`,
+                    ];
+
+                    return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} ent gears\
+                    increase time speed by [${effect_formula}]<br><br>\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                const cost = {
+                    leaf: D(1.5).pow(x).times(32),
+                    normal_log: D(1.5).pow(x).times(8),
+                    seed: D(1.5).pow(x),
+                };
+
+                return cost;
+            },
+            effect(x) { return D.div(x, 15); },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => D.gte(player.lo.items[item].amount, amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, amount));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['zombie'].color;
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 51) && hasChallenge('b', 21); },
         },
         // mining
         21: {

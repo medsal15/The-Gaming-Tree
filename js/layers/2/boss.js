@@ -1,7 +1,5 @@
 'use strict';
 
-//todo put canComplete 21
-//todo implement 41, 51
 //todo exception for 32: final "enemy" drop
 addLayer('b', {
     name: 'boss',
@@ -117,7 +115,7 @@ addLayer('b', {
             name: 'Slime King\'s Wrath',
             challengeDescription: 'Slime health is multiplied by 5, unlock a new layer.',
             goalDescription: 'Kill another thousand slimes.',
-            canComplete() { return player.xp.kills.slime.gte(1_000); },
+            canComplete() { return tmp.xp.total.kills.gte(1_000); },
             rewardDescription() {
                 if (!hasChallenge(this.layer, this.id)) {
                     return 'The Slime King has a lot of treasure, surely you can find something of use in there.';
@@ -149,10 +147,10 @@ addLayer('b', {
         },
         21: {
             name: 'The Eternal Lich',
-            challengeDescription: 'All enemies gain 5% of health regeneration<br>You lose 1% of skill progress per second.',
-            goalDescription: '???',
-            canComplete: false,
-            rewardDescription: 'Unlock ents. Your tree upgrades are always visible. Apply 1/20 of your unassigned skill points to all of your skills.',
+            challengeDescription: 'All enemies gain 5% of health regeneration, you lose 1% of skill progress per second, but you unlock a new item.',
+            goalDescription: 'Make holy water and purify the monsters.',
+            canComplete() { return player.lo.items.holy_water.amount.gt(0); },
+            rewardDescription: 'Unlock ents. Your tree upgrades are always visible. Unlock a skill for mining and get a free skill point.',
             unlocked() { return player.b.points.gte(3); },
             buttonStyle() {
                 const active = activeChallenge('b'),
@@ -191,9 +189,23 @@ addLayer('b', {
                 return style;
             },
         },
-        //!41: amalgam is ready for use
-        //todo onEnter set xp type to amalgam
-        //todo onExit/onComplete set xp type to slime
+        41: {
+            name: 'The Incomplete Ghost',
+            challengeDescription: 'Fight all the enemies at once. As one.',
+            goalDescription: 'We\'re gonna need more holy water. Maybe 5 should be enough.',
+            canComplete() { return player.lo.items.holy_water.amount.gte(5); },
+            rewardDescription: 'Double zombie drops, and trees regenerate 1% of their health',
+            unlocked() { return hasChallenge('b', 21); },
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    style = { 'background-color': '#CC6666', };
+                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
+            onEnter() { player.xp.type = 'amalgam'; },
+            onExit() { player.xp.type = 'slime'; },
+            onComplete() { player.xp.type = 'slime'; },
+        },
         // Relics
         51: {
             name: 'The Broken Clock',
@@ -213,8 +225,8 @@ addLayer('b', {
         },
         52: {
             name: 'Misfortune',
-            challengeDescription: 'Item drops are shuffled (only affects unlocked items)<br>Swap cost base is decreased',
-            goalDescription: 'Fix the items drops',
+            challengeDescription: 'Item drops are shuffled (only affects unlocked items).<br>Swap cost base is decreased for the challenge.',
+            goalDescription: 'Fix the items drops.',
             canComplete() { return Object.keys(player.cas.swaps.challenge).length == 0; },
             rewardDescription: 'Unlock The Casino, a special layer to change your luck.',
             unlocked() { return hasChallenge('b', 32); },
@@ -231,6 +243,31 @@ addLayer('b', {
             },
             onComplete() { layerDataReset('cas'); },
             onExit() { layerDataReset('cas'); },
+        },
+        61: {
+            name: 'Differences',
+            challengeDescription: 'Enemies are given a random element which is randomized on death. Not using an element effectively disables row 1 layers.',
+            goalDescription: 'Kill a thousand enemies',
+            canComplete() { return tmp.xp.total.kills.gte(1e3); },
+            rewardDescription: 'Unlock Magic.',
+            unlocked() { return hasChallenge('b', 41); },
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    style = { 'background-color': '#7777EE', };
+                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
+            onEnter() {
+                player.mag.points = D(50);
+                layers.mag.elements['*'].randomize();
+            },
+            onComplete() {
+                player.mag.points = D.dZero;
+                player.mag.element = 'none';
+            },
+            onExit() {
+                player.mag.element = 'none';
+            },
         },
     },
     automate() {
@@ -262,9 +299,9 @@ addLayer('b', {
             if (!hasUpgrade('s', 12)) {
                 const total = tmp.xp.total.kills,
                     loss = get_loss(total);
-                if (loss.gt(0)) Object.entries(player.xp.kills).forEach(([type, kills]) => {
-                    const l = kills.div(total).times(loss);
-                    player.xp.kills[type] = kills.minus(l).max(0);
+                if (loss.gt(0)) Object.entries(player.xp.enemies).forEach(([type, data]) => {
+                    const l = data.kills.div(total).times(loss);
+                    data.kills[type] = data.kills.minus(l).max(0);
                 });
             }
             if (!hasUpgrade('s', 13)) {
@@ -282,15 +319,15 @@ addLayer('b', {
     },
     type: 'custom',
     getResetGain() {
-        if (player.b.points.lt(1)) return D(+player.xp.kills.slime.gte(1_000));
-        if (player.b.points.lt(2)) return D(+player.xp.kills.goblin.gte(1_000));
-        if (player.b.points.lt(3)) return D(+player.xp.kills.zombie.gte(1_000));
+        if (player.b.points.lt(1)) return D(+player.xp.enemies.slime.kills.gte(1_000));
+        if (player.b.points.lt(2)) return D(+player.xp.enemies.goblin.kills.gte(1_000));
+        if (player.b.points.lt(3)) return D(+player.xp.enemies.zombie.kills.gte(1_000));
         return D.dZero;
     },
     baseAmount() {
-        if (player.b.points.lt(1)) return player.xp.kills.slime;
-        if (player.b.points.lt(2)) return player.xp.kills.goblin;
-        if (player.b.points.lt(3)) return player.xp.kills.zombie;
+        if (player.b.points.lt(1)) return player.xp.enemies.slime.kills;
+        if (player.b.points.lt(2)) return player.xp.enemies.goblin.kills;
+        if (player.b.points.lt(3)) return player.xp.enemies.zombie.kills;
         return D.dZero;
     },
     getNextAt() {
@@ -298,15 +335,15 @@ addLayer('b', {
         return D.dInf;
     },
     canReset() {
-        if (player.b.points.lt(1)) return player.xp.kills.slime.gte(1_000);
-        if (player.b.points.lt(2)) return player.xp.kills.goblin.gte(1_000);
-        if (player.b.points.lt(3)) return player.xp.kills.zombie.gte(1_000);
+        if (player.b.points.lt(1)) return player.xp.enemies.slime.kills.gte(1_000);
+        if (player.b.points.lt(2)) return player.xp.enemies.goblin.kills.gte(1_000);
+        if (player.b.points.lt(3)) return player.xp.enemies.zombie.kills.gte(1_000);
         return false;
     },
     prestigeButtonText() {
-        if (player.b.points.eq(0)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemy.name('slime')} kills`;
-        if (player.b.points.eq(1)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemy.name('goblin')} kills`;
-        if (player.b.points.eq(2)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemy.name('zombie')} kills`;
+        if (player.b.points.eq(0)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemies['slime'].name} kills`;
+        if (player.b.points.eq(1)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemies['goblin'].name} kills`;
+        if (player.b.points.eq(2)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemies['zombie'].name} kills`;
         return 'There are no more bosses to fight';
     },
     prestigeNotify() { return tmp.b.getResetGain.gte(1); },

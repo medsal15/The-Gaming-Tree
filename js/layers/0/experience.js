@@ -1,6 +1,5 @@
 'use strict';
 
-//todo "enemy dropped nothing X times"
 addLayer('xp', {
     name: 'Experience Points',
     symbol: 'XP',
@@ -9,17 +8,21 @@ addLayer('xp', {
         return {
             unlocked: true,
             points: D.dZero,
-            health: Object.fromEntries(layers.xp?.enemy.all_types.map(id => [id, D.dZero]) ?? []),
-            kills: Object.fromEntries(layers.xp?.enemy.all_types.map(id => [id, D.dZero]) ?? []),
             type: 'slime',
             clicked: false,
-            last_drops: Object.fromEntries(layers.xp?.enemy.all_types.map(id => [id, []]) ?? []),
+            enemies: Object.fromEntries(Object.keys(layers.xp.enemies).map(type => [type, {
+                health: D.dZero,
+                kills: D.dZero,
+                last_drops: [],
+                last_drops_times: D.dZero,
+                element: 'none',
+            }])),
         };
     },
     tooltip() {
         return `${formatWhole(player.xp.points)} experience<br>${formatWhole(tmp.xp.total.kills)} kills`;
     },
-    color() { return tmp.xp.enemy.color; },
+    color() { return tmp.xp.enemies[player.xp.type].color; },
     row: 0,
     position: 0,
     resource: 'experience',
@@ -33,9 +36,9 @@ addLayer('xp', {
         {
             key: 'ArrowUp',
             description: '↑ (in XP): Switch to previous enemy',
-            unlocked() { return tmp.xp.enemy.types.length > 1; },
+            unlocked() { return tmp.xp.enemies['*'].list.length > 1; },
             onPress() {
-                const types = tmp.xp.enemy.types;
+                const types = tmp.xp.enemies['*'].list;
                 if (player.tab == 'xp' && player.xp.type != types[0]) {
                     const i = types.indexOf(player.xp.type);
                     if (i == -1) player.xp.type = types[0];
@@ -46,9 +49,9 @@ addLayer('xp', {
         {
             key: 'ArrowDown',
             description: '↓ (in XP): Switch to next enemy',
-            unlocked() { return tmp.xp.enemy.types.length > 1; },
+            unlocked() { return tmp.xp.enemies['*'].list.length > 1; },
             onPress() {
-                const types = tmp.xp.enemy.types;
+                const types = tmp.xp.enemies['*'].list;
                 if (player.tab == 'xp' && player.xp.type != types[types.length - 1]) {
                     const i = types.indexOf(player.xp.type);
                     if (i == -1) player.xp.type = types[0];
@@ -74,14 +77,14 @@ addLayer('xp', {
                     'display-text',
                     () => {
                         const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`,
-                            capped = !tmp.l.canBuyMax && D.gte(player.xp.points, tmp.xp.enemy.cap),
-                            xp_text = capped ? 'hardcapped' : layerColor('xp', `+${format(tmp.xp.enemy.experience)}`),
+                            capped = !tmp.l.canBuyMax && D.gte(player.xp.points, tmp.xp.enemies['*'].exp_cap),
+                            xp_text = capped ? 'hardcapped' : layerColor('xp', `+${format(tmp.xp.enemies[player.xp.type].experience)}`),
                             kill_pieces = [];
-                        if (tmp.xp.total.kills.neq(player.xp.kills[player.xp.type])) {
-                            kill_pieces.push(kill_style(`<span title="Kills from the current enemy">${format(player.xp.kills[player.xp.type])}</span>`));
+                        if (tmp.xp.total.kills.neq(player.xp.enemies[player.xp.type].kills)) {
+                            kill_pieces.push(kill_style(`<span title="Kills from the current enemy">${format(player.xp.enemies[player.xp.type].kills)}</span>`));
                         }
-                        if (tmp.xp.enemy.kills.neq(1)) {
-                            kill_pieces.push(kill_style(`+${format(tmp.xp.enemy.kills)}`));
+                        if (tmp.xp.enemies[player.xp.type].kills.neq(1)) {
+                            kill_pieces.push(kill_style(`+${format(tmp.xp.enemies[player.xp.type].kills)}`));
                         }
 
                         const kill_text = kill_pieces.length ? ` (${kill_pieces.join(', ')})` : '';
@@ -90,32 +93,42 @@ addLayer('xp', {
                             and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')}${kill_text} kills`;
                     },
                 ],
+                () => { if (tmp.xp.enemies['*'].drops_mult.neq(1) && layers.lo.items['*'].can_drop('enemy:')) return ['display-text', `Drop chances multiplier: *${format(tmp.xp.enemies['*'].drops_mult)}`]; },
                 'blank',
                 ['bar', 'health'],
                 ['display-text', () => {
-                    const level = tmp.xp.enemy.level;
                     let text = '';
                     if (options.colorLevels) {
-                        text = capitalize(layers.xp.enemy.color_level(level));
+                        text = capitalize(tmp.xp.enemies[player.xp.type].color_level);
                     } else {
-                        text = `Level ${formatWhole(tmp.xp.enemy.level)}`;
+                        text = `Level ${formatWhole(tmp.xp.enemies[player.xp.type].level)}`;
                     }
-                    return `${text} ${player.xp.type}`
+
+                    let element = '';
+                    if (inChallenge('b', 61) || hasChallenge('b', 61)) {
+                        const elem = player.xp.enemies[player.xp.type].element;
+                        element = `(<span style="color:${tmp.mag.elements[elem].color};">${tmp.mag.elements[elem].name}</span>)`;
+                    }
+
+                    return `${text} ${player.xp.type} ${element}`;
                 }],
                 'blank',
                 ['clickables', [1]],
                 'blank',
-                ['display-text', () => `Current damage: ${format(tmp.xp.enemy.damage)}`],
+                ['display-text', () => `Current damage: ${format(tmp.xp.enemies[player.xp.type].damage)}`],
                 'blank',
                 ['display-text', () => {
                     const type = player.xp.type;
-                    if (!layers.lo.items["*"].can_drop('enemy:') || player.xp.kills[type].lte(0)) return;
+                    if (!layers.lo.items["*"].can_drop('enemy:') || player.xp.enemies[type].kills.lte(0)) return;
 
-                    let drops = 'nothing';
-                    const last_drops = player.xp.last_drops[type];
+                    let drops = 'nothing',
+                        count = '';
+                    const last_drops = player.xp.enemies[type].last_drops,
+                        last_count = player.xp.enemies[type].last_drops_times;
                     if (last_drops.length) drops = listFormat.format(last_drops.map(([item, amount]) => `${format(amount)} ${layers.lo.items[item].name}`));
+                    if (last_count.gt(1)) count = ` (${formatWhole(last_count)} times)`;
 
-                    return `${layers.xp.enemy.name(type).replace(/^./, s => s.toUpperCase())} dropped ${drops}`;
+                    return `${capitalize(layers.xp.enemies[type].name)} dropped ${drops}${count}`;
                 }],
             ],
         },
@@ -154,21 +167,25 @@ addLayer('xp', {
                 ['display-text', () => {
                     const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`,
                         enemy_style = (type, text, ...style) => {
-                            const color = layers.xp.enemy.color(type);
+                            const color = tmp.xp.enemies[type].color;
                             return `<span style="color:${color};text-shadow:${color} 0 0 10px;${style.join(';')}">${text}</span>`
                         },
                         show_dps = hasChallenge('b', 12),
+                        show_element = hasChallenge('b', 61) || inChallenge('b', 61),
                         row = type => {
-                            const kills = layers.xp.enemy.kills(type),
+                            const enemy = tmp.xp.enemies[type],
+                                kills = enemy.kills,
                                 kill_text = kills.neq(1) ? ` (+${kill_style(format(kills))})` : '',
-                                dps = show_dps ? `<td>${type == player.xp.type ? '<u>' : ''}${format(layers.xp.enemy.dps(type))}${type == player.xp.type ? '</u>' : ''}</td>` : '';
+                                dps = show_dps ? `<td>${type == player.xp.type ? '<u>' : ''}${format(enemy.dps)}${type == player.xp.type ? '</u>' : ''}</td>` : '',
+                                element = show_element ? `<td style="color:${tmp.mag.elements[player.xp.enemies[type].element].color};">${tmp.mag.elements[player.xp.enemies[type].element].name}</td>` : '';
                             return `<tr>\
-                                <td>${capitalize(layers.xp.enemy.name(type))}</td>\
-                                <td>${format(player.xp.health[type])} / ${format(layers.xp.enemy.health(type))}</td>\
-                                <td>${enemy_style(type, `+${format(layers.xp.enemy.experience(type))}`)}</td>\
-                                <td>${kill_style(format(player.xp.kills[type]))}${kill_text}</td>\
-                                <td>${options.colorLevels ? capitalize(layers.xp.enemy.color_level(layers.xp.enemy.level(type))) : formatWhole(layers.xp.enemy.level(type))}</td>\
+                                <td>${capitalize(enemy.name)}</td>\
+                                <td>${format(player.xp.enemies[type].health)} / ${format(enemy.health)}</td>\
+                                <td>${enemy_style(type, `+${format(enemy.experience)}`)}</td>\
+                                <td>${kill_style(format(player.xp.enemies[type].kills))}${kill_text}</td>\
+                                <td>${options.colorLevels ? capitalize(enemy.color_level) : formatWhole(enemy.level)}</td>\
                                 ${dps}\
+                                ${element}\
                             </tr>`;
                         };
 
@@ -180,45 +197,46 @@ addLayer('xp', {
                             <th>Kills</th>
                             <th>${options.colorLevels ? 'Color' : 'Level'}</th>
                             ${show_dps ? '<th>DPS</th>' : ''}
+                            ${show_element ? '<th>Element</th>' : ''}
                         </tr>
-                        ${tmp.xp.enemy.types.map(row).join('')}
+                        ${tmp.xp.enemies['*'].list.map(row).join('')}
                     </table>`;
                 }],
             ],
-            unlocked() { return tmp.xp.enemy.types.length > 1; }, // Otherwise it'd show what you can see in the main view
+            unlocked() { return tmp.xp.enemies['*'].list.length > 1 || inChallenge('b', 41); }, // Otherwise it'd show what you can see in the main view
         },
     },
     clickables: {
         11: {
             style: { 'background-image': `url('./resources/images/previous-button.svg')`, },
-            unlocked() { return tmp.xp.enemy.types.length > 1; },
-            canClick() { return player.xp.type != tmp.xp.enemy.types[0]; },
+            unlocked() { return tmp.xp.enemies['*'].list.length > 1; },
+            canClick() { return player.xp.type != tmp.xp.enemies['*'].list[0]; },
             onClick() {
-                const i = tmp.xp.enemy.types.indexOf(player.xp.type);
-                if (i == -1) player.xp.type = tmp.xp.enemy.types[0];
-                else player.xp.type = tmp.xp.enemy.types[i - 1];
+                const i = tmp.xp.enemies['*'].list.indexOf(player.xp.type);
+                if (i == -1) player.xp.type = tmp.xp.enemies['*'].list[0];
+                else player.xp.type = tmp.xp.enemies['*'].list[i - 1];
             },
         },
         12: {
             style: { 'background-image': `url('./resources/images/gladius.svg')`, },
-            canClick() { return D.gt(player.xp.health[player.xp.type], 0); },
+            canClick() { return D.gt(player.xp.enemies[player.xp.type].health, 0); },
             onClick() {
-                player.xp.health[player.xp.type] = D.minus(player.xp.health[player.xp.type], tmp.xp.enemy.damage);
+                player.xp.enemies[player.xp.type].health = D.minus(player.xp.enemies[player.xp.type].health, tmp.xp.enemies[player.xp.type].damage);
                 player.xp.clicked = true;
             },
             onHold() {
-                player.xp.health[player.xp.type] = D.minus(player.xp.health[player.xp.type], tmp.xp.enemy.damage.div(3));
+                player.xp.enemies[player.xp.type].health = D.minus(player.xp.enemies[player.xp.type].health, tmp.xp.enemies[player.xp.type].damage.div(3));
                 player.xp.clicked = true;
             },
         },
         13: {
             style: { 'background-image': `url('./resources/images/next-button.svg')`, },
-            unlocked() { return tmp.xp.enemy.types.length > 1; },
-            canClick() { return player.xp.type != tmp.xp.enemy.types[tmp.xp.enemy.types.length - 1]; },
+            unlocked() { return tmp.xp.enemies['*'].list.length > 1; },
+            canClick() { return player.xp.type != tmp.xp.enemies['*'].list[tmp.xp.enemies['*'].list.length - 1]; },
             onClick() {
-                const i = tmp.xp.enemy.types.indexOf(player.xp.type);
-                if (i == -1) player.xp.type = tmp.xp.enemy.types[0];
-                else player.xp.type = tmp.xp.enemy.types[i + 1];
+                const i = tmp.xp.enemies['*'].list.indexOf(player.xp.type);
+                if (i == -1) player.xp.type = tmp.xp.enemies['*'].list[0];
+                else player.xp.type = tmp.xp.enemies['*'].list[i + 1];
             },
         },
     },
@@ -295,7 +313,7 @@ addLayer('xp', {
                 }
             },
             effect() {
-                let effect = tmp.xp.enemy.health.add(1).root(10).minus(1);
+                let effect = tmp.xp.enemies[player.xp.type].health.add(1).root(10).minus(1);
 
                 effect = effect.times(tmp.l.skills.vampirism.effect);
 
@@ -327,7 +345,7 @@ addLayer('xp', {
             },
             effectDisplay() {
                 if (hasChallenge('b', 12)) return '';
-                return `${format(tmp.xp.enemy.damage.times(this.effect().active))} /s`;
+                return `${format(tmp.xp.enemies[player.xp.type].damage.times(this.effect().active))} /s`;
             },
             unlocked() { return tmp.xp.total.kills.gte(50) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(150),
@@ -436,15 +454,15 @@ addLayer('xp', {
             width: 200,
             height: 50,
             progress() {
-                const max = tmp.xp.enemy.health;
-                return D.div(player.xp.health[player.xp.type] ?? max, max);
+                const max = tmp.xp.enemies[player.xp.type].health;
+                return D.div(player.xp.enemies[player.xp.type].health ?? max, max);
             },
             display() {
-                let text = `${format(player.xp.health[player.xp.type])} / ${format(tmp.xp.enemy.health)}`;
+                let text = `${format(player.xp.enemies[player.xp.type].health)} / ${format(tmp.xp.enemies[player.xp.type].health)}`;
 
-                const regen = tmp.xp.enemy.regen;
+                const regen = tmp.xp.enemies[player.xp.type].regen;
                 if (regen.gt(0)) {
-                    text += `<br>(+${format(regen)}/s)`;
+                    text += `<br>(+${format(regen)} /s)`;
                 }
 
                 return text;
@@ -457,375 +475,680 @@ addLayer('xp', {
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
 
-        for (const type of tmp.xp.enemy.types) {
-            if (player.xp.health[type].lte(0)) continue;
+        for (const type of tmp.xp.enemies['*'].list) {
+            if (player.xp.enemies[type].health.lte(0)) continue;
 
-            const dps = layers.xp.enemy.dps(type),
-                regen = layers.xp.enemy.regen(type);
+            const dps = tmp.xp.enemies[type].dps,
+                regen = tmp.xp.enemies[type].regen;
+
             if (dps.gt(0)) {
                 player.xp.clicked = true;
-                player.xp.health[type] = D.minus(player.xp.health[type], dps.times(diff));
+                player.xp.enemies[type].health = D.minus(player.xp.enemies[type].health, dps.times(diff));
             }
-            if (regen.gt(0) && player.xp.health[type].lt(layers.xp.enemy.health(type))) {
-                player.xp.health[type] = D.add(player.xp.health[type], regen.times(diff)).min(layers.xp.enemy.health(type));
+
+            if (regen.gt(0)) {
+                player.xp.enemies[type].health = D.add(player.xp.enemies[type].health, regen.times(diff));
             }
         }
     },
     automate() {
-        for (const type of tmp.xp.enemy.all_types) {
-            if (D.gt(player.xp.health[type], layers.xp.enemy.health(type))) player.xp.health[type] = layers.xp.enemy.health(type);
-            if (D.lte(player.xp.health[type], 0)) {
+        for (const type of tmp.xp.enemies['*'].list) {
+            const player_data = player.xp.enemies[type];
+
+            if (D.gt(player_data.health, tmp.xp.enemies[type].health)) player_data.health = tmp.xp.enemies[type].health;
+            if (D.lte(player_data.health, 0)) {
                 if (player.xp.clicked) {
-                    //workaround for starting at undefined
-                    const xp_gain = tmp.xp.enemy.experience,
-                        kills_gain = tmp.xp.enemy.kills;
+                    // Workaround for starting at undefined
+                    const xp_gain = tmp.xp.enemies[type].experience,
+                        kills_gain = tmp.xp.enemies[type].kills;
 
-                    player.xp.points = player.xp.points.add(xp_gain);
-                    player.xp.total = D.add(player.xp.total, xp_gain);
-                    player.xp.best = D.max(player.xp.best, player.xp.points);
-                    player.xp.kills[type] = D.add(player.xp.kills[type], kills_gain);
+                    addPoints('xp', xp_gain);
+                    player_data.kills = D.add(player_data.kills, kills_gain);
 
-                    if (layers.lo.items["*"].can_drop('enemy:')) {
-                        /** @type {[string, Decimal][]} */
-                        let drops;
-                        if (type == 'amalgam') {
-                            const all_drops = tmp.xp.enemy.types.map(type => layers.lo.items['*'].get_drops(`enemy:${type}`, kills_gain));
-                            drops = Object.fromEntries(
-                                all_drops.reduce((prev, cur) => {
-                                    cur.forEach(([item, amount]) => {
-                                        prev[item] = D.add(prev[item], amount);
-                                    });
-                                    return prev;
-                                }, {}),
-                            );
+                    if (layers.lo.items['*'].can_drop('enemy:')) {
+                        let drops_mult = kills_gain;
+
+                        drops_mult = drops_mult.times(tmp.xp.enemies['*'].drops_mult);
+
+                        const drops = layers.xp.enemies[type].get_drops(drops_mult),
+                            equal = drops.length == player_data.last_drops.length &&
+                                drops.every(([item, amount]) => player_data.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
+                        if (equal) {
+                            player_data.last_drops_times = D.add(player_data.last_drops_times, 1);
                         } else {
-                            drops = player.xp.last_drops[type] = layers.lo.items["*"].get_drops(`enemy:${type}`, kills_gain);
+                            player_data.last_drops_times = D.dOne;
+                            player_data.last_drops = drops;
                         }
-                        layers.lo.items["*"].gain_drops(drops);
+                        layers.lo.items['*'].gain_drops(drops);
+                    }
+
+                    if (inChallenge('b', 61)) {
+                        player_data.element = tmp.mag.elements['*'].random;
                     }
                 }
 
-                player.xp.health[type] = D.add(player.xp.health[type], layers.xp.enemy.health(type));
+                player_data.health = D.add(player_data.health, tmp.xp.enemies[type].health);
             }
         }
     },
     type: 'none',
-    /** @type {typeof layers.xp.enemy} */
-    enemy: {
-        types() {
-            const list = ['slime'];
-
-            if (!inChallenge('b', 31)) {
-                if (hasChallenge('b', 11)) list.push('goblin');
-                if (hasChallenge('b', 12)) list.push('zombie');
-                if (hasChallenge('b', 21)) list.push('ent');
-            }
-
-            return list;
-        },
-        all_types: ['amalgam', 'slime', 'goblin', 'zombie', 'ent'],
-        level(type = player.xp.type) {
-            const kills = player.xp.kills[type] ?? D.dZero;
-
-            let level = D.div(kills, 10).root(2);
-
-            if (type == 'slime' && hasUpgrade('xp', 43)) level = level.times(upgradeEffect('xp', 43).level_mult);
-
-            return level.floor();
-        },
-        color_level(level = 0) {
-            const l = D(level);
-            if (format(l) == 'NaN') return 'unknown';
-            /** @type {{[k in number|'e'|'F'|'.']: (len: number) => string}} */
-            const map = {
-                0: len => [
-                    'black',
-                    'ebony',
-                    'dark',
-                    'grim',
-                    'inky',
-                    'vantablack',
-                    'onyx',
-                ][len - 1] ?? 'black',
-                1: len => [
-                    'gray',
-                    'dusty',
-                    'light gray',
-                    'ashen',
-                    'grey',
-                    'slate',
-                    'light grey',
-                    'silver',
-                ][len - 1] ?? 'gray',
-                2: len => [
-                    'red',
-                    'carmine',
-                    'carnelian',
-                    'cardinal',
-                    'crimson',
-                    'coquelicot',
-                    'scarlet',
-                    'ruby',
-                ][len - 1] ?? 'red',
-                3: len => [
-                    'orange',
-                    'carrot',
-                    'fulvous',
-                    'flame',
-                    'ginger',
-                    'sunset',
-                    'tangerine',
-                    'amber',
-                ][len - 1] ?? 'orange',
-                4: len => [
-                    'yellow',
-                    'sunglow',
-                    'mustard',
-                    'jonquil',
-                    'mango',
-                    'jasmine',
-                    'lemon',
-                    'gold',
-                ][len - 1] ?? 'yellow',
-                5: len => [
-                    'green',
-                    'volt',
-                    'mint',
-                    'chartreuse',
-                    'harlequin',
-                    'olive',
-                    'moss',
-                    'jade',
-                ][len - 1] ?? 'green',
-                6: len => [
-                    'blue',
-                    'zaffre',
-                    'verdigris',
-                    'ultramarine',
-                    'glaucous',
-                    'azure',
-                    'cerulean',
-                    'sapphire',
-                ][len - 1] ?? 'blue',
-                7: len => [
-                    'magenta',
-                    'purple',
-                    'violet',
-                    'lavender',
-                    'orchid',
-                    'lilac',
-                    'plum',
-                    'amethyst',
-                ][len - 1] ?? 'magenta',
-                8: len => [
-                    'brown',
-                    'beige',
-                    'chestnut',
-                    'chocolate',
-                    'coffee',
-                    'tan',
-                    'sepia',
-                    'bronze',
-                ][len - 1] ?? 'brown',
-                9: len => [
-                    'white',
-                    'snow',
-                    'pale',
-                    'bleached',
-                    'ghostly',
-                    'cream',
-                    'light',
-                    'ivory',
-                ][len - 1] ?? 'white',
-                'e': len => 'shifted through',
-                'F': len => 'tainted by',
-                '.': len => 'covered by',
-            };
-
-            return formatWhole(l).replaceAll(/(.)\1*/g, s => `${map[s[0]](s.length)} `);
-        },
-        color(type = player.xp.type) {
-            switch (type) {
-                default:
-                case 'slime': return '#77BB77';
-                case 'goblin': return '#33DD33';
-                case 'zombie': return '#779900';
-                case 'ent': return '#884411';
-                case 'amalgam': return colors_average(...tmp.xp.enemy.all_types.filter(type => type != 'amalgam').map(type => layers.xp.enemy.color(type)));
-            };
-        },
-        health(type = player.xp.type, level) {
-            let health;
-            switch (type) {
-                case 'amalgam': {
-                    const level = layers.xp.enemy.level(type);
-                    return tmp.xp.enemy.all_types.filter(type => type != 'amalgam')
-                        .reduce((sum, type) => {
-                            return D.add(sum, layers.xp.enemy.health(type, level));
-                        }, D.dZero)
+    /** @type {typeof layers.xp.enemies} */
+    enemies: {
+        '*': {
+            color_level(level = 0) {
+                const l = D(level);
+                if (format(l) == 'NaN') return 'unknown';
+                /** @type {{[k in number|'e'|'F'|'.']: (len: number) => string}} */
+                const map = {
+                    0: len => [
+                        'black',
+                        'ebony',
+                        'dark',
+                        'grim',
+                        'inky',
+                        'vantablack',
+                        'onyx',
+                    ][len - 1] ?? 'black',
+                    1: len => [
+                        'gray',
+                        'dusty',
+                        'light gray',
+                        'ashen',
+                        'grey',
+                        'slate',
+                        'light grey',
+                        'silver',
+                    ][len - 1] ?? 'gray',
+                    2: len => [
+                        'red',
+                        'carmine',
+                        'carnelian',
+                        'cardinal',
+                        'crimson',
+                        'coquelicot',
+                        'scarlet',
+                        'ruby',
+                    ][len - 1] ?? 'red',
+                    3: len => [
+                        'orange',
+                        'carrot',
+                        'fulvous',
+                        'flame',
+                        'ginger',
+                        'sunset',
+                        'tangerine',
+                        'amber',
+                    ][len - 1] ?? 'orange',
+                    4: len => [
+                        'yellow',
+                        'sunglow',
+                        'mustard',
+                        'jonquil',
+                        'mango',
+                        'jasmine',
+                        'lemon',
+                        'gold',
+                    ][len - 1] ?? 'yellow',
+                    5: len => [
+                        'green',
+                        'volt',
+                        'mint',
+                        'chartreuse',
+                        'harlequin',
+                        'olive',
+                        'moss',
+                        'jade',
+                    ][len - 1] ?? 'green',
+                    6: len => [
+                        'blue',
+                        'zaffre',
+                        'verdigris',
+                        'ultramarine',
+                        'glaucous',
+                        'azure',
+                        'cerulean',
+                        'sapphire',
+                    ][len - 1] ?? 'blue',
+                    7: len => [
+                        'magenta',
+                        'purple',
+                        'violet',
+                        'lavender',
+                        'orchid',
+                        'lilac',
+                        'plum',
+                        'amethyst',
+                    ][len - 1] ?? 'magenta',
+                    8: len => [
+                        'brown',
+                        'beige',
+                        'chestnut',
+                        'chocolate',
+                        'coffee',
+                        'tan',
+                        'sepia',
+                        'bronze',
+                    ][len - 1] ?? 'brown',
+                    9: len => [
+                        'white',
+                        'snow',
+                        'pale',
+                        'bleached',
+                        'ghostly',
+                        'cream',
+                        'light',
+                        'ivory',
+                    ][len - 1] ?? 'white',
+                    'e': len => 'shifted through',
+                    'F': len => 'tainted by',
+                    '.': len => 'covered by',
                 };
-                default:
-                case 'slime':
-                    health = D(2).pow(level ?? layers.xp.enemy.level(type)).times(10);
-                    break;
-                case 'goblin':
-                    health = D(3).pow(level ?? layers.xp.enemy.level(type)).times(15);
-                    break;
-                case 'zombie':
-                    health = D(2.5).pow(level ?? layers.xp.enemy.level(type)).times(20);
-                    break;
-                case 'ent':
-                    health = D(2.25).pow(level ?? layers.xp.enemy.level(type)).times(50);
-                    break;
-            }
 
-            if (hasUpgrade('xp', 12)) health = health.add(upgradeEffect('xp', 12).health);
+                return formatWhole(l).replaceAll(/(.)\1*/g, s => `${map[s[0]](s.length)} `);
+            },
+            level_mult() {
+                return D.dOne;
+            },
+            health_mult() {
+                let mult = D.dOne;
 
-            health = health.div(buyableEffect('lo', 13));
+                mult = mult.div(buyableEffect('lo', 13));
 
-            if (type == 'slime') {
+                return mult;
+            },
+            health_add() {
+                let add = D.dZero;
+
+                if (hasUpgrade('xp', 12)) add = add.add(upgradeEffect('xp', 12).health);
+
+                return add;
+            },
+            exp_mult() {
+                let mult = D.dOne;
+
+                if (hasUpgrade('xp', 12)) mult = mult.times(upgradeEffect('xp', 12).experience);
+                if (hasUpgrade('xp', 13)) mult = mult.times(upgradeEffect('xp', 13));
+                if (hasUpgrade('xp', 23)) mult = mult.times(upgradeEffect('xp', 23));
+                if (hasUpgrade('xp', 42)) mult = mult.times(upgradeEffect('xp', 42));
+
+                mult = mult.times(buyableEffect('lo', 11));
+
+                if (inChallenge('b', 12) && !hasUpgrade('s', 11)) mult = mult.div(player.xp.points.add(10).log10());
+                if (hasUpgrade('s', 11)) mult = mult.div(upgradeEffect('s', 11));
+
+                return mult;
+            },
+            exp_cap() {
+                let cap = getNextAt('l');
+
+                if (inChallenge('b', 32)) cap = cap.times(1.05); // Allows getting a level
+
+                return cap;
+            },
+            kill_mult() {
+                let mult = D.dOne;
+
+                if (inChallenge('b', 12) && !hasUpgrade('s', 12)) mult = mult.div(tmp.xp.total.kills.add(10).log10());
+                if (hasUpgrade('s', 12)) mult = mult.times(upgradeEffect('s', 12));
+
+                return mult;
+            },
+            damage_mult() {
+                let mult = D.dOne;
+
+                mult = mult.times(tmp.mag.elements[player.mag.element].effects.xp?.damage_multiplier ?? 1);
+                if (mult.eq(0)) return D.dZero;
+
+                if (hasUpgrade('xp', 11)) mult = mult.times(upgradeEffect('xp', 11));
+                if (hasUpgrade('xp', 31)) mult = mult.times(upgradeEffect('xp', 31));
+                if (hasUpgrade('xp', 33)) mult = mult.times(upgradeEffect('xp', 33));
+                if (hasUpgrade('xp', 41)) mult = mult.times(upgradeEffect('xp', 41));
+
+                if (hasUpgrade('m', 21)) mult = mult.times(upgradeEffect('m', 21));
+
+                if (hasUpgrade('t', 21)) mult = mult.times(upgradeEffect('t', 21));
+
+                mult = mult.times(tmp.l.skills.attacking.effect);
+
+                mult = mult.times(buyableEffect('lo', 31));
+                mult = mult.times(buyableEffect('lo', 42).xp_damage_mult);
+
+                if (hasUpgrade('f', 21)) mult = mult.times(upgradeEffect('f', 21));
+
+                if (hasUpgrade('s', 71)) mult = mult.times(upgradeEffect('s', 71));
+
+                return mult;
+            },
+            damage_add() {
+                let add = D.dZero;
+
+                if (hasUpgrade('xp', 21)) add = add.add(upgradeEffect('xp', 21));
+
+                return add;
+            },
+            dps_mult_active() {
+                let mult = D.dZero;
+
+                if (hasUpgrade('xp', 22)) mult = mult.add(upgradeEffect('xp', 22).active);
+
+                return mult;
+            },
+            dps_mult_inactive() {
+                let mult = D.dZero;
+
+                if (hasUpgrade('xp', 22)) mult = mult.add(upgradeEffect('xp', 22).global);
+
+                return mult;
+            },
+            regen_add() {
+                let add = D.dZero;
+
+                if (inChallenge('b', 21)) add = add.add(.05);
+
+                return add;
+            },
+            drops_mult() {
+                let mult = D.dOne;
+
+                mult = mult.times(tmp.mag.elements[player.mag.element].effects.xp?.drop_multiplier ?? 1);
+
+                return mult;
+            },
+            list() {
+                return Object.keys(layers.xp.enemies)
+                    .filter(type => type != '*' && tmp.xp.enemies[type].unlocked);
+            },
+        },
+        // Normal enemies
+        slime: {
+            _type: null,
+            get type() { return this._type ??= Object.keys(layers.xp.enemies).find(item => layers.xp.enemies[item] == this); },
+            level() {
+                const kills = player.xp.enemies[this.type].kills ?? D.dZero;
+
+                let level = D.div(kills, 10).root(2);
+
+                level = level.times(tmp.xp.enemies['*'].level_mult);
+
+                if (hasUpgrade('xp', 43)) level = level.times(upgradeEffect('xp', 43).level_mult);
+
+                return level.floor();
+            },
+            color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
+            color: '#77BB77',
+            health(level) {
+                level ??= tmp.xp.enemies[this.type].level;
+
+                let health = D(2).pow(level).times(10);
+
+                health = health.add(tmp.xp.enemies['*'].health_add);
+
+                health = health.times(tmp.xp.enemies['*'].health_mult);
+
                 if (inChallenge('b', 11)) health = health.times(5);
                 if (inChallenge('b', 31)) health = health.times(2.5);
-            }
 
-            return health;
+                return health;
+            },
+            experience(level) {
+                let exp = D.add(1, level ?? tmp.xp.enemies[this.type].level);
+
+                exp = exp.times(tmp.xp.enemies['*'].exp_mult);
+
+                exp = exp.times(D.pow(buyableEffect('lo', 11), .1));
+
+                return exp.min(tmp.xp.enemies['*'].exp_cap.minus(player.xp.points)).max(0);
+            },
+            kills() {
+                let kills = D.dOne;
+
+                kills = kills.times(tmp.xp.enemies['*'].kill_mult);
+
+                return kills;
+            },
+            name: 'slime',
+            damage() {
+                let damage = D.dOne;
+
+                damage = damage.add(tmp.xp.enemies['*'].damage_add);
+
+                damage = damage.times(tmp.xp.enemies['*'].damage_mult);
+
+                if (tmp.mag.elements[player.mag.element].strong.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].strong_multiplier);
+                } else if (tmp.mag.elements[player.mag.element].weak.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].weak_multiplier);
+                }
+
+                return damage;
+            },
+            dps() {
+                let dps = tmp.xp.enemies['*'].dps_mult_inactive;
+
+                if (this.type == player.xp.type) dps = dps.add(tmp.xp.enemies['*'].dps_mult_active);
+
+                if (dps.eq(0)) return D.dZero;
+
+                return dps.times(tmp.xp.enemies[this.type].damage);
+            },
+            regen(level) {
+                let regen_perc = D.dZero;
+
+                regen_perc = regen_perc.add(tmp.xp.enemies['*'].regen_add);
+
+                if (regen_perc.eq(0)) return D.dZero;
+
+                return regen_perc.times(this.health(level ?? tmp.xp.enemies[this.type].level));
+            },
+            unlocked() { return !inChallenge('b', 41); },
+            get_drops(kills) { return layers.lo.items['*'].get_drops(`enemy:${this.type}`, kills); },
         },
-        experience(type = player.xp.type, level) {
-            let xp_gain;
-            switch (type) {
-                case 'amalgam': {
-                    const level = layers.xp.enemy.level(type);
-                    return tmp.xp.enemy.all_types.filter(type => type != 'amalgam')
-                        .reduce((sum, type) => {
-                            return D.add(sum, layers.xp.enemy.experience(type, level));
-                        }, D.dZero)
-                };
-                default:
-                case 'slime':
-                    xp_gain = D.add(level ?? layers.xp.enemy.level(type), 1);
-                    break;
-                case 'goblin':
-                    xp_gain = D.pow(level ?? layers.xp.enemy.level(type), 2).add(2);
-                    break;
-                case 'zombie':
-                    xp_gain = D.pow(level ?? layers.xp.enemy.level(type), 2.5).add(4);
-                    break;
-                case 'ent':
-                    xp_gain = D.pow(level ?? layers.xp.enemy.level(type), 3).add(8);
-                    break;
-            }
+        goblin: {
+            _type: null,
+            get type() { return this._type ??= Object.keys(layers.xp.enemies).find(item => layers.xp.enemies[item] == this); },
+            level() {
+                const kills = player.xp.enemies[this.type].kills ?? D.dZero;
 
-            if (hasUpgrade('xp', 12)) xp_gain = xp_gain.times(upgradeEffect('xp', 12).experience);
-            if (hasUpgrade('xp', 13)) xp_gain = xp_gain.times(upgradeEffect('xp', 13));
-            if (hasUpgrade('xp', 23)) xp_gain = xp_gain.times(upgradeEffect('xp', 23));
-            if (hasUpgrade('xp', 42)) xp_gain = xp_gain.times(upgradeEffect('xp', 42));
+                let level = D.div(kills, 10).root(2);
 
-            xp_gain = xp_gain.times(tmp.l.skills.learning.effect);
+                level = level.times(tmp.xp.enemies['*'].level_mult);
 
-            /** @type {Decimal} */
-            let lo_11_mult = buyableEffect('lo', 11);
-            if (type == 'slime') lo_11_mult = lo_11_mult.pow(1.1);
-            xp_gain = xp_gain.times(lo_11_mult);
+                return level.floor();
+            },
+            color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
+            color: '#33DD33',
+            health(level) {
+                level ??= tmp.xp.enemies[this.type].level;
 
-            if (inChallenge('b', 12) && !hasUpgrade('s', 11)) xp_gain = xp_gain.div(player.xp.points.add(10).log10());
-            if (hasUpgrade('s', 11)) xp_gain = xp_gain.times(upgradeEffect('s', 11));
+                let health = D(3).pow(level).times(15);
 
-            const cap = tmp.xp.enemy.cap;
+                health = health.add(tmp.xp.enemies['*'].health_add);
 
-            return xp_gain.min(cap.minus(player.xp.points)).max(0);
+                health = health.times(tmp.xp.enemies['*'].health_mult);
+
+                return health;
+            },
+            experience(level) {
+                let exp = D.pow(level ?? tmp.xp.enemies[this.type].level, 2).add(2);
+
+                exp = exp.times(tmp.xp.enemies['*'].exp_mult);
+
+                return exp.min(tmp.xp.enemies['*'].exp_cap.minus(player.xp.points)).max(0);
+            },
+            kills() {
+                let kills = D.dOne;
+
+                kills = kills.times(tmp.xp.enemies['*'].kill_mult);
+
+                return kills;
+            },
+            name: 'goblin',
+            damage() {
+                let damage = D.dOne;
+
+                damage = damage.add(tmp.xp.enemies['*'].damage_add);
+
+                damage = damage.times(tmp.xp.enemies['*'].damage_mult);
+
+                if (tmp.mag.elements[player.mag.element].strong.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].strong_multiplier);
+                } else if (tmp.mag.elements[player.mag.element].weak.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].weak_multiplier);
+                }
+
+                return damage;
+            },
+            dps() {
+                let dps = tmp.xp.enemies['*'].dps_mult_inactive;
+
+                if (this.type == player.xp.type) dps = dps.add(tmp.xp.enemies['*'].dps_mult_active);
+
+                if (dps.eq(0)) return D.dZero;
+
+                return dps.times(tmp.xp.enemies[this.type].damage);
+            },
+            regen(level) {
+                let regen_perc = D.dZero;
+
+                regen_perc = regen_perc.add(tmp.xp.enemies['*'].regen_add);
+
+                if (regen_perc.eq(0)) return D.dZero;
+
+                return regen_perc.times(this.health(level ?? tmp.xp.enemies[this.type].level));
+            },
+            unlocked() { return hasChallenge('b', 11) && !inChallenge('b', 31) && !inChallenge('b', 41); },
+            get_drops(kills) { return layers.lo.items['*'].get_drops(`enemy:${this.type}`, kills); },
         },
-        kills(type = player.xp.type) {
-            let kills = D.dOne;
+        zombie: {
+            _type: null,
+            get type() { return this._type ??= Object.keys(layers.xp.enemies).find(item => layers.xp.enemies[item] == this); },
+            level() {
+                const kills = player.xp.enemies[this.type].kills ?? D.dZero;
 
-            if (inChallenge('b', 12) && !hasUpgrade('s', 12)) kills = kills.div(tmp.xp.total.kills.add(10).log10());
-            if (hasUpgrade('s', 12)) kills = kills.times(upgradeEffect('s', 12));
+                let level = D.div(kills, 10).root(2);
 
-            return kills;
+                level = level.times(tmp.xp.enemies['*'].level_mult);
+
+                return level.floor();
+            },
+            color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
+            color: '#779900',
+            health(level) {
+                level ??= tmp.xp.enemies[this.type].level;
+
+                let health = D(2.5).pow(level).times(20);
+
+                health = health.add(tmp.xp.enemies['*'].health_add);
+
+                health = health.times(tmp.xp.enemies['*'].health_mult);
+
+                return health;
+            },
+            experience(level) {
+                let exp = D.pow(level ?? tmp.xp.enemies[this.type].level, 2.5).add(4);
+
+                exp = exp.times(tmp.xp.enemies['*'].exp_mult);
+
+                return exp.min(tmp.xp.enemies['*'].exp_cap.minus(player.xp.points)).max(0);
+            },
+            kills() {
+                let kills = D.dOne;
+
+                kills = kills.times(tmp.xp.enemies['*'].kill_mult);
+
+                return kills;
+            },
+            name: 'zombie',
+            damage() {
+                let damage = D.dOne;
+
+                damage = damage.add(tmp.xp.enemies['*'].damage_add);
+
+                damage = damage.times(tmp.xp.enemies['*'].damage_mult);
+
+                if (tmp.mag.elements[player.mag.element].strong.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].strong_multiplier);
+                } else if (tmp.mag.elements[player.mag.element].weak.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].weak_multiplier);
+                }
+
+                return damage;
+            },
+            dps() {
+                let dps = tmp.xp.enemies['*'].dps_mult_inactive;
+
+                if (this.type == player.xp.type) dps = dps.add(tmp.xp.enemies['*'].dps_mult_active);
+
+                if (dps.eq(0)) return D.dZero;
+
+                return dps.times(tmp.xp.enemies[this.type].damage);
+            },
+            regen(level) {
+                let regen_perc = D(.01);
+
+                regen_perc = regen_perc.add(tmp.xp.enemies['*'].regen_add);
+
+                if (regen_perc.eq(0)) return D.dZero;
+
+                return regen_perc.times(this.health(level ?? tmp.xp.enemies[this.type].level));
+            },
+            unlocked() { return hasChallenge('b', 12) && !inChallenge('b', 31) && !inChallenge('b', 41); },
+            get_drops(kills) { return layers.lo.items['*'].get_drops(`enemy:${this.type}`, kills); },
         },
-        name(type) {
-            switch (type) {
-                default: return '';
-                case 'amalgam': return 'amalgam';
-                case 'slime': return 'slime';
-                case 'goblin': return 'goblin';
-                case 'zombie': return 'zombie';
-                case 'ent': return 'ent';
-            }
+        ent: {
+            _type: null,
+            get type() { return this._type ??= Object.keys(layers.xp.enemies).find(item => layers.xp.enemies[item] == this); },
+            level() {
+                const kills = player.xp.enemies[this.type].kills ?? D.dZero;
+
+                let level = D.div(kills, 10).root(2);
+
+                level = level.times(tmp.xp.enemies['*'].level_mult);
+
+                return level.floor();
+            },
+            color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
+            color: '#884411',
+            health(level) {
+                level ??= tmp.xp.enemies[this.type].level;
+
+                let health = D(2.25).pow(level).times(50);
+
+                health = health.add(tmp.xp.enemies['*'].health_add);
+
+                health = health.times(tmp.xp.enemies['*'].health_mult);
+
+                return health;
+            },
+            experience(level) {
+                let exp = D.pow(level ?? tmp.xp.enemies[this.type].level, 3).add(8);
+
+                exp = exp.times(tmp.xp.enemies['*'].exp_mult);
+
+                return exp.min(tmp.xp.enemies['*'].exp_cap.minus(player.xp.points)).max(0);
+            },
+            kills() {
+                let kills = D.dOne;
+
+                kills = kills.times(tmp.xp.enemies['*'].kill_mult);
+
+                return kills;
+            },
+            name: 'ent',
+            damage() {
+                let damage = D.dOne;
+
+                damage = damage.add(tmp.xp.enemies['*'].damage_add);
+
+                damage = damage.add(tmp.t.trees['*'].damage_base);
+
+                damage = damage.times(tmp.xp.enemies['*'].damage_mult);
+
+                if (tmp.mag.elements[player.mag.element].strong.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].strong_multiplier);
+                } else if (tmp.mag.elements[player.mag.element].weak.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].weak_multiplier);
+                }
+
+                return damage;
+            },
+            dps() {
+                let dps = tmp.xp.enemies['*'].dps_mult_inactive;
+
+                if (this.type == player.xp.type) dps = dps.add(tmp.xp.enemies['*'].dps_mult_active);
+
+                if (dps.eq(0)) return D.dZero;
+
+                return dps.times(tmp.xp.enemies[this.type].damage);
+            },
+            regen(level) {
+                let regen_perc = D(.05);
+
+                regen_perc = regen_perc.add(tmp.xp.enemies['*'].regen_add);
+
+                if (regen_perc.eq(0)) return D.dZero;
+
+                return regen_perc.times(this.health(level ?? tmp.xp.enemies[this.type].level));
+            },
+            unlocked() { return hasChallenge('b', 21) && !inChallenge('b', 31) && !inChallenge('b', 41); },
+            get_drops(kills) { return layers.lo.items['*'].get_drops(`enemy:${this.type}`, kills); },
         },
-        damage(type = player.xp.type, level) {
-            let damage = D(1);
+        // Challenges enemies
+        amalgam: {
+            _type: null,
+            get type() { return this._type ??= Object.keys(layers.xp.enemies).find(item => layers.xp.enemies[item] == this); },
+            level() {
+                const kills = player.xp.enemies[this.type].kills ?? D.dZero;
 
-            if (hasUpgrade('xp', 21)) damage = damage.add(upgradeEffect('xp', 21));
+                let level = D.div(kills, 10).root(2);
 
-            if (type == 'ent') {
-                damage = damage.add(tmp.t.trees.damage);
-            }
+                level = level.times(tmp.xp.enemies['*'].level_mult);
 
-            if (hasUpgrade('xp', 11)) damage = damage.times(upgradeEffect('xp', 11));
-            if (hasUpgrade('xp', 31)) damage = damage.times(upgradeEffect('xp', 31));
-            if (hasUpgrade('xp', 33)) damage = damage.times(upgradeEffect('xp', 33));
-            if (hasUpgrade('xp', 41)) damage = damage.times(upgradeEffect('xp', 41));
+                return level.floor();
+            },
+            color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
+            color() { return colors_average(...['slime', 'goblin', 'zombie', 'ent'].map(type => tmp.xp.enemies[type].color)); },
+            health(level) {
+                level ??= tmp.xp.enemies[this.type].level;
 
-            if (hasUpgrade('m', 21)) damage = damage.times(upgradeEffect('m', 21));
+                return ['slime', 'goblin', 'zombie', 'ent'].reduce((sum, type) => D.add(sum, layers.xp.enemies[type].health(level)), D.dZero);
+            },
+            experience(level) {
+                level ??= tmp.xp.enemies[this.type].level;
 
-            if (hasUpgrade('t', 21)) damage = damage.times(upgradeEffect('t', 21));
+                return ['slime', 'goblin', 'zombie', 'ent'].reduce((sum, type) => D.add(sum, layers.xp.enemies[type].experience(level)), D.dZero);
+            },
+            kills() {
+                let kills = D.dOne;
 
-            damage = damage.times(tmp.l.skills.attacking.effect);
+                kills = kills.times(tmp.xp.enemies['*'].kill_mult);
 
-            damage = damage.times(buyableEffect('lo', 31));
-            damage = damage.times(buyableEffect('lo', 42).xp_damage_mult);
+                return kills;
+            },
+            name: 'amalgam',
+            damage() {
+                let damage = D.dOne;
 
-            if (hasUpgrade('f', 21)) damage = damage.times(upgradeEffect('f', 21));
+                damage = damage.add(tmp.xp.enemies['*'].damage_add);
 
-            if (hasUpgrade('s', 71)) damage = damage.times(upgradeEffect('s', 71));
+                damage = damage.times(tmp.xp.enemies['*'].damage_mult);
 
-            return damage.max(1);
-        },
-        dps(type = player.xp.type) {
-            let active_damage = D.dZero,
-                damage = D.dZero;
+                if (tmp.mag.elements[player.mag.element].strong.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].strong_multiplier);
+                } else if (tmp.mag.elements[player.mag.element].weak.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].weak_multiplier);
+                }
 
-            if (hasUpgrade('xp', 22)) {
-                active_damage = active_damage.add(upgradeEffect('xp', 22).active);
-                damage = damage.add(upgradeEffect('xp', 22).global);
-            }
+                return damage;
+            },
+            dps() {
+                let dps = tmp.xp.enemies['*'].dps_mult_inactive;
 
-            if (type == player.xp.type) damage = damage.add(active_damage);
+                if (this.type == player.xp.type) dps = dps.add(tmp.xp.enemies['*'].dps_mult_active);
 
-            return damage.times(this.damage(type));
-        },
-        regen(type = player.xp.type, level) {
-            if (type == 'amalgam') {
-                const level = layers.xp.enemy.level(type);
-                return tmp.xp.enemy.all_types.filter(type => type != 'amalgam')
-                    .reduce((sum, type) => {
-                        return D.add(sum, layers.xp.enemy.regen(type, level));
-                    }, D.dZero)
-            }
+                if (dps.eq(0)) return D.dZero;
 
-            let regen = D.dZero;
+                return dps.times(tmp.xp.enemies[this.type].damage);
+            },
+            regen(level) {
+                level ??= tmp.xp.enemies[this.type].level;
 
-            if (type == 'zombie') regen = regen.add(.01);
+                return ['slime', 'goblin', 'zombie', 'ent'].reduce((sum, type) => D.add(sum, layers.xp.enemies[type].regen(level)), D.dZero);
+            },
+            unlocked() { return inChallenge('b', 41); },
+            get_drops(kills) {
+                return Object.entries(['slime', 'goblin', 'zombie', 'ent'].reduce((sum, type) => {
+                    layers.xp.enemies[type].get_drops(kills).forEach(([item, amount]) => sum[item] = D.add(sum[item], amount));
 
-            if (type == 'ent') regen = regen.add(.02);
-
-            if (inChallenge('b', 21)) regen = regen.add(.05);
-
-            return this.health(type, level ?? this.level(type)).times(regen);
-        },
-        cap() {
-            let cap = getNextAt('l');
-
-            if (inChallenge('b', 32)) cap = cap.times(1.05); // Allows getting a level
-
-            return cap;
-
+                    return sum;
+                }, {}));
+            },
         },
     },
     /** @type {typeof layers.xp.total} */
     total: {
         kills() {
-            return Object.values(player.xp.kills).reduce(D.add, D.dZero);
+            return Object.values(player.xp.enemies).reduce((sum, data) => D.add(sum, data.kills), D.dZero);
         },
     },
     doReset(layer, force = false) {
@@ -838,6 +1161,12 @@ addLayer('xp', {
 
         layerDataReset(this.layer, keep);
         player.xp.upgrades.push(...kept_ups);
-        Object.keys(player.xp.health).forEach(type => player.xp.health[type] = layers.xp.enemy.health(type));
+        Object.keys(player.xp.enemies).forEach(type => player.xp.enemies[type] = {
+            health: tmp.xp.enemies[type].health,
+            last_drops: [],
+            last_drops_times: D.dZero,
+            kills: D.dZero,
+            element: layers.mag.elements['*'].element(type),
+        });
     },
 });

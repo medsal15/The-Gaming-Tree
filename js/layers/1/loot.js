@@ -1,6 +1,6 @@
 'use strict';
 
-//todo ent buyables (8X)
+//todo keep final "enemy" drop
 addLayer('lo', {
     name: 'Loot',
     image: './resources/images/swap-bag.svg',
@@ -48,7 +48,7 @@ addLayer('lo', {
                 },
                 ['upgrades', [1]],
                 () => { if (tmp.lo.items['*'].craft_consumption.neq(1)) return ['display-text', `Crafting consumes ${format(tmp.lo.items['*'].craft_consumption.times(100))}% of required resources`]; },
-                ['buyables', [1, 2, 3, 4, 5, 6, 7]],
+                ['buyables', [1, 2, 3, 4, 5, 6, 7, 8, 9]],
             ],
         },
         'Inventory': {
@@ -115,12 +115,12 @@ addLayer('lo', {
             pay() {
                 /** @type {Decimal} */
                 let to_lose = this.cost;
-                Object.entries(player.xp.kills)
-                    .forEach(([type, kills]) => {
-                        if (to_lose.lte(0) || kills.lte(0)) return;
-                        const lose = kills.min(to_lose);
-                        player.xp.kills[type] = kills.minus(lose);
-                        to_lose = to_lose.minus(lose);
+                Object.entries(player.xp.enemies)
+                    .forEach(([type, data]) => {
+                        if (to_lose.lte(0) || data.kills.lte(0)) return;
+                        const lose = data.kills.min(to_lose);
+                        player.xp.enemies[type].kills = D.minus(player.xp.enemies[type].kills, lose);
+                        to_lose = D.minus(to_lose, lose);
                     });
             },
         },
@@ -197,7 +197,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('slime');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['slime'].color;
 
                 return style;
             },
@@ -286,7 +286,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('slime');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['slime'].color;
 
                 return style;
             },
@@ -366,7 +366,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('slime');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['slime'].color;
 
                 return style;
             },
@@ -793,7 +793,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('goblin');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['goblin'].color;
 
                 return style;
             },
@@ -884,7 +884,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('goblin');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['goblin'].color;
 
                 return style;
             },
@@ -990,7 +990,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('goblin');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['goblin'].color;
 
                 return style;
             },
@@ -1078,7 +1078,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('zombie');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['zombie'].color;
 
                 return style;
             },
@@ -1185,7 +1185,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('zombie');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['zombie'].color;
 
                 return style;
             },
@@ -1272,7 +1272,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.xp.enemy.color('zombie');
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['zombie'].color;
 
                 return style;
             },
@@ -2135,9 +2135,534 @@ addLayer('lo', {
                 return value;
             },
         },
+        // holy water
+        81: {
+            title: 'Blessing of Levels',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id);
+
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} blessings of levels\
+                    divide level costs by ${format(buyableEffect(this.layer, this.id).divide)}<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula_divide = 'amount / 10 + 1',
+                        cost_formula_holy_water = '1.5 ^ amount',
+                        cost_formula_brain = '(1.5 ^ amount) * 5',
+                        value_formula = 'amount * 5';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_holy_water = `(${cost_formula_holy_water}) * ${effect}`;
+                        cost_formula_brain += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_holy_water}] ${tmp.lo.items.holy_water.name}`,
+                        `[${cost_formula_brain}] ${tmp.lo.items.brain.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} blessings of levels\
+                    divide level costs by [${effect_formula_divide}]<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                const cost = {
+                    holy_water: D(1.5).pow(x),
+                    brain: D(1.5).pow(x).times(5),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+                return {
+                    divide: D.div(x, 10).add(1),
+                };
+            },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => D.gte(player.lo.items[item].amount, amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background'] = `${tmp.lo.items.holy_water.style['background'].split(',')[1]}, ${tmp.l.color})`;
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 21); },
+            value() {
+                let value = D(5);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        82: {
+            title: 'Blessing of Mining',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id),
+                    anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
+
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} blessings of mining\
+                    multiply ore regeneration by ${format(buyableEffect(this.layer, this.id).regen)}<br><br>\
+                    ${anvil_req}\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula_divide = 'amount / 10 + 1',
+                        cost_formula_holy_water = '1.5 ^ amount',
+                        cost_formula_stone = '(2.5 ^ amount) * 500',
+                        value_formula = 'amount * 7';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_holy_water = `(${cost_formula_holy_water}) * ${effect}`;
+                        cost_formula_stone += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_formula_stone += ` / ${format(D.pow(upgradeEffect('f', 11)['stone_brick'], -1))}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_holy_water}] ${tmp.lo.items.holy_water.name}`,
+                        `[${cost_formula_stone}] ${tmp.lo.items.stone.name}`,
+                    ];
+
+                    if (hasUpgrade('f', 11)) {
+                        cost_list[1] = `[${cost_formula_stone}] ${tmp.lo.items.stone_brick.name}`;
+                    }
+
+                    return `Your ${formatWhole(amount)} blessings of mining\
+                    multiply ore regeneration by [${effect_formula_divide}]<br><br>\
+                    ${anvil_req}\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                const cost = {
+                    holy_water: D(1.5).pow(x),
+                    stone: D(2.5).pow(x).times(500),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                if (hasUpgrade('f', 11)) {
+                    cost['stone_brick'] = cost['stone'].times(upgradeEffect('f', 11)['stone_brick']);
+                    delete cost['stone'];
+                }
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+                return {
+                    regen: D.div(x, 10).add(1),
+                };
+            },
+            canAfford() {
+                return tmp.lo.items['*'].has_anvil && Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => D.gte(player.lo.items[item].amount, amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background'] = `${tmp.lo.items.holy_water.style['background'].split(',')[1]}, ${tmp.m.color})`;
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 21); },
+            value() {
+                let value = D(7);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        83: {
+            title: 'Blessing of Growth',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id);
+
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} blessings of growth\
+                    increase tree size by ${format(buyableEffect(this.layer, this.id).size)}<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula_divide = 'amount / 10',
+                        cost_formula_holy_water = '1.5 ^ amount',
+                        cost_formula_normal_log = '(1.5 ^ amount) * 250',
+                        value_formula = 'amount * 6';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_holy_water = `(${cost_formula_holy_water}) * ${effect}`;
+                        cost_formula_normal_log += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_holy_water}] ${tmp.lo.items.holy_water.name}`,
+                        `[${cost_formula_normal_log}] ${tmp.lo.items.normal_log.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} blessings of growth\
+                    increase tree size by [${effect_formula_divide}]<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                const cost = {
+                    holy_water: D(1.5).pow(x),
+                    normal_log: D(1.5).pow(x).times(250),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+                return {
+                    size: D.div(x, 10),
+                };
+            },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => D.gte(player.lo.items[item].amount, amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background'] = `${tmp.lo.items.holy_water.style['background'].split(',')[1]}, ${tmp.t.color})`;
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 21); },
+            value() {
+                let value = D(6);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        // ent
+        91: {
+            title: 'Leaves Compost Bin',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id);
+
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} leaves compost bins\
+                    multiply tree growth by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'log5(amount + 5)',
+                        cost_formula_leaf = '(1.25 ^ amount) * 10',
+                        cost_formula_plank = '(1.3 ^ amount) * 50',
+                        value_formula = 'amount * 3';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_leaf += ` * ${effect}`;
+                        cost_formula_plank += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_leaf}] ${tmp.lo.items.leaf.name}`,
+                        `[${cost_formula_plank}] ${tmp.lo.items.plank.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} leaves compost bins\
+                    multiply tree growth by [${effect_formula}]<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                const cost = {
+                    leaf: D(1.25).pow(x).times(10),
+                    plank: D(1.3).pow(x).times(50),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+
+                return D.add(x, 5).log(5);
+            },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => D.gte(player.lo.items[item].amount, amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies.ent.color;
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 21); },
+            value() {
+                let value = D(3);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        92: {
+            title: 'Fake Tree',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id);
+
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} fake trees\
+                    increase tree cap and ent health by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount * 10',
+                        cost_formula_normal_log = '(1.2 ^ amount) * 150',
+                        cost_formula_leaf = '(1.4 ^ amount) * 25',
+                        value_formula = 'amount * 4';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_normal_log += ` * ${effect}`;
+                        cost_formula_leaf += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_normal_log}] ${tmp.lo.items.normal_log.name}`,
+                        `[${cost_formula_leaf}] ${tmp.lo.items.leaf.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} fake trees\
+                    increase tree cap and ent health by [${effect_formula}]<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                const cost = {
+                    normal_log: D(1.2).pow(x).times(150),
+                    leaf: D(1.4).pow(x).times(25),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+
+                return D.times(x, 10);
+            },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => D.gte(player.lo.items[item].amount, amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies.ent.color;
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 21); },
+            value() {
+                let value = D(4);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
+        93: {
+            title: 'Planter Box',
+            display() {
+                const amount = getBuyableAmount(this.layer, this.id);
+
+                if (!shiftDown) {
+                    /** @type {{[item: string]: Decimal}} */
+                    const cost_obj = this.cost(amount),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
+
+                    return `Your ${formatWhole(amount)} planter boxes\
+                    multiply chopping chance and item drops by ${format(buyableEffect(this.layer, this.id))}<br><br>\
+                    ${value}\
+                    Cost: ${cost}`;
+                } else {
+                    let effect_formula = 'amount / 20 + 1',
+                        cost_formula_seed = '(1.25 ^ amount) * 3',
+                        cost_formula_plank = '(1.5 ^ amount) * 100',
+                        value_formula = 'amount * 4';
+
+                    if (hasUpgrade('s', 63)) {
+                        const effect = format(upgradeEffect('s', 63));
+                        cost_formula_seed += ` * ${effect}`;
+                        cost_formula_plank += ` * ${effect}`;
+                    }
+
+                    if (hasUpgrade('s', 81)) {
+                        value_formula += ` + amount * ${upgradeEffect('s', 81)}`;
+                    }
+
+                    const cost_list = [
+                        `[${cost_formula_seed}] ${tmp.lo.items.seed.name}`,
+                        `[${cost_formula_plank}] ${tmp.lo.items.plank.name}`,
+                    ];
+
+                    return `Your ${formatWhole(amount)} planter boxes\
+                    multiply chopping chance and item drops by [${effect_formula}]<br><br>\
+                    ${tmp.s.layerShown ? `Value: [${value_formula}]<br>` : ''}\
+                    Cost: ${listFormat.format(cost_list)}`;
+                }
+            },
+            cost(x) {
+                const cost = {
+                    seed: D(1.25).pow(x).times(3),
+                    plank: D(1.5).pow(x).times(100),
+                };
+
+                if (hasUpgrade('s', 63)) Object.entries(cost).forEach(([item, amount]) => {
+                    cost[item] = amount.times(upgradeEffect('s', 63));
+                });
+
+                return cost;
+            },
+            effect(x) {
+                if (tmp.l.deactivated) x = D.dZero;
+
+                return D.div(x, 20).add(1);
+            },
+            canAfford() {
+                return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .every(([item, amount]) => D.gte(player.lo.items[item].amount, amount));
+            },
+            buy() {
+                Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
+                    .forEach(([item, amount]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, D.times(amount, tmp.lo.items['*'].craft_consumption)));
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies.ent.color;
+
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 21); },
+            value() {
+                let value = D(4);
+
+                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 81)));
+
+                return value;
+            },
+        },
     },
     grid: {
-        rows: 8,
+        rows: 9,
         cols: 6,
         getStartData(_) { return {}; },
         getStyle(_, id) {
@@ -2225,6 +2750,7 @@ addLayer('lo', {
                 mult = mult.times(buyableEffect('lo', 23).chance_mult);
                 mult = mult.times(buyableEffect('lo', 32).chance_mult);
                 mult = mult.times(buyableEffect('lo', 41).chance_mult);
+                mult = mult.times(buyableEffect('lo', 93));
 
                 if (hasUpgrade('m', 53)) mult = mult.times(upgradeEffect('m', 53));
 
@@ -2337,6 +2863,7 @@ addLayer('lo', {
             gain_drops(drops) { drops.forEach(([item, amount]) => player.lo.items[item].amount = D.add(player.lo.items[item].amount, amount)); },
             format_chance(chance) {
                 if (chance.gte(1) || options.noRNG) return `+${format(chance)}`;
+                if (chance.lte(0)) return format(0);
 
                 const fractional = options.chanceMode == 'NOT_GUARANTEED' || (options.chanceMode == 'LESS_HALF' && chance.lt(.5));
 
@@ -2350,9 +2877,11 @@ addLayer('lo', {
                 /** @type {[drop_sources, string]} */
                 const [from, sub] = type.split(':');
                 switch (from) {
-                    case 'enemy': return layers.xp.enemy.name(sub);
+                    case 'enemy': return tmp.xp.enemies[sub].name;
                     case 'mining': return `${layers.m.ore.mode(sub)} ${tmp.m.name.toLowerCase()}`.trim();
-                    case 'tree': return `Chopping ${layers.t.trees.name(sub)}`;
+                    case 'tree':
+                        if (sub == 'convertion') return 'Convertion';
+                        return `Chopping ${tmp.t.trees[sub].name}`;
                     case 'forge':
                         let text = 'Forge: ';
                         if (sub == 'fuel') text += 'fueling';
@@ -2451,6 +2980,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 101,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:slime': D(1 / 3), };
 
@@ -2464,7 +2995,7 @@ addLayer('lo', {
             name: 'slime goo',
             style: {
                 'background-image': `url('./resources/images/spill.svg')`,
-                'background-color'() { return layers.xp.enemy.color('slime'); },
+                'background-color'() { return tmp.xp.enemies['slime'].color; },
             },
         },
         slime_core_shard: {
@@ -2472,6 +3003,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 102,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:slime': D(1 / 16), };
 
@@ -2485,7 +3018,7 @@ addLayer('lo', {
             name: 'slime core shard',
             style: {
                 'background-image': `url('./resources/images/slime_core_shard.svg')`,
-                'background-color'() { return layers.xp.enemy.color('slime'); },
+                'background-color'() { return tmp.xp.enemies['slime'].color; },
             },
         },
         slime_core: {
@@ -2493,6 +3026,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 103,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:slime': D(1 / 125), };
 
@@ -2506,7 +3041,7 @@ addLayer('lo', {
             name: 'slime core',
             style: {
                 'background-image': `url('./resources/images/slime_core.svg')`,
-                'background-color'() { return layers.xp.enemy.color('slime'); },
+                'background-color'() { return tmp.xp.enemies['slime'].color; },
             },
         },
         // Goblin drops
@@ -2515,6 +3050,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 201,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:goblin': D(1 / 4), };
 
@@ -2526,7 +3063,7 @@ addLayer('lo', {
             name: 'red fabric',
             style: {
                 'background-image': `url('./resources/images/rolled-cloth.svg')`,
-                'background-color': () => layers.xp.enemy.color('goblin'),
+                'background-color': () => tmp.xp.enemies['goblin'].color,
             },
             unlocked() { return hasChallenge('b', 11); },
         },
@@ -2535,6 +3072,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 202,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:goblin': D(1 / 25), };
 
@@ -2546,7 +3085,7 @@ addLayer('lo', {
             name: 'pyrite coin',
             style: {
                 'background-image': `url('./resources/images/token.svg')`,
-                'background-color': () => layers.xp.enemy.color('goblin'),
+                'background-color': () => tmp.xp.enemies['goblin'].color,
             },
             unlocked() { return hasChallenge('b', 11); },
         },
@@ -2555,6 +3094,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 203,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:goblin': D(1 / 216), };
 
@@ -2566,7 +3107,7 @@ addLayer('lo', {
             name: 'rusty gear',
             style: {
                 'background-image': `url('./resources/images/cog.svg')`,
-                'background-color': () => layers.xp.enemy.color('goblin'),
+                'background-color': () => tmp.xp.enemies['goblin'].color,
             },
             unlocked() { return hasChallenge('b', 11); },
         },
@@ -2576,8 +3117,12 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 301,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:zombie': D(1 / 5), };
+
+                    if (hasChallenge('b', 41)) chances['enemy:zombie'] = D.times(chances['enemy:zombie'], 2);
 
                     return chances;
                 },
@@ -2585,7 +3130,7 @@ addLayer('lo', {
             name: 'rotten flesh',
             style: {
                 'background-image': `url('./resources/images/fleshy-mass.svg')`,
-                'background-color': () => layers.xp.enemy.color('zombie'),
+                'background-color': () => tmp.xp.enemies['zombie'].color,
             },
             unlocked() { return hasChallenge('b', 12); },
         },
@@ -2594,8 +3139,12 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 302,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:zombie': D(1 / 343), };
+
+                    if (hasChallenge('b', 41)) chances['enemy:zombie'] = D.times(chances['enemy:zombie'], 2);
 
                     return chances;
                 },
@@ -2603,7 +3152,7 @@ addLayer('lo', {
             name: 'brain',
             style: {
                 'background-image': `url('./resources/images/brain.svg')`,
-                'background-color': () => layers.xp.enemy.color('zombie'),
+                'background-color': () => tmp.xp.enemies['zombie'].color,
             },
             unlocked() { return hasChallenge('b', 12); },
         },
@@ -2613,6 +3162,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 401,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:ent': D(1 / 6), };
 
@@ -2622,7 +3173,7 @@ addLayer('lo', {
             name: 'leaf',
             style: {
                 'background-image': `url('./resources/images/falling-leaf.svg')`,
-                'background-color': () => layers.xp.enemy.color('ent'),
+                'background-color': () => tmp.xp.enemies['ent'].color,
             },
             unlocked() { return hasChallenge('b', 21); },
         },
@@ -2631,6 +3182,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 402,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:ent': D(1 / 512), };
 
@@ -2640,7 +3193,7 @@ addLayer('lo', {
             name: 'seed',
             style: {
                 'background-image': `url('./resources/images/sesame.svg')`,
-                'background-color': () => layers.xp.enemy.color('ent'),
+                'background-color': () => tmp.xp.enemies['ent'].color,
             },
             unlocked() { return hasChallenge('b', 21); },
         },
@@ -2650,6 +3203,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 501,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 weights() {
                     if (hasUpgrade('m', 32)) return {};
 
@@ -2686,6 +3241,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 502,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 weights() {
                     let shallow = D(4);
 
@@ -2716,6 +3273,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 503,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 weights() {
                     let shallow = D(1);
 
@@ -2746,6 +3305,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 504,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 weights() {
                     if (!hasUpgrade('m', 52)) return {};
 
@@ -2785,8 +3346,12 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 505,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'enemy:zombie': D(1 / 36), };
+
+                    if (hasChallenge('b', 41)) chances['enemy:zombie'] = D.times(chances['enemy:zombie'], 2);
 
                     return chances;
                 },
@@ -2814,6 +3379,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 506,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 weights() {
                     if (!hasUpgrade('m', 52)) return {};
 
@@ -2839,6 +3406,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 601,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
             },
             name: 'stone brick',
@@ -2853,6 +3422,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 602,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
             },
             name: 'copper ingot',
@@ -2867,6 +3438,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 603,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
             },
             name: 'tin ingot',
@@ -2881,6 +3454,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 604,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
             },
             name: 'iron ingot',
@@ -2895,6 +3470,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 605,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
             },
             name: 'gold ingot',
@@ -2910,6 +3487,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 701,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.alloys) return ['forge:smelt']; },
             },
             name: 'bronze ingot',
@@ -2924,6 +3503,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 702,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.alloys) return ['forge:smelt']; },
             },
             name: 'steel ingot',
@@ -2939,6 +3520,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 801,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = { 'tree:driftwood': D(1), };
 
@@ -2974,6 +3557,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 802,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 chances() {
                     const chances = {
                         'tree:oak': D(1),
@@ -3015,6 +3600,8 @@ addLayer('lo', {
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 803,
             sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 per_second() {
                     const per_second = {};
 
@@ -3039,6 +3626,22 @@ addLayer('lo', {
                 'background-color': '#997744',
             },
             unlocked() { return tmp.t.layerShown; },
+        },
+        // Special
+        holy_water: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 901,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                other() { if (player.f.unlocked) return ['forge:smelt']; },
+            },
+            name: 'holy water',
+            style: {
+                'background': `url('./resources/images/round-bottom-flask.svg'), radial-gradient(#88CCFF, #EEDD88)`,
+            },
+            unlocked() { return inChallenge('b', 21) || hasChallenge('b', 21); },
         },
     },
     // type none does not allow layerReset

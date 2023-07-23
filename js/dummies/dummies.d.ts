@@ -1911,25 +1911,101 @@ type Layers = {
         }
         regex: RegExp
     }
+    mag: Layer<Player['mag']> & {
+        elements: {
+            '*': {
+                weak_multiplier: Decimal
+                strong_multiplier: Decimal
+                /**
+                 * Returns the element for an entity
+                 *
+                 * May return a different element
+                 */
+                element(enemy: string): string
+                /** Returns a random element */
+                random(): string
+                randomize(): void
+            }
+        } & {
+            [element: string]: {
+                readonly id: string
+                name: string
+                color: Computable<string>
+                effects(): {
+                    xp?: {
+                        damage_multiplier?: Decimal
+                        drop_multiplier?: Decimal
+                    }
+                    mining?: {
+                        regen_multiplier?: Decimal
+                        chance_multiplier?: Decimal
+                    }
+                    tree?: {
+                        size_multiplier?: Decimal
+                        damage_multiplier?: Decimal
+                    }
+                }
+                /** Strong against */
+                strong: string[]
+                /** Weak against */
+                readonly weak: string[]
+            }
+        }
+        mana: {
+            gain(): Decimal
+            formula: Computable<string>
+            cost: Computable<Decimal>
+        }
+    }
     // Row 0
     xp: Layer<Player['xp']> & {
-        enemy: {
-            /** Unlocked enemy types */
-            types(): string[]
-            /** Full list of enemy types */
-            all_types: string[]
-            level(type?: string): Decimal
-            color_level(level?: DecimalSource): string
-            /** Color of an enemy type */
-            color(type?: string): string
-            health(type?: string, level?: DecimalSource): Decimal
-            experience(type?: string, level?: DecimalSource): Decimal
-            kills(type?: string): Decimal
-            name(type: string): string
-            damage(type?: string, level?: DecimalSource): Decimal
-            dps(type?: string): Decimal
-            regen(type?: string, level?: DecimalSource): Decimal
-            cap(): Decimal
+        enemies: {
+            '*': {
+                color_level(level?: DecimalSource): string
+                level_mult(): Decimal
+                health_mult(): Decimal
+                health_add(): Decimal
+                exp_mult(): Decimal
+                exp_cap(): Decimal
+                kill_mult(): Decimal
+                damage_mult(): Decimal
+                damage_add(): Decimal
+                /** Damage multiplier for dps on the current enemy */
+                dps_mult_active(): Decimal
+                /** Damage multiplier for dps on all enemies */
+                dps_mult_inactive(): Decimal
+                /** Added % of health regeneration */
+                regen_add(): Decimal
+                drops_mult(): Decimal
+                list(): string[]
+            }
+        } & {
+            [type: string]: {
+                readonly type: string
+                level(): Decimal
+                /** Color version of level */
+                color_level(): string
+                /** Color of the enemy */
+                color: Computable<string>
+                health(level?: DecimalSource): Decimal
+                experience(level?: DecimalSource): Decimal
+                kills(): Decimal
+                /** Current name (lowercase) */
+                name: Computable<string>
+                damage(): Decimal
+                /** Amount of damage dealt every second */
+                dps(): Decimal
+                /** Amount of health regenerated each second */
+                regen(level?: DecimalSource): Decimal
+                /** Determines whether the enemy is visible */
+                unlocked(): boolean
+                /**
+                 * Get drops as if the enemy were killed
+                 *
+                 * **Does a loot roll (only important if casino is unlocked)**
+                 */
+                get_drops(kills: DecimalSource): [string, Decimal][]
+            }
         }
         total: {
             kills(): Decimal
@@ -1954,28 +2030,43 @@ type Layers = {
             [id: number]: Upgrade & { item: string }
         }
         trees: {
-            /** Tracked items for display */
-            items: string[]
-            /** Unlocked trees */
-            trees(): string[]
-            /** All existing trees */
-            all_trees: string[]
-            health(type?: string | false): Decimal
-            /** Chance to get wood when hitting a tree */
-            chance(type?: string | false): Decimal
-            name(type?: string | false): string
-            /** Amount of trees regenerated every second */
-            regen(type?: string | false): Decimal
-            damage(type?: string | false): Decimal
-            passive_damage(type?: string | false): Decimal
-            get_drops(type?: string | false, amount: DecimalSource): [string, Decimal][]
-            /** Amount of wood when felling a tree */
-            size(type?: string | false): Decimal
-            /** Gets a random existing tree */
-            random(): string | false
-            /** Total amount of logs */
-            logs(): Decimal
-            cap(type?: string | false): Decimal
+            '*': {
+                health_mult(): Decimal
+                growth_mult(): Decimal
+                /** Base damage, may be changed depending on trees */
+                damage_base(): Decimal
+                /** Damage multiplier for dps on the current tree */
+                dps_mult_active(): Decimal
+                /** Damage multiplier for dps on all trees */
+                dps_mult_inactive(): Decimal
+                size_add(): Decimal
+                size_mult(): Decimal
+                cap_add(): Decimal
+                cap_mult(): Decimal
+                /** Added % of health regeneration */
+                regen_add(): Decimal
+                /** Tracked items for display */
+                items: string[]
+                /** Chance to get wood when hitting a tree */
+                chance(): Decimal
+                /** Total amount of logs */
+                logs(): Decimal
+            }
+        } & {
+            [tree: string | false]: {
+                readonly id: string
+                unlocked(): boolean
+                health: Computable<Decimal>
+                name: Computable<string>
+                growth: Computable<Decimal>
+                regen: Computable<Decimal>
+                damage: Computable<Decimal>
+                dps: Computable<Decimal>
+                get_drops(amount: DecimalSource): [string, Decimal][]
+                /** Amount of wood when felling a tree */
+                size: Computable<Decimal>
+                cap: Computable<Decimal>
+            }
         }
         convertion: {
             /** Items that can be converted to planks */
@@ -2042,6 +2133,7 @@ type Layers = {
                 readonly id: string
                 readonly grid: number
                 sources: {
+                    readonly id: string
                     chances?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
                     weights?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
                     per_second?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
@@ -2148,11 +2240,13 @@ type Layers = {
         }
         investloans: {
             amount(real?: boolean): Decimal
+            /** Determines whether the player is in a loan/debt challenge */
             is_loans(): boolean
             type(): 'loan' | 'debt' | 'investment'
             item_upgrade: {
                 [item: string]: number | undefined
             }
+            /** Checks whether the upgrade id is an investment/loan/debt */
             is_loan(id?: number): boolean
         }
     }
@@ -2172,6 +2266,7 @@ type Temp = {
     ach: TempLayer & RComputed<Layers['ach']>
     clo: TempLayer & RComputed<Layers['clo']>
     cas: TempLayer & RComputed<Layers['cas']>
+    mag: TempLayer & RComputed<Layers['mag']>
     // Row 0
     xp: TempLayer & RComputed<Layers['xp']>
     m: TempLayer & RComputed<Layers['m']>
@@ -2235,27 +2330,44 @@ type Player = {
         /** Amount of times swapped */
         count: Decimal
     }
+    mag: LayerData & {
+        element: string
+    }
     // Row 0
     xp: LayerData & {
-        health: { [enemy: string]: Decimal }
-        kills: { [enemy: string]: Decimal }
         type: string
         clicked: boolean
-        last_drops: { [enemy: string]: [string, Decimal][] }
+        enemies: {
+            [enemy: string]: {
+                health: Decimal
+                kills: Decimal
+                last_drops: [string, Decimal][]
+                last_drops_times: Decimal
+                element: string
+            }
+        }
     }
     m: LayerData & {
         health: Decimal
         last_drops: [string, Decimal][]
+        last_drops_times: Decimal
         short_mode: boolean
         mode: 'shallow' | 'deep'
         show_deep: boolean
     }
     t: LayerData & {
         short_mode: boolean
-        last_drops: [string, Decimal][]
-        trees: { [id: string]: { amount: Decimal, } }
-        current: string | false
-        health: Decimal
+        clicked: boolean
+        trees: {
+            [id: string]: {
+                amount: Decimal
+                health: Decimal
+                last_drops: [string, Decimal][]
+                last_drops_times: Decimal
+            }
+        }
+        current: string
+        focus: string
         convert: boolean
     }
     // Row 1

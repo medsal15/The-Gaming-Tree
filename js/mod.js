@@ -1,4 +1,3 @@
-//todo layers/side/magic.js
 /**
  * Where most of the basic configuration for the mod is.
  */
@@ -27,7 +26,7 @@ let modInfo = {
 	modFiles: [
 		'moreutils.js', 'tree.js',
 		'layers/hotkeys.js',
-		'layers/side/achievements.js', 'layers/side/clock.js', 'layers/side/casino.js',
+		'layers/side/achievements.js', 'layers/side/clock.js', 'layers/side/casino.js', 'layers/side/magic.js',
 		'layers/0/experience.js', 'layers/0/mining.js', 'layers/0/tree.js',
 		'layers/1/level.js', 'layers/1/loot.js', 'layers/1/forge.js',
 		'layers/2/boss.js', 'layers/2/shop.js',
@@ -77,6 +76,7 @@ let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.5</h3><br>
 		- Added 1 new layer.<br>
 		- Added the 3rd boss, miniboss, and relic.<br>
+		- QoL: Keep shop upgrades on reset (not the investments though).<br>
 		- Update endgame: Beat the 3rd boss.<br>
 	<h3>v0.4</h3><br>
 		- Added 4 new layers.<br>
@@ -108,7 +108,7 @@ let winText = `Congratulations! You have finished the current content in the gam
  * var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything"]
  * ```
  */
-var doNotCallTheseFunctionsEveryTick = ['show_skill', 'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop', 'gain_drops', 'show_fuel', 'show_smelt'];
+var doNotCallTheseFunctionsEveryTick = ['show_skill', 'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop', 'gain_drops', 'show_fuel', 'show_smelt', 'randomize'];
 
 /**
  * A function to determine the amount of points the player starts with after a reset.
@@ -175,7 +175,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return false;
+	return hasChallenge('b', 21);
 }
 
 
@@ -208,4 +208,19 @@ function maxTickLength() {
  * @param {string} oldVersion
  */
 function fixOldSave(oldVersion) {
+	if (oldVersion <= 'R0.4') {
+		player.xp.enemies = Object.fromEntries(
+			Object.keys(player.xp.enemies)
+				.map(type => [type, {
+					health: new Decimal(player.xp.health[type]),
+					kills: new Decimal(player.xp.kills[type]),
+					last_drops: player.xp.last_drops[type] ?? [],
+				}])
+		);
+		Object.entries(player.t.trees)
+			.forEach(([tree, data]) => {
+				data.health = tree == player.t.current ? player.t.health : tmp.t.trees[tree].health;
+				data.last_drops = tree == player.t.current ? player.t.last_drops : [];
+			});
+	}
 }

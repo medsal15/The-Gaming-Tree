@@ -1,5 +1,6 @@
 'use strict';
 
+//todo move normal upgrades to rows 1-3, boss loan to row 4 and the rest to further rows
 addLayer('s', {
     name: 'Shop',
     symbol: 'S',
@@ -68,9 +69,10 @@ addLayer('s', {
                 'blank',
                 ['display-text', () => `You have ${formatWhole(tmp.s.investloans.amount)} effective ${tmp.s.investloans.is_loans ? 'repaid loans' : 'investments'}`],
                 ['display-text', () => `<span style="color:#AA5555;">Buying a${tmp.s.investloans.is_loans ? ' loan' : 'n investment'} increases the price of all the others</span>`],
+                () => tmp.s.investloans.is_loans ? '' : ['display-text', '<span style="color:#AA5555;">Investments are reset on boss reset</span>'],
                 'blank',
                 ['clickable', 11],
-                ['upgrades', [1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 5]],
+                ['upgrades', [1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 15, 5]],
             ],
             name() { return `${capitalize(tmp.s.investloans.type)}s`; },
         },
@@ -869,6 +871,87 @@ addLayer('s', {
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
+        143: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Holy Water ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Holy Water';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate holy water challenge penality';
+                if (!shiftDown) return 'Boost holy water gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.holy_water.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.holy_water.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.lo.items.holy_water.unlocked; },
+        },
+        151: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Leaf ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Leaves';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate leaf challenge penality';
+                if (!shiftDown) return 'Boost leaf gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.leaf.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.leaf.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && hasChallenge('b', 21); },
+        },
+        152: {
+            title() {
+                if (tmp.s.investloans.is_loans) return `Repay Seed ${capitalize(tmp.s.investloans.type)}`;
+                return 'Invest in Seeds';
+            },
+            description() {
+                if (tmp.s.investloans.is_loans) return 'Negate seed challenge penality';
+                if (!shiftDown) return 'Boost seed gain based on investments owned';
+                let formula = 'investments / 10 + 1';
+
+                return `Formula: ${formula}`;
+            },
+            effect() {
+                if (tmp.s.investloans.is_loans) return D.dOne;
+                return D.div(tmp.s.investloans.amount, 10).add(1);
+            },
+            effectDisplay() {
+                switch (tmp.s.investloans.type) {
+                    case 'loan': return `/${format(D.add(player.lo.items.seed.amount, 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.seed.amount, 100).floor())}/s`;
+                    case 'investment': return `*${format(this.effect())}`;
+                }
+            },
+            cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
+            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost(), false)}`; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && hasChallenge('b', 21); },
+        },
         //#endregion Loans/Investments
         //#region Normal upgrades
         61: {
@@ -958,7 +1041,7 @@ addLayer('s', {
             effect() {
                 let mult = D(2);
 
-                mult = mult.times(tmp.l.skills.reading.effect);
+                mult = mult.add(tmp.l.skills.reading.effect);
 
                 return mult;
             },
@@ -968,9 +1051,9 @@ addLayer('s', {
             title: 'Crafting Quality Improvements',
             description: 'Item values increase by their amount',
             effect() {
-                let add = D.dOne;
+                let add = D(.1);
 
-                if (hasUpgrade('s', 83)) add = add.add(upgradeEffect('s', 83));
+                if (hasUpgrade('s', 83)) add = add.times(upgradeEffect('s', 83));
 
                 return add;
             },
@@ -995,7 +1078,7 @@ addLayer('s', {
         83: {
             title: 'Better Paper',
             description: 'Increase effects of first column of upgrades',
-            effect() { return D.dOne; },
+            effect() { return D(.5); },
             effectDisplay() { return `+${format(this.effect())}`; },
             cost: D(750),
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
@@ -1049,12 +1132,13 @@ addLayer('s', {
             'soaked_log': 111, 'normal_log': 112, 'plank': 113,
             'bronze_ingot': 122, 'steel_ingot': 123,
             'stone_brick': 131, 'copper_ingot': 132, 'tin_ingot': 133,
-            'iron_ingot': 141, 'gold_ingot': 142,
+            'iron_ingot': 141, 'gold_ingot': 142, 'holy_water': 143,
+            'leaf': 151, 'seed': 152,
         },
         is_loan(id) {
             if (!id) return false;
 
-            return id <= 51 || (id >= 91 && id <= 103);
+            return id <= 51 || id >= 91;
         },
     },
     branches: ['lo'],
@@ -1070,5 +1154,19 @@ addLayer('s', {
         mult = mult.times(tmp.l.skills.bartering.effect);
 
         return mult;
+    },
+    doReset(layer) {
+        if (layers[layer].row <= this.row) return;
+
+        /** @type {number[]} */
+        const kept_upgrades = [];
+        if (layer == 'b') {
+            // Keep non investments
+            kept_upgrades.push(...player.s.upgrades.filter(id => !layers.s.investloans.is_loan(id)));
+        }
+
+        layerDataReset(this.layer, []);
+
+        player.s.upgrades.push(...kept_upgrades);
     },
 });

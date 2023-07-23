@@ -1,5 +1,6 @@
 'use strict';
 
+//todo alternator achievements (19X, vR0.6)
 addLayer('ach', {
     name: 'Achievements',
     symbol: '⭐',
@@ -70,7 +71,7 @@ addLayer('ach', {
         11: {
             name: 'Murderer',
             tooltip: 'Kill an innocent slime',
-            done() { return player.xp.kills.slime.gte(1); },
+            done() { return player.xp.enemies.slime.kills.gte(1); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.xp.color); },
             style() {
                 let s = {};
@@ -81,7 +82,7 @@ addLayer('ach', {
         12: {
             name: 'Tougher enemies',
             tooltip: 'Get your slimes to level 1',
-            done() { return layers.xp.enemy.level('slime').gte(1); },
+            done() { return tmp.xp.enemies['slime'].level.gte(1); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.xp.color); },
             style() {
                 let s = {};
@@ -114,7 +115,7 @@ addLayer('ach', {
         15: {
             name: 'A quarter of a thousand',
             tooltip: 'Kill 250 innocent slimes',
-            done() { return player.xp.kills.slime.gte(250); },
+            done() { return player.xp.enemies.slime.kills.gte(250); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.xp.color); },
             style() {
                 let s = {};
@@ -283,7 +284,10 @@ addLayer('ach', {
         },
         74: {
             name: 'Diligent',
-            tooltip: 'Defeat ???',
+            tooltip() {
+                if (player.b.points.lt(3)) return 'Defeat ???';
+                return 'Defeat the eternal lich';
+            },
             done() { return hasChallenge('b', 21); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.b.color); },
             style() {
@@ -295,8 +299,11 @@ addLayer('ach', {
         },
         75: {
             name: 'Hungry for more',
-            tooltip: 'Defeat ???',
-            done() { return hasAchievement('b', 22); },
+            tooltip() {
+                if (player.b.points.lt(4)) return 'Destroy ???';
+                return 'Destroy the kudzu';
+            },
+            done() { return hasChallenge('b', 22); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.b.color); },
             style() {
                 let s = {};
@@ -620,7 +627,7 @@ addLayer('ach', {
         172: {
             name: 'Better minerals',
             tooltip: 'Smelt an ingot',
-            done() { return ['copper_ingot', 'iron_ingot', 'tin_ingot', 'gold_ingot'].some(item => D.gt(player.lo.items[item].amount.gt, 0)); },
+            done() { return ['copper_ingot', 'iron_ingot', 'tin_ingot', 'gold_ingot'].some(item => D.gt(player.lo.items[item].amount, 0)); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.f.color); },
             style() {
                 let s = {};
@@ -697,8 +704,12 @@ addLayer('ach', {
         },
         83: {
             name: 'Amalgam',
-            tooltip: 'Defeat ???',
-            done() { return false; },
+            tooltip() {
+                if (!hasChallenge('b', 21)) return 'Defeat ???';
+
+                return 'Defeat the amalgam';
+            },
+            done() { return hasChallenge('b', 41); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
                 let s = {};
@@ -709,8 +720,12 @@ addLayer('ach', {
         },
         84: {
             name: 'Going global',
-            tooltip: 'Destroy ???',
-            done() { return false; },
+            tooltip() {
+                if (!hasChallenge('b', 22)) return 'Destroy ???';
+
+                return 'Defeat the world tree';
+            },
+            done() { return hasChallenge('b', 42); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
                 let s = {};
@@ -723,7 +738,7 @@ addLayer('ach', {
             name: 'Boss Star',
             tooltip: 'Beat all 4 bonus bosses',
             done() { return [31, 32, 41, 42].every(id => hasChallenge('b', id)); },
-            onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
+            onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Row Completed!", 3, 'rgb(0,127,255)'); },
             style() {
                 let s = { 'background-image': `url('./resources/images/round-star.svg')`, };
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(0,127,255)';
@@ -765,8 +780,12 @@ addLayer('ach', {
         },
         93: {
             name: 'Wizardry',
-            tooltip: 'Unlock ???',
-            done() { return false; },
+            tooltip() {
+                if (!hasChallenge('b', 32)) return 'Unlock ???';
+
+                return 'Unlock Magic';
+            },
+            done() { return hasChallenge('b', 61); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
                 let s = {};
@@ -777,8 +796,12 @@ addLayer('ach', {
         },
         94: {
             name: 'SP',
-            tooltip: 'Unlock ???',
-            done() { return false; },
+            tooltip() {
+                if (!hasChallenge('b', 32)) return 'Unlock ???';
+
+                return 'Unlock Attributes';
+            },
+            done() { return hasChallenge('b', 62); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
             style() {
                 let s = {};
@@ -791,7 +814,7 @@ addLayer('ach', {
             name: 'Relic Star',
             tooltip: 'Get all 4 relics',
             done() { return [51, 52, 61, 62].every(id => hasChallenge('b', id)); },
-            onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Unlocked!", 3, 'rgb(0,127,255)'); },
+            onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Achievement Row Completed!", 3, 'rgb(0,127,255)'); },
             style() {
                 let s = { 'background-image': `url('./resources/images/round-star.svg')`, };
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(0,127,255)';
@@ -821,9 +844,14 @@ addLayer('ach', {
             name: 'Pure luck',
             tooltip: 'Get all drops from an enemy at once without any chance boost',
             done() {
-                if (tmp.lo.items["*"].global_chance_multiplier.neq(1) || !layers.lo.items['*'].can_drop('enemy:')) return false;
+                if (tmp.lo.items["*"].global_chance_multiplier.gt(1) ||
+                    !layers.lo.items['*'].can_drop('enemy:') ||
+                    tmp.xp.enemies['*'].drops_mult.gt(1) ||
+                    options.noRNG) return false;
 
-                return tmp.lo.items["*"].global_chance_multiplier.lte(1) && [['slime', 3], ['goblin', 3], ['zombie', 3]].some(([type, len]) => player.xp.last_drops[type].length == len && player.xp.kills[type].gt(0));
+                return tmp.lo.items["*"].global_chance_multiplier.lte(1) &&
+                    [['slime', 3], ['goblin', 3], ['zombie', 3], ['ent', 3]]
+                        .some(([type, len]) => player.xp.enemies[type].last_drops.length == len && player.xp.enemies[type].kills.gt(0));
             },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
             style: { 'background-color': 'rgb(127,0,255)' },
@@ -832,7 +860,7 @@ addLayer('ach', {
         101: {
             name: 'You\'re done, please stop',
             tooltip: () => `Get ${format(10_000)} kills fighting the Slime King`,
-            done() { return inChallenge('b', 11) && player.xp.kills.slime.gte(1e4); },
+            done() { return inChallenge('b', 11) && player.xp.enemies.slime.kills.gte(1e4); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
             style: { 'background-color': 'rgb(127,0,255)' },
             unlocked() { return hasAchievement(this.layer, this.id); },
@@ -865,6 +893,22 @@ addLayer('ach', {
             name: 'Another Level',
             tooltip: 'Lose a level to your loans',
             done() { return inChallenge('b', 32) && player.l.points.gt(100); },
+            onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
+            style: { 'background-color': 'rgb(127,0,255)' },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+        },
+        181: {
+            name: 'Jackpot',
+            tooltip: 'Get all drops from the amalgam',
+            done() {
+                if (tmp.lo.items["*"].global_chance_multiplier.neq(1) ||
+                    !layers.lo.items['*'].can_drop('enemy:') ||
+                    tmp.xp.enemies['*'].drops_mult.gt(1) ||
+                    options.noRNG ||
+                    !inChallenge('b', 41)) return false;
+
+                return player.xp.enemies.amalgam.last_drops.length == 12;
+            },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
             style: { 'background-color': 'rgb(127,0,255)' },
             unlocked() { return hasAchievement(this.layer, this.id); },
@@ -913,7 +957,7 @@ addLayer('ach', {
                 rows = [8, 9];
                 break;
             case 'secret':
-                rows = [2, 4, 6, 10, 14];
+                rows = [2, 4, 6, 10, 14, 18];
                 break;
         }
 

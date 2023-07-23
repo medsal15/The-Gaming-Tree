@@ -1,6 +1,5 @@
 'use strict';
 
-//todo "mined nothing X times"
 addLayer('m', {
     name: 'Mining',
     symbol: 'M',
@@ -9,9 +8,10 @@ addLayer('m', {
         return {
             points: D.dZero,
             unlocked: true,
-            health: null ?? D(10),
+            health: D.dZero,
             short_mode: false,
             last_drops: [],
+            last_drops_times: D.dZero,
             mode: 'shallow',
             show_deep: false,
         };
@@ -111,12 +111,15 @@ addLayer('m', {
                 ['display-text', () => `Chance to mine something: ${layers.lo.items["*"].format_chance(tmp.m.ore.chance)}`],
                 () => { if (tmp.m.ore.mine_mult.neq(1)) return ['display-text', `Mining *${format(tmp.m.ore.mine_mult)} ore`]; },
                 ['display-text', () => {
-                    let drops = 'nothing';
+                    let drops = 'nothing',
+                        count = '';
 
-                    const last_drops = player.m.last_drops;
+                    const last_drops = player.m.last_drops,
+                        last_count = player.m.last_drops_times;
                     if (last_drops.length) drops = listFormat.format(last_drops.map(([item, amount]) => `${format(amount)} ${layers.lo.items[item].name}`));
+                    if (last_count.gt(1)) count = ` (${formatWhole(last_count)} times)`;
 
-                    return `Mined ${drops}`;
+                    return `Mined ${drops}${count}`;
                 }],
             ],
         },
@@ -169,27 +172,54 @@ addLayer('m', {
             onClick() {
                 player.m.health = player.m.health.minus(1);
 
+                /** @type {[string, Decimal][]} */
+                let drops = [];
+
                 if (options.noRNG) {
-                    const drops = player.m.last_drops = layers.m.ore.get_drops(tmp.m.ore.chance);
-                    layers.lo.items["*"].gain_drops(drops);
+                    drops = layers.m.ore.get_drops(tmp.m.ore.chance);
                 } else if (tmp.m.ore.chance.gt(Math.random())) {
-                    const drops = player.m.last_drops = layers.m.ore.get_drops(1);
-                    layers.lo.items["*"].gain_drops(drops);
+                    drops = layers.m.ore.get_drops(1);
                 } else {
-                    player.m.last_drops = [];
+                    drops = [];
                 }
+
+                const equal = drops.length == player.m.last_drops.length &&
+                    drops.every(([item, amount]) => player.m.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
+
+                if (equal) {
+                    player.m.last_drops_times = D.add(player.m.last_drops_times, 1);
+                } else {
+                    player.m.last_drops_times = D.dOne;
+                    player.m.last_drops = drops;
+                }
+
+                layers.lo.items['*'].gain_drops(drops);
             },
             onHold() {
                 player.m.health = player.m.health.minus(1);
+
+                /** @type {[string, Decimal][]} */
+                let drops = [];
+
                 if (options.noRNG) {
-                    const drops = player.m.last_drops = layers.m.ore.get_drops(tmp.m.ore.chance);
-                    layers.lo.items["*"].gain_drops(drops);
+                    drops = layers.m.ore.get_drops(tmp.m.ore.chance);
                 } else if (tmp.m.ore.chance.gt(Math.random())) {
-                    const drops = player.m.last_drops = layers.m.ore.get_drops(1);
-                    layers.lo.items["*"].gain_drops(drops);
+                    drops = layers.m.ore.get_drops(1);
                 } else {
-                    player.m.last_drops = [];
+                    drops = [];
                 }
+
+                const equal = drops.length == player.m.last_drops.length &&
+                    drops.every(([item, amount]) => player.m.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
+
+                if (equal) {
+                    player.m.last_drops_times = D.add(player.m.last_drops_times, 1);
+                } else {
+                    player.m.last_drops_times = D.dOne;
+                    player.m.last_drops = drops;
+                }
+
+                layers.lo.items['*'].gain_drops(drops);
             },
         },
         13: {
@@ -409,9 +439,11 @@ addLayer('m', {
             title: 'Tin Anvil',
             description() {
                 if (!shiftDown) {
-                    let text = 'Allow crafting items with metals';
+                    let text = '';
 
-                    if (!hasUpgrade('s', 72)) text += '<br>Tin boosts max ore health';
+                    if (!hasUpgrade('s', 72)) text += 'Allow crafting items with metals<br>';
+
+                    text += 'Tin boosts max ore health';
 
                     return text;
                 }
@@ -694,7 +726,13 @@ addLayer('m', {
         regen() {
             let regen = D.dOne;
 
+            regen = regen.add(tmp.l.skills.mining.effect);
+
             if (hasUpgrade('m', 23)) regen = regen.times(upgradeEffect('m', 23));
+
+            regen = regen.times(buyableEffect('lo', 82).regen);
+
+            regen = regen.times(tmp.mag.elements[player.mag.element].effects.mining?.regen_multiplier ?? 1);
 
             return regen;
         },
@@ -717,6 +755,8 @@ addLayer('m', {
 
             chance = chance.times(buyableEffect('lo', 22));
             chance = chance.times(buyableEffect('lo', 23).chance_mult);
+
+            chance = chance.times(tmp.mag.elements[player.mag.element].effects.mining?.chance_multiplier ?? 1);
 
             if (hasUpgrade('s', 61)) chance = chance.root(upgradeEffect('s', 61));
             else chance = chance.min(1);
@@ -784,7 +824,15 @@ addLayer('m', {
     automate() {
         if (hasUpgrade('m', 22) && player.m.health.gte(tmp.m.ore.health)) {
             const chance = player.m.health.times(tmp.m.ore.chance),
-                drops = player.m.last_drops = layers.m.ore.get_drops(chance);
+                drops = layers.m.ore.get_drops(chance),
+                equal = drops.length == player.m.last_drops.length &&
+                    drops.every(([item, amount]) => player.m.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
+            if (equal) {
+                player.m.last_drops_times = D.add(player.m.last_drops_times, 1);
+            } else {
+                player.m.last_drops_times = D.dOne;
+                player.m.last_drops = drops;
+            }
             layers.lo.items["*"].gain_drops(drops);
             player.m.health = D.dZero;
         }

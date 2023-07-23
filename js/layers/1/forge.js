@@ -218,8 +218,8 @@ addLayer('f', {
     },
     automate() {
         // Prevent overflow in some cases
-        Object.values(player.f.recipes)
-            .forEach(recipe => {
+        Object.entries(player.f.recipes)
+            .forEach(([id, recipe]) => {
                 if (recipe.amount_target.gt(tmp.f.recipes['*'].size)) recipe.amount_target = tmp.f.recipes['*'].size;
             });
     },
@@ -430,7 +430,11 @@ addLayer('f', {
         },
         31: {
             title: 'Steel Skills',
-            description: 'Start with at least 1 level in every skills',
+            description: 'Get a bonus level in every skills',
+            effect() { return D.dOne; },
+            effectDisplay() {
+                return `+${format(this.effect())}`;
+            },
             cost() {
                 let cost = D(40);
 
@@ -507,7 +511,7 @@ addLayer('f', {
         '*': {
             regex: /^fuel_(display|toggle)_([a-z_]+)$/,
             show_fuel(fuel) {
-                if (!fuel) return;
+                if (!fuel || !(tmp.f.fuels[fuel].unlocked ?? true)) return;
 
                 const entry = tmp.f.fuels[fuel];
 
@@ -544,7 +548,7 @@ addLayer('f', {
 
                 return heat;
             },
-            unlocked() { return player.m.show_deep; },
+            unlocked() { return tmp.lo.items[this.item].unlocked ?? true; },
             item: 'coal',
             consuming() {
                 if (!player.f.fuels[this.id]) return D.dZero;
@@ -567,7 +571,7 @@ addLayer('f', {
 
                 return heat;
             },
-            unlocked() { return tmp.t.layerShown; },
+            unlocked() { return tmp.lo.items[this.item].unlocked ?? true; },
             item: 'soaked_log',
             consuming() {
                 if (!player.f.fuels[this.id]) return D.dZero;
@@ -590,7 +594,7 @@ addLayer('f', {
 
                 return heat;
             },
-            unlocked() { return tmp.t.layerShown; },
+            unlocked() { return tmp.lo.items[this.item].unlocked ?? true; },
             item: 'normal_log',
             consuming() {
                 if (!player.f.fuels[this.id]) return D.dZero;
@@ -613,7 +617,7 @@ addLayer('f', {
 
                 return heat;
             },
-            unlocked() { return tmp.t.layerShown; },
+            unlocked() { return tmp.lo.items[this.item].unlocked ?? true; },
             item: 'plank',
             consuming() {
                 if (!player.f.fuels[this.id]) return D.dZero;
@@ -630,13 +634,13 @@ addLayer('f', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.f.fuels).find(fuel => layers.f.fuels[fuel] == this); },
             heat() {
-                let heat = D(.1);
+                let heat = D(.15);
 
                 heat = heat.times(tmp.f.heat.mult);
 
                 return heat;
             },
-            unlocked() { return hasChallenge('b', 21); },
+            unlocked() { return tmp.lo.items[this.item].unlocked ?? true; },
             item: 'leaf',
             consuming() {
                 if (!player.f.fuels[this.id]) return D.dZero;
@@ -659,7 +663,7 @@ addLayer('f', {
                 amount: /^recipe_(increase|decrease)_([a-z_]+)$/,
             },
             show_recipe(recipe_id) {
-                if (!recipe_id) return;
+                if (!recipe_id || !(tmp.f.recipes[recipe_id].unlocked ?? true)) return;
 
                 const recipe = tmp.f.recipes[recipe_id];
 
@@ -748,6 +752,7 @@ addLayer('f', {
                 'soaked_log': 'amount * 5',
                 'time': 'amount + 20',
             },
+            unlocked() { return (tmp.lo.items['soaked_log'].unlocked ?? true) && (tmp.lo.items['normal_log'].unlocked ?? true); },
         },
         coal: {
             _id: null,
@@ -796,6 +801,7 @@ addLayer('f', {
                 'normal_log': 'amount * 20',
                 'time': 'amount * 5 + 60',
             },
+            unlocked() { return (tmp.lo.items['normal_log'].unlocked ?? true) && (tmp.lo.items['coal'].unlocked ?? true); },
         },
         // Materials
         stone_brick: {
@@ -1042,7 +1048,7 @@ addLayer('f', {
         bronze_ingot_crude: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.f.recipes).find(fuel => layers.f.recipes[fuel] == this); },
-            heat: D(1000),
+            heat: D(1_000),
             consumes(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
@@ -1093,7 +1099,7 @@ addLayer('f', {
         bronze_ingot: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.f.recipes).find(fuel => layers.f.recipes[fuel] == this); },
-            heat: D(1000),
+            heat: D(1_000),
             consumes(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
@@ -1136,7 +1142,7 @@ addLayer('f', {
             },
             formulas: {
                 'copper_ingot': '(amount ^ 1.4) * 3',
-                'tin_ingot': '(amount ^ 1.4) * 1',
+                'tin_ingot': 'amount ^ 1.4',
                 'time': 'amount * 25 + 180',
             },
             unlocked() { return hasUpgrade('f', 12); },
@@ -1144,7 +1150,7 @@ addLayer('f', {
         steel_ingot_crude: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.f.recipes).find(fuel => layers.f.recipes[fuel] == this); },
-            heat: D(2000),
+            heat: D(2_000),
             consumes(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
@@ -1195,7 +1201,7 @@ addLayer('f', {
         steel_ingot: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.f.recipes).find(fuel => layers.f.recipes[fuel] == this); },
-            heat: D(2000),
+            heat: D(2_000),
             consumes(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
@@ -1242,6 +1248,60 @@ addLayer('f', {
                 'time': 'amount * 50 + 300',
             },
             unlocked() { return hasUpgrade('f', 12); },
+        },
+        // Challenge
+        holy_water: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.f.recipes).find(fuel => layers.f.recipes[fuel] == this); },
+            heat: D(2_500),
+            consumes(amount) {
+                amount = layers.f.recipes['*'].default_amount(this.id, amount);
+
+                const items = {
+                    'slime_goo': D.times(amount, 100),
+                    'copper_ingot': D.pow(amount, 1.25).times(50),
+                    'gold_ingot': D.pow(amount, 1.25),
+                };
+
+                if (hasUpgrade('f', 33)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.times(upgradeEffect('f', 33));
+                        });
+                }
+
+                const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
+                if (upg && hasUpgrade('s', upg)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.div(upgradeEffect('s', upg));
+                        });
+                } else if (inChallenge('b', 12)) {
+                    Object.entries(items)
+                        .forEach(([item, amount]) => {
+                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                        });
+                }
+
+                return Object.entries(items);
+            },
+            produces: 'holy_water',
+            time(amount) {
+                amount = layers.f.recipes['*'].default_amount(this.id, amount);
+
+                let time = D.times(amount, 60).add(600);
+
+                time = time.div(tmp.f.recipes['*'].speed);
+
+                return time;
+            },
+            formulas: {
+                'slime_goo': 'amount * 100',
+                'copper_ingot': '(amount ^ 1.25) * 50',
+                'gold_ingot': 'amount ^ 1.25',
+                'time': 'amount * 60 + 600',
+            },
+            unlocked() { return tmp.lo.items['holy_water'].unlocked ?? true; },
         },
     },
     /** @type {typeof layers.f.heat} */
@@ -1376,13 +1436,23 @@ addLayer('f', {
                     },
                     unlocked() { return recipe().unlocked ?? true; },
                     style() {
-                        return Object.assign({
+                        const style = Object.assign({
                             'height': '80px',
                             'width': '80px',
                             'min-height': 'unset',
                             'transform': 'unset',
                             'color': 'black',
                         }, tmp.lo?.items[entry()[0]].style);
+
+                        if (is_output()) {
+                            if (precipe().amount_smelting.gt(0)) {
+                                style['filter'] = 'drop-shadow(0 0 5px orange)';
+                            } else if (precipe().amount_target.lte(0) || !has_materials()) {
+                                style['filter'] = 'brightness(75%)';
+                            }
+                        }
+
+                        return style;
                     },
                     onClick() {
                         if (is_output()) {

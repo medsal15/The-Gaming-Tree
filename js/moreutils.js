@@ -157,6 +157,7 @@ function powerRound(decimal, pow) {
  * Returns the average of 2 or more hex colors
  *
  * @param {...string} colors
+ * @returns {string}
  */
 function colors_average(...colors) {
     if (!colors.length) return '#000000';

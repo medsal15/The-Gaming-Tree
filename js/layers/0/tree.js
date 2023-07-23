@@ -1,6 +1,5 @@
 'use strict';
 
-//todo "cut nothing X times"
 addLayer('t', {
     name: 'Tree',
     symbol: 'T',
@@ -9,10 +8,15 @@ addLayer('t', {
         return {
             unlocked: false,
             short_mode: false,
-            last_drops: [],
-            trees: Object.fromEntries(layers.t.trees.all_trees.map(item => [item, { amount: D.dZero }])),
-            current: false,
-            health: D.dZero,
+            clicked: false,
+            trees: Object.fromEntries(Object.keys(layers.t.trees).map(item => [item, {
+                amount: D.dZero,
+                health: D.dZero,
+                last_drops: [],
+                last_drops_times: D.dZero,
+            }])),
+            current: '',
+            focus: '',
             convert: false,
         };
     },
@@ -23,11 +27,11 @@ addLayer('t', {
                 return `<span style="color:${color};text-shadow:${color} 0 0 10px;">${formatWhole(player.lo.items[item].amount)}</span>`;
             };
 
-            return tmp.t.trees.items.map?.(style).join(', ');
+            return tmp.t.trees['*'].items.map?.(style).join(', ');
         } else {
             const line = item => `${formatWhole(player.lo.items[item].amount)} ${tmp.lo.items[item].name}`;
 
-            return tmp.t.trees.items.map?.(line).join('<br>');
+            return tmp.t.trees['*'].items.map?.(line).join('<br>');
         }
     },
     layerShown() { return player[this.layer].unlocked && !tmp[this.layer].deactivated; },
@@ -62,13 +66,13 @@ addLayer('t', {
                         const itemp = tmp.lo.items[item],
                             color = itemp.style['background-color'],
                             change = layers.t.convertion.per_second(item),
-                            change_str = change.abs().gt(.001) ? ` (<span style="color:${color};text-shadow:${color} 0 0 10px">${change.gt(0) ? '+' : ''}${format(change)}</span> /s)` : '';
+                            change_str = change.abs().gt(.001) && player.t.convert ? ` (<span style="color:${color};text-shadow:${color} 0 0 10px">${change.gt(0) ? '+' : ''}${format(change)}</span> /s)` : '';
                         return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">\
                         ${formatWhole(player.lo.items[item].amount)}\
                         </span>${change_str} ${itemp.name}`;
                     };
 
-                    return `You have ${listFormat.format(tmp.t.trees.items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
+                    return `You have ${listFormat.format(tmp.t.trees['*'].items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
                 }],
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
@@ -83,25 +87,29 @@ addLayer('t', {
                 'blank',
                 ['bar', 'health'],
                 ['clickables', [1]],
-                ['display-text', () => `Current damage: ${format(tmp.t.trees.damage)}`],
-                ['display-text', () => `Chance to cut an additionnal piece of wood: ${layers.lo.items["*"].format_chance(tmp.t.trees.chance)}`],
+                ['display-text', () => `Current damage: ${format(tmp.t.trees['*'].damage_base)}`],
+                ['display-text', () => `Chance to cut an additionnal piece of wood: ${layers.lo.items["*"].format_chance(tmp.t.trees['*'].chance)}`],
                 ['display-text', () => {
-                    let drops = 'nothing';
+                    let drops = 'nothing',
+                        count = '';
 
-                    const last_drops = player.t.last_drops;
+                    const last_drops = player.t.trees[player.t.current].last_drops,
+                        last_count = player.t.trees[player.t.current].last_drops_times;
                     if (last_drops.length) drops = listFormat.format(last_drops.map(([item, amount]) => `${format(amount)} ${layers.lo.items[item].name}`));
+                    if (last_count.gt(1)) count = ` (${formatWhole(last_count)} times)`;
 
-                    return `Cut ${drops}`;
+                    return `Cut ${drops}${count}`;
                 }],
                 'blank',
                 ['display-text', () => {
                     /** @param {string} tree */
                     const row = tree => {
-                        const regen = layers.t.trees.regen(tree);
+                        const regen = tmp.t.trees[tree].growth;
+
                         return `<tr>\
-                            <td>${capitalize(layers.t.trees.name(tree))}</td>\
-                            <td>${format(player.t.trees[tree].amount)} / ${format(layers.t.trees.cap(tree))} ${regen.gt(0) ? `(+${format(regen)}/s)` : ''}</td>\
-                            <td>${format(layers.t.trees.size(tree))}</td>\
+                            <td>${capitalize(tmp.t.trees[tree].name)}</td>\
+                            <td>${format(player.t.trees[tree].amount)} / ${format(tmp.t.trees[tree].cap)} ${regen.gt(0) ? `(+${format(regen)}/s)` : ''}</td>\
+                            <td>${format(tmp.t.trees[tree].size)}</td>\
                         </tr>`;
                     };
 
@@ -111,7 +119,7 @@ addLayer('t', {
                             <td>Amount</td>\
                             <td>Size</td>\
                         </tr>\
-                        ${tmp.t.trees.trees.map(row).join('')}\
+                        ${Object.keys(tmp.t.trees).filter(tree => tree != '*' && tmp.t.trees[tree].unlocked).map(row).join('')}\
                     </table>`;
                 }],
             ],
@@ -123,13 +131,13 @@ addLayer('t', {
                         const itemp = tmp.lo.items[item],
                             color = itemp.style['background-color'],
                             change = layers.t.convertion.per_second(item),
-                            change_str = change.abs().gt(.001) ? ` (<span style="color:${color};text-shadow:${color} 0 0 10px">${change.gt(0) ? '+' : ''}${format(change)}</span> /s)` : '';
+                            change_str = change.abs().gt(.001) && player.t.convert ? ` (<span style="color:${color};text-shadow:${color} 0 0 10px">${change.gt(0) ? '+' : ''}${format(change)}</span> /s)` : '';
                         return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">\
                         ${formatWhole(player.lo.items[item].amount)}\
                         </span>${change_str} ${itemp.name}`;
                     };
 
-                    return `You have ${listFormat.format(tmp.t.trees.items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
+                    return `You have ${listFormat.format(tmp.t.trees['*'].items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
                 }],
                 'blank',
                 ['upgrades', [1, 2, 3]],
@@ -142,43 +150,127 @@ addLayer('t', {
                 return style;
             },
         },
+        'Focus': {
+            content: [
+                ['display-text', () => {
+                    const line = item => {
+                        const itemp = tmp.lo.items[item],
+                            color = itemp.style['background-color'],
+                            change = layers.t.convertion.per_second(item),
+                            change_str = change.abs().gt(.001) && player.t.convert ? ` (<span style="color:${color};text-shadow:${color} 0 0 10px">${change.gt(0) ? '+' : ''}${format(change)}</span> /s)` : '';
+                        return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">\
+                        ${formatWhole(player.lo.items[item].amount)}\
+                        </span>${change_str} ${itemp.name}`;
+                    };
+
+                    return `You have ${listFormat.format(tmp.t.trees['*'].items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
+                }],
+                'blank',
+                () => { if (!options.noRNG) return ['display-text', '<span style="color:#AA5555;">This tab does nothing when luck is enabled</span>'] },
+                ['display-text', 'Focusing on a tree will automatically select it when your current tree is felled.'],
+                ['display-text', 'If there are none of it, a random tree will be selected.'],
+                'blank',
+                ['clickables', [2]],
+            ],
+            unlocked() { return options.noRNG; },
+        },
     },
     clickables: {
         11: {
             style: { 'background-image': `url('./resources/images/wood-axe.svg')`, },
-            canClick() { return player.t.current && D.gt(player.t.health, 0); },
+            canClick() { return player.t.current && D.gt(player.t.trees[player.t.current].health, 0); },
             onClick() {
-                const damage = tmp.t.trees.damage.min(player.t.health),
-                    type = player.t.current;
+                player.t.clicked = true;
+                const type = player.t.current,
+                    damage = tmp.t.trees['*'].damage_base.min(player.t.trees[type].health);
                 if (!type) return;
-                player.t.health = player.t.health.minus(damage).max(0);
+
+                player.t.trees[type].health = player.t.trees[type].health.minus(damage);
+
+                /** @type {[string, Decimal][]} */
+                let drops = [];
 
                 if (options.noRNG) {
-                    const drops = player.t.last_drops = layers.t.trees.get_drops(type, damage.times(tmp.t.trees.chance));
-                    layers.lo.items["*"].gain_drops(drops);
-                } else if (tmp.t.trees.chance.gt(Math.random())) {
-                    const drops = player.t.last_drops = layers.t.trees.get_drops(type, damage);
-                    layers.lo.items["*"].gain_drops(drops);
+                    drops = layers.t.trees[type].get_drops(damage.times(tmp.t.trees['*'].chance));
+                } else if (tmp.t.trees['*'].chance.gt(Math.random())) {
+                    drops = layers.t.trees[type].get_drops(damage);
                 } else {
-                    player.t.last_drops = [];
+                    drops = [];
                 }
+
+                const equal = drops.length == player.t.trees[type].last_drops.length &&
+                    drops.every(([item, amount]) => player.t.trees[type].last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
+
+                if (equal) {
+                    player.t.trees[type].last_drops_times = D.add(player.t.trees[type].last_drops_times, 1);
+                } else {
+                    player.t.trees[type].last_drops_times = D.dOne;
+                    player.t.trees[type].last_drops = drops;
+                }
+
+                layers.lo.items["*"].gain_drops(drops);
             },
             onHold() {
-                const damage = tmp.t.trees.damage.min(player.t.health),
-                    type = player.t.current;
+                player.t.clicked = true;
+                const type = player.t.current,
+                    damage = tmp.t.trees['*'].damage_base.min(player.t.trees[type].health);
                 if (!type) return;
-                player.t.health = player.t.health.minus(damage).max(0);
+
+                player.t.trees[type].health = player.t.trees[type].health.minus(damage);
+
+                /** @type {[string, Decimal][]} */
+                let drops = [];
 
                 if (options.noRNG) {
-                    const drops = player.t.last_drops = layers.t.trees.get_drops(type, damage.times(tmp.t.trees.chance));
-                    layers.lo.items["*"].gain_drops(drops);
-                } else if (tmp.t.trees.chance.gt(Math.random())) {
-                    const drops = player.t.last_drops = layers.t.trees.get_drops(type, damage);
-                    layers.lo.items["*"].gain_drops(drops);
+                    drops = layers.t.trees[type].get_drops(damage.times(tmp.t.trees['*'].chance));
+                } else if (tmp.t.trees['*'].chance.gt(Math.random())) {
+                    drops = layers.t.trees[type].get_drops(damage);
                 } else {
-                    player.t.last_drops = [];
+                    drops = [];
                 }
+
+                const equal = drops.length == player.t.trees[type].last_drops.length &&
+                    drops.every(([item, amount]) => player.t.trees[type].last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
+
+                if (equal) {
+                    player.t.trees[type].last_drops_times = D.add(player.t.trees[type].last_drops_times, 1);
+                } else {
+                    player.t.trees[type].last_drops_times = D.dOne;
+                    player.t.trees[type].last_drops = drops;
+                }
+
+                layers.lo.items["*"].gain_drops(drops);
             },
+        },
+        // Focus clickables
+        21: {
+            title: 'Focus on no specific tree',
+            display() { return player.t.focus == '' ? 'ON' : 'OFF'; },
+            canClick() { return player.t.focus != ''; },
+            onClick() { player.t.focus = ''; },
+            unlocked() { return true; },
+            tooltip: 'Default behavior',
+        },
+        22: {
+            title: 'Focus on Driftwood',
+            display() { return player.t.focus == 'driftwood' ? 'ON' : 'OFF'; },
+            canClick() { return player.t.focus != 'driftwood'; },
+            onClick() { player.t.focus = 'driftwood'; },
+            unlocked() { return tmp.t.trees.driftwood.unlocked ?? true; },
+        },
+        23: {
+            title: 'Focus on Oak',
+            display() { return player.t.focus == 'oak' ? 'ON' : 'OFF'; },
+            canClick() { return player.t.focus != 'oak'; },
+            onClick() { player.t.focus = 'oak'; },
+            unlocked() { return tmp.t.trees.oak.unlocked ?? true; },
+        },
+        24: {
+            title: 'Focus on Birch',
+            display() { return player.t.focus == 'birch' ? 'ON' : 'OFF'; },
+            canClick() { return player.t.focus != 'birch'; },
+            onClick() { player.t.focus = 'birch'; },
+            unlocked() { return tmp.t.trees.birch.unlocked ?? true; },
         },
     },
     /** @type {typeof layers.t.upgrades} */
@@ -277,7 +369,7 @@ addLayer('t', {
             title: 'Mechanical Sawmill',
             description: 'Passively cut the current tree with 25% of your damage',
             effect() { return D(.25); },
-            effectDisplay() { return `${format(D.times(this.effect(), tmp.t.trees.damage))} dps`; },
+            effectDisplay() { return `${format(D.times(this.effect(), tmp.t.trees['*'].damage_base))} dps`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
             cost: D(80),
             item: 'normal_log',
@@ -323,8 +415,8 @@ addLayer('t', {
             title: 'Driftwood Destroyer',
             description: 'Increases damage by driftwood health when chopping driftwood<br>Or by 10% of it when not',
             effect() {
-                if (player.t.current != 'driftwood') return layers.t.trees.health('driftwood').times(.1);
-                return layers.t.trees.health('driftwood');
+                if (player.t.current != 'driftwood') return tmp.t.trees['driftwood'].health.times(.1);
+                return tmp.t.trees['driftwood'].health;
             },
             effectDisplay() { return `+${format(this.effect())}`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
@@ -384,13 +476,17 @@ addLayer('t', {
             width: 200,
             height: 50,
             progress() {
-                const max = tmp.t.trees.health;
-                if (max.lte(0)) return 0;
-                return D.div(player.t.health ?? max, max);
+                let max = tmp.t.trees[player.t.current]?.health;
+                if (D.lte(max, 0)) return 0;
+                return D.div(player.t.trees[player.t.current].health ?? max, max);
             },
             display() {
-                return `${capitalize(tmp.t.trees.name)}<br>\
-                ${format(player.t.health)} / ${format(tmp.t.trees.health)}`;
+                const current = player.t.current,
+                    regen = tmp.t.trees[current].regen,
+                    regen_text = regen.neq(0) ? `<br>(+${format(regen)} /s)` : '';
+                return `${capitalize(tmp.t.trees[current].name)}<br>\
+                ${format(player.t.trees[current].health)} / ${format(tmp.t.trees[current].health)}\
+                ${regen_text}`;
             },
             baseStyle: { 'background-color': 'brown' },
             fillStyle: { 'background-color': 'lime' },
@@ -399,158 +495,300 @@ addLayer('t', {
     },
     /** @type {typeof layers.t.trees} */
     trees: {
-        items: ['soaked_log', 'normal_log', 'plank'],
-        trees() {
-            const trees = ['driftwood', 'oak', 'birch'];
+        '*': {
+            health_mult() {
+                let mult = D.dOne;
 
-            return trees;
+                if (hasUpgrade('t', 11)) mult = mult.times(upgradeEffect('t', 11).health);
+
+                return mult;
+            },
+            growth_mult() {
+                let mult = D.dOne;
+
+                if (hasUpgrade('t', 13)) mult = mult.times(upgradeEffect('t', 13));
+
+                mult = mult.times(buyableEffect('lo', 91));
+
+                return mult;
+            },
+            damage_base() {
+                let damage = D.dOne;
+
+                if (hasUpgrade('m', 62)) damage = damage.add(upgradeEffect('m', 62));
+
+                if (hasUpgrade('t', 31)) damage = damage.add(upgradeEffect('t', 31));
+
+                damage = damage.add(buyableEffect('lo', 42).tree_damage);
+
+                if (hasUpgrade('m', 61)) damage = damage.times(upgradeEffect('m', 61));
+
+                damage = damage.times(tmp.mag.elements[player.mag.element].effects.tree?.damage_multiplier ?? 1);
+
+                return damage;
+            },
+            dps_mult_inactive() {
+                let mult = D.dZero;
+
+                return mult;
+            },
+            dps_mult_active() {
+                let mult = D.dZero;
+
+                if (hasUpgrade('t', 22)) mult = mult.add(upgradeEffect('t', 22));
+
+                return mult;
+            },
+            size_add() {
+                let add = D.dZero;
+
+                add = add.add(buyableEffect('lo', 83).size);
+
+                return add;
+            },
+            size_mult() {
+                let mult = D.dOne;
+
+                if (hasUpgrade('t', 11)) mult = mult.times(upgradeEffect('t', 11).size);
+
+                if (hasUpgrade('f', 23)) mult = mult.times(upgradeEffect('f', 23));
+
+                mult = mult.times(tmp.mag.elements[player.mag.element].effects.tree?.size_multiplier ?? 1);
+
+                return mult;
+            },
+            cap_add() {
+                let add = D.dZero;
+
+                add = add.add(buyableEffect('lo', 92));
+
+                return add;
+            },
+            cap_mult() {
+                let mult = D.dOne;
+
+                mult = mult.times(buyableEffect('lo', 62).cap);
+
+                return mult;
+            },
+            regen_add() {
+                let add = D.dZero;
+
+                if (hasChallenge('b', 41)) add = add.add(.01);
+
+                return add;
+            },
+            items: ['soaked_log', 'normal_log', 'plank'],
+            chance() {
+                let chance = D(1 / 10);
+
+                chance = chance.times(buyableEffect('lo', 93));
+
+                return chance.min(1);
+            },
         },
-        all_trees: ['driftwood', 'oak', 'birch'],
-        health(type = player.t.current) {
-            if (!type) return D.dZero;
+        driftwood: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.t.trees).find(item => layers.t.trees[item] == this); },
+            unlocked: true,
+            health() {
+                let health = D(5);
 
-            let health = D.dZero;
-            switch (type) {
-                case 'driftwood':
-                    health = D(5);
+                health = health.add(buyableEffect('lo', 61).soaked);
 
-                    health = health.add(buyableEffect('lo', 61).soaked);
-                    break;
-                case 'oak':
-                    health = D(15);
-                    break;
-                case 'birch':
-                    health = D(10);
-                    break;
-            }
+                health = health.times(tmp.t.trees['*'].health_mult);
 
-            if (hasUpgrade('t', 11)) health = health.times(upgradeEffect('t', 11).health);
+                return health;
+            },
+            name: 'driftwood',
+            growth() {
+                let regen = D(1 / 20);
 
-            return health;
+                regen = regen.times(tmp.t.trees['*'].growth_mult);
+
+                return regen;
+            },
+            damage() {
+                let damage = tmp.t.trees['*'].damage_base;
+
+                return damage;
+            },
+            dps() {
+                let mult = tmp.t.trees['*'].dps_mult_inactive;
+
+                if (player.t.current == this.id) mult = mult.add(tmp.t.trees['*'].dps_mult_active);
+
+                return tmp.t.trees[this.id].damage.times(mult);
+            },
+            get_drops(amount) { return layers.lo.items['*'].get_drops(`tree:${this.id}`, D(amount)); },
+            size() {
+                let size = D(5);
+
+                size = size.add(buyableEffect('lo', 61).soaked);
+
+                size = size.add(tmp.t.trees['*'].size_add);
+
+                size = size.times(tmp.t.trees['*'].size_mult);
+
+                return size;
+            },
+            cap() {
+                let cap = D(1);
+
+                cap = cap.add(tmp.t.trees['*'].cap_add);
+
+                cap = cap.times(tmp.t.trees['*'].cap_mult);
+
+                return cap.floor();
+            },
+            regen() {
+                let mult = tmp.t.trees['*'].regen_add;
+
+                if (mult.eq(0)) return D.dZero;
+
+                return mult.times(tmp.t.trees[this.id].health);
+            },
         },
-        chance(type = player.t.current) {
-            if (!type) return D.dZero;
+        oak: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.t.trees).find(item => layers.t.trees[item] == this); },
+            unlocked: true,
+            health() {
+                let health = D(15);
 
-            let chance = D(1 / 10);
+                health = health.times(tmp.t.trees['*'].health_mult);
 
-            return chance;
+                return health;
+            },
+            name: 'oak',
+            growth() {
+                let regen = player.t.trees[this.id].amount.add(1).root(2).div(50);
+
+                regen = regen.times(tmp.t.trees['*'].growth_mult);
+
+                return regen;
+            },
+            damage() {
+                let damage = tmp.t.trees['*'].damage_base;
+
+                return damage;
+            },
+            dps() {
+                let mult = tmp.t.trees['*'].dps_mult_inactive;
+
+                if (player.t.current == this.id) mult = mult.add(tmp.t.trees['*'].dps_mult_active);
+
+                return tmp.t.trees[this.id].damage.times(mult);
+            },
+            get_drops(amount) { return layers.lo.items['*'].get_drops(`tree:${this.id}`, D(amount)); },
+            size() {
+                let size = D(20);
+
+                size = size.add(tmp.t.trees['*'].size_add);
+
+                size = size.times(tmp.t.trees['*'].size_mult);
+
+                return size;
+            },
+            cap() {
+                let cap = D(100);
+
+                cap = cap.add(tmp.t.trees['*'].cap_add);
+
+                cap = cap.times(tmp.t.trees['*'].cap_mult);
+
+                return cap.floor();
+            },
+            regen() {
+                let mult = tmp.t.trees['*'].regen_add;
+
+                if (mult.eq(0)) return D.dZero;
+
+                return mult.times(tmp.t.trees[this.id].health);
+            },
         },
-        name(type = player.t.current) {
-            switch (type) {
-                default: case false: return 'none';
-                case 'driftwood': return 'driftwood';
-                case 'oak': return 'oak';
-                case 'birch': return 'birch';
-                case 'convertion':
-                    let text = 'convertion';
-                    if (!player.t.convert) text += ' (disabled)';
-                    return text;
-            }
+        birch: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.t.trees).find(item => layers.t.trees[item] == this); },
+            unlocked: true,
+            health() {
+                let health = D(10);
+
+                health = health.times(tmp.t.trees['*'].health_mult);
+
+                return health;
+            },
+            name: 'birch',
+            growth() {
+                let regen = player.t.trees[this.id].amount.add(1).root(2).div(35);
+
+                regen = regen.times(tmp.t.trees['*'].growth_mult);
+
+                return regen;
+            },
+            damage() {
+                let damage = tmp.t.trees['*'].damage_base;
+
+                return damage;
+            },
+            dps() {
+                let mult = tmp.t.trees['*'].dps_mult_inactive;
+
+                if (player.t.current == this.id) mult = mult.add(tmp.t.trees['*'].dps_mult_active);
+
+                return tmp.t.trees[this.id].damage.times(mult);
+            },
+            get_drops(amount) { return layers.lo.items['*'].get_drops(`tree:${this.id}`, D(amount)); },
+            size() {
+                let size = D(10);
+
+                size = size.add(tmp.t.trees['*'].size_add);
+
+                size = size.times(tmp.t.trees['*'].size_mult);
+
+                return size;
+            },
+            cap() {
+                let cap = D(100);
+
+                cap = cap.add(tmp.t.trees['*'].cap_add);
+
+                cap = cap.times(tmp.t.trees['*'].cap_mult);
+
+                return cap.floor();
+            },
+            regen() {
+                let mult = tmp.t.trees['*'].regen_add;
+
+                if (mult.eq(0)) return D.dZero;
+
+                return mult.times(tmp.t.trees[this.id].health);
+            },
         },
-        regen(type = player.t.current) {
-            if (!(type in player.t.trees) || player.t.trees[type].amount.gte(layers.t.trees.cap(type))) return D.dZero;
+        // Special tree for when the player is not chopping any
+        '': {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.t.trees).find(item => layers.t.trees[item] == this); },
+            unlocked: false,
+            health: D.dZero,
+            name: 'none',
+            growth: D.dZero,
+            damage() {
+                let damage = tmp.t.trees['*'].damage_base;
 
-            let regen = D.dZero;
-            switch (type) {
-                default: return D.dZero;
-                case 'driftwood':
-                    regen = D(1 / 20);
-                    break;
-                case 'oak':
-                    regen = player.t.trees.oak.amount.add(1).root(2).div(50);
-                    break;
-                case 'birch':
-                    regen = player.t.trees.birch.amount.add(1).root(2).div(35);
-                    break;
-            }
+                return damage;
+            },
+            dps() {
+                let mult = tmp.t.trees['*'].dps_mult_inactive;
 
-            if (hasUpgrade('t', 13)) regen = regen.times(upgradeEffect('t', 13));
+                if (player.t.current == this.id) mult = mult.add(tmp.t.trees['*'].dps_mult_active);
 
-            return regen;
-        },
-        damage(type = player.t.current) {
-            let damage = D.dOne;
-
-            if (hasUpgrade('m', 62)) damage = damage.add(upgradeEffect('m', 62));
-
-            if (hasUpgrade('t', 31)) damage = damage.add(upgradeEffect('t', 31));
-
-            damage = damage.add(buyableEffect('lo', 42).tree_damage);
-
-            if (hasUpgrade('m', 61)) damage = damage.times(upgradeEffect('m', 61));
-
-            return damage;
-        },
-        passive_damage(type = player.t.current) {
-            if (!type) return D.dZero;
-
-            let passive = D.dZero;
-
-            if (hasUpgrade('t', 22)) passive = passive.add(upgradeEffect('t', 22));
-
-            return passive.times(this.damage(type));
-        },
-        get_drops(type = player.t.current, amount = 1) {
-            const drops = layers.lo.items["*"].get_drops(`tree:${type}`, D(amount));
-
-            return drops;
-        },
-        size(type = player.t.current) {
-            let size = D.dZero;
-            switch (type) {
-                case 'driftwood':
-                    size = D(5);
-
-                    size = size.add(buyableEffect('lo', 61).soaked);
-                    break;
-                case 'oak':
-                    size = D(20);
-                    break;
-                case 'birch':
-                    size = D(10);
-                    break;
-            }
-
-            if (hasUpgrade('t', 11)) size = size.times(upgradeEffect('t', 11).size);
-
-            if (hasUpgrade('f', 23)) size = size.times(upgradeEffect('f', 23));
-
-            return size;
-        },
-        random() {
-            if (!Object.values(player.t.trees).some(({ amount }) => amount.gte(1))) return false;
-
-            const trees = Object.entries(player.t.trees).filter(([, { amount }]) => amount.gte(1)),
-                sum = trees.reduce((sum, [, { amount }]) => sum.add(amount), D.dZero);
-            if (!trees.length) return false;
-
-            let choice = sum.times(Math.random()),
-                i = 0;
-            while (choice.gt(0) && i < trees.length - 1) {
-                const [, w] = trees[i];
-                choice = choice.minus(w);
-                i++;
-            }
-
-            return trees[i][0];
-        },
-        logs() {
-            return this.items.filter(item => /log$/.test(item))
-                .map(item => player.lo.items[item].amount)
-                .reduce(D.add, D.dZero);
-        },
-        cap(type = false) {
-            let cap = D.dZero;
-
-            switch (type) {
-                case 'driftwood': cap = D.dOne; break;
-                case 'oak': cap = D(100); break;
-                case 'birch': cap = D(100); break;
-            }
-
-            cap = cap.times(buyableEffect('lo', 62).cap);
-
-            return cap.floor();
+                return tmp.t.trees[this.id].damage.times(mult);
+            },
+            get_drops(amount) { return []; },
+            size: D.dZero,
+            cap: D.dZero,
+            regen: D.dZero,
         },
     },
     /** @type {typeof layers.t.convertion} */
@@ -601,14 +839,6 @@ addLayer('t', {
 
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed('t'));
 
-        // Grow trees
-        tmp.t.trees.trees.forEach(tree => {
-            const regen = layers.t.trees.regen(tree).times(diff);
-            if (regen.eq(0)) return;
-
-            player.t.trees[tree].amount = player.t.trees[tree].amount.add(regen);
-        });
-
         // Convert logs to planks
         if (player.t.convert && tmp.t.convertion.per_second.gt(0)) {
             ['plank', ...layers.t.convertion.from].forEach(item => {
@@ -619,40 +849,80 @@ addLayer('t', {
             });
         }
 
-        // Cut tree
-        if (tmp.t.trees.passive_damage.gt(0)) {
-            const damage = tmp.t.trees.passive_damage.times(diff),
-                drops = layers.t.trees.get_drops(player.t.current, damage);
+        for (const tree of Object.keys(layers.t.trees).filter(tree => tree != '*')) {
+            const player_tree = player.t.trees[tree],
+                tmp_tree = tmp.t.trees[tree];
 
-            if (drops.length) {
-                layers.lo.items['*'].gain_drops(drops);
-                player.t.last_drops = drops;
+            // Grow tree
+            if (tmp_tree.growth.gt(0) && player_tree.amount.lt(tmp_tree.cap)) {
+                player_tree.amount = player_tree.amount.add(tmp_tree.growth.times(diff));
             }
 
-            player.t.health = player.t.health.minus(damage);
+            // Heal tree
+            if (player_tree.health.gt(0) && tmp_tree.regen.gt(0) && player_tree.health.lt(tmp_tree.health)) {
+                player_tree.health = player_tree.health.add(tmp_tree.regen.times(diff));
+            }
+
+            // Cut tree
+            if (tmp_tree.dps.gt(0)) {
+                player.t.clicked = true;
+                const damage = tmp_tree.dps.times(diff),
+                    drops = layers.t.trees[tree].get_drops(damage);
+
+                if (drops.length) {
+                    layers.lo.items['*'].gain_drops(drops);
+
+                    const equal = drops.length == player_tree.last_drops.length &&
+                        drops.every(([item, amount]) => player_tree.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
+                    if (equal) {
+                        player_tree.last_drops_times = D.add(player_tree.last_drops_times, 1);
+                    } else {
+                        player_tree.last_drops_times = D.dOne;
+                        player_tree.last_drops = drops;
+                    }
+                }
+
+                player_tree.health = player_tree.health.minus(damage);
+            }
         }
     },
     automate() {
-        if (player.t.health.lte(0)) {
-            // Tree is dead
-            const type = player.t.current,
-                drops = layers.t.trees.get_drops(type, layers.t.trees.size(type));
+        for (const tree of Object.keys(layers.t.trees).filter(tree => tree != '*')) {
+            if (D.lte(player.t.trees[tree].health, 0)) {
+                // Tree is dead
+                if (player.t.clicked) {
+                    const drops = layers.t.trees[tree].get_drops(tmp.t.trees[tree].size);
 
-            player.t.last_drops.push(...drops);
-            layers.lo.items['*'].gain_drops(drops);
+                    player.t.trees[tree].last_drops.push(...drops);
+                    player.t.trees[tree].last_drops_times = D.dOne;
+                    layers.lo.items['*'].gain_drops(drops);
+                }
 
-            player.t.current = false;
+                player.t.trees[tree].health = tmp.t.trees[tree].health;
+
+                if (tree == player.t.current) player.t.current = '';
+            }
         }
 
         if (!player.t.current && Object.values(player.t.trees).some(({ amount }) => amount.gte(1))) {
             // No tree and there is one available
-            const trees = Object.entries(player.t.trees)
-                .filter(([, { amount }]) => amount.gte(1))
-                .map(([tree]) => tree),
-                tree = trees[Math.floor(Math.random() * trees.length)];
+            /** @type {string} */
+            let tree;
+            const random_tree = () => {
+                const trees = Object.entries(player.t.trees)
+                    .filter(([, { amount }]) => amount.gte(1))
+                    .map(([tree]) => tree);
+                return trees[Math.floor(Math.random() * trees.length)];
+            };
+            if (options.noRNG) {
+                // The player gets the focused tree when available
+                if (player.t.trees[player.t.focus].amount.gte(1)) tree = player.t.focus;
+                else tree = random_tree();
+            } else {
+                tree = random_tree();
+            }
 
             player.t.trees[tree].amount = player.t.trees[tree].amount.minus(1);
-            player.t.health = layers.t.trees.health(tree);
             player.t.current = tree;
         }
     },
@@ -660,13 +930,19 @@ addLayer('t', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
-        const keep = ['convert', 'short_mode'],
+        const keep = ['convert', 'short_mode', 'focus'],
             kept_ups = [...player.t.upgrades];
 
         kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 62).t_hold).toNumber();
 
         layerDataReset(this.layer, keep);
-        layers.t.trees.items.forEach(item => player.lo.items[item].amount = D.dZero);
+        layers.t.trees['*'].items.forEach(item => player.lo.items[item].amount = D.dZero);
+        Object.keys(player.t.trees).forEach(tree => player.t.trees[tree] = {
+            amount: D.dZero,
+            health: D.dZero,
+            last_drops: [],
+            last_drops_times: D.dZero,
+        });
         player.t.upgrades.push(...kept_ups);
     },
     branches: [() => player.f.unlocked ? 'f' : 'lo'],
