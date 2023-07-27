@@ -859,7 +859,7 @@ addLayer('t', {
             }
 
             // Heal tree
-            if (player_tree.health.gt(0) && tmp_tree.regen.gt(0) && player_tree.health.lt(tmp_tree.health)) {
+            if (D.gt(player_tree.health, 0) && tmp_tree.regen.gt(0) && player_tree.health.lt(tmp_tree.health)) {
                 player_tree.health = player_tree.health.add(tmp_tree.regen.times(diff));
             }
 

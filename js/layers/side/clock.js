@@ -1,5 +1,6 @@
 'use strict';
 
+//todo add buyMax to buyables
 addLayer('clo', {
     name: 'Clock',
     symbol: '⏲',
@@ -548,7 +549,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['zombie'].color;
+                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['ent'].color;
 
                 return style;
             },

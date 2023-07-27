@@ -84,7 +84,9 @@ addLayer('cas', {
                 else return '';
             }
 
-            return Object.entries(player.cas.swaps[type]).find(([, it]) => it == item)[0];
+            if (!(type in player.cas.swaps)) return '';
+
+            return (Object.entries(player.cas.swaps[type]).find(([, it]) => it == item) ?? [''])[0];
         },
         items(source) {
             if (!source) return {};
@@ -172,7 +174,7 @@ addLayer('cas', {
             }
 
             const swaps = player.cas.swaps[type];
-            [swaps[from], swaps[dest]] = [swaps[dest], swaps[from]];
+            [swaps[from], swaps[dest]] = [swaps[dest] ?? dest, swaps[from] ?? from];
 
             this.clean_swaps();
         },

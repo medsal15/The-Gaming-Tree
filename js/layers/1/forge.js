@@ -121,7 +121,7 @@ addLayer('f', {
                 () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '(technically 2% because of your challenges)']; },
                 'blank',
                 ['display-text', `<span style="color:#AA5555;">You consume 1% of your fuels to produce heat every second</span>`],
-                ['display-text', () => `Your forge's prevents consuming more than ${format(tmp.f.fuels['*'].size)} of each fuel per second`],
+                ['display-text', () => `Your forge's size prevents consuming more than ${format(tmp.f.fuels['*'].size)} of each fuel per second`],
                 'blank',
                 [
                     'column',
@@ -158,7 +158,7 @@ addLayer('f', {
                 () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '(technically 2% because of your challenges)']; },
                 ['display-text', () => `Your heat divides time requirements by ${shiftDown ? `[${tmp.f.heat.speed_formula}]` : format(tmp.f.heat.speed)}`],
                 'blank',
-                ['display-text', () => `Your forge's prevents producing more than ${format(tmp.f.recipes['*'].size)} of each recipes per second`],
+                ['display-text', () => `Your forge's size prevents producing more than ${format(tmp.f.recipes['*'].size)} of each recipes per second`],
                 [
                     'display-text',
                     () => `Hold <span style="${ctrlDown && !shiftDown ? 'text-decoration:underline;' : ''}">control for *10</span>,\
@@ -889,7 +889,7 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.add(50, amount.times(25));
+                let time = D.add(40, amount.times(20));
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
@@ -897,7 +897,7 @@ addLayer('f', {
             },
             formulas: {
                 'copper_ore': '(amount ^ 1.25) * 100',
-                'time': 'amount * 25 + 50',
+                'time': 'amount * 20 + 40',
             },
         },
         tin_ingot: {

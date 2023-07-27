@@ -42,6 +42,6 @@ addLayer('_hotkeys', {
         },
     ],
     type: 'none',
-    style: { 'display': 'none', },
+    nodeStyle: { 'display': 'none', },
     layerShown: false,
 });

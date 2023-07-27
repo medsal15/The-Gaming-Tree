@@ -1891,9 +1891,10 @@ type Layers = {
             /**
              * Reverse lookup for items
              *
-             * Points to the original item
+             * Points to the original item (that was swapped)
              */
             base(item: string, type?: 'chances' | 'weights' | 'challenge'): string
+            /** Copy of layers.lo.items.*.items but modified to apply swaps */
             items(source: `${drop_sources}:${string}`): {
                 chances?: { [item_id: string]: Decimal }
                 weights?: { [item_id: string]: Decimal }
@@ -1903,8 +1904,18 @@ type Layers = {
             swap_cost_formula(): string
             /** Makes an item be replaced with another */
             swap(from: string, dest: string, type?: 'chances' | 'weights' | 'challenge'): void
+            /** Removes items swapped with themselves from the player data */
             clean_swaps(): void
-            show_row(item: string): ['row', []]
+            /** Returns a row that displays the swapping */
+            show_row(item: string): ['row', [
+                ['clickable', `swap_chances_left_${string}`],
+                ['clickable', `swap_weights_left_${string}`],
+                'blank',
+                ['display-text', ' is currently replaced by '],
+                'blank',
+                ['clickable', `swap_chances_right_${string}`],
+                ['clickable', `swap_weights_right_${string}`],
+            ]] | undefined
         }
         token: {
             chance(): Decimal
@@ -1914,12 +1925,14 @@ type Layers = {
     mag: Layer<Player['mag']> & {
         elements: {
             '*': {
+                /** Damage multiplier when an element is used against a stronger one */
                 weak_multiplier: Decimal
+                /** Damage multiplier when an element is used against a weaker one */
                 strong_multiplier: Decimal
                 /**
                  * Returns the element for an entity
                  *
-                 * May return a different element
+                 * May return a different element on subsequent calls
                  */
                 element(enemy: string): string
                 /** Returns a random element */
@@ -1977,11 +1990,13 @@ type Layers = {
                 /** Added % of health regeneration */
                 regen_add(): Decimal
                 drops_mult(): Decimal
+                /** List of currently unlocked enemies */
                 list(): string[]
             }
         } & {
             [type: string]: {
                 readonly type: string
+                /** Current levels */
                 level(): Decimal
                 /** Color version of level */
                 color_level(): string
@@ -1989,6 +2004,7 @@ type Layers = {
                 color: Computable<string>
                 health(level?: DecimalSource): Decimal
                 experience(level?: DecimalSource): Decimal
+                /** Gained kills on death */
                 kills(): Decimal
                 /** Current name (lowercase) */
                 name: Computable<string>
@@ -2019,8 +2035,10 @@ type Layers = {
             health(): Decimal
             regen(): Decimal
             chance(mode?: Player['m']['mode']): Decimal
+            /** Name of the mode */
             mode(mode?: Player['m']['mode']): string
             get_drops(amount: DecimalSource): [string, Decimal][]
+            /** List of items tracked by the layer */
             items: string[]
             mine_mult(): Decimal
         }
@@ -2053,7 +2071,7 @@ type Layers = {
                 logs(): Decimal
             }
         } & {
-            [tree: string | false]: {
+            [tree: string]: {
                 readonly id: string
                 unlocked(): boolean
                 health: Computable<Decimal>
@@ -2108,21 +2126,30 @@ type Layers = {
         }
         items: {
             '*': {
+                /** Converts a grid id to an item id (or false if there is none) */
                 grid_to_item: ((id: number) => string | false) & {
                     cache: { [k: number]: string | false }
                 }
                 global_chance_multiplier(): Decimal
-                get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: Decimal): [string, Decimal][]
+                /** Computes the drops from a type */
+                get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: DecimalSource): [string, Decimal][]
+                /** Adds the drops in question to the player data */
                 gain_drops(drops: [string, Decimal][]): void
                 format_chance(chance: Decimal): string
                 type_name(type: `${drop_sources}:${string}`): string
                 can_drop(type: `${drop_sources}:${string}`): boolean
+                /** Total amount of items */
                 amount(): Decimal
+                /** Total weight of a type (or all types) */
                 weight(type?: `${drop_sources}:${string}`): typeof type extends string ? Decimal : { [key: `${drop_sources}:${string}`]: Decimal }
                 has_anvil(): boolean
+                /** Total value of all buyables */
                 value: Computable<Decimal>
+                /** Multiplier to items gained */
                 gain_multiplier: Computable<Decimal>
+                /** Multiplier to effective buyable costs */
                 craft_consumption: Computable<Decimal>
+                /** Items dropped by a type, split between chances and weights */
                 items(type: `${drop_sources}:${string}`): {
                     chances?: { [item_id: string]: Decimal }
                     weights?: { [item_id: string]: Decimal }
@@ -2134,11 +2161,27 @@ type Layers = {
                 readonly grid: number
                 sources: {
                     readonly id: string
+                    /**
+                     * Odds for the item to drop from a given type
+                     *
+                     * If the value is greater or equal to 1, the drop is guaranteed to be the chance
+                     */
                     chances?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
+                    /**
+                     * Odds for the item to drop from a given type
+                     *
+                     * Actual odds are `weight/total weight`
+                     */
                     weights?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
+                    /**
+                     * Amount gained/lost per second from another source
+                     *
+                     * Done by the other source
+                     */
                     per_second?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
                     other?: Computable<`${drop_sources}:${string}`[]>
                 }
+                /** Item style */
                 style?: Computable<CSSStyles>
                 name: Computable<string>
                 unlocked?: Computable<boolean>
@@ -2149,9 +2192,11 @@ type Layers = {
         fuels: {
             '*': {
                 regex: RegExp
+                /** Returns a row that displays the fuel */
                 show_fuel(fuel: string): ['row', [['clickable', `fuel_display_${string}`], ['display-text', string], ['clickable', `fuel_toggle_${string}`]]]
                 /** Maximum amount of a fuel that can be consumed per second */
                 size(): Decimal
+                /** Amount of the item being consumed every second */
                 consuming(item: string): Decimal
             }
             [fuel: string]: {
@@ -2168,12 +2213,21 @@ type Layers = {
         }
         recipes: {
             '*': {
+                /** List of regexes for the clickables and bar */
                 regexes: {
                     bar: RegExp
                     display: RegExp
                     amount: RegExp
                 }
-                show_recipe(recipe: string): ['row', []]
+                /** Returns a row that displays the recipe */
+                show_recipe(recipe: string): ['row', [
+                    ...['clickable', `recipe_display_${string}_${number}`],
+                    ['bar', `recipe_heat_${string}`],
+                    ['bar', `recipe_time_${string}`],
+                    ['clickable', `recipe_decrease_${string}`],
+                    ['clickable', `recipe_display_${string}_${number}`],
+                    ['clickable', `recipe_increase_${string}`],
+                ]] | undefined
                 /** Maximum amount of items produced at once */
                 size(): Decimal
                 /**
@@ -2184,6 +2238,7 @@ type Layers = {
                  * May return a negative value if more is being consumed than produced
                  */
                 producing(item: string): Decimal
+                /** Computes a recipe's default amount (for tmp display) */
                 default_amount(recipe: string, amount?: Decimal): Decimal
                 speed(): Decimal
             }
@@ -2224,9 +2279,12 @@ type Layers = {
             }
         }
         heat: {
+            /** Speed multiplier from heat */
             speed(): Decimal
             speed_formula: Computable<string>
+            /** Total heat gained every second */
             gain(): Decimal
+            /** Multiplier to heat gain */
             mult(): Decimal
         }
     }
@@ -2234,15 +2292,24 @@ type Layers = {
     b: Layer<Player['b']> & {}
     s: Layer<Player['s']> & {
         coins: {
-            types: [string, string][]
+            /** List of coins */
+            types: [name: string, color: string][]
+            /** Default format coin method which returns a string with the amount of every coin type */
             format(amount?: DecimalSource, color?: boolean, split?: false): string
+            /** Alternate format coin method that splits coin types in their own entry */
             format(amount?: DecimalSource, color?: boolean, split: true): string[]
         }
         investloans: {
+            /**
+             * Amount of investments/loans bought
+             *
+             * If real, coins the boss investment as 1 (instead of its current value)
+             */
             amount(real?: boolean): Decimal
             /** Determines whether the player is in a loan/debt challenge */
             is_loans(): boolean
             type(): 'loan' | 'debt' | 'investment'
+            /** List of investments/loans linked to specific items */
             item_upgrade: {
                 [item: string]: number | undefined
             }
@@ -2304,6 +2371,7 @@ type Player = {
         short_mode: boolean
     }
     clo: LayerData & {
+        /** If true, uses advanced materials from the forge */
         use_advanced: boolean
     }
     cas: LayerData & {
@@ -2331,18 +2399,23 @@ type Player = {
         count: Decimal
     }
     mag: LayerData & {
+        /** Current selected element */
         element: string
     }
     // Row 0
     xp: LayerData & {
+        /** Current selected enemy */
         type: string
         clicked: boolean
         enemies: {
             [enemy: string]: {
+                /** Enemy health left */
                 health: Decimal
                 kills: Decimal
                 last_drops: [string, Decimal][]
+                /** Amount of times the value in last_drops was dropped */
                 last_drops_times: Decimal
+                /** Current element, irrelevant if magic is locked */
                 element: string
             }
         }
@@ -2350,9 +2423,11 @@ type Player = {
     m: LayerData & {
         health: Decimal
         last_drops: [string, Decimal][]
+        /** Amount of times the value in last_drops was dropped */
         last_drops_times: Decimal
         short_mode: boolean
         mode: 'shallow' | 'deep'
+        /** If true, shows deep mining upgrades */
         show_deep: boolean
     }
     t: LayerData & {
@@ -2363,25 +2438,33 @@ type Player = {
                 amount: Decimal
                 health: Decimal
                 last_drops: [string, Decimal][]
+                /** Amount of times the value in last_drops was dropped */
                 last_drops_times: Decimal
             }
         }
+        /** Current selected tree */
         current: string
+        /** Current focused tree, only used with `options.noRNG` */
         focus: string
         convert: boolean
     }
     // Row 1
     l: LayerData & {
+        /** Amount of points being added/removed from a skill */
         change: Decimal
         skills: {
             [skill: string]: {
+                /** Amount of points in a skill */
                 points: Decimal
+                /** Current level of the skill */
                 level: Decimal
+                /** Progress towards next level of the skill */
                 progress: Decimal
             }
         }
     }
     lo: LayerData & {
+        /** Replaces `unlocked` to allow buying the only upgrade */
         shown: boolean
         items: { [id: string]: { amount: Decimal, } }
     }
@@ -2416,10 +2499,12 @@ type Player = {
                 progress: Decimal
             }
         }
+        /** If true, shows alloys upgrades and buyables */
         alloys: boolean
     }
     // Row 2
     b: LayerData & {
+        /** If true, bosses are automatically started unless beaten */
         auto_start: boolean
     }
     s: LayerData & {

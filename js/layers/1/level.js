@@ -426,5 +426,5 @@ addLayer('l', {
 
         layerDataReset(this.layer, keep);
     },
-    shouldNotify() { return tmp.l.skills['*'].left.gt(0); },
+    shouldNotify() { return tmp.l.skills['*'].left.gt(0) && Object.keys(layers.l.skills).some(skill => skill != '*' && (tmp.l.skills[skill].unlocked ?? true)); },
 });

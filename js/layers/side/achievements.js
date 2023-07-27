@@ -781,7 +781,7 @@ addLayer('ach', {
         93: {
             name: 'Wizardry',
             tooltip() {
-                if (!hasChallenge('b', 32)) return 'Unlock ???';
+                if (!hasChallenge('b', 41)) return 'Unlock ???';
 
                 return 'Unlock Magic';
             },
@@ -797,7 +797,7 @@ addLayer('ach', {
         94: {
             name: 'SP',
             tooltip() {
-                if (!hasChallenge('b', 32)) return 'Unlock ???';
+                if (!hasChallenge('b', 42)) return 'Unlock ???';
 
                 return 'Unlock Attributes';
             },

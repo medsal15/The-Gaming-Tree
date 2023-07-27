@@ -1,7 +1,7 @@
 'use strict';
 
-//todo keep final "enemy" drop
 //todo add buyMax to buyables
+//todo keep final "enemy" drop
 addLayer('lo', {
     name: 'Loot',
     image: './resources/images/swap-bag.svg',
@@ -150,12 +150,6 @@ addLayer('lo', {
                         cost_formula_shard = '1.1 ^ amount',
                         value_formula = 'amount';
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_goo += ` * ${effect}`;
-                        cost_formula_shard = `(${cost_formula_shard}) * ${effect}`;
-                    }
-
                     if (value.gt(1)) {
                         value_formula += ` * ${formatWhole(value)}`;
                     }
@@ -236,12 +230,6 @@ addLayer('lo', {
                         cost_formula_shard = '(1.2 ^ amount) * 3',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_goo += ` * ${effect}`;
-                        cost_formula_shard += ` * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula_goo}] ${tmp.lo.items.slime_goo.name}`,
                         `[${cost_formula_shard}] ${tmp.lo.items.slime_core_shard.name}`,
@@ -316,12 +304,6 @@ addLayer('lo', {
                         cost_formula_goo = '(1.5 ^ amount) * 30',
                         cost_formula_core = '1.1 ^ amount',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_goo += ` * ${effect}`;
-                        cost_formula_core = `(${cost_formula_core}) * ${effect}`;
-                    }
 
                     const cost_list = [
                         `[${cost_formula_goo}] ${tmp.lo.items.slime_goo.name}`,
@@ -403,12 +385,6 @@ addLayer('lo', {
 
                     if (hasUpgrade('m', 51)) {
                         effect_formula = `(${effect_formula}) ^ ${format(upgradeEffect('m', 51))}`;
-                    }
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_stone += ` * ${effect}`;
-                        cost_formula_copper += ` * ${effect}`;
                     }
 
                     if (hasUpgrade('f', 11)) {
@@ -516,12 +492,6 @@ addLayer('lo', {
                         cost_formula_core = '(1.125 ^ amount) * 5',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_copper += ` * ${effect}`;
-                        cost_formula_core += ` * ${effect}`;
-                    }
-
                     if (hasUpgrade('f', 11)) {
                         cost_formula_copper += ` / ${format(D.pow(upgradeEffect('f', 11)['copper_ingot'], -1))}`;
                     }
@@ -622,13 +592,6 @@ addLayer('lo', {
                         cost_formula_copper = '(1.125 ^ amount) * 50',
                         cost_formula_goo = '(1.5 ^ amount) * 20',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_tin += ` * ${effect}`;
-                        cost_formula_copper += ` * ${effect}`;
-                        cost_formula_goo += ` * ${effect}`;
-                    }
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
@@ -732,12 +695,6 @@ addLayer('lo', {
                         cost_formula_goo = '(1.5 ^ amount) * 25',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_fabric += ` * ${effect}`;
-                        cost_formula_goo += ` * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula_fabric}] ${tmp.lo.items.red_fabric.name}`,
                         `[${cost_formula_goo}] ${tmp.lo.items.slime_goo.name}`,
@@ -814,12 +771,6 @@ addLayer('lo', {
                         cost_formula_fabric = '(1.5 ^ amount) * 10',
                         cost_formula_pyrite = '1.23 ^ amount',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_fabric += ` * ${effect}`;
-                        cost_formula_pyrite = `(${cost_formula_pyrite}) * ${effect}`;
-                    }
 
                     const cost_list = [
                         `[${cost_formula_fabric}] ${tmp.lo.items.red_fabric.name}`,
@@ -901,13 +852,6 @@ addLayer('lo', {
                         cost_formula_tin = '(1.5 ^ amount) * 25',
                         cost_formula_gear = '1.23 ^ amount',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_copper += ` * ${effect}`;
-                        cost_formula_tin += ` * ${effect}`;
-                        cost_formula_gear = `(${cost_formula_gear}) * ${effect}`;
-                    }
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_tin += ` / ${format(D.pow(upgradeEffect('f', 11)['tin_ingot'], -1))}`;
@@ -1005,12 +949,6 @@ addLayer('lo', {
                         cost_formula_fabric = '(1.25 ^ amount) * 2',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_rotten += ` * ${effect}`;
-                        cost_formula_fabric += ` * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula_rotten}] ${tmp.lo.items.rotten_flesh.name}`,
                         `[${cost_formula_fabric}] ${tmp.lo.items.red_fabric.name}`,
@@ -1092,12 +1030,6 @@ addLayer('lo', {
                         cost_formula_iron = '(1.5 ^ amount) * 2.5',
                         cost_fprmula_goo = '(1.75 ^ amount) * 20',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_iron += ` * ${effect}`;
-                        cost_fprmula_goo += ` * ${effect}`;
-                    }
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_iron += ` / ${format(D.pow(upgradeEffect('f', 11)['iron_ingot'], -1))}`;
@@ -1192,13 +1124,6 @@ addLayer('lo', {
                         cost_formula_brain = '1.5 ^ amount',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_core = `(${cost_formula_core}) * ${effect}`;
-                        cost_formula_gear = `(${cost_formula_gear}) * ${effect}`;
-                        cost_formula_brain = `(${cost_formula_brain}) * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula_core}] ${tmp.lo.items.slime_core.name}`,
                         `[${cost_formula_gear}] ${tmp.lo.items.rusty_gear.name}`,
@@ -1277,12 +1202,6 @@ addLayer('lo', {
                         cost_formula_stone = '(2.5 ^ amount) * 10',
                         cost_formula_coal = '(1.5 ^ amount) * 5',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_stone += ` * ${effect}`;
-                        cost_formula_coal += ` * ${effect}`;
-                    }
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_stone += ` / ${format(D.pow(upgradeEffect('f', 11)['stone_brick'], -1))}`;
@@ -1376,13 +1295,6 @@ addLayer('lo', {
                         cost_formula_copper = '(1.5 ^ amount) * 50',
                         cost_formula_tin = '(1.5 ^ amount) * 25',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_iron += ` * ${effect}`;
-                        cost_formula_copper += ` * ${effect}`;
-                        cost_formula_tin += ` * ${effect}`;
-                    }
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_iron += ` / ${format(D.pow(upgradeEffect('f', 11)['iron_ingot'], -1))}`;
@@ -1483,11 +1395,6 @@ addLayer('lo', {
                         cost_formula_gold = '(amount ^ 2) * 5',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_gold += ` * ${effect}`;
-                    }
-
                     if (hasUpgrade('f', 11)) {
                         cost_formula_gold += ` / ${format(D.pow(upgradeEffect('f', 11)['gold_ingot'], -1))}`;
                     }
@@ -1576,12 +1483,6 @@ addLayer('lo', {
                         cost_formula_normal = '(1.125 ^ amount) * 20',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_soaked = `(${cost_formula_soaked}) * ${effect}`;
-                        cost_formula_normal += ` * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula_soaked}] ${tmp.lo.items.soaked_log.name}`,
                         `[${cost_formula_normal}] ${tmp.lo.items.normal_log.name}`,
@@ -1661,12 +1562,6 @@ addLayer('lo', {
                         cost_formula_plank = '(1.5 ^ amount) * 20',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_normal += ` * ${effect}`;
-                        cost_formula_plank += ` * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula_normal}] ${tmp.lo.items.normal_log.name}`,
                         `[${cost_formula_plank}] ${tmp.lo.items.plank.name}`,
@@ -1744,13 +1639,6 @@ addLayer('lo', {
                         cost_formula_coal = '(1.2 ^ amount) * 3',
                         cost_formula_gold = '(1.1 ^ amount) / 10',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_plank += ` * ${effect}`;
-                        cost_formula_coal += ` * ${effect}`;
-                        cost_formula_gold += ` * ${effect}`;
-                    }
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_coal += ` / ${format(D.pow(upgradeEffect('f', 11)['coal'], -1))}`;
@@ -1848,11 +1736,6 @@ addLayer('lo', {
                         cost_formula = '(1.5 ^ amount) * 10',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula += ` * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula}] ${tmp.lo.items.bronze_ingot.name}`,
                     ];
@@ -1931,13 +1814,8 @@ addLayer('lo', {
                         cost_formula = '(2 ^ amount) * 10',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula += ` * ${effect}`;
-                    }
-
                     const cost_list = [
-                        `[${cost_formula}] ${tmp.lo.items.bronze_ingot.name}`,
+                        `[${cost_formula}] ${tmp.lo.items.steel_ingot.name}`,
                     ];
 
                     return `Your ${formatWhole(amount)} steel minecarts\
@@ -2014,12 +1892,6 @@ addLayer('lo', {
                         cost_formula_bronze = '(1.75 ^ amount) * 10',
                         cost_formula_steel = '(2.25 ^ amount) * 10',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_bronze += ` * ${effect}`;
-                        cost_formula_steel += ` * ${effect}`;
-                    }
 
                     const cost_list = [
                         `[${cost_formula_bronze}] ${tmp.lo.items.bronze_ingot.name}`,
@@ -2100,12 +1972,6 @@ addLayer('lo', {
                         cost_formula_brain = '(1.5 ^ amount) * 5',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_holy_water = `(${cost_formula_holy_water}) * ${effect}`;
-                        cost_formula_brain += ` * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula_holy_water}] ${tmp.lo.items.holy_water.name}`,
                         `[${cost_formula_brain}] ${tmp.lo.items.brain.name}`,
@@ -2183,12 +2049,6 @@ addLayer('lo', {
                         cost_formula_holy_water = '1.5 ^ amount',
                         cost_formula_stone = '(2.5 ^ amount) * 500',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_holy_water = `(${cost_formula_holy_water}) * ${effect}`;
-                        cost_formula_stone += ` * ${effect}`;
-                    }
 
                     if (hasUpgrade('f', 11)) {
                         cost_formula_stone += ` / ${format(D.pow(upgradeEffect('f', 11)['stone_brick'], -1))}`;
@@ -2280,12 +2140,6 @@ addLayer('lo', {
                         cost_formula_normal_log = '(1.5 ^ amount) * 250',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_holy_water = `(${cost_formula_holy_water}) * ${effect}`;
-                        cost_formula_normal_log += ` * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula_holy_water}] ${tmp.lo.items.holy_water.name}`,
                         `[${cost_formula_normal_log}] ${tmp.lo.items.normal_log.name}`,
@@ -2363,12 +2217,6 @@ addLayer('lo', {
                         cost_formula_plank = '(1.3 ^ amount) * 50',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_leaf += ` * ${effect}`;
-                        cost_formula_plank += ` * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula_leaf}] ${tmp.lo.items.leaf.name}`,
                         `[${cost_formula_plank}] ${tmp.lo.items.plank.name}`,
@@ -2444,12 +2292,6 @@ addLayer('lo', {
                         cost_formula_leaf = '(1.4 ^ amount) * 25',
                         value_formula = `amount * ${formatWhole(value)}`;
 
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_normal_log += ` * ${effect}`;
-                        cost_formula_leaf += ` * ${effect}`;
-                    }
-
                     const cost_list = [
                         `[${cost_formula_normal_log}] ${tmp.lo.items.normal_log.name}`,
                         `[${cost_formula_leaf}] ${tmp.lo.items.leaf.name}`,
@@ -2524,12 +2366,6 @@ addLayer('lo', {
                         cost_formula_seed = '(1.25 ^ amount) * 3',
                         cost_formula_plank = '(1.5 ^ amount) * 100',
                         value_formula = `amount * ${formatWhole(value)}`;
-
-                    if (hasUpgrade('s', 63)) {
-                        const effect = format(upgradeEffect('s', 63));
-                        cost_formula_seed += ` * ${effect}`;
-                        cost_formula_plank += ` * ${effect}`;
-                    }
 
                     const cost_list = [
                         `[${cost_formula_seed}] ${tmp.lo.items.seed.name}`,
@@ -2691,7 +2527,7 @@ addLayer('lo', {
                 return cache[id];
             },
             get_drops(type = player.xp.type, chance_multiplier = D.dOne) {
-                if (!this.can_drop(type) || chance_multiplier.lte(0)) return [];
+                if (!this.can_drop(type) || D.lte(chance_multiplier, 0)) return [];
 
                 const items = (inChallenge('b', 52) || hasChallenge('b', 52)) ? layers.cas.items.items(type) : this.items(type),
                     /** @type {{[item_id: string]: Decimal}} */
@@ -2736,7 +2572,7 @@ addLayer('lo', {
 
                     if (entries.length == 1) {
                         add_to_results(entries[0][0], 1);
-                    } else if (chance_multiplier.gt(10) || options.noRNG) {
+                    } else if (D.gt(chance_multiplier, 10) || options.noRNG) {
                         entries.forEach(([item_id, weight]) => {
                             const amount = weight.div(total).times(chance_multiplier);
 
