@@ -849,9 +849,10 @@ addLayer('ach', {
                     tmp.xp.enemies['*'].drops_mult.gt(1) ||
                     options.noRNG) return false;
 
-                return tmp.lo.items["*"].global_chance_multiplier.lte(1) &&
+                return (tmp.lo.items["*"].global_chance_multiplier.lte(1) &&
                     [['slime', 3], ['goblin', 3], ['zombie', 3], ['ent', 3]]
-                        .some(([type, len]) => player.xp.enemies[type].last_drops.length == len && player.xp.enemies[type].kills.gt(0));
+                        .some(([type, len]) => player.xp.enemies[type].last_drops.length == len && player.xp.enemies[type].kills.gt(0))) ||
+                    hasAchievement('ach', 181);
             },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
             style: { 'background-color': 'rgb(127,0,255)' },

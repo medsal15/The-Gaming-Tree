@@ -30,11 +30,11 @@ addLayer('f', {
         /** @type {[DecimalSource, [number, number, number]][]} */
         const color_points = [
             [1, [0xCC, 0xCC, 0xCC]],
-            ['1e20', [0xBB, 0x00, 0x00]],
-            ['1e30', [0xFF, 0x00, 0x00]],
-            ['1e40', [0xFF, 0xAA, 0x00]],
-            ['1e50', [0xFF, 0xFF, 0x00]],
-            ['1e70', [0xFF, 0xFF, 0xFF]],
+            ['1e10', [0xBB, 0x00, 0x00]],
+            ['1e20', [0xFF, 0x00, 0x00]],
+            ['1e30', [0xFF, 0xAA, 0x00]],
+            ['1e40', [0xFF, 0xFF, 0x00]],
+            ['1e50', [0xFF, 0xFF, 0xFF]],
         ],
             i = color_points.findIndex(([n]) => D.gte(n, player.f.points.max(0)));
 
