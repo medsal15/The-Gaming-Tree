@@ -286,7 +286,7 @@ addLayer('t', {
             },
             effectDisplay() {
                 /** @type {{health: Decimal, size: Decimal}} */
-                const effect = this.effect();
+                const effect = upgradeEffect(this.layer, this.id);
                 return `*${format(effect.health)} tree health, *${format(effect.size)} tree size`;
             },
             cost: D(10),
@@ -306,7 +306,7 @@ addLayer('t', {
             title: 'Saw',
             description: 'Convert 1% of your logs into planks',
             effect() { return D(.01); },
-            effectDisplay() { return `${format(this.effect().times(100))}%`; },
+            effectDisplay() { return `${format(upgradeEffect(this.layer, this.id).times(100))}%`; },
             cost: D(20),
             item: 'normal_log',
             currencyInternalName: 'amount',
@@ -324,7 +324,7 @@ addLayer('t', {
             title: 'Wood Chips',
             description: 'Double tree growth speed',
             effect() { return D.dTwo; },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(30),
             item: 'plank',
             currencyInternalName: 'amount',
@@ -350,7 +350,7 @@ addLayer('t', {
                 return `Formula: ${formula}`;
             },
             effect() { return D.add(player.lo.items.soaked_log.amount, 1).root(7); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
             cost: D(25),
             item: 'soaked_log',
@@ -369,7 +369,7 @@ addLayer('t', {
             title: 'Mechanical Sawmill',
             description: 'Passively cut the current tree with 25% of your damage',
             effect() { return D(.25); },
-            effectDisplay() { return `${format(D.times(this.effect(), tmp.t.trees['*'].damage_base))} dps`; },
+            effectDisplay() { return `${format(D.times(upgradeEffect(this.layer, this.id), tmp.t.trees['*'].damage_base))} dps`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
             cost: D(80),
             item: 'normal_log',
@@ -396,7 +396,7 @@ addLayer('t', {
                 return `Formula: ${formula}`;
             },
             effect() { return D.root(player.lo.items.plank.amount, 2).div(25).add(1); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
             cost: D(100),
             item: 'plank',
@@ -418,7 +418,7 @@ addLayer('t', {
                 if (player.t.current != 'driftwood') return tmp.t.trees['driftwood'].health.times(.1);
                 return tmp.t.trees['driftwood'].health;
             },
-            effectDisplay() { return `+${format(this.effect())}`; },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
             cost: D(100),
             item: 'soaked_log',
@@ -454,7 +454,7 @@ addLayer('t', {
             title: 'Crafting Table',
             description: 'Crafting now consumes 90% of costs',
             effect() { return D(.9); },
-            effectDisplay() { return `*${format(D.times(this.effect(), 100))}%`; },
+            effectDisplay() { return `*${format(D.times(upgradeEffect(this.layer, this.id), 100))}%`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
             cost: D(444),
             item: 'plank',
@@ -816,6 +816,8 @@ addLayer('t', {
             }
 
             efficiency = efficiency.add(buyableEffect('lo', 63).plank);
+
+            if (hasUpgrade('s', 113)) efficiency = efficiency.times(upgradeEffect('s', 113));
 
             return efficiency;
         },

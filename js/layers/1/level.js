@@ -236,7 +236,7 @@ addLayer('l', {
                 if (!shiftDown) {
                     return `Attacking level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to attacking<br>\
-                    Damage *${format(this.effect())}`;
+                    Damage *${format(tmp.l.skills[this.id].effect)}`;
                 } else {
                     let effect_formula = '1.15 ^ level';
 
@@ -260,7 +260,7 @@ addLayer('l', {
                 if (!shiftDown) {
                     return `Learning level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to learning<br>\
-                    Experience gain *${format(this.effect())}`;
+                    Experience gain *${format(tmp.l.skills[this.id].effect)}`;
                 } else {
                     let effect_formula = '1.1 ^ level';
 
@@ -284,7 +284,7 @@ addLayer('l', {
                 if (!shiftDown) {
                     return `Vampirism level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to vampirism<br>\
-                    ${layerColor('xp', tmp.xp.upgrades[13].title)} and ${layerColor('xp', tmp.xp.upgrades[21].title)} effects *${format(this.effect())}`;
+                    ${layerColor('xp', tmp.xp.upgrades[13].title)} and ${layerColor('xp', tmp.xp.upgrades[21].title)} effects *${format(tmp.l.skills[this.id].effect)}`;
                 } else {
                     let effect_formula = 'level / 50 + 1';
 
@@ -308,7 +308,7 @@ addLayer('l', {
                 if (!shiftDown) {
                     return `Reading level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to reading<br>\
-                    ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects +${format(this.effect())}`;
+                    ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects +${format(tmp.l.skills[this.id].effect)}`;
                 } else {
                     let effect_formula = 'level / 100';
 
@@ -332,7 +332,7 @@ addLayer('l', {
                 if (!shiftDown) {
                     return `Bartering level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to bartering<br>\
-                    Coins gain *${format(this.effect())}`;
+                    Coins gain *${format(tmp.l.skills[this.id].effect)}`;
                 } else {
                     let effect_formula = '1.01 ^ level';
 
@@ -356,7 +356,7 @@ addLayer('l', {
                 if (!shiftDown) {
                     return `Mining level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to mining<br>\
-                    Ore regeneration +${format(this.effect())}`;
+                    Ore regeneration +${format(tmp.l.skills[this.id].effect)}`;
                 } else {
                     let effect_formula = 'level / 20';
 

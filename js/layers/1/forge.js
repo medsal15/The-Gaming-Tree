@@ -224,7 +224,6 @@ addLayer('f', {
             });
     },
     type: 'none',
-    branches: ['lo'],
     upgrades: {
         11: {
             title: 'Iron Anvil',
@@ -307,7 +306,7 @@ addLayer('f', {
                 };
             },
             effectDisplay() {
-                return `+${format(this.effect().fuel)} fuel size, +${format(this.effect().recipe)} production size`;
+                return `+${format(upgradeEffect(this.layer, this.id).fuel)} fuel size, +${format(upgradeEffect(this.layer, this.id).recipe)} production size`;
             },
             cost: D(20),
             item: 'bronze_ingot',
@@ -336,7 +335,7 @@ addLayer('f', {
                 return D.add(player.lo.items.bronze_ingot.amount, 60).log(60);
             },
             effectDisplay() {
-                return `*${format(this.effect())}`;
+                return `*${format(upgradeEffect(this.layer, this.id))}`;
             },
             cost() {
                 let cost = D(60);
@@ -371,7 +370,7 @@ addLayer('f', {
                 return D.add(player.lo.items.bronze_ingot.amount, 60).log(60);
             },
             effectDisplay() {
-                return `*${format(this.effect())}`;
+                return `*${format(upgradeEffect(this.layer, this.id))}`;
             },
             cost() {
                 let cost = D(60);
@@ -406,7 +405,7 @@ addLayer('f', {
                 return D.add(player.lo.items.bronze_ingot.amount, 60).log(60);
             },
             effectDisplay() {
-                return `+${format(this.effect())}`;
+                return `+${format(upgradeEffect(this.layer, this.id))}`;
             },
             cost() {
                 let cost = D(60);
@@ -433,7 +432,7 @@ addLayer('f', {
             description: 'Get a bonus level in every skills',
             effect() { return D.dOne; },
             effectDisplay() {
-                return `+${format(this.effect())}`;
+                return `+${format(upgradeEffect(this.layer, this.id))}`;
             },
             cost() {
                 let cost = D(40);
@@ -466,7 +465,7 @@ addLayer('f', {
                 return cost;
             },
             effect() { return D.dTwo; },
-            effectDisplay() { return `*${this.effect()}`; },
+            effectDisplay() { return `*${upgradeEffect(this.layer, this.id)}`; },
             item: 'steel_ingot',
             currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -491,7 +490,7 @@ addLayer('f', {
                 return cost;
             },
             effect() { return D(.9); },
-            effectDisplay() { return `*${this.effect()}`; },
+            effectDisplay() { return `*${upgradeEffect(this.layer, this.id)}`; },
             item: 'steel_ingot',
             currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -732,7 +731,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -781,7 +780,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -831,7 +830,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -879,7 +878,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -927,7 +926,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -975,7 +974,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -1073,7 +1072,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -1124,7 +1123,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -1175,7 +1174,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -1226,7 +1225,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -1279,7 +1278,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount, 10).log10());
+                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount, 10).log10());
                         });
                 }
 
@@ -1337,6 +1336,7 @@ addLayer('f', {
 
         layerDataReset(this.layer, keep);
     },
+    branches: ['lo'],
     /*
     If you've looked at level.js, you know what you're about to see.
 

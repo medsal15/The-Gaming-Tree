@@ -251,7 +251,7 @@ addLayer('xp', {
 
                 return base;
             },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return tmp.xp.total.kills.gte(5) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(5),
         },
@@ -271,7 +271,7 @@ addLayer('xp', {
             },
             effectDisplay() {
                 /** @type {{health: Decimal, experience: Decimal}} */
-                const { health, experience } = this.effect();
+                const { health, experience } = upgradeEffect(this.layer, this.id);
                 return `+${format(health)} health, *${format(experience)} xp`;
             },
             unlocked() { return tmp.xp.total.kills.gte(10) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
@@ -297,7 +297,7 @@ addLayer('xp', {
 
                 return effect;
             },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return tmp.xp.total.kills.gte(15) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(15),
         },
@@ -319,7 +319,7 @@ addLayer('xp', {
 
                 return effect;
             },
-            effectDisplay() { return `+${format(this.effect())}`; },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return tmp.xp.total.kills.gte(30) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(50),
         },
@@ -345,7 +345,7 @@ addLayer('xp', {
             },
             effectDisplay() {
                 if (hasChallenge('b', 12)) return '';
-                return `${format(tmp.xp.enemies[player.xp.type].damage.times(this.effect().active))} /s`;
+                return `${format(tmp.xp.enemies[player.xp.type].damage.times(upgradeEffect(this.layer, this.id).active))} /s`;
             },
             unlocked() { return tmp.xp.total.kills.gte(50) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(150),
@@ -360,7 +360,7 @@ addLayer('xp', {
 
                 return effect;
             },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return tmp.xp.total.kills.gte(70) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(250),
         },
@@ -376,7 +376,7 @@ addLayer('xp', {
                 }
             },
             effect() { return player.xp.points.max(0).add(5).log(5); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return tmp.xp.total.kills.gte(100) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(400),
         },
@@ -391,14 +391,14 @@ addLayer('xp', {
 
                 return effect;
             },
-            effectDisplay() { return `+${format(this.effect().minus(1))} times`; },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1))} times`; },
             cost: D(600),
         },
         33: {
             title: 'Better Power',
             description: 'Unlock 2 new layers<br>Deal 50% more damage',
             effect() { return D(1.5); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return tmp.xp.total.kills.gte(150) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(900),
         },
@@ -414,7 +414,7 @@ addLayer('xp', {
                 }
             },
             effect() { return tmp.xp.total.kills.add(9).log(9); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
             cost: D(195),
         },
@@ -430,7 +430,7 @@ addLayer('xp', {
                 }
             },
             effect() { return player.xp.points.root(15).add(1); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
             cost: D(850),
         },
@@ -443,7 +443,7 @@ addLayer('xp', {
 
                 return { level_mult, chance_mult };
             },
-            effectDisplay() { return `level *${format(this.effect().level_mult)}, chance *${format(this.effect().chance_mult)}`; },
+            effectDisplay() { return `level *${format(upgradeEffect(this.layer, this.id).level_mult)}, chance *${format(upgradeEffect(this.layer, this.id).chance_mult)}`; },
             unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
             cost: D(2222),
         },

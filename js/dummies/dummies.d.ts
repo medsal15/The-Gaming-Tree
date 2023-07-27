@@ -2091,7 +2091,7 @@ type Layers = {
             from: string[]
             /** Amount of an item being converted at once */
             rate(item?: string): Decimal
-            /** Multiplier to plamks produced from an item */
+            /** Multiplier to planks produced from an item */
             efficiency(item?: string): Decimal
             /** Actual amount of an item consumed/produced each second by convertion */
             per_second(item?: string): Decimal

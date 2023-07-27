@@ -341,9 +341,9 @@ addLayer('b', {
         return false;
     },
     prestigeButtonText() {
-        if (player.b.points.eq(0)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemies['slime'].name} kills`;
-        if (player.b.points.eq(1)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemies['goblin'].name} kills`;
-        if (player.b.points.eq(2)) return `Your next boss will be at ${format(this.getNextAt())} ${layers.xp.enemies['zombie'].name} kills`;
+        if (player.b.points.eq(0)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['slime'].name} kills`;
+        if (player.b.points.eq(1)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['goblin'].name} kills`;
+        if (player.b.points.eq(2)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['zombie'].name} kills`;
         return 'There are no more bosses to fight';
     },
     prestigeNotify() { return tmp.b.getResetGain.gte(1); },

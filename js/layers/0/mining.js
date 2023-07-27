@@ -242,7 +242,7 @@ addLayer('m', {
             title: 'Stone Pickaxe',
             description: 'Double ore health',
             effect() { return D(2); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(10),
             item: 'stone',
             currencyInternalName: 'amount',
@@ -266,7 +266,7 @@ addLayer('m', {
                 return `Formula: ${formula}`;
             },
             effect() { return player.m.health.add(7).log(7); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(5),
             item: 'copper_ore',
             currencyInternalName: 'amount',
@@ -311,7 +311,7 @@ addLayer('m', {
             },
             effectDisplay() {
                 const k = hasUpgrade('m', 32) ? 'mine_chance' : 'ore_chance';
-                return `*${format(this.effect()[k])}`;
+                return `*${format(upgradeEffect(this.layer, this.id)[k])}`;
             },
             cost: D(1),
             item: 'tin_ore',
@@ -336,7 +336,7 @@ addLayer('m', {
                 return `Formula: ${formula}`;
             },
             effect() { return D.add(player.lo.items.stone.amount, 1).root(5); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(50),
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
             item: 'stone',
@@ -378,7 +378,7 @@ addLayer('m', {
                 return `Formula: ${formula}`;
             },
             effect() { return player.m.health.max(0).add(1).root(7); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(3),
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
             item: 'tin_ore',
@@ -403,7 +403,7 @@ addLayer('m', {
                 return `Formula: ${formula}`;
             },
             effect() { return D.add(player.lo.items.stone.amount, 10).log10(); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(250),
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
             item: 'stone',
@@ -459,7 +459,7 @@ addLayer('m', {
 
                 return D.root(player.lo.items.tin_ore.amount, 3);
             },
-            effectDisplay() { return `+${format(this.effect())}`; },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(9),
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
             item: 'tin_ore',
@@ -478,7 +478,7 @@ addLayer('m', {
             title: 'Coal Pickaxe',
             description: 'How does this thing even stay intact?<br>Double mining chance',
             effect() { return D.dTwo; },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(1),
             item: 'coal',
             currencyInternalName: 'amount',
@@ -506,7 +506,7 @@ addLayer('m', {
                 return `Formula: ${formula}`;
             },
             effect() { return tmp.xp.total.kills.add(100).log(100); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(1),
             item: 'iron_ore',
             currencyInternalName: 'amount',
@@ -525,7 +525,7 @@ addLayer('m', {
             title: 'Gold Pickaxe',
             description: 'Increases amount of mined ores',
             effect() { return D(1.5); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(1),
             item: 'gold_ore',
             currencyInternalName: 'amount',
@@ -544,7 +544,7 @@ addLayer('m', {
             title: 'Coal Forge',
             description() { return `Unlock the forge<br>Boost ${layerColor('lo', tmp.lo.buyables[21].title)} effect`; },
             effect() { return D(1.1); },
-            effectDisplay() { return `^${format(this.effect())}`; },
+            effectDisplay() { return `^${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(7),
             item: 'coal',
             currencyInternalName: 'amount',
@@ -567,7 +567,7 @@ addLayer('m', {
             title: 'Iron Shaft',
             description: 'Allows deep mining<br>Doubles stone gain',
             effect() { return D.dTwo; },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(5),
             item: 'iron_ore',
             currencyInternalName: 'amount',
@@ -599,7 +599,7 @@ addLayer('m', {
 
                 return gold.add(18).log(18);
             },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(3),
             item: 'gold_ore',
             currencyInternalName: 'amount',
@@ -624,7 +624,7 @@ addLayer('m', {
                 return `Formula: ${formula}`;
             },
             effect() { return D.add(player.lo.items.coal.amount, 1).root(7); },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(49),
             item: 'coal',
             currencyInternalName: 'amount',
@@ -647,7 +647,7 @@ addLayer('m', {
             description: 'Unlock a new layer<br>Increase tree damage',
             onPurchase() { player.t.unlocked = true; },
             effect() { return D.dOne; },
-            effectDisplay() { return `+${format(this.effect())}`; },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(25),
             item: 'iron_ore',
             currencyInternalName: 'amount',
@@ -678,7 +678,7 @@ addLayer('m', {
 
                 return gold.add(9).log(9);
             },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(9),
             item: 'gold_ore',
             currencyInternalName: 'amount',

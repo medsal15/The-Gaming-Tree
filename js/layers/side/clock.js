@@ -266,7 +266,7 @@ addLayer('clo', {
             title: 'Hour Hand',
             description: 'Missing piece of The Clock<br>Doubles time speed',
             effect() { return D.dTwo; },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(100),
             item: 'slime_goo',
             currencyInternalName: 'amount',
@@ -285,7 +285,7 @@ addLayer('clo', {
             title: 'Minute Hand',
             description: 'Missing piece of The Clock<br>Doubles time speed',
             effect() { return D.dTwo; },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(50),
             item: 'copper_ore',
             currencyInternalName: 'amount',
@@ -304,7 +304,7 @@ addLayer('clo', {
             title: 'Second Hand',
             description: 'Missing piece of The Clock<br>Doubles time speed',
             effect() { return D.dTwo; },
-            effectDisplay() { return `*${format(this.effect())}`; },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(10),
             item: 'rusty_gear',
             currencyInternalName: 'amount',
@@ -370,7 +370,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['slime'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['slime'].color;
 
                 return style;
             },
@@ -424,7 +424,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['goblin'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['goblin'].color;
 
                 return style;
             },
@@ -493,7 +493,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['zombie'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['zombie'].color;
 
                 return style;
             },
@@ -549,7 +549,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['ent'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['ent'].color;
 
                 return style;
             },
@@ -616,7 +616,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.stone.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.stone.style['background-color'];
 
                 return style;
             },
@@ -689,7 +689,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = '#C4995E';
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = '#C4995E';
 
                 return style;
             },
@@ -729,7 +729,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.s.color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = layers.s.color;
 
                 return style;
             },
@@ -796,7 +796,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = '#888888';
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = '#888888';
 
                 return style;
             },
@@ -862,7 +862,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = 'gold';
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = 'gold';
 
                 return style;
             },
@@ -917,7 +917,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = layers.t.color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = layers.t.color;
 
                 return style;
             },
@@ -975,7 +975,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.bronze_ingot.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.bronze_ingot.style['background-color'];
 
                 return style;
             },
@@ -1032,7 +1032,7 @@ addLayer('clo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.steel_ingot.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.steel_ingot.style['background-color'];
 
                 return style;
             },
@@ -1070,6 +1070,7 @@ addLayer('clo', {
         speed = speed.add(buyableEffect('clo', 11));
         speed = speed.add(buyableEffect('clo', 12));
         speed = speed.add(buyableEffect('clo', 13));
+        speed = speed.add(buyableEffect('clo', 14));
         speed = speed.add(buyableEffect('clo', 21));
         speed = speed.add(buyableEffect('clo', 22));
         speed = speed.add(buyableEffect('clo', 31));

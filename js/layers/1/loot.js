@@ -102,7 +102,7 @@ addLayer('lo', {
             effectDisplay() {
                 if (!hasUpgrade('s', 72)) return '';
 
-                return `${format(this.effect())}`;
+                return `${format(upgradeEffect(this.layer, this.id))}`;
             },
             cost: D(250),
             currencyDisplayName: 'kills',
@@ -193,7 +193,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['slime'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['slime'].color;
 
                 return style;
             },
@@ -257,7 +257,7 @@ addLayer('lo', {
             effect(x) {
                 if (tmp.l.deactivated) x = D.dZero;
                 return {
-                    xp_hold: x,
+                    xp_hold: D(x),
                     chance_mult: D(.05).times(x).add(1),
                 };
             },
@@ -273,7 +273,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['slime'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['slime'].color;
 
                 return style;
             },
@@ -344,7 +344,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['slime'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['slime'].color;
 
                 return style;
             },
@@ -362,7 +362,7 @@ addLayer('lo', {
             display() {
                 const amount = getBuyableAmount(this.layer, this.id),
                     /** @type {Decimal} */
-                    bonus = this.bonusAmount(),
+                    bonus = tmp[this.layer].buyables[this.id].bonusAmount,
                     amount_bonus = bonus.gt(0) ? `+${formatWhole(bonus)}` : '',
                     anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
                 if (!shiftDown) {
@@ -448,7 +448,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.stone.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.stone.style['background-color'];
 
                 return style;
             },
@@ -471,7 +471,7 @@ addLayer('lo', {
             display() {
                 const amount = getBuyableAmount(this.layer, this.id),
                     /** @type {Decimal} */
-                    bonus = this.bonusAmount(),
+                    bonus = tmp[this.layer].buyables[this.id].bonusAmount,
                     amount_bonus = bonus.gt(0) ? `+${formatWhole(bonus)}` : '',
                     anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
                 if (!shiftDown) {
@@ -545,7 +545,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.copper_ore.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.copper_ore.style['background-color'];
 
                 return style;
             },
@@ -569,7 +569,7 @@ addLayer('lo', {
                 /** @type {{[item: string]: Decimal}} */
                 const amount = getBuyableAmount(this.layer, this.id),
                     /** @type {Decimal} */
-                    bonus = this.bonusAmount(),
+                    bonus = tmp[this.layer].buyables[this.id].bonusAmount,
                     amount_bonus = bonus.gt(0) ? `+${formatWhole(bonus)}` : '',
                     anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
                 if (!shiftDown) {
@@ -639,7 +639,7 @@ addLayer('lo', {
             effect(x) {
                 if (tmp.l.deactivated) x = D.dZero;
                 return {
-                    m_hold: x,
+                    m_hold: D(x),
                     chance_mult: D(.05).times(x).add(1)
                 };
             },
@@ -655,7 +655,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.tin_ore.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.tin_ore.style['background-color'];
 
                 return style;
             },
@@ -734,7 +734,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['goblin'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['goblin'].color;
 
                 return style;
             },
@@ -816,7 +816,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['goblin'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['goblin'].color;
 
                 return style;
             },
@@ -912,7 +912,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['goblin'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['goblin'].color;
 
                 return style;
             },
@@ -991,7 +991,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['zombie'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['zombie'].color;
 
                 return style;
             },
@@ -1089,7 +1089,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['zombie'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['zombie'].color;
 
                 return style;
             },
@@ -1166,7 +1166,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies['zombie'].color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies['zombie'].color;
 
                 return style;
             },
@@ -1259,7 +1259,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.coal.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.coal.style['background-color'];
 
                 return style;
             },
@@ -1360,7 +1360,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.iron_ore.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.iron_ore.style['background-color'];
 
                 return style;
             },
@@ -1447,7 +1447,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.gold_ore.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.gold_ore.style['background-color'];
 
                 return style;
             },
@@ -1473,7 +1473,7 @@ addLayer('lo', {
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} tiny dams\
-                        add ${format(this.effect().soaked)} size and health to driftwood<br><br>\
+                        add ${format(buyableEffect(this.layer, this.id).soaked)} size and health to driftwood<br><br>\
                         ${value}\
                         Cost: ${cost}`;
                 } else {
@@ -1524,7 +1524,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.soaked_log.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.soaked_log.style['background-color'];
 
                 return style;
             },
@@ -1589,7 +1589,7 @@ addLayer('lo', {
                 if (tmp.l.deactivated) x = D.dZero;
                 return {
                     cap: D(1.1).pow(x),
-                    t_hold: x,
+                    t_hold: D(x),
                 };
             },
             canAfford() {
@@ -1604,7 +1604,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.normal_log.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.normal_log.style['background-color'];
 
                 return style;
             },
@@ -1698,7 +1698,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.plank.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.plank.style['background-color'];
 
                 return style;
             },
@@ -1777,7 +1777,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.bronze_ingot.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.bronze_ingot.style['background-color'];
 
                 return style;
             },
@@ -1855,7 +1855,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.lo.items.steel_ingot.style['background-color'];
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.steel_ingot.style['background-color'];
 
                 return style;
             },
@@ -1936,7 +1936,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background'] = `linear-gradient(to right, ${tmp.lo.items.bronze_ingot.style['background-color']}, ${tmp.lo.items.steel_ingot.style['background-color']}) no-repeat`;
+                if (canBuyBuyable(this.layer, this.id)) style['background'] = `linear-gradient(to right, ${tmp.lo.items.bronze_ingot.style['background-color']}, ${tmp.lo.items.steel_ingot.style['background-color']}) no-repeat`;
 
                 return style;
             },
@@ -2013,7 +2013,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background'] = `${tmp.lo.items.holy_water.style['background'].split(',')[1]}, ${tmp.l.color})`;
+                if (canBuyBuyable(this.layer, this.id)) style['background'] = `${tmp.lo.items.holy_water.style['background'].split(',')[1]}, ${tmp.l.color})`;
 
                 return style;
             },
@@ -2105,7 +2105,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background'] = `${tmp.lo.items.holy_water.style['background'].split(',')[1]}, ${tmp.m.color})`;
+                if (canBuyBuyable(this.layer, this.id)) style['background'] = `${tmp.lo.items.holy_water.style['background'].split(',')[1]}, ${tmp.m.color})`;
 
                 return style;
             },
@@ -2135,7 +2135,7 @@ addLayer('lo', {
                     Cost: ${cost}`;
                 } else {
                     const value = tmp.lo.buyables[this.id].value;
-                    let effect_formula_divide = 'amount / 10',
+                    let effect_formula_divide = 'amount',
                         cost_formula_holy_water = '1.5 ^ amount',
                         cost_formula_normal_log = '(1.5 ^ amount) * 250',
                         value_formula = `amount * ${formatWhole(value)}`;
@@ -2166,7 +2166,7 @@ addLayer('lo', {
             effect(x) {
                 if (tmp.l.deactivated) x = D.dZero;
                 return {
-                    size: D.div(x, 10),
+                    size: D(x),
                 };
             },
             canAfford() {
@@ -2181,7 +2181,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background'] = `${tmp.lo.items.holy_water.style['background'].split(',')[1]}, ${tmp.t.color})`;
+                if (canBuyBuyable(this.layer, this.id)) style['background'] = `${tmp.lo.items.holy_water.style['background'].split(',')[1]}, ${tmp.t.color})`;
 
                 return style;
             },
@@ -2257,7 +2257,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies.ent.color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies.ent.color;
 
                 return style;
             },
@@ -2332,7 +2332,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies.ent.color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies.ent.color;
 
                 return style;
             },
@@ -2407,7 +2407,7 @@ addLayer('lo', {
             style() {
                 const style = {};
 
-                if (this.canAfford()) style['background-color'] = tmp.xp.enemies.ent.color;
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.xp.enemies.ent.color;
 
                 return style;
             },
