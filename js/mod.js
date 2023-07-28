@@ -219,7 +219,7 @@ function fixOldSave(oldVersion) {
 		);
 		Object.entries(player.t.trees)
 			.forEach(([tree, data]) => {
-				data.health = tree == (player.t.current && tree in tmp.t.trees) ? player.t.health : tmp.t.trees[tree].health;
+				data.health = tree == (player.t.current || !(tree in tmp.t.trees)) ? player.t.health : tmp.t.trees[tree].health;
 				data.last_drops = tree == player.t.current ? player.t.last_drops : [];
 			});
 	}
