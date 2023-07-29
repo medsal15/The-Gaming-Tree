@@ -1,6 +1,5 @@
 'use strict';
 
-//todo ignore final "enemy" drop
 addLayer('cas', {
     name: 'Casino',
     symbol: '🎲',
@@ -144,7 +143,7 @@ addLayer('cas', {
             }
         },
         shuffle() {
-            const items = Object.keys(layers.lo.items).filter(item => item != '*' && (tmp.lo.items[item].unlocked ?? true));
+            const items = Object.keys(layers.lo.items).filter(item => item != '*' && item != 'stardust' && (tmp.lo.items[item].unlocked ?? true));
             let targets = [...items];
             if (options.noRNG) {
                 targets.unshift(targets.splice(Math.floor(targets.length / 2)));

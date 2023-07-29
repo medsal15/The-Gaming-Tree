@@ -23,6 +23,7 @@ addLayer('xp', {
         return `${formatWhole(player.xp.points)} experience<br>${formatWhole(tmp.xp.total.kills)} kills`;
     },
     color() { return tmp.xp.enemies[player.xp.type].color; },
+    color_kill: '#9F9F5F',
     row: 0,
     position: 0,
     resource: 'experience',
@@ -76,7 +77,7 @@ addLayer('xp', {
                 [
                     'display-text',
                     () => {
-                        const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`,
+                        const kill_style = (text, ...style) => `<span style="color:${tmp.xp.color_kill};text-shadow:${tmp.xp.color_kill} 0 0 10px;${style.join(';')}">${text}</span>`,
                             capped = !tmp.l.canBuyMax && D.gte(player.xp.points, tmp.xp.enemies['*'].exp_cap),
                             xp_text = capped ? 'hardcapped' : layerColor('xp', `+${format(tmp.xp.enemies[player.xp.type].experience)}`),
                             kill_pieces = [];
@@ -137,7 +138,7 @@ addLayer('xp', {
                 [
                     'display-text',
                     () => {
-                        const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`;
+                        const kill_style = (text, ...style) => `<span style="color:${tmp.xp.color_kill};text-shadow:${tmp.xp.color_kill} 0 0 10px;${style.join(';')}">${text}</span>`;
                         return `You have ${layerColor('xp', format(player.xp.points, player.xp.points.gte('1e9') ? 2 : 0), 'font-size:1.5em;')} experience
                             and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')} kills`;
                     },
@@ -158,14 +159,14 @@ addLayer('xp', {
                 [
                     'display-text',
                     () => {
-                        const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`;
+                        const kill_style = (text, ...style) => `<span style="color:${tmp.xp.color_kill};text-shadow:${tmp.xp.color_kill} 0 0 10px;${style.join(';')}">${text}</span>`;
                         return `You have ${layerColor('xp', format(player.xp.points, player.xp.points.gte('1e9') ? 2 : 0), 'font-size:1.5em;')} experience
                             and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')} kills`;
                     },
                 ],
                 'blank',
                 ['display-text', () => {
-                    const kill_style = (text, ...style) => `<span style="color:#9F9F5F;text-shadow:#9F9F5F 0 0 10px;${style.join(';')}">${text}</span>`,
+                    const kill_style = (text, ...style) => `<span style="color:${tmp.xp.color_kill};text-shadow:${tmp.xp.color_kill} 0 0 10px;${style.join(';')}">${text}</span>`,
                         enemy_style = (type, text, ...style) => {
                             const color = tmp.xp.enemies[type].color;
                             return `<span style="color:${color};text-shadow:${color} 0 0 10px;${style.join(';')}">${text}</span>`
@@ -221,10 +222,22 @@ addLayer('xp', {
             style: { 'background-image': `url('./resources/images/gladius.svg')`, },
             canClick() { return D.gt(player.xp.enemies[player.xp.type].health, 0); },
             onClick() {
+                if (player.xp.type == 'star') {
+                    showTab('none');
+                    showNavTab('star');
+                    return;
+                }
+
                 player.xp.enemies[player.xp.type].health = D.minus(player.xp.enemies[player.xp.type].health, tmp.xp.enemies[player.xp.type].damage);
                 player.xp.clicked = true;
             },
             onHold() {
+                if (player.xp.type == 'star') {
+                    showTab('none');
+                    showNavTab('star');
+                    return;
+                }
+
                 player.xp.enemies[player.xp.type].health = D.minus(player.xp.enemies[player.xp.type].health, tmp.xp.enemies[player.xp.type].damage.div(3));
                 player.xp.clicked = true;
             },
@@ -505,7 +518,7 @@ addLayer('xp', {
                     addPoints('xp', xp_gain);
                     player_data.kills = D.add(player_data.kills, kills_gain);
 
-                    if (layers.lo.items['*'].can_drop('enemy:')) {
+                    if (layers.lo.items['*'].can_drop(`enemy:${type}`)) {
                         let drops_mult = kills_gain;
 
                         drops_mult = drops_mult.times(tmp.xp.enemies['*'].drops_mult);
@@ -525,9 +538,12 @@ addLayer('xp', {
                     if (inChallenge('b', 61)) {
                         player_data.element = tmp.mag.elements['*'].random;
                     }
+                    if (type == 'star') {
+                        player_data.name = random_string_alpha(Math.floor(Math.random() * 12) + 4).toLowerCase();
+                    }
                 }
 
-                player_data.health = D.add(player_data.health, tmp.xp.enemies[type].health);
+                player_data.health = D.add(player_data.health, layers.xp.enemies[type].health(layers.xp.enemies[type].level(player_data.kills)));
             }
         }
     },
@@ -649,6 +665,13 @@ addLayer('xp', {
             level_mult() {
                 return D.dOne;
             },
+            level_exp() {
+                let exp = D.dOne;
+
+                if (inChallenge('b', 22)) exp = D.dTwo;
+
+                return exp;
+            },
             health_mult() {
                 let mult = D.dOne;
 
@@ -673,8 +696,8 @@ addLayer('xp', {
 
                 mult = mult.times(buyableEffect('lo', 11));
 
-                if (inChallenge('b', 12) && !hasUpgrade('s', 11)) mult = mult.div(player.xp.points.add(10).log10());
-                if (hasUpgrade('s', 11)) mult = mult.div(upgradeEffect('s', 11));
+                if (inChallenge('b', 12) && !hasUpgrade('s', 41)) mult = mult.div(player.xp.points.add(10).log10());
+                if (hasUpgrade('s', 41)) mult = mult.div(upgradeEffect('s', 41));
 
                 return mult;
             },
@@ -688,8 +711,8 @@ addLayer('xp', {
             kill_mult() {
                 let mult = D.dOne;
 
-                if (inChallenge('b', 12) && !hasUpgrade('s', 12)) mult = mult.div(tmp.xp.total.kills.add(10).log10());
-                if (hasUpgrade('s', 12)) mult = mult.times(upgradeEffect('s', 12));
+                if (inChallenge('b', 12) && !hasUpgrade('s', 42)) mult = mult.div(tmp.xp.total.kills.add(10).log10());
+                if (hasUpgrade('s', 42)) mult = mult.times(upgradeEffect('s', 42));
 
                 return mult;
             },
@@ -772,6 +795,8 @@ addLayer('xp', {
 
                 if (hasUpgrade('xp', 43)) level = level.times(upgradeEffect('xp', 43).level_mult);
 
+                level = level.pow(tmp.xp.enemies['*'].level_exp);
+
                 return level.floor();
             },
             color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
@@ -853,6 +878,8 @@ addLayer('xp', {
 
                 level = level.times(tmp.xp.enemies['*'].level_mult);
 
+                level = level.pow(tmp.xp.enemies['*'].level_exp);
+
                 return level.floor();
             },
             color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
@@ -928,6 +955,8 @@ addLayer('xp', {
                 let level = D.div(kills, 10).root(2);
 
                 level = level.times(tmp.xp.enemies['*'].level_mult);
+
+                level = level.pow(tmp.xp.enemies['*'].level_exp);
 
                 return level.floor();
             },
@@ -1005,6 +1034,8 @@ addLayer('xp', {
 
                 level = level.times(tmp.xp.enemies['*'].level_mult);
 
+                level = level.pow(tmp.xp.enemies['*'].level_exp);
+
                 return level.floor();
             },
             color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
@@ -1040,8 +1071,6 @@ addLayer('xp', {
 
                 damage = damage.add(tmp.xp.enemies['*'].damage_add);
 
-                damage = damage.add(tmp.t.trees['*'].damage_base);
-
                 damage = damage.times(tmp.xp.enemies['*'].damage_mult);
 
                 if (tmp.mag.elements[player.mag.element].strong.includes(player.xp.enemies[this.type].element)) {
@@ -1049,6 +1078,8 @@ addLayer('xp', {
                 } else if (tmp.mag.elements[player.mag.element].weak.includes(player.xp.enemies[this.type].element)) {
                     damage = damage.times(tmp.mag.elements['*'].weak_multiplier);
                 }
+
+                damage = damage.add(tmp.t.trees['*'].damage_base);
 
                 return damage;
             },
@@ -1073,6 +1104,39 @@ addLayer('xp', {
             unlocked() { return hasChallenge('b', 21) && !inChallenge('b', 31) && !inChallenge('b', 41); },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`enemy:${this.type}`, kills); },
         },
+        star: {
+            _type: null,
+            get type() { return this._type ??= Object.keys(layers.xp.enemies).find(item => layers.xp.enemies[item] == this); },
+            level() {
+                const kills = player.xp.enemies[this.type].kills ?? D.dZero;
+
+                return kills.floor();
+            },
+            color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
+            color() {
+                const cycle = 300,
+                    hue = (player.xp.resetTime % cycle) / cycle,
+                    saturation = 1,
+                    lightness = .85;
+
+                return '#' + hsl_to_rgb(hue, saturation, lightness).map(num => num.toString(16).padStart(2, '0')).join('');
+            },
+            health(level) {
+                level ??= tmp.xp.enemies[this.type].level;
+
+                let health = D.pow(2, level).times(10);
+
+                return health;
+            },
+            experience: D.dZero,
+            kills: D.dOne,
+            name() { return player.xp.enemies[this.type].name ??= random_string_alpha(Math.floor(Math.random() * 12) + 4).toLowerCase(); },
+            damage: D.dOne,
+            dps: D.dZero,
+            regen: D.dZero,
+            unlocked() { return hasChallenge('b', 22) && !inChallenge('b', 31) && !inChallenge('b', 41); },
+            get_drops(kills) { return [['stardust', D.dOne]]; },
+        },
         // Challenges enemies
         amalgam: {
             _type: null,
@@ -1083,6 +1147,8 @@ addLayer('xp', {
                 let level = D.div(kills, 10).root(2);
 
                 level = level.times(tmp.xp.enemies['*'].level_mult);
+
+                level = level.pow(tmp.xp.enemies['*'].level_exp);
 
                 return level.floor();
             },
@@ -1143,6 +1209,112 @@ addLayer('xp', {
                     return sum;
                 }, {}));
             },
+        },
+        world_tree: {
+            _type: null,
+            get type() { return this._type ??= Object.keys(layers.xp.enemies).find(item => layers.xp.enemies[item] == this); },
+            level() {
+                const kills = tmp.xp.total.kills;
+
+                let level = D.div(kills, 10).root(2);
+
+                level = level.times(tmp.xp.enemies['*'].level_mult);
+
+                level = level.pow(tmp.xp.enemies['*'].level_exp);
+
+                return level.floor();
+            },
+            color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
+            color() {
+                /** @type {[DecimalSource, [number, number, number]][]} */
+                const color_points = [
+                    [1, [0xFF, 0xDD, 0x99]],
+                    [1e3, [0x55, 0x99, 0x66]],
+                ],
+                    i = color_points.findIndex(([n]) => D.gte(n, tmp.xp.total.kills.max(0)));
+
+                if (i == color_points.length - 1 || i == 0) {
+                    return `#${color_points[i][1].map(n => n.toString(16)).join('')}`;
+                }
+                const min = D.log10(color_points[i - 1][0]),
+                    color_min = color_points[i - 1][1],
+                    max = D.log10(color_points[i][0]),
+                    color_max = color_points[i][1],
+                    current = D.log10(tmp.xp.total.kills.max(1)),
+                    fraction = current.minus(min).div(max).max(0).min(1).toNumber();
+
+                return `#${Array.from({ length: 3 }, (_, i) => Math.floor(color_max[i] * fraction + color_min[i] * (1 - fraction)).toString(16).padStart(2, '0')).join('')}`;
+            },
+            health(level) {
+                level ??= tmp.xp.enemies[this.type].level;
+
+                let health = D(2.25).pow(level).times(250);
+
+                health = health.add(tmp.xp.enemies['*'].health_add);
+
+                health = health.times(tmp.xp.enemies['*'].health_mult);
+
+                return health;
+            },
+            experience(level) {
+                let exp = D.pow(level ?? tmp.xp.enemies[this.type].level, 2).times(D.log10(tmp.xp.total.kills.add(1)));
+
+                exp = exp.times(tmp.xp.enemies['*'].exp_mult);
+
+                return exp.min(tmp.xp.enemies['*'].exp_cap.minus(player.xp.points)).max(0);
+            },
+            kills() {
+                let kills = D.dOne;
+
+                kills = kills.times(tmp.xp.enemies['*'].kill_mult);
+
+                return kills;
+            },
+            name() {
+                let name = 'world tree';
+
+                if (tmp.xp.total.kills.lte(10)) return `${name} (sickly)`;
+                if (tmp.xp.total.kills.lte(100)) return name;
+                if (tmp.xp.total.kills.lte(1000)) return `${name} (healthy)`;
+                return `${name} (restored)`;
+            },
+            damage() {
+                let damage = D.dOne;
+
+                damage = damage.add(tmp.xp.enemies['*'].damage_add);
+
+                damage = damage.times(tmp.xp.enemies['*'].damage_mult);
+
+                if (tmp.mag.elements[player.mag.element].strong.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].strong_multiplier);
+                } else if (tmp.mag.elements[player.mag.element].weak.includes(player.xp.enemies[this.type].element)) {
+                    damage = damage.times(tmp.mag.elements['*'].weak_multiplier);
+                }
+
+                damage = damage.add(tmp.t.trees['*'].damage_base);
+
+                return damage;
+            },
+            dps() {
+                let dps = tmp.xp.enemies['*'].dps_mult_inactive;
+
+                if (this.type == player.xp.type) dps = dps.add(tmp.xp.enemies['*'].dps_mult_active);
+
+                if (dps.eq(0)) return D.dZero;
+
+                return dps.times(tmp.xp.enemies[this.type].damage);
+            },
+            regen(level) {
+                let regen_perc = D(.01);
+
+                regen_perc = regen_perc.add(tmp.xp.enemies['*'].regen_add);
+
+                if (regen_perc.eq(0)) return D.dZero;
+
+                return regen_perc.times(this.health(level ?? tmp.xp.enemies[this.type].level));
+            },
+            unlocked() { return !inChallenge('b', 31) && inChallenge('b', 42); },
+            get_drops() { return []; },
         },
     },
     /** @type {typeof layers.xp.total} */

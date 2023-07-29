@@ -25,11 +25,14 @@ let modInfo = {
 	 */
 	modFiles: [
 		'moreutils.js', 'tree.js',
-		'layers/hotkeys.js',
+		'layers/hotkeys.js', 'layers/star.js',
+
 		'layers/side/achievements.js', 'layers/side/clock.js', 'layers/side/casino.js', 'layers/side/magic.js',
 		'layers/0/experience.js', 'layers/0/mining.js', 'layers/0/tree.js',
 		'layers/1/level.js', 'layers/1/loot.js', 'layers/1/forge.js',
-		'layers/2/boss.js', 'layers/2/shop.js',
+		'layers/2/boss.js', 'layers/2/shop.js', 'layers/2/alternator.js',
+
+		'alternate/side/failures.js',
 	],
 	/**
 	 * If you have a Discord server or other discussion place, you can add a link to it.
@@ -62,17 +65,21 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.5',
+	num: 'R0.6',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
-	name: 'Sloth',
+	name: 'Gluttony',
 };
 
 /**
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.6</h3><br>
+		- Added 3 new layers.<br>
+		- Added the 4th boss, miniboss, and relic.<br>
+		- Update endgame: Beat the 4th boss.<br>
 	<h3>v0.5</h3><br>
 		- Added 1 new layer.<br>
 		- Added the 3rd boss, miniboss, and relic.<br>
@@ -108,7 +115,12 @@ let winText = `Congratulations! You have finished the current content in the gam
  * var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything"]
  * ```
  */
-var doNotCallTheseFunctionsEveryTick = ['show_skill', 'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop', 'gain_drops', 'show_fuel', 'show_smelt', 'randomize'];
+var doNotCallTheseFunctionsEveryTick = [
+	'show_skill',
+	'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop', 'gain_drops',
+	'show_fuel', 'show_smelt',
+	'randomize',
+];
 
 /**
  * A function to determine the amount of points the player starts with after a reset.
@@ -175,7 +187,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return hasChallenge('b', 21);
+	return hasChallenge('b', 22);
 }
 
 
@@ -222,5 +234,13 @@ function fixOldSave(oldVersion) {
 				data.health = tree == (player.t.current || !(tree in tmp.t.trees)) ? player.t.health : tmp.t.trees[tree].health;
 				data.last_drops = tree == player.t.current ? player.t.last_drops : [];
 			});
+	}
+	if (oldVersion <= 'R0.5') {
+		player.s.upgrades = player.s.upgrades.map(id => {
+			if (id > 90) return id;
+
+			if (id > 60) return id - 50;
+			else return id + 30;
+		});
 	}
 }

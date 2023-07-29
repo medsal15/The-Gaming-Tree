@@ -272,6 +272,13 @@ addLayer('t', {
             onClick() { player.t.focus = 'birch'; },
             unlocked() { return tmp.t.trees.birch.unlocked ?? true; },
         },
+        25: {
+            title: 'Focus on Baobab',
+            display() { return player.t.focus == 'baobab' ? 'ON' : 'OFF'; },
+            canClick() { return player.t.focus != 'baobab'; },
+            onClick() { player.t.focus = 'baobab'; },
+            unlocked() { return tmp.t.trees.baobab.unlocked ?? true; },
+        },
     },
     /** @type {typeof layers.t.upgrades} */
     upgrades: {
@@ -323,7 +330,13 @@ addLayer('t', {
         13: {
             title: 'Wood Chips',
             description: 'Double tree growth speed',
-            effect() { return D.dTwo; },
+            effect() {
+                let effect = D.dTwo;
+
+                if (inChallenge('b', 22)) effect = effect.root(2);
+
+                return effect;
+            },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(30),
             item: 'plank',
@@ -395,7 +408,13 @@ addLayer('t', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return D.root(player.lo.items.plank.amount, 2).div(25).add(1); },
+            effect() {
+                let effect = D.root(player.lo.items.plank.amount, 2).div(25).add(1);
+
+                if (inChallenge('b', 22)) effect = effect.root(2);
+
+                return effect;
+            },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
             cost: D(100),
@@ -453,7 +472,13 @@ addLayer('t', {
         33: {
             title: 'Crafting Table',
             description: 'Crafting now consumes 90% of costs',
-            effect() { return D(.9); },
+            effect() {
+                let effect = D(.9);
+
+                if (inChallenge('b', 22)) effect = effect.root(2);
+
+                return effect;
+            },
             effectDisplay() { return `*${format(D.times(upgradeEffect(this.layer, this.id), 100))}%`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
             cost: D(444),
@@ -554,6 +579,10 @@ addLayer('t', {
                 if (hasUpgrade('f', 23)) mult = mult.times(upgradeEffect('f', 23));
 
                 mult = mult.times(tmp.mag.elements[player.mag.element].effects.tree?.size_multiplier ?? 1);
+
+                mult = mult.times(tmp.l.skills.growing.effect);
+
+                if (hasChallenge('b', 42)) mult = mult.times(1.5);
 
                 return mult;
             },
@@ -765,6 +794,64 @@ addLayer('t', {
                 return mult.times(tmp.t.trees[this.id].health);
             },
         },
+        baobab: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.t.trees).find(item => layers.t.trees[item] == this); },
+            unlocked() { return hasChallenge('b', 42); },
+            health() {
+                let health = D(20);
+
+                health = health.times(tmp.t.trees['*'].health_mult);
+
+                return health;
+            },
+            name: 'baobab',
+            growth() {
+                let regen = player.t.trees[this.id].amount.add(1).root(2).div(100);
+
+                regen = regen.times(tmp.t.trees['*'].growth_mult);
+
+                return regen;
+            },
+            damage() {
+                let damage = tmp.t.trees['*'].damage_base;
+
+                return damage;
+            },
+            dps() {
+                let mult = tmp.t.trees['*'].dps_mult_inactive;
+
+                if (player.t.current == this.id) mult = mult.add(tmp.t.trees['*'].dps_mult_active);
+
+                return tmp.t.trees[this.id].damage.times(mult);
+            },
+            get_drops(amount) { return layers.lo.items['*'].get_drops(`tree:${this.id}`, D(amount)); },
+            size() {
+                let size = D(40);
+
+                size = size.add(tmp.t.trees['*'].size_add);
+
+                size = size.times(tmp.t.trees['*'].size_mult);
+
+                return size;
+            },
+            cap() {
+                let cap = D(10);
+
+                cap = cap.add(tmp.t.trees['*'].cap_add);
+
+                cap = cap.times(tmp.t.trees['*'].cap_mult);
+
+                return cap.floor();
+            },
+            regen() {
+                let mult = tmp.t.trees['*'].regen_add;
+
+                if (mult.eq(0)) return D.dZero;
+
+                return mult.times(tmp.t.trees[this.id].health);
+            },
+        },
         // Special tree for when the player is not chopping any
         '': {
             _id: null,
@@ -819,6 +906,8 @@ addLayer('t', {
 
             if (hasUpgrade('s', 113)) efficiency = efficiency.times(upgradeEffect('s', 113));
 
+            if (inChallenge('b', 22)) efficiency = efficiency.div(2);
+
             return efficiency;
         },
         per_second(item = 'plank') {
@@ -851,7 +940,7 @@ addLayer('t', {
             });
         }
 
-        for (const tree of Object.keys(layers.t.trees).filter(tree => tree != '*')) {
+        for (const tree of Object.keys(layers.t.trees).filter(tree => tree != '*' && tmp.t.trees[tree].unlocked)) {
             const player_tree = player.t.trees[tree],
                 tmp_tree = tmp.t.trees[tree];
 

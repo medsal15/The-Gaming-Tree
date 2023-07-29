@@ -173,3 +173,51 @@ function colors_average(...colors) {
         .map(num => Math.floor(num).toString(16).padStart(2, '0'))
         .join('');
 }
+/**
+ * Converts hsl to rgb
+ *
+ * @param {number} hue Contained within [0,1]
+ * @param {number} saturation Contained within [0,1]
+ * @param {number} lightness Contained within [0,1]
+ * @returns {[number, number, number]}
+ *
+ * @see https://stackoverflow.com/a/9493060
+ */
+function hsl_to_rgb(hue, saturation, lightness) {
+    let r, g, b;
+
+    if (saturation == 0) {
+        // Achromatic
+        r = g = b = lightness;
+    } else {
+        const q = lightness < .5 ? l * (1 + saturation) : lightness + saturation - lightness * saturation,
+            p = 2 * lightness - q;
+        r = hue_to_rgb(p, q, hue + 1 / 3);
+        g = hue_to_rgb(p, q, hue);
+        b = hue_to_rgb(p, q, hue - 1 / 3);
+    }
+
+    return [Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255)];
+}
+/**
+ * @param {number} p
+ * @param {number} q
+ * @param {number} t
+ */
+function hue_to_rgb(p, q, t) {
+    if (t < 0) t++;
+    if (t > 1) t--;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+}
+/**
+ * Generates a random alphabetical string
+ *
+ * @param {number} length
+ * @returns {string}
+ */
+function random_string_alpha(length) {
+    return Array.from({ length }, () => String.fromCharCode(Math.floor(Math.random() * 26) + 65)).join('');
+}
