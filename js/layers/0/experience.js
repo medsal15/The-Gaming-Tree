@@ -111,7 +111,7 @@ addLayer('xp', {
                         element = `(<span style="color:${tmp.mag.elements[elem].color};">${tmp.mag.elements[elem].name}</span>)`;
                     }
 
-                    return `${text} ${player.xp.type} ${element}`;
+                    return `${text} ${tmp.xp.enemies[player.xp.type].name} ${element}`;
                 }],
                 'blank',
                 ['clickables', [1]],
@@ -129,7 +129,7 @@ addLayer('xp', {
                     if (last_drops.length) drops = listFormat.format(last_drops.map(([item, amount]) => `${format(amount)} ${layers.lo.items[item].name}`));
                     if (last_count.gt(1)) count = ` (${formatWhole(last_count)} times)`;
 
-                    return `${capitalize(layers.xp.enemies[type].name)} dropped ${drops}${count}`;
+                    return `${capitalize(tmp.xp.enemies[type].name)} dropped ${drops}${count}`;
                 }],
             ],
         },
@@ -223,6 +223,7 @@ addLayer('xp', {
             canClick() { return D.gt(player.xp.enemies[player.xp.type].health, 0); },
             onClick() {
                 if (player.xp.type == 'star') {
+                    player.star.time = tmp.star.star.time;
                     showTab('none');
                     showNavTab('star');
                     return;
@@ -233,6 +234,7 @@ addLayer('xp', {
             },
             onHold() {
                 if (player.xp.type == 'star') {
+                    player.star.time = tmp.star.star.time;
                     showTab('none');
                     showNavTab('star');
                     return;
@@ -1104,39 +1106,6 @@ addLayer('xp', {
             unlocked() { return hasChallenge('b', 21) && !inChallenge('b', 31) && !inChallenge('b', 41); },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`enemy:${this.type}`, kills); },
         },
-        star: {
-            _type: null,
-            get type() { return this._type ??= Object.keys(layers.xp.enemies).find(item => layers.xp.enemies[item] == this); },
-            level() {
-                const kills = player.xp.enemies[this.type].kills ?? D.dZero;
-
-                return kills.floor();
-            },
-            color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
-            color() {
-                const cycle = 300,
-                    hue = (player.xp.resetTime % cycle) / cycle,
-                    saturation = 1,
-                    lightness = .85;
-
-                return '#' + hsl_to_rgb(hue, saturation, lightness).map(num => num.toString(16).padStart(2, '0')).join('');
-            },
-            health(level) {
-                level ??= tmp.xp.enemies[this.type].level;
-
-                let health = D.pow(2, level).times(10);
-
-                return health;
-            },
-            experience: D.dZero,
-            kills: D.dOne,
-            name() { return player.xp.enemies[this.type].name ??= random_string_alpha(Math.floor(Math.random() * 12) + 4).toLowerCase(); },
-            damage: D.dOne,
-            dps: D.dZero,
-            regen: D.dZero,
-            unlocked() { return hasChallenge('b', 22) && !inChallenge('b', 31) && !inChallenge('b', 41); },
-            get_drops(kills) { return [['stardust', D.dOne]]; },
-        },
         // Challenges enemies
         amalgam: {
             _type: null,
@@ -1228,7 +1197,7 @@ addLayer('xp', {
             color() {
                 /** @type {[DecimalSource, [number, number, number]][]} */
                 const color_points = [
-                    [1, [0xFF, 0xDD, 0x99]],
+                    [1, [0xCC, 0xAA, 0x66]],
                     [1e3, [0x55, 0x99, 0x66]],
                 ],
                     i = color_points.findIndex(([n]) => D.gte(n, tmp.xp.total.kills.max(0)));
@@ -1305,7 +1274,7 @@ addLayer('xp', {
                 return dps.times(tmp.xp.enemies[this.type].damage);
             },
             regen(level) {
-                let regen_perc = D(.01);
+                let regen_perc = D(.05);
 
                 regen_perc = regen_perc.add(tmp.xp.enemies['*'].regen_add);
 
@@ -1315,6 +1284,40 @@ addLayer('xp', {
             },
             unlocked() { return !inChallenge('b', 31) && inChallenge('b', 42); },
             get_drops() { return []; },
+        },
+        // Final enemy
+        star: {
+            _type: null,
+            get type() { return this._type ??= Object.keys(layers.xp.enemies).find(item => layers.xp.enemies[item] == this); },
+            level() {
+                const kills = player.lo.items.stardust.amount;
+
+                return kills.floor();
+            },
+            color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
+            color() {
+                const cycle = 300,
+                    hue = (player.xp.resetTime % cycle) / cycle,
+                    saturation = 1,
+                    lightness = .85;
+
+                return '#' + hsl_to_rgb(hue, saturation, lightness).map(num => num.toString(16).padStart(2, '0')).join('');
+            },
+            health(level) {
+                level ??= tmp.xp.enemies[this.type].level;
+
+                let health = D.pow(2, level).times(10);
+
+                return health;
+            },
+            experience: D.dZero,
+            kills: D.dOne,
+            name() { return player.xp.enemies[this.type].name ??= random_string_alpha(Math.floor(Math.random() * 12) + 4).toLowerCase(); },
+            damage: D.dOne,
+            dps: D.dZero,
+            regen: D.dZero,
+            unlocked() { return hasChallenge('b', 22) && !inChallenge('b', 31) && !inChallenge('b', 41); },
+            get_drops(kills) { return [['stardust', D.dOne]]; },
         },
     },
     /** @type {typeof layers.xp.total} */
