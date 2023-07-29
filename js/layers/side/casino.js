@@ -36,6 +36,10 @@ addLayer('cas', {
                 ['display-text', () => `You have swapped ${format(player.cas.count)} times`],
                 ['display-text', () => `You have ${format(tmp.cas.token.chance.times(100))}% to get a token every item drop roll`],
                 'blank',
+                ['display-text', 'Click an item on the left column to select it.'],
+                ['display-text', 'Click an item on the right column to swap with the selected item.'],
+                ['display-text', '<sub>Because of the way the game is made, some items cannot be swapped with others.</sub>'],
+                'blank',
                 ['clickable', 'respec_swaps'],
                 [
                     'column',
