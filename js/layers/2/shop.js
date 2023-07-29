@@ -1,6 +1,5 @@
 'use strict';
 
-//todo move normal upgrades to rows 1-3, boss loan to row 4 and the rest to further rows
 addLayer('s', {
     name: 'Shop',
     symbol: 'S',
@@ -59,7 +58,7 @@ addLayer('s', {
                     ];
                 },
                 'blank',
-                ['upgrades', [6, 7, 8]],
+                ['upgrades', [1, 2, 3]],
             ],
         },
         'Loans': {
@@ -72,7 +71,7 @@ addLayer('s', {
                 () => tmp.s.investloans.is_loans ? '' : ['display-text', '<span style="color:#AA5555;">Investments are reset on boss reset</span>'],
                 'blank',
                 ['clickable', 11],
-                ['upgrades', [1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 15, 5]],
+                ['upgrades', [4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 8]],
             ],
             name() { return `${capitalize(tmp.s.investloans.type)}s`; },
         },
@@ -91,7 +90,7 @@ addLayer('s', {
     },
     upgrades: {
         //#region Loans/Investments
-        11: {
+        41: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Experience ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Experience';
@@ -117,7 +116,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        12: {
+        42: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Kills ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Kills';
@@ -143,7 +142,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        13: {
+        43: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Levels ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Levels';
@@ -169,7 +168,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        21: {
+        51: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Slime Goo ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Slime Goo';
@@ -195,7 +194,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        22: {
+        52: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Slime Core Shards ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Slime Core Shards';
@@ -221,7 +220,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        23: {
+        53: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Slime Cores ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Slime Cores';
@@ -247,7 +246,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        31: {
+        61: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Stone ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Stone';
@@ -273,7 +272,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        32: {
+        62: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Copper Ore ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Copper Ore';
@@ -299,7 +298,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        33: {
+        63: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Tin Ore ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Tin Ore';
@@ -325,7 +324,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        41: {
+        71: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Red Fabric ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Red Fabric';
@@ -351,7 +350,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        42: {
+        72: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Pyrite Coin ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Pyrite Coins';
@@ -377,7 +376,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        43: {
+        73: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Rusty Gear ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Rusty Gears';
@@ -403,7 +402,7 @@ addLayer('s', {
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
         },
-        51: {
+        81: {
             title() {
                 if (tmp.s.investloans.is_loans) return `Repay Boss ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Bosses';
@@ -954,7 +953,7 @@ addLayer('s', {
         },
         //#endregion Loans/Investments
         //#region Normal upgrades
-        61: {
+        11: {
             title: 'Mining Map',
             description: 'Mining chance is rooted, and it can go above 1',
             cost: D.dOne,
@@ -968,7 +967,7 @@ addLayer('s', {
             },
             effectDisplay() { return `${format(upgradeEffect(this.layer, this.id))}√`; },
         },
-        62: {
+        12: {
             title: 'Multi-Level Marketing',
             description() {
                 if (!shiftDown) return 'Levels boost coins gain';
@@ -986,7 +985,7 @@ addLayer('s', {
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
         },
-        63: {
+        13: {
             title: 'Blueprint Makers',
             description() {
                 if (!shiftDown) return 'Shop upgrades reduce loot crafting costs';
@@ -998,13 +997,13 @@ addLayer('s', {
             cost: D(5),
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
             effect() {
-                let mult = D(.95).pow(player.s.upgrades.filter(id => id > 60 && id < 90).length);
+                let mult = D(.95).pow(player.s.upgrades.filter(id => !layers.s.investloans.is_loan(id)).length);
 
                 return mult;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
         },
-        71: {
+        21: {
             title: 'Shiny Sword',
             description() {
                 if (!shiftDown) return 'Coins boost damage';
@@ -1024,7 +1023,7 @@ addLayer('s', {
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
         },
-        72: {
+        22: {
             title: 'Crafting Tools',
             description() {
                 return `Allows getting items and crafting with metals.<br>\
@@ -1033,7 +1032,7 @@ addLayer('s', {
             cost: D(25),
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
         },
-        73: {
+        23: {
             title: 'Book of Skills',
             description: 'Skill points are stronger',
             cost: D(50),
@@ -1047,7 +1046,7 @@ addLayer('s', {
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
         },
-        81: {
+        31: {
             title: 'Crafting Quality Improvements',
             description: 'Increase item values',
             effect() {
@@ -1061,7 +1060,7 @@ addLayer('s', {
             cost: D(100),
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
         },
-        82: {
+        32: {
             title: 'Cash Shop',
             description() {
                 if (!shiftDown) return `${tmp.s.investloans.is_loans ? 'Loans' : 'Investments'} decrease level costs`;
@@ -1075,7 +1074,7 @@ addLayer('s', {
             cost: D(300),
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
         },
-        83: {
+        33: {
             title: 'Better Paper',
             description: 'Increase effects of first column of upgrades',
             effect() { return D(1); },
@@ -1113,7 +1112,7 @@ addLayer('s', {
         amount(real = false) {
             let amount = D(player.s.upgrades.filter(id => id < 60 || id >= 90).length);
 
-            if (!real && hasUpgrade('s', 51)) amount = amount.add(upgradeEffect('s', 51));
+            if (!real && hasUpgrade('s', 81)) amount = amount.add(upgradeEffect('s', 81));
 
             return amount;
         },
@@ -1124,9 +1123,9 @@ addLayer('s', {
             return 'investment';
         },
         item_upgrade: {
-            'slime_goo': 21, 'slime_core_shard': 22, 'slime_core': 23,
-            'stone': 31, 'copper_ore': 32, 'tin_ore': 33,
-            'red_fabric': 41, 'pyrite_coin': 42, 'rusty_gear': 43,
+            'slime_goo': 51, 'slime_core_shard': 52, 'slime_core': 53,
+            'stone': 61, 'copper_ore': 62, 'tin_ore': 63,
+            'red_fabric': 71, 'pyrite_coin': 72, 'rusty_gear': 73,
             'rotten_flesh': 91, 'brain': 92,
             'coal': 101, 'iron_ore': 102, 'gold_ore': 103,
             'soaked_log': 111, 'normal_log': 112, 'plank': 113,
@@ -1138,13 +1137,14 @@ addLayer('s', {
         is_loan(id) {
             if (!id) return false;
 
-            return id <= 51 || id >= 91;
+            return id >= 41;
         },
     },
     branches: ['lo'],
     gainMult() {
         let mult = D.dOne;
 
+        if (hasUpgrade('s', 12)) mult = mult.times(upgradeEffect('s', 12));
         if (hasUpgrade('s', 62)) mult = mult.times(upgradeEffect('s', 62));
 
         mult = mult.times(buyableEffect('lo', 32).coin_mult);

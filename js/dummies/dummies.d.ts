@@ -1972,10 +1972,12 @@ type Layers = {
     }
     // Row 0
     xp: Layer<Player['xp']> & {
+        color_kill: string
         enemies: {
             '*': {
                 color_level(level?: DecimalSource): string
                 level_mult(): Decimal
+                level_exp(): Decimal
                 health_mult(): Decimal
                 health_add(): Decimal
                 exp_mult(): Decimal
@@ -2317,6 +2319,29 @@ type Layers = {
             is_loan(id?: number): boolean
         }
     }
+    a: Layer<Player['b']> & {
+        upgrades: {
+            [id: number]: Upgrade & { item: string }
+        }
+    }
+    // Alt Side
+    fai: Layer<Player['ach']> & {
+        getFailuresRows(type?: AchievementTypes): number[]
+        getFailures(type?: AchievementTypes): string[]
+        totalFailures(type?: AchievementTypes): Decimal
+        ownedFailures(type?: AchievementTypes): Decimal
+    }
+    // Special
+    star: Layer<Player['star']> & {
+        star: {
+            /** Time to hit a target, in seconds */
+            time: Computable<Decimal>
+            /** Size of the grid */
+            size: Computable<Decimal>
+            /** Amount of targets on the grid */
+            targets: Computable<Decimal>
+        }
+    }
 };
 type Temp = {
     displayThings: (string | (() => string))[]
@@ -2345,6 +2370,11 @@ type Temp = {
     // Row 2
     b: TempLayer & RComputed<Layers['b']>
     s: TempLayer & RComputed<Layers['s']>
+    a: TempLayer & RComputed<Layers['a']>
+    // Alt Side
+    fai: TempLayer & RComputed<Layers['fai']>
+    // Special
+    star: TempLayer & RComputed<Layers['star']>
 };
 type Player = {
     devSpeed: string
@@ -2417,6 +2447,8 @@ type Player = {
                 last_drops_times: Decimal
                 /** Current element, irrelevant if magic is locked */
                 element: string
+                /** Star-only saved name */
+                name?: string
             }
         }
     }
@@ -2506,8 +2538,22 @@ type Player = {
     b: LayerData & {
         /** If true, bosses are automatically started unless beaten */
         auto_start: boolean
+        final_challenges: number[]
     }
     s: LayerData & {
         short_mode: boolean,
+    }
+    a: LayerData & {}
+    // Alt Side
+    fai: LayerData & {
+        short_mode: boolean
+    }
+    // Special
+    star: LayerData & {
+        targets: number[]
+        /** Time left to hit a target, in seconds */
+        time: Decimal
+        /** If true, leaves from the star fight automatically */
+        auto_leave: boolean
     }
 };

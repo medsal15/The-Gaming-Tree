@@ -758,7 +758,7 @@ addLayer('m', {
 
             chance = chance.times(tmp.mag.elements[player.mag.element].effects.mining?.chance_multiplier ?? 1);
 
-            if (hasUpgrade('s', 61)) chance = chance.root(upgradeEffect('s', 61));
+            if (hasUpgrade('s', 11)) chance = chance.root(upgradeEffect('s', 11));
             else chance = chance.min(1);
 
             return chance;
@@ -780,8 +780,8 @@ addLayer('m', {
             if (hasUpgrade('m', 32)) {
                 let stone = drops.reduce((sum, [, amount]) => D.add(sum, amount), D.dZero);
 
-                if (inChallenge('b', 12) && !hasUpgrade('s', 31)) stone = stone.div(D.add(player.lo.items.stone.amount, 10).log10());
-                if (hasUpgrade('s', 31)) stone = stone.times(upgradeEffect('s', 31));
+                if (inChallenge('b', 12) && !hasUpgrade('s', 61)) stone = stone.div(D.add(player.lo.items.stone.amount, 10).log10());
+                if (hasUpgrade('s', 61)) stone = stone.times(upgradeEffect('s', 61));
 
                 const entry = drops.find(([item]) => item == 'stone') ?? false;
                 if (entry) entry[1] = stone;

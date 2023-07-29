@@ -367,6 +367,30 @@ addLayer('l', {
             },
             name: 'mining',
         },
+        growing: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
+            needed() { return player.l.skills[this.id].level.add(1).pow(3).times(25); },
+            effect() {
+                if (tmp.l.deactivated) return D.dOne;
+                return D.pow(1.05, player.l.skills[this.id].level);
+            },
+            unlocked() { return hasChallenge('b', 22); },
+            text() {
+                if (!shiftDown) {
+                    return `Growing level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to growing<br>\
+                    Tree size *${format(tmp.l.skills[this.id].effect)}`;
+                } else {
+                    let effect_formula = '1.05 ^ level';
+
+                    return `Growing level ${formatWhole(player.l.skills[this.id].level)}<br>\
+                    ${format(player.l.skills[this.id].points)} points assigned to growing<br>\
+                    Tree size *[${effect_formula}]`;
+                }
+            },
+            name: 'growing',
+        },
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
@@ -402,8 +426,8 @@ addLayer('l', {
 
         div = div.div(buyableEffect('lo', 71));
 
-        if (inChallenge('b', 12) && !hasUpgrade('s', 13)) div = div.div(player.l.points.add(10).log10());
-        if (hasUpgrade('s', 13)) div = div.div(upgradeEffect('s', 13));
+        if (inChallenge('b', 12) && !hasUpgrade('s', 43)) div = div.div(player.l.points.add(10).log10());
+        if (hasUpgrade('s', 43)) div = div.div(upgradeEffect('s', 43));
 
         if (hasUpgrade('s', 82)) div = div.div(upgradeEffect('s', 82));
 

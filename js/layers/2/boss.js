@@ -1,6 +1,6 @@
 'use strict';
 
-//todo exception for 32: final "enemy" drop
+//todo implement 62
 addLayer('b', {
     name: 'boss',
     symbol: 'B',
@@ -10,6 +10,7 @@ addLayer('b', {
             unlocked: false,
             points: D.dZero,
             auto_start: true,
+            final_challenges: [],
         };
     },
     tooltipLocked() { return 'Danger approaches'; },
@@ -108,6 +109,65 @@ addLayer('b', {
             unlocked() { return [31, 32, 41, 42].some(id => hasChallenge('b', id)); },
             buttonStyle: { 'border-color': '#7777EE', },
         },
+        'Universe': {
+            content: [
+                'main-display',
+                'prestige-button',
+                () => {
+                    const id = activeChallenge('b');
+                    if (!id) return;
+                    return ['display-text', `In challenge: ${layerColor('b', layers.b.challenges[id].name)}`];
+                },
+                'blank',
+                () => {
+                    const speed = layers.clo.time_speed('b');
+
+                    if (speed.neq(1)) return [
+                        'column', [
+                            ['display-text', `Time speed: *${format(speed)}`],
+                            'blank',
+                        ],
+                    ];
+                },
+                ['display-text', () => `<span style="color:#AA5555;font-size:1.5em;">This challenge cannot be exited.</span>`],
+                'blank',
+                ['challenges', [7]],
+                'blank',
+                ['column', () => {
+                    const row = challenge => {
+                        let color,
+                            beaten;
+                        switch (Math.floor(challenge / 10)) {
+                            default:
+                            case 1:
+                            case 2:
+                                color = '#AA5555';
+                                break;
+                            case 3:
+                            case 4:
+                                color = '#CC6666';
+                                break;
+                            case 5:
+                            case 6:
+                                color = '#7777EE';
+                                break;
+                        }
+                        if (inChallenge('b', 71)) {
+                            if (player.b.final_challenges.includes(challenge)) beaten = 'active';
+                            else beaten = 'beaten';
+                        } else {
+                            beaten = 'inactive';
+                        }
+
+                        return ['display-text', `<span style="color:${color}">${tmp.b.challenges[challenge].name}</span> is ${beaten}`];
+                    };
+
+                    return Object.keys(layers.b.challenges).filter(id => hasChallenge('b', id) && id != 71).map(id => row(+id));
+                }],
+            ],
+            unlocked() { return hasChallenge('b', 22); },
+            buttonStyle: { 'border-color': '#FFFFFF', },
+        },
     },
     challenges: {
         // Bosses
@@ -127,7 +187,7 @@ addLayer('b', {
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = {};
-                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
         },
@@ -135,13 +195,13 @@ addLayer('b', {
             name: 'The Goblin CEO',
             challengeDescription: 'All resource gains are divided by log10(amount + 10), unlock a new layer.',
             goalDescription: 'Pay off your loan.',
-            canComplete() { return hasUpgrade('s', 51); },
+            canComplete() { return hasUpgrade('s', 81); },
             rewardDescription() { return `Unlock zombies and keep the new layer. Your mining upgrades are always visible and ${layerColor('xp', tmp.xp.upgrades[22].title, 'text-shadow:#000 0 0 10px')} also affects all enemies at half its amount.`; },
             unlocked() { return player.b.points.gte(2); },
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = {};
-                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
         },
@@ -155,7 +215,21 @@ addLayer('b', {
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = {};
-                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
+        },
+        22: {
+            name: 'Kudzu',
+            challengeDescription: 'Enemy level is squared, plank gain is halved, third column tree upgrades\' effects are square rooted.',
+            goalDescription: 'Reach a thousand heat',
+            canComplete() { return player.f.points.gte(1e3); },
+            rewardDescription: 'Unlock stars, the alternator, and a skill for trees.',
+            unlocked() { return player.b.points.gte(4); },
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    style = {};
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
         },
@@ -170,7 +244,7 @@ addLayer('b', {
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = { 'background-color': '#CC6666', };
-                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
             onEnter() { player.xp.type = 'slime'; },
@@ -179,13 +253,13 @@ addLayer('b', {
             name: 'The Goblin President',
             challengeDescription: 'Lose 1% (rounded down) of your lower rows resources every second.<br>Get new debts to pay off.<br>Double price of final debt.',
             goalDescription: 'Pay off your debt',
-            canComplete() { return hasUpgrade('s', 51); },
+            canComplete() { return hasUpgrade('s', 81); },
             rewardDescription: 'Your portfolio grows, goblin item drops are doubled.',
             unlocked() { return hasChallenge('b', 12); },
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = { 'background-color': '#CC6666', };
-                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
         },
@@ -194,17 +268,31 @@ addLayer('b', {
             challengeDescription: 'Fight all the enemies at once. As one.',
             goalDescription: 'We\'re gonna need more holy water. Maybe 5 should be enough.',
             canComplete() { return player.lo.items.holy_water.amount.gte(5); },
-            rewardDescription: 'Double zombie drops, and trees regenerate 1% of their health',
+            rewardDescription: 'Double zombie drops, and trees regenerate 1% of their health.',
             unlocked() { return hasChallenge('b', 21); },
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = { 'background-color': '#CC6666', };
-                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
             onEnter() { player.xp.type = 'amalgam'; },
             onExit() { player.xp.type = 'slime'; },
             onComplete() { player.xp.type = 'slime'; },
+        },
+        42: {
+            name: 'The World Tree',
+            challengeDescription: 'Unlock a new enemy, the World Tree, which absorbs the spirit of the fallen.',
+            goalDescription: 'Destroy it',
+            canComplete() { return player.xp.enemies.world_tree.kills.gte(1); },
+            rewardDescription: 'Double ent drops, trees are 50% bigger, and unlock a new tree.',
+            unlocked() { return hasChallenge('b', 22); },
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    style = { 'background-color': '#CC6666', };
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
         },
         // Relics
         51: {
@@ -217,7 +305,7 @@ addLayer('b', {
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = { 'background-color': '#7777EE', };
-                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
             // Removes repair upgrades
@@ -233,7 +321,7 @@ addLayer('b', {
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = { 'background-color': '#7777EE', };
-                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
             onEnter() {
@@ -254,7 +342,7 @@ addLayer('b', {
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = { 'background-color': '#7777EE', };
-                if (active && active < 50 && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
             onEnter() {
@@ -267,6 +355,70 @@ addLayer('b', {
             },
             onExit() {
                 player.mag.element = 'none';
+            },
+        },
+        62: {
+            name: 'True Fight',
+            challengeDescription: 'Enemies strike back. If you die, your row 1 layers are reset. Unlock a toggle for auto attacking and a new layer to help.',
+            goalDescription: 'no fucking clue lmao',
+            canComplete() { return false; },
+            rewardDescription: 'Unlock Attributes.',
+            unlocked() { return hasChallenge('b', 42); },
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    style = { 'background-color': '#7777EE', };
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
+            //todo onEnter reset player player health
+        },
+        // Final
+        71: {
+            name: 'Big Crunch',
+            challengeDescription() {
+                let text = 'Enter all your beaten challenges at once. They are automatically completed but affect both sides.';
+                if (!false) {
+                    text = `<span style="color:#AA5555;">Your world is too small for this challenge.</span><br>\
+                    ${text}`;
+                }
+
+                return text;
+            },
+            goalDescription: 'Complete all the challenges',
+            canComplete: false,
+            rewardDescription: 'Win the game. As in, truly win the game.',
+            countsAs() { return player.b.final_challenges; },
+            unlocked() { return hasChallenge('b', 22); },
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    style = { 'background-color': '#FFFFFF', };
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id) || true) style.display = 'none';
+                return style;
+            },
+            onEnter() {
+                const challenges = Object.keys(layers.b.challenges).filter(id => hasChallenge('b', id) && id != 71).map(id => +id);
+
+                player.b.final_challenges = challenges;
+
+                // Mini boss challenges
+                if (challenges.includes(41)) {
+                    player.xp.type = 'amalgam';
+                } else if (challenges.includes(31)) {
+                    player.xp.type = 'slime';
+                }
+                // Relic challenges
+                if (challenges.includes(51)) {
+                    player.clo.upgrades = player.clo.upgrades.filter(id => Math.floor(id / 10) != 4);
+                }
+                if (challenges.includes(52)) {
+                    layerDataReset('cas');
+                    player.cas.swaps.challenge = layers.cas.items.shuffle();
+                    layers.cas.items.clean_swaps();
+                }
+                if (challenges.includes(61)) {
+                    player.mag.points = D(50);
+                    layers.mag.elements['*'].randomize();
+                }
             },
         },
     },
@@ -293,10 +445,10 @@ addLayer('b', {
                 return loss;
             };
 
-            if (!hasUpgrade('s', 11)) {
+            if (!hasUpgrade('s', 41)) {
                 player.xp.points = player.xp.points.minus(get_loss(player.xp.points)).max(0);
             }
-            if (!hasUpgrade('s', 12)) {
+            if (!hasUpgrade('s', 42)) {
                 const total = tmp.xp.total.kills,
                     loss = get_loss(total);
                 if (loss.gt(0)) Object.entries(player.xp.enemies).forEach(([type, data]) => {
@@ -304,7 +456,7 @@ addLayer('b', {
                     data.kills[type] = data.kills.minus(l).max(0);
                 });
             }
-            if (!hasUpgrade('s', 13)) {
+            if (!hasUpgrade('s', 43)) {
                 player.l.points = player.l.points.minus(get_loss(player.l.points));
             }
             if (!hasUpgrade('s', 121)) {
@@ -312,6 +464,8 @@ addLayer('b', {
             }
             // Items
             Object.entries(player.lo.items).forEach(([item, { amount }]) => {
+                if (item == 'stardust') return;
+
                 const upg = layers.s.investloans.item_upgrade[item] ?? false;
                 if (!upg || !hasUpgrade('s', upg)) player.lo.items[item].amount = D.minus(amount, get_loss(amount));
             });
@@ -322,28 +476,32 @@ addLayer('b', {
         if (player.b.points.lt(1)) return D(+player.xp.enemies.slime.kills.gte(1_000));
         if (player.b.points.lt(2)) return D(+player.xp.enemies.goblin.kills.gte(1_000));
         if (player.b.points.lt(3)) return D(+player.xp.enemies.zombie.kills.gte(1_000));
+        if (player.b.points.lt(4)) return D(+player.xp.enemies.ent.kills.gte(1_000));
         return D.dZero;
     },
     baseAmount() {
         if (player.b.points.lt(1)) return player.xp.enemies.slime.kills;
         if (player.b.points.lt(2)) return player.xp.enemies.goblin.kills;
         if (player.b.points.lt(3)) return player.xp.enemies.zombie.kills;
+        if (player.b.points.lt(4)) return player.xp.enemies.ent.kills;
         return D.dZero;
     },
     getNextAt() {
-        if (player.b.points.lt(3)) return D(1_000);
+        if (player.b.points.lt(4)) return D(1_000);
         return D.dInf;
     },
     canReset() {
         if (player.b.points.lt(1)) return player.xp.enemies.slime.kills.gte(1_000);
         if (player.b.points.lt(2)) return player.xp.enemies.goblin.kills.gte(1_000);
         if (player.b.points.lt(3)) return player.xp.enemies.zombie.kills.gte(1_000);
+        if (player.b.points.lt(4)) return player.xp.enemies.ent.kills.gte(1_000);
         return false;
     },
     prestigeButtonText() {
         if (player.b.points.eq(0)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['slime'].name} kills`;
         if (player.b.points.eq(1)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['goblin'].name} kills`;
         if (player.b.points.eq(2)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['zombie'].name} kills`;
+        if (player.b.points.eq(3)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['ent'].name} kills`;
         return 'There are no more bosses to fight';
     },
     prestigeNotify() { return tmp.b.getResetGain.gte(1); },
