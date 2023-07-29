@@ -108,9 +108,7 @@ addLayer('star', {
     },
     /** @type {Layers['star']['star']} */
     star: {
-        time() {
-            return D.div(5, D.add(player.xp.enemies.star.kills, 1));
-        },
+        time() { return D.div(5, D.add(tmp.xp.enemies.star.level, 1).pow(2)); },
         size() { return D(3).add(tmp.xp.enemies.star.level).min(10); },
         targets() { return D.add(tmp.xp.enemies.star.level, 1); },
     },
@@ -130,6 +128,7 @@ addLayer('star', {
         getCanClick(_, id) { return player.star.targets.includes(id); },
         onClick(_, id) {
             if (player.star.targets.includes(id)) {
+                player.xp.clicked = true;
                 player.xp.enemies.star.health = D.minus(player.xp.enemies.star.health, 1);
                 player.star.time = tmp.star.star.time;
 

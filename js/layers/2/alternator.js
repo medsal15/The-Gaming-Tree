@@ -24,7 +24,7 @@ addLayer('a', {
             key: 'A',
             description: 'Shift + A: Display alternator layer',
             unlocked() { return tmp.s.layerShown; },
-            onPress() { showTab('s'); },
+            onPress() { showTab('a'); },
         },
     ],
     tabFormat: {
@@ -38,6 +38,7 @@ addLayer('a', {
                 ],
                 'blank',
                 ['display-text', `<span style="color:#AA5555;">Alternating a layer will radically change its function and effects</span>`],
+                ['display-text', `<span style="color:#AA5555;">Alternating a layer will increase the cost to alternate other layers</span>`],
                 ['upgrade-tree', [
                     [11, 12, 13, 14],
                     [21, 22, 23, 24],
@@ -56,6 +57,7 @@ addLayer('a', {
     upgrades: {
         11: {
             title: 'Alternate XP',
+            description: 'Not Yet Implemented',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -75,11 +77,14 @@ addLayer('a', {
                 return style;
             },
             branches: [21, 22],
+            canAfford: false,
         },
         12: {
             title: 'Alternate Mining',
+            description: 'Not Yet Implemented',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
+            currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
@@ -96,11 +101,14 @@ addLayer('a', {
                 return style;
             },
             branches: [22],
+            canAfford: false,
         },
         13: {
             title: 'Alternate Tree',
+            description: 'Not Yet Implemented',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
+            currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
@@ -117,11 +125,13 @@ addLayer('a', {
                 return style;
             },
             branches: [23],
+            canAfford: false,
         },
         14: {
             title: 'Alternate Achievements',
             cost: D.dZero,
             item: 'stardust',
+            currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
@@ -145,6 +155,7 @@ addLayer('a', {
         },
         21: {
             title: 'Alternate Levels',
+            description: 'Not Yet Implemented<br>Requires all 1st row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -168,6 +179,7 @@ addLayer('a', {
         },
         22: {
             title: 'Alternate Loot',
+            description: 'Not Yet Implemented<br>Requires all 1st row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -191,6 +203,7 @@ addLayer('a', {
         },
         23: {
             title: 'Alternate Forge',
+            description: 'Not Yet Implemented<br>Requires all 1st row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -214,6 +227,7 @@ addLayer('a', {
         },
         24: {
             title: 'Alternate Clock',
+            description: 'Not Yet Implemented',
             cost: D.dTwo,
             item: 'stardust',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -239,6 +253,7 @@ addLayer('a', {
         },
         31: {
             title: 'Alternate Bosses',
+            description: 'Not Yet Implemented<br>Requires all 2nd row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -261,6 +276,7 @@ addLayer('a', {
         },
         32: {
             title: 'Alternate Shop',
+            description: 'Not Yet Implemented<br>Requires all 2nd row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -283,6 +299,7 @@ addLayer('a', {
         },
         33: {
             title: 'Alternate Alternator',
+            description: 'Not Yet Implemented<br>Requires all other 3rd row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -306,6 +323,7 @@ addLayer('a', {
         },
         34: {
             title: 'Alternate Casino',
+            description: 'Not Yet Implemented',
             cost: D(4),
             item: 'stardust',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -331,6 +349,7 @@ addLayer('a', {
         },
         44: {
             title: 'Alternate Magic',
+            description: 'Not Yet Implemented',
             cost: D(6),
             item: 'stardust',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },

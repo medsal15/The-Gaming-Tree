@@ -5,6 +5,11 @@
 addLayer('lo', {
     name: 'Loot',
     image: './resources/images/swap-bag.svg',
+    nodeStyle: {
+        'background-repeat': 'no-repeat',
+        'background-position': 'center',
+        'background-size': 'contain',
+    },
     /** @returns {typeof player.lo} */
     startData() {
         return {

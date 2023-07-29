@@ -2,7 +2,12 @@
 
 addLayer('fai', {
     name: 'Failures',
-    image: `resources/images/cracked-disk.svg`,
+    image: `./resources/images/cracked-disc.svg`,
+    nodeStyle: {
+        'background-repeat': 'no-repeat',
+        'background-position': 'center',
+        'background-size': 'contain',
+    },
     /** @returns {Player['fai']} */
     startData() {
         return {
