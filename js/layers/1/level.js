@@ -390,6 +390,9 @@ addLayer('l', {
     automate() {
         Object.entries(player.l.skills).forEach(([skill, pdata]) => {
             const tdata = tmp.l.skills[skill];
+            if (!(tdata.unlocked ?? true) && D.gt(player.l.skills[skill].points, 0)) {
+                player.l.skills[skill].points = D.dZero;
+            }
             while (pdata.progress.gte(tdata.needed)) {
                 const tdata = tmp.l.skills[skill];
                 pdata.progress = pdata.progress.minus(tdata.needed);
