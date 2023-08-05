@@ -1970,6 +1970,32 @@ type Layers = {
             cost: Computable<Decimal>
         }
     }
+    sta: Layer<Player['sta']> & {
+        stats: {
+            '*': {
+                total(): Decimal
+                left(): Decimal
+                /** Amount of points gained on kill */
+                gain(): Decimal
+                gain_formula: string
+                regex: RegExp
+                show_row(stat: string): [['row', [
+                    ['display-text', string],
+                    'blank',
+                    ['clickable', `${string}_increase`],
+                    'blank',
+                    ['clickable', `${string}_decrease`],
+                ]], 'blank'] | undefined
+            }
+        } & {
+            [stat: string]: {
+                readonly id: string
+                name: string
+                effect(): Decimal
+                text(): string
+            }
+        }
+    }
     // Row 0
     xp: Layer<Player['xp']> & {
         color_kill: string
@@ -2325,7 +2351,7 @@ type Layers = {
         }
     }
     // Alt Side
-    fai: Layer<Player['ach']> & {
+    suc: Layer<Player['ach']> & {
         getFailuresRows(type?: AchievementTypes): number[]
         getFailures(type?: AchievementTypes): string[]
         totalFailures(type?: AchievementTypes): Decimal
@@ -2359,6 +2385,7 @@ type Temp = {
     clo: TempLayer & RComputed<Layers['clo']>
     cas: TempLayer & RComputed<Layers['cas']>
     mag: TempLayer & RComputed<Layers['mag']>
+    sta: TempLayer & RComputed<Layers['sta']>
     // Row 0
     xp: TempLayer & RComputed<Layers['xp']>
     m: TempLayer & RComputed<Layers['m']>
@@ -2372,7 +2399,7 @@ type Temp = {
     s: TempLayer & RComputed<Layers['s']>
     a: TempLayer & RComputed<Layers['a']>
     // Alt Side
-    fai: TempLayer & RComputed<Layers['fai']>
+    suc: TempLayer & RComputed<Layers['suc']>
     // Special
     star: TempLayer & RComputed<Layers['star']>
 };
@@ -2432,6 +2459,14 @@ type Player = {
         /** Current selected element */
         element: string
     }
+    sta: LayerData & {
+        stats: {
+            [stat: string]: {
+                /** Amount of points in a stat */
+                points: Decimal,
+            }
+        }
+    }
     // Row 0
     xp: LayerData & {
         /** Current selected enemy */
@@ -2451,6 +2486,8 @@ type Player = {
                 name?: string
             }
         }
+        auto_attack_current: boolean
+        auto_attack_all: boolean
     }
     m: LayerData & {
         health: Decimal
@@ -2545,7 +2582,7 @@ type Player = {
     }
     a: LayerData & {}
     // Alt Side
-    fai: LayerData & {
+    suc: LayerData & {
         short_mode: boolean
     }
     // Special

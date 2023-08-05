@@ -584,6 +584,8 @@ addLayer('t', {
 
                 if (hasChallenge('b', 42)) mult = mult.times(1.5);
 
+                if (hasChallenge('b', 62) && !inChallenge('b', 62)) mult = mult.times(tmp.sta.stats.defense.effect);
+
                 return mult;
             },
             cap_add() {

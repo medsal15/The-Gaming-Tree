@@ -27,12 +27,12 @@ let modInfo = {
 		'moreutils.js', 'tree.js',
 		'layers/hotkeys.js', 'layers/star.js',
 
-		'layers/side/achievements.js', 'layers/side/clock.js', 'layers/side/casino.js', 'layers/side/magic.js',
+		'layers/side/achievements.js', 'layers/side/clock.js', 'layers/side/casino.js', 'layers/side/magic.js', 'layers/side/stats.js',
 		'layers/0/experience.js', 'layers/0/mining.js', 'layers/0/tree.js',
 		'layers/1/level.js', 'layers/1/loot.js', 'layers/1/forge.js',
 		'layers/2/boss.js', 'layers/2/shop.js', 'layers/2/alternator.js',
 
-		'alternate/side/failures.js',
+		'alternate/side/successes.js',
 	],
 	/**
 	 * If you have a Discord server or other discussion place, you can add a link to it.

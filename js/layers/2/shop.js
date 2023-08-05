@@ -961,7 +961,7 @@ addLayer('s', {
             effect() {
                 let root = D(3);
 
-                if (hasUpgrade('s', 83)) root = root.add(upgradeEffect('s', 83));
+                if (hasUpgrade('s', 33)) root = root.add(upgradeEffect('s', 33));
 
                 return root;
             },
@@ -1017,7 +1017,7 @@ addLayer('s', {
             effect() {
                 let mult = player.s.points.add(8).log(8);
 
-                if (hasUpgrade('s', 83)) mult = mult.add(upgradeEffect('s', 83));
+                if (hasUpgrade('s', 33)) mult = mult.add(upgradeEffect('s', 33));
 
                 return mult;
             },
@@ -1052,7 +1052,7 @@ addLayer('s', {
             effect() {
                 let add = D(1);
 
-                if (hasUpgrade('s', 83)) add = add.times(upgradeEffect('s', 83));
+                if (hasUpgrade('s', 33)) add = add.times(upgradeEffect('s', 33));
 
                 return add;
             },
@@ -1110,7 +1110,7 @@ addLayer('s', {
     /** @type {typeof layers.s.investloans} */
     investloans: {
         amount(real = false) {
-            let amount = D(player.s.upgrades.filter(id => id < 60 || id >= 90).length);
+            let amount = D(player.s.upgrades.filter(id => id >= 41).length);
 
             if (!real && hasUpgrade('s', 81)) amount = amount.add(upgradeEffect('s', 81));
 
@@ -1145,7 +1145,6 @@ addLayer('s', {
         let mult = D.dOne;
 
         if (hasUpgrade('s', 12)) mult = mult.times(upgradeEffect('s', 12));
-        if (hasUpgrade('s', 62)) mult = mult.times(upgradeEffect('s', 62));
 
         mult = mult.times(buyableEffect('lo', 32).coin_mult);
 

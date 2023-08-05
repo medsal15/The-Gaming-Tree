@@ -1,7 +1,6 @@
 'use strict';
 
 //todo add buyMax to buyables
-//todo star buyables
 addLayer('lo', {
     name: 'Loot',
     image: './resources/images/swap-bag.svg',
@@ -95,17 +94,17 @@ addLayer('lo', {
         11: {
             title: 'Lootbag',
             description() {
-                if (!hasUpgrade('s', 72)) return 'Start getting items from your kills';
+                if (!hasUpgrade('s', 22)) return 'Start getting items from your kills';
 
                 return 'Double items gain';
             },
             effect() {
-                if (!hasUpgrade('s', 72)) return D.dOne;
+                if (!hasUpgrade('s', 22)) return D.dOne;
 
                 return D.dTwo;
             },
             effectDisplay() {
-                if (!hasUpgrade('s', 72)) return '';
+                if (!hasUpgrade('s', 22)) return '';
 
                 return `${format(upgradeEffect(this.layer, this.id))}`;
             },
@@ -205,7 +204,7 @@ addLayer('lo', {
             value() {
                 let value = D.dOne;
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -285,7 +284,7 @@ addLayer('lo', {
             value() {
                 let value = D(5);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -356,7 +355,7 @@ addLayer('lo', {
             value() {
                 let value = D(3);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -461,7 +460,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -558,7 +557,7 @@ addLayer('lo', {
             value() {
                 let value = D(7);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -668,7 +667,7 @@ addLayer('lo', {
             value() {
                 let value = D(5);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -747,7 +746,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -829,7 +828,7 @@ addLayer('lo', {
             value() {
                 let value = D(10);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -925,7 +924,7 @@ addLayer('lo', {
             value() {
                 let value = D(10);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1004,7 +1003,7 @@ addLayer('lo', {
             value() {
                 let value = D(2);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1102,7 +1101,7 @@ addLayer('lo', {
             value() {
                 let value = D(13);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1179,7 +1178,7 @@ addLayer('lo', {
             value() {
                 let value = D(7);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1272,7 +1271,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1373,7 +1372,7 @@ addLayer('lo', {
             value() {
                 let value = D(9);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1460,7 +1459,7 @@ addLayer('lo', {
             value() {
                 let value = D(15);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1537,7 +1536,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1617,7 +1616,7 @@ addLayer('lo', {
             value() {
                 let value = D(5);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1711,7 +1710,7 @@ addLayer('lo', {
             value() {
                 let value = D(7);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1790,7 +1789,7 @@ addLayer('lo', {
             value() {
                 let value = D(9);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1868,7 +1867,7 @@ addLayer('lo', {
             value() {
                 let value = D(9);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -1949,7 +1948,7 @@ addLayer('lo', {
             value() {
                 let value = D(15);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -2026,7 +2025,7 @@ addLayer('lo', {
             value() {
                 let value = D(5);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -2118,7 +2117,7 @@ addLayer('lo', {
             value() {
                 let value = D(7);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -2194,7 +2193,7 @@ addLayer('lo', {
             value() {
                 let value = D(6);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -2270,7 +2269,7 @@ addLayer('lo', {
             value() {
                 let value = D(3);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -2345,7 +2344,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -2420,7 +2419,7 @@ addLayer('lo', {
             value() {
                 let value = D(4);
 
-                if (hasUpgrade('s', 81)) value = value.add(getBuyableAmount(this.layer, this.id));
+                if (hasUpgrade('s', 31)) value = value.add(getBuyableAmount(this.layer, this.id).times(upgradeEffect('s', 31)));
 
                 return value;
             },
@@ -2659,7 +2658,7 @@ addLayer('lo', {
                 /** @type {[drop_sources, string]} */
                 const [from, sub] = type.split(':');
 
-                if (from == 'enemy') return hasUpgrade('lo', 11) || hasUpgrade('s', 72) || sub == 'star';
+                if (from == 'enemy') return hasUpgrade('lo', 11) || hasUpgrade('s', 22) || sub == 'star';
                 if (from == 'mining') return tmp.m.layerShown;
                 if (from == 'tree') return tmp.t.layerShown;
                 if (from == 'forge') return tmp.f.layerShown;
@@ -2694,7 +2693,7 @@ addLayer('lo', {
                         return sum.add(item.sources.weights[type]);
                     }, D.dZero);
             },
-            has_anvil() { return hasUpgrade('m', 33) || hasUpgrade('s', 72); },
+            has_anvil() { return hasUpgrade('m', 33) || hasUpgrade('s', 22); },
             value() {
                 return Object.values(tmp.lo.buyables).reduce((sum, buyable) => {
                     if (typeof buyable != 'object' || !('value' in buyable)) return sum;
