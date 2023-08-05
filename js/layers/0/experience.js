@@ -1294,7 +1294,7 @@ addLayer('xp', {
                 ],
                     i = color_points.findIndex(([n]) => D.gte(n, tmp.xp.total.kills.max(1).min(1e3)));
 
-                if (i == color_points.length - 1 || i == 0) {
+                if (i == 0) {
                     return `#${color_points[i][1].map(n => n.toString(16)).join('')}`;
                 }
                 const min = D.log10(color_points[i - 1][0]),
