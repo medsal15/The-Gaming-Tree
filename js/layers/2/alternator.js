@@ -30,6 +30,16 @@ addLayer('a', {
     tabFormat: {
         'Alternate': {
             content: [
+                () => {
+                    const speed = layers.clo.time_speed('a');
+
+                    if (speed.neq(1)) return [
+                        'column', [
+                            ['display-text', `Time speed: *${format(speed)}`],
+                            'blank',
+                        ],
+                    ];
+                },
                 [
                     'display-text',
                     () => `You have <span style="color:${tmp.xp.enemies.star.color};text-shadow:${tmp.xp.enemies.star.color} 0 0 10px;font-size:1.5em;">\

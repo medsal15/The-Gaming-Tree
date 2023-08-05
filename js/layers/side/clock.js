@@ -190,7 +190,7 @@ addLayer('clo', {
                 return style;
             },
             unlocked() { return hasChallenge('b', 51) && player.f.unlocked; },
-            branches: [22],
+            branches: [22, 33],
         },
         31: {
             title: 'Boss connector',
@@ -241,12 +241,12 @@ addLayer('clo', {
         },
         33: {
             title() {
-                if (!false) return '??? connector';
+                if (!tmp.a.layerShown) return '??? connector';
 
                 return 'Alternator connector';
             },
             description() {
-                if (!shiftDown) {
+                if (!tmp.a.layerShown) {
                     if (!false) return 'Applies time speed to ??? layer';
 
                     return 'Applies time speed to alternator layer';
@@ -256,11 +256,20 @@ addLayer('clo', {
 
                 return `Formula: ${formula}`;
             },
-            effectDisplay() { return `*${format(D.dOne)}`; },
-            costDisplay() { return 'Cost: Unknown'; },
-            canAfford: false,
+            effectDisplay() { return `*${format(layers.clo.time_speed('a', true))}`; },
+            price: [['stardust', D(1)]],
+            costDisplay() { return `Requires: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
+            canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
             pay() { },
-            unlocked() { return hasChallenge('b', 51) && false; },
+            style() {
+                const style = {};
+                if (hasUpgrade(this.layer, this.id)) {
+                    style['background-image'] = tmp.a.nodeStyle['background-image'];
+                    style['background-origin'] = tmp.a.nodeStyle['background-origin'];
+                }
+                return style;
+            },
+            unlocked() { return hasChallenge('b', 51) && tmp.a.layerShown; },
         },
         41: {
             title: 'Hour Hand',
@@ -1058,7 +1067,7 @@ addLayer('clo', {
             const links = {
                 'xp': 11, 'm': 12, 't': 13,
                 'l': 21, 'lo': 22, 'f': 23,
-                'b': 31, 's': 32,
+                'b': 31, 's': 32, 'a': 33,
             };
             if (!(layer in links) || !hasUpgrade(this.layer, links[layer])) return speed;
         }
