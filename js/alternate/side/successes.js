@@ -1,14 +1,14 @@
 'use strict';
 
-addLayer('fai', {
-    name: 'Failures',
+addLayer('suc', {
+    name: 'Successes',
     image: `./resources/images/cracked-disc.svg`,
     nodeStyle: {
         'background-repeat': 'no-repeat',
         'background-position': 'center',
         'background-size': 'contain',
     },
-    /** @returns {Player['fai']} */
+    /** @returns {Player['suc']} */
     startData() {
         return {
             unlocked: true,
@@ -17,69 +17,69 @@ addLayer('fai', {
     },
     color: '#0000FF',
     row: 'side',
-    resource: 'failures',
+    resource: 'successes',
     type: 'none',
     position: 0.5,
     layerShown() { return hasUpgrade('a', 14); },
     tabFormat: {
-        'Failures': {
+        'Successes': {
             content: [
-                ['display-text', () => `You have ${formatWhole(layers.fai.ownedFailures())} / ${formatWhole(layers.fai.totalFailures())} failures`],
+                ['display-text', () => `You have ${formatWhole(layers.suc.ownedSuccesses())} / ${formatWhole(layers.suc.totalSuccesses())} successes`],
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
                     'blank',
                     ['toggle', ['fai', 'short_mode']]
                 ]],
                 'blank',
-                ['achievements', () => layers.fai.getFailuresRows()],
+                ['achievements', () => layers.suc.getSuccessesRows()],
             ],
         },
-        'Malus': {
+        'Bonus': {
             content: [
-                ['display-text', () => `You have ${formatWhole(layers.fai.ownedFailures('bonus'))} / ${formatWhole(layers.fai.totalFailures('bonus'))} malus failures`],
+                ['display-text', () => `You have ${formatWhole(layers.suc.ownedSuccesses('bonus'))} / ${formatWhole(layers.suc.totalSuccesses('bonus'))} bonus successes`],
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
                     'blank',
                     ['toggle', ['fai', 'short_mode']]
                 ]],
                 'blank',
-                ['achievements', () => layers.fai.getFailuresRows('bonus')],
+                ['achievements', () => layers.suc.getSuccessesRows('bonus')],
             ],
-            unlocked() { return layers.fai.totalFailures('bonus').gte(1); },
+            unlocked() { return layers.suc.totalSuccesses('bonus').gte(1); },
             buttonStyle: {
                 'border-color': 'rgb(255,127,0)',
             },
-            name: 'Malus Failures',
+            name: 'Bonus Successes',
         },
         'Secrets': {
             content: [
-                ['display-text', () => `You have ${formatWhole(layers.fai.ownedFailures('secret'))} secret failures`],
+                ['display-text', () => `You have ${formatWhole(layers.suc.ownedSuccesses('secret'))} secret successes`],
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
                     'blank',
                     ['toggle', ['fai', 'short_mode']]
                 ]],
                 'blank',
-                ['achievements', () => layers.fai.getFailuresRows('secret')],
+                ['achievements', () => layers.suc.getSuccessesRows('secret')],
             ],
             unlocked() {
-                return layers.fai.ownedFailures('secret').gte(1);
+                return layers.suc.ownedSuccesses('secret').gte(1);
             },
             buttonStyle: {
                 'border-color': 'rgb(127,255,0)',
             },
-            name: 'Secret Failures',
+            name: 'Secret Successes',
         },
     },
     achievements: {
-        //#region Normal Failures
-        //#endregion Normal Failures
-        //#region Malus Failures
+        //#region Normal Successes
+        //#endregion Normal Successes
+        //#region Bonus Successes
         11: {
             name: 'Hello World',
             tooltip: 'Awaken the other side',
             done() { return hasUpgrade('a', 14); },
-            onComplete() { if (tmp.fai.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Malus Failure Completed!", 3, 'rgb(255,127,0)'); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
             style() {
                 let s = {};
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
@@ -95,7 +95,7 @@ addLayer('fai', {
                 return 'Unseal the Time Cubes';
             },
             done() { return false; },
-            onComplete() { if (tmp.fai.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Malus Failure Completed!", 3, 'rgb(255,127,0)'); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
             style() {
                 let s = {};
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
@@ -111,7 +111,7 @@ addLayer('fai', {
                 return 'Unseal the Stock Market';
             },
             done() { return false; },
-            onComplete() { if (tmp.fai.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Malus Failure Completed!", 3, 'rgb(255,127,0)'); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
             style() {
                 let s = {};
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
@@ -127,7 +127,7 @@ addLayer('fai', {
                 return 'Unseal the Elements';
             },
             done() { return false; },
-            onComplete() { if (tmp.fai.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Malus Failure Completed!", 3, 'rgb(255,127,0)'); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
             style() {
                 let s = {};
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
@@ -143,7 +143,7 @@ addLayer('fai', {
                 return 'Unseal the Party';
             },
             done() { return false; },
-            onComplete() { if (tmp.fai.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Malus Failure Completed!", 3, 'rgb(255,127,0)'); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
             style() {
                 let s = {};
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
@@ -151,41 +151,41 @@ addLayer('fai', {
             },
             unlocked() { return hasChallenge('b', 22); },
         },
-        //#endregion Malus Failures
-        //#region Secret Failures
-        //#endregion Secret Failures
+        //#endregion Bonus Successes
+        //#region Secret Successes
+        //#endregion Secret Successes
     },
     tooltip() {
-        if (player.fai.short_mode) {
+        if (player.suc.short_mode) {
             let pieces = [
-                layerColor('fai', `${formatWhole(layers.fai.ownedFailures())} / ${formatWhole(layers.fai.totalFailures())}`),
+                layerColor('fai', `${formatWhole(layers.suc.ownedSuccesses())} / ${formatWhole(layers.suc.totalSuccesses())}`),
             ];
-            if (tmp.fai.tabFormat['Malus'].unlocked) {
-                const color = tmp.fai.tabFormat['Malus'].buttonStyle['border-color'];
-                pieces.push(`<span style="color:${color};text-shadow:${color} 0 0 10px";>${formatWhole(layers.fai.ownedFailures('bonus'))} / ${formatWhole(layers.fai.totalFailures('bonus'))}</span>`);
+            if (tmp.suc.tabFormat['Bonus'].unlocked) {
+                const color = tmp.suc.tabFormat['Bonus'].buttonStyle['border-color'];
+                pieces.push(`<span style="color:${color};text-shadow:${color} 0 0 10px";>${formatWhole(layers.suc.ownedSuccesses('bonus'))} / ${formatWhole(layers.suc.totalSuccesses('bonus'))}</span>`);
             }
-            if (layers.fai.ownedFailures('secret').gte(1)) {
-                const color = tmp.fai.tabFormat['Secrets'].buttonStyle['border-color'];
-                pieces.push(`<span style="color:${color};text-shadow:${color} 0 0 10px;">${formatWhole(layers.fai.ownedFailures('secret'))}</span>`);
+            if (layers.suc.ownedSuccesses('secret').gte(1)) {
+                const color = tmp.suc.tabFormat['Secrets'].buttonStyle['border-color'];
+                pieces.push(`<span style="color:${color};text-shadow:${color} 0 0 10px;">${formatWhole(layers.suc.ownedSuccesses('secret'))}</span>`);
             }
             return pieces.join(' | ');
         } else {
             let lines = [
-                `<span style="white-space: nowrap">${formatWhole(layers.fai.ownedFailures())} / ${formatWhole(layers.fai.totalFailures())} failures</span>`
+                `<span style="white-space: nowrap">${formatWhole(layers.suc.ownedSuccesses())} / ${formatWhole(layers.suc.totalSuccesses())} successes</span>`
             ];
 
-            if (tmp.fai.tabFormat['Malus'].unlocked) {
-                lines.push(`<span style="white-space: nowrap">${formatWhole(layers.fai.ownedFailures('bonus'))} / ${formatWhole(layers.fai.totalFailures('bonus'))} malus failures</span>`)
+            if (tmp.suc.tabFormat['Bonus'].unlocked) {
+                lines.push(`<span style="white-space: nowrap">${formatWhole(layers.suc.ownedSuccesses('bonus'))} / ${formatWhole(layers.suc.totalSuccesses('bonus'))} bonus successes</span>`)
             }
-            if (layers.fai.ownedFailures('secret').gte(1)) {
-                lines.push(`${formatWhole(layers.fai.ownedFailures('secret'))} secrets`);
+            if (layers.suc.ownedSuccesses('secret').gte(1)) {
+                lines.push(`${formatWhole(layers.suc.ownedSuccesses('secret'))} secrets`);
             }
 
             return lines.join('<br />');
         }
     },
     /** @param {AchievementTypes} [type] */
-    getFailuresRows(type = 'normal') {
+    getSuccessesRows(type = 'normal') {
         let rows = [];
 
         switch (type) {
@@ -204,22 +204,22 @@ addLayer('fai', {
         return rows;
     },
     /** @param {AchievementTypes} [type] */
-    getFailures(type = 'normal') {
-        let rows = layers.fai.getFailuresRows(type);
+    getSuccesses(type = 'normal') {
+        let rows = layers.suc.getSuccessesRows(type);
 
         if (!rows.length) return [];
 
-        return Object.keys(layers.fai.achievements).filter(id => {
+        return Object.keys(layers.suc.achievements).filter(id => {
             if (isNaN(id)) return false;
 
-            if (!(tmp.fai.achievements[id].unlocked ?? true)) return false;
+            if (!(tmp.suc.achievements[id].unlocked ?? true)) return false;
 
             return rows.some(r => RegExp(`^${r}\\d$`).test(id));
         });
     },
     /** @param {AchievementTypes} [type] */
-    totalFailures(type = 'normal') { return D(this.getFailures(type).length); },
+    totalSuccesses(type = 'normal') { return D(this.getSuccesses(type).length); },
     /** @param {AchievementTypes} [type] */
-    ownedFailures(type = 'normal') { return D(this.getFailures(type).filter(id => hasAchievement('fai', id)).length); },
+    ownedSuccesses(type = 'normal') { return D(this.getSuccesses(type).filter(id => hasAchievement('suc', id)).length); },
     achievementPopups: false,
 });

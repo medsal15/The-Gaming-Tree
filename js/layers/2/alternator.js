@@ -14,7 +14,7 @@ addLayer('a', {
     tooltip() { return `${formatWhole(player.lo.items.stardust.amount)} stardust`; },
     color: '#773377',
     nodeStyle: {
-        'background-image': 'linear-gradient(to right, #0044BB, #EE2233)',
+        'background-image': 'linear-gradient(to right, #EE2233, #0044BB)',
         'background-origin': 'border-box',
     },
     row: 2,
@@ -28,7 +28,7 @@ addLayer('a', {
         },
     ],
     tabFormat: {
-        'Alteration': {
+        'Alternate': {
             content: [
                 [
                     'display-text',
@@ -40,15 +40,14 @@ addLayer('a', {
                 ['display-text', `<span style="color:#AA5555;">Alternating a layer will radically change its function and effects</span>`],
                 ['display-text', `<span style="color:#AA5555;">Alternating a layer will increase the cost to alternate other layers</span>`],
                 ['upgrade-tree', [
-                    [11, 12, 13, 14],
-                    [21, 22, 23, 24],
-                    [31, 32, 33, 34],
-                    [44],
-                    [54],
+                    [11, 12, 13],
+                    [21, 22, 23],
+                    [31, 32, 33],
+                    [14, 24, 34, 44, 54],
                 ]],
             ],
             buttonStyle: {
-                'border-image-source': 'linear-gradient(to right, #0044BB, #EE2233)',
+                'border-image-source'() { return tmp.a.nodeStyle['background-image']; },
                 'border-image-slice': '1',
             },
         },
@@ -76,7 +75,10 @@ addLayer('a', {
 
                 return style;
             },
-            branches: [21, 22],
+            branches() {
+                const color = [11, 12, 13].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
+                return [[21, color], [22, color]];
+            },
             canAfford: false,
         },
         12: {
@@ -100,7 +102,10 @@ addLayer('a', {
 
                 return style;
             },
-            branches: [22],
+            branches() {
+                const color = [11, 12, 13].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
+                return [[22, color]];
+            },
             canAfford: false,
         },
         13: {
@@ -124,7 +129,10 @@ addLayer('a', {
 
                 return style;
             },
-            branches: [23],
+            branches() {
+                const color = [11, 12, 13].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
+                return [[23, color]];
+            },
             canAfford: false,
         },
         14: {
@@ -142,9 +150,9 @@ addLayer('a', {
                 };
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    style['background-color'] = tmp.fai.color;
+                    style['background-color'] = tmp.suc.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    style['background-image'] = `linear-gradient(to right, ${tmp.ach.color}, ${tmp.fai.color})`;
+                    style['background-image'] = `linear-gradient(to right, ${tmp.ach.color}, ${tmp.suc.color})`;
                     style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.ach.color;
@@ -175,7 +183,10 @@ addLayer('a', {
                 return style;
             },
             canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)); },
-            branches: [31],
+            branches() {
+                const color = [21, 22, 23].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
+                return [[31, color]];
+            },
         },
         22: {
             title: 'Alternate Loot',
@@ -199,7 +210,10 @@ addLayer('a', {
                 return style;
             },
             canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)); },
-            branches: [32],
+            branches() {
+                const color = [21, 22, 23].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
+                return [[32, color], 23];
+            },
         },
         23: {
             title: 'Alternate Forge',
@@ -223,7 +237,10 @@ addLayer('a', {
                 return style;
             },
             canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)); },
-            branches: [33],
+            branches() {
+                const color = [31, 32].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
+                return [[33, color]];
+            },
         },
         24: {
             title: 'Alternate Clock',
@@ -372,6 +389,32 @@ addLayer('a', {
                 return style;
             },
             unlocked() { return tmp.mag.layerShown; },
+        },
+        54: {
+            title: 'Alternate Stats',
+            description: 'Not Yet Implemented',
+            cost: D(8),
+            item: 'stardust',
+            currencyDisplayName() { return tmp.lo.items[this.item].name; },
+            currencyLocation() { return player.lo.items[this.item]; },
+            style() {
+                const style = {
+                    'height': '90px',
+                    'width': '90px',
+                    'min-height': 'unset',
+                };
+
+                if (hasUpgrade(this.layer, this.id)) {
+                    //todo
+                } else if (canAffordUpgrade(this.layer, this.id)) {
+                    //todo
+                } else {
+                    style['background-color'] = tmp.sta.color;
+                }
+
+                return style;
+            },
+            unlocked() { return tmp.sta.layerShown; },
         },
         //todo 54
     },

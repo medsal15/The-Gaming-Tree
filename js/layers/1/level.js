@@ -1,6 +1,5 @@
 'use strict';
 
-//todo tree skill
 addLayer('l', {
     name: 'Level',
     symbol: 'L',
@@ -406,7 +405,7 @@ addLayer('l', {
 
                 points = points.add(passive_points);
 
-                if (hasUpgrade('s', 73)) points = points.times(upgradeEffect('s', 73));
+                if (hasUpgrade('s', 23)) points = points.times(upgradeEffect('s', 23));
 
                 skill.progress = skill.progress.add(points.pow(2).times(skill_speed));
             });
@@ -432,7 +431,7 @@ addLayer('l', {
         if (inChallenge('b', 12) && !hasUpgrade('s', 43)) div = div.div(player.l.points.add(10).log10());
         if (hasUpgrade('s', 43)) div = div.div(upgradeEffect('s', 43));
 
-        if (hasUpgrade('s', 82)) div = div.div(upgradeEffect('s', 82));
+        if (hasUpgrade('s', 32)) div = div.div(upgradeEffect('s', 32));
 
         div = div.div(buyableEffect('lo', 81).divide);
 

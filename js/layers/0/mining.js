@@ -441,7 +441,7 @@ addLayer('m', {
                 if (!shiftDown) {
                     let text = '';
 
-                    if (!hasUpgrade('s', 72)) text += 'Allow crafting items with metals<br>';
+                    if (!hasUpgrade('s', 22)) text += 'Allow crafting items with metals<br>';
 
                     text += 'Tin boosts max ore health';
 
@@ -450,12 +450,12 @@ addLayer('m', {
 
                 let formula = '5√(tin ore)';
 
-                if (hasUpgrade('s', 72)) formula = '3√(tin ore)';
+                if (hasUpgrade('s', 22)) formula = '3√(tin ore)';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (!hasUpgrade('s', 72)) return D.root(player.lo.items.tin_ore.amount, 5);
+                if (!hasUpgrade('s', 22)) return D.root(player.lo.items.tin_ore.amount, 5);
 
                 return D.root(player.lo.items.tin_ore.amount, 3);
             },
@@ -727,6 +727,8 @@ addLayer('m', {
             let regen = D.dOne;
 
             regen = regen.add(tmp.l.skills.mining.effect);
+
+            if (hasChallenge('b', 62) && !inChallenge('b', 62)) regen = regen.add(tmp.sta.stats.regeneration.effect);
 
             if (hasUpgrade('m', 23)) regen = regen.times(upgradeEffect('m', 23));
 

@@ -1,6 +1,5 @@
 'use strict';
 
-//todo implement 62
 addLayer('b', {
     name: 'boss',
     symbol: 'B',
@@ -277,8 +276,8 @@ addLayer('b', {
                 return style;
             },
             onEnter() { player.xp.type = 'amalgam'; },
-            onExit() { player.xp.type = 'slime'; },
-            onComplete() { player.xp.type = 'slime'; },
+            onExit() { if (player.xp.type == 'amalgam') player.xp.type = 'slime'; },
+            onComplete() { if (player.xp.type == 'amalgam') player.xp.type = 'slime'; },
         },
         42: {
             name: 'The World Tree',
@@ -293,6 +292,8 @@ addLayer('b', {
                 if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
+            onComplete() { if (player.xp.type == 'world_tree') player.xp.type = 'slime'; },
+            onExit() { if (player.xp.type == 'world_tree') player.xp.type = 'slime'; },
         },
         // Relics
         51: {
@@ -360,9 +361,9 @@ addLayer('b', {
         62: {
             name: 'True Fight',
             challengeDescription: 'Enemies strike back. If you die, your row 1 layers are reset. Unlock a toggle for auto attacking and a new layer to help.',
-            goalDescription: 'no fucking clue lmao',
-            canComplete() { return false; },
-            rewardDescription: 'Unlock Attributes.',
+            goalDescription: 'Kill 250 enemies',
+            canComplete() { return tmp.xp.total.kills.gte(250); },
+            rewardDescription: 'Unlock Stats.',
             unlocked() { return hasChallenge('b', 42); },
             buttonStyle() {
                 const active = activeChallenge('b'),
@@ -370,7 +371,11 @@ addLayer('b', {
                 if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
-            //todo onEnter reset player player health
+            onEnter() {
+                player.xp.enemies.player.health = tmp.xp.enemies.player.health;
+                layerDataReset('sta');
+            },
+            onComplete() { layerDataReset('sta'); },
         },
         // Final
         71: {
