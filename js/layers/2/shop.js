@@ -1056,7 +1056,7 @@ addLayer('s', {
 
                 return add;
             },
-            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))} value per item`; },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))} value`; },
             cost: D(100),
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
         },

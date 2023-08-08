@@ -28,7 +28,7 @@ addLayer('suc', {
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
                     'blank',
-                    ['toggle', ['fai', 'short_mode']]
+                    ['toggle', ['suc', 'short_mode']]
                 ]],
                 'blank',
                 ['achievements', () => layers.suc.getSuccessesRows()],
@@ -40,7 +40,7 @@ addLayer('suc', {
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
                     'blank',
-                    ['toggle', ['fai', 'short_mode']]
+                    ['toggle', ['suc', 'short_mode']]
                 ]],
                 'blank',
                 ['achievements', () => layers.suc.getSuccessesRows('bonus')],
@@ -57,7 +57,7 @@ addLayer('suc', {
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
                     'blank',
-                    ['toggle', ['fai', 'short_mode']]
+                    ['toggle', ['suc', 'short_mode']]
                 ]],
                 'blank',
                 ['achievements', () => layers.suc.getSuccessesRows('secret')],
@@ -108,7 +108,7 @@ addLayer('suc', {
             tooltip() {
                 if (!hasChallenge('b', 32)) return 'Unseal ???';
 
-                return 'Unseal the Stock Market';
+                return 'Unseal Bingo';
             },
             done() { return false; },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
@@ -120,11 +120,11 @@ addLayer('suc', {
             unlocked() { return hasChallenge('b', 22); },
         },
         14: {
-            name: 'Chemistry',
+            name: '???',
             tooltip() {
                 if (!hasChallenge('b', 31)) return 'Unseal ???';
 
-                return 'Unseal the Elements';
+                return 'Unseal ???';
             },
             done() { return false; },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
@@ -136,11 +136,11 @@ addLayer('suc', {
             unlocked() { return hasChallenge('b', 22); },
         },
         15: {
-            name: 'Tell a friend',
+            name: '???',
             tooltip() {
                 if (!hasChallenge('b', 31)) return 'Unseal ???';
 
-                return 'Unseal the Party';
+                return 'Unseal ???';
             },
             done() { return false; },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
@@ -158,7 +158,7 @@ addLayer('suc', {
     tooltip() {
         if (player.suc.short_mode) {
             let pieces = [
-                layerColor('fai', `${formatWhole(layers.suc.ownedSuccesses())} / ${formatWhole(layers.suc.totalSuccesses())}`),
+                layerColor('suc', `${formatWhole(layers.suc.ownedSuccesses())} / ${formatWhole(layers.suc.totalSuccesses())}`),
             ];
             if (tmp.suc.tabFormat['Bonus'].unlocked) {
                 const color = tmp.suc.tabFormat['Bonus'].buttonStyle['border-color'];

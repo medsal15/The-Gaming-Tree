@@ -79,6 +79,7 @@ let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.6</h3><br>
 		- Added 3 new layers.<br>
 		- Added the 4th boss, miniboss, and relic.<br>
+		- QoL: Added automatic upgrades to row 1 layers.<br>
 		- Update endgame: Beat the 4th boss.<br>
 	<h3>v0.5</h3><br>
 		- Added 1 new layer.<br>

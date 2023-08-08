@@ -14,6 +14,7 @@ addLayer('m', {
             last_drops_times: D.dZero,
             mode: 'shallow',
             show_deep: false,
+            auto_upgrade: true,
         };
     },
     tooltip() {
@@ -140,6 +141,11 @@ addLayer('m', {
                     'blank',
                     ['toggle', ['m', 'short_mode']]
                 ]],
+                () => hasChallenge('b', 21) ? ['row', [
+                    ['display-text', 'Automatically buy upgrades'],
+                    'blank',
+                    ['toggle', ['m', 'auto_upgrade']],
+                ]] : undefined,
                 'blank',
                 'upgrades',
             ],
@@ -861,4 +867,5 @@ addLayer('m', {
             'border-radius': 0,
         }
     },
+    autoUpgrade() { return hasChallenge('b', 21) && player.m.auto_upgrade; },
 });

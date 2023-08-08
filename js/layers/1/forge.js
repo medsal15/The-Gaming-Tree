@@ -234,7 +234,7 @@ addLayer('f', {
                         <span style="color:#AA5555;">Reset ALL affected buyables</span>`;
                 }
 
-                let formula = '(depth ^ 2) * 100';
+                let formula = '/(depth ^ 2) * 100';
 
                 return `Formula: ${formula}`;
             },
@@ -243,9 +243,9 @@ addLayer('f', {
                     stone_brick: D(1 / 100),
                     copper_ingot: D(1 / 100),
                     tin_ingot: D(1 / 100),
-                    coal: D(1 / 200),
-                    iron_ingot: D(1 / 200),
-                    gold_ingot: D(1 / 200),
+                    coal: D(1 / 400),
+                    iron_ingot: D(1 / 400),
+                    gold_ingot: D(1 / 400),
                 };
             },
             cost: D(25),

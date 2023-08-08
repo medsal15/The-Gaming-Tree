@@ -204,13 +204,13 @@ addLayer('cas', {
             }
 
             return ['row', [
-                ['clickable', `swap_chances_left_${item_id}`],
                 ['clickable', `swap_weights_left_${item_id}`],
+                ['clickable', `swap_chances_left_${item_id}`],
                 'blank',
                 ['display-text', ' is currently replaced by '],
                 'blank',
-                ['clickable', `swap_chances_right_${item_id}`],
                 ['clickable', `swap_weights_right_${item_id}`],
+                ['clickable', `swap_chances_right_${item_id}`],
             ]];
         },
     },
@@ -262,6 +262,8 @@ addLayer('cas', {
                         }
                     },
                     display() {
+                        if (!(r_mode in item().sources)) return '';
+
                         let mode_text = {
                             challenge: 'challenge',
                             chances: 'chances',
@@ -275,9 +277,20 @@ addLayer('cas', {
 
                         if (inChallenge('b', 52)) return r_mode == 'chances';
 
-                        return r_mode in item().sources;
+                        //return r_mode in item().sources;
+                        return true;
                     },
                     style() {
+                        if (!(r_mode in item().sources)) return {
+                            'height': '80px',
+                            'width': '80px',
+                            'min-height': 'unset',
+                            'background-color': 'transparent',
+                            'box-shadow': 'none',
+                            'border-width': '0',
+                            'cursor': 'initial',
+                        };
+
                         const style = Object.assign({
                             'height': '80px',
                             'width': '80px',
