@@ -195,7 +195,12 @@ addLayer('b', {
             challengeDescription: 'All resource gains are divided by log10(amount + 10), unlock a new layer.',
             goalDescription: 'Pay off your loan.',
             canComplete() { return hasUpgrade('s', 81); },
-            rewardDescription() { return `Unlock zombies and keep the new layer. Your mining upgrades are always visible and ${layerColor('xp', tmp.xp.upgrades[22].title, 'text-shadow:#000 0 0 10px')} also affects all enemies at half its amount.`; },
+            rewardDescription() {
+                return `Unlock zombies and keep the new layer.\
+                    Your mining upgrades are always visible,\
+                    ${layerColor('xp', tmp.xp.upgrades[22].title, 'text-shadow:#000 0 0 10px')} also affects all enemies at half its amount,\
+                    and automate xp upgrade.`;
+            },
             unlocked() { return player.b.points.gte(2); },
             buttonStyle() {
                 const active = activeChallenge('b'),
@@ -209,7 +214,7 @@ addLayer('b', {
             challengeDescription: 'All enemies gain 5% of health regeneration, you lose 1% of skill progress per second, but you unlock a new item.',
             goalDescription: 'Make holy water and purify the monsters.',
             canComplete() { return player.lo.items.holy_water.amount.gt(0); },
-            rewardDescription: 'Unlock ents. Your tree upgrades are always visible. Unlock a skill for mining and get a free skill point.',
+            rewardDescription: 'Unlock ents. Your tree upgrades are always visible. Unlock a skill for mining, get a free skill point, and automate mining upgrades.',
             unlocked() { return player.b.points.gte(3); },
             buttonStyle() {
                 const active = activeChallenge('b'),
@@ -223,7 +228,7 @@ addLayer('b', {
             challengeDescription: 'Enemy level is squared, plank gain is halved, third column tree upgrades\' effects are square rooted.',
             goalDescription: 'Reach a thousand heat',
             canComplete() { return player.f.points.gte(1e3); },
-            rewardDescription: 'Unlock stars, the alternator, and a skill for trees.',
+            rewardDescription: 'Unlock stars, the alternator, a skill for trees, and automate tree upgrades.',
             unlocked() { return player.b.points.gte(4); },
             buttonStyle() {
                 const active = activeChallenge('b'),
@@ -503,10 +508,19 @@ addLayer('b', {
         return false;
     },
     prestigeButtonText() {
-        if (player.b.points.eq(0)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['slime'].name} kills`;
-        if (player.b.points.eq(1)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['goblin'].name} kills`;
-        if (player.b.points.eq(2)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['zombie'].name} kills`;
-        if (player.b.points.eq(3)) return `Your next boss will be at ${format(getNextAt('b'))} ${layers.xp.enemies['ent'].name} kills`;
+        if (player.b.points.eq(0)) return `Your next boss will be at ${format(getNextAt('b'))} ${tmp.xp.enemies['slime'].name} kills`;
+        if (player.b.points.eq(1)) {
+            const name = hasChallenge('b', 11) ? tmp.xp.enemies['goblin'].name : '???';
+            return `Your next boss will be at ${format(getNextAt('b'))} ${name} kills`;
+        }
+        if (player.b.points.eq(2)) {
+            const name = hasChallenge('b', 12) ? tmp.xp.enemies['zombie'].name : '???';
+            return `Your next boss will be at ${format(getNextAt('b'))} ${name} kills`;
+        }
+        if (player.b.points.eq(3)) {
+            const name = hasChallenge('b', 21) ? tmp.xp.enemies['ent'].name : '???';
+            return `Your next boss will be at ${format(getNextAt('b'))} ${name} kills`;
+        }
         return 'There are no more bosses to fight';
     },
     prestigeNotify() { return tmp.b.getResetGain.gte(1); },

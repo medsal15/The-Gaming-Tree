@@ -1,5 +1,6 @@
 'use strict';
 
+//todo? tree colors for layer display
 addLayer('t', {
     name: 'Tree',
     symbol: 'T',
@@ -18,6 +19,7 @@ addLayer('t', {
             current: '',
             focus: '',
             convert: false,
+            auto_upgrade: true,
         };
     },
     tooltip() {
@@ -139,6 +141,21 @@ addLayer('t', {
 
                     return `You have ${listFormat.format(tmp.t.trees['*'].items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
                 }],
+                ['row', [
+                    ['display-text', 'Short tooltip mode'],
+                    'blank',
+                    ['toggle', ['t', 'short_mode']]
+                ]],
+                () => hasUpgrade('t', 12) ? ['row', [
+                    ['display-text', 'Convert wood'],
+                    'blank',
+                    ['toggle', ['t', 'convert']],
+                ]] : undefined,
+                () => hasChallenge('b', 22) ? ['row', [
+                    ['display-text', 'Automatically buy upgrades'],
+                    'blank',
+                    ['toggle', ['t', 'auto_upgrade']],
+                ]] : undefined,
                 'blank',
                 ['upgrades', [1, 2, 3]],
             ],
@@ -1040,4 +1057,5 @@ addLayer('t', {
     },
     branches: [() => player.f.unlocked ? 'f' : 'lo'],
     prestigeNotify() { return !hasUpgrade('t', 22) && player.t.current; },
+    autoUpgrade() { return hasChallenge('b', 22) && player.t.auto_upgrade; },
 });

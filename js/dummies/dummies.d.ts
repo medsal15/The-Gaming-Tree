@@ -2486,8 +2486,11 @@ type Player = {
                 name?: string
             }
         }
-        auto_attack_current: boolean
-        auto_attack_all: boolean
+        auto: {
+            attack_current: boolean
+            attack_all: boolean
+            upgrade: boolean
+        }
     }
     m: LayerData & {
         health: Decimal
@@ -2498,6 +2501,7 @@ type Player = {
         mode: 'shallow' | 'deep'
         /** If true, shows deep mining upgrades */
         show_deep: boolean
+        auto_upgrade: boolean
     }
     t: LayerData & {
         short_mode: boolean
@@ -2516,6 +2520,7 @@ type Player = {
         /** Current focused tree, only used with `options.noRNG` */
         focus: string
         convert: boolean
+        auto_upgrade: boolean
     }
     // Row 1
     l: LayerData & {

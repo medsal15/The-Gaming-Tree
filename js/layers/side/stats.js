@@ -139,7 +139,7 @@ addLayer('sta', {
                         Increase regeneration by ${shiftDown ? `[${formula}]` : format(effect)}`;
                 } else {
                     return `${formatWhole(player.sta.stats[this.id].points)} points in regeneration<br>\
-                        Multiply ore regeneration by ${shiftDown ? `[${formula}]` : format(effect)}`;
+                        Increase ore regeneration by ${shiftDown ? `[${formula}]` : format(effect)}`;
                 }
             },
         },

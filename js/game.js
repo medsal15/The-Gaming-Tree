@@ -170,8 +170,9 @@ function rowReset(row, layer) {
 }
 
 /**
- * @param {String} layer
- * @param {String[]} keep
+ * @template {keyof player} T
+ * @param {T} layer
+ * @param {(keyof player[T])[]} keep
  */
 function layerDataReset(layer, keep = []) {
 	let storedData = { unlocked: player[layer].unlocked, forceTooltip: player[layer].forceTooltip, noRespecConfirm: player[layer].noRespecConfirm, prevTab: player[layer].prevTab } // Always keep these

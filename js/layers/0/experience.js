@@ -17,8 +17,11 @@ addLayer('xp', {
                 last_drops_times: D.dZero,
                 element: 'none',
             }])),
-            auto_attack_current: true,
-            auto_attack_all: true,
+            auto: {
+                attack_current: true,
+                attack_all: true,
+                upgrade: true,
+            },
         };
     },
     tooltip() {
@@ -125,12 +128,12 @@ addLayer('xp', {
                             ['row', [
                                 ['display-text', 'Auto attack current enemy'],
                                 'blank',
-                                ['toggle', ['xp', 'auto_attack_current']],
+                                ['clickable', 'auto_attack_current'],
                             ]],
                             ['row', [
                                 ['display-text', 'Auto attack all enemies'],
                                 'blank',
-                                ['toggle', ['xp', 'auto_attack_all']],
+                                ['clickable', 'auto_attack_all'],
                             ]],
                         ]];
                     }
@@ -168,6 +171,11 @@ addLayer('xp', {
                             and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')} kills`;
                     },
                 ],
+                () => hasChallenge('b', 12) ? ['row', [
+                    ['display-text', 'Automatically buy upgrades'],
+                    'blank',
+                    ['clickable', 'auto_upgrade'],
+                ]] : undefined,
                 'blank',
                 ['upgrades', [1, 2, 3, 4]],
             ],
@@ -283,6 +291,43 @@ addLayer('xp', {
                 const i = tmp.xp.enemies['*'].list.indexOf(player.xp.type);
                 if (i == -1) player.xp.type = tmp.xp.enemies['*'].list[0];
                 else player.xp.type = tmp.xp.enemies['*'].list[i + 1];
+            },
+        },
+        // Auto clickables that look like toggles
+        'auto_attack_current': {
+            unlocked() { return inChallenge('b', 62) || hasChallenge('b', 62); },
+            canClick() { return inChallenge('b', 62) || hasChallenge('b', 62); },
+            onClick() { player.xp.auto.attack_current = !player.xp.auto.attack_current; },
+            display() { return player.xp.auto.attack_current ? 'ON' : 'OFF'; },
+            style: {
+                'height': '40px',
+                'width': '40px',
+                'min-height': 'unset',
+                'font-size': '.8em',
+            },
+        },
+        'auto_attack_all': {
+            unlocked() { return inChallenge('b', 62) || hasChallenge('b', 62); },
+            canClick() { return inChallenge('b', 62) || hasChallenge('b', 62); },
+            onClick() { player.xp.auto.attack_all = !player.xp.auto.attack_all; },
+            display() { return player.xp.auto.attack_all ? 'ON' : 'OFF'; },
+            style: {
+                'height': '40px',
+                'width': '40px',
+                'min-height': 'unset',
+                'font-size': '.8em',
+            },
+        },
+        'auto_upgrade': {
+            unlocked() { return hasChallenge('b', 12); },
+            canClick() { return hasChallenge('b', 12); },
+            onClick() { player.xp.auto.upgrade = !player.xp.auto.upgrade; },
+            display() { return player.xp.auto.upgrade ? 'ON' : 'OFF'; },
+            style: {
+                'height': '40px',
+                'width': '40px',
+                'min-height': 'unset',
+                'font-size': '.8em',
             },
         },
     },
@@ -610,6 +655,8 @@ addLayer('xp', {
 
                     if (inChallenge('b', 61)) {
                         player_data.element = tmp.mag.elements['*'].random;
+                    } else if (hasChallenge('b', 61)) {
+                        player_data.element = layers.mag.elements['*'].element(type);
                     }
                     if (inChallenge('b', 62) || hasChallenge('b', 62)) {
                         addPoints('sta', tmp.sta.stats['*'].gain);
@@ -840,7 +887,7 @@ addLayer('xp', {
                 return add;
             },
             dps_mult_active() {
-                if ((inChallenge('b', 62) || hasChallenge('b', 62)) && !player.xp.auto_attack_current) return D.dZero;
+                if ((inChallenge('b', 62) || hasChallenge('b', 62)) && !player.xp.auto.attack_current) return D.dZero;
 
                 let mult = D.dZero;
 
@@ -849,7 +896,7 @@ addLayer('xp', {
                 return mult;
             },
             dps_mult_inactive() {
-                if ((inChallenge('b', 62) || hasChallenge('b', 62)) && !player.xp.auto_attack_all) return D.dZero;
+                if ((inChallenge('b', 62) || hasChallenge('b', 62)) && !player.xp.auto.attack_all) return D.dZero;
 
                 let mult = D.dZero;
 
@@ -1475,7 +1522,8 @@ addLayer('xp', {
     doReset(layer, force = false) {
         if (!force && layers[layer].row <= this.row) return;
 
-        const keep = ['type', 'auto_attack_current', 'auto_attack_all'],
+        /** @type {(keyof player['xp'])[]} */
+        const keep = ['type', 'auto'],
             kept_ups = [...player.xp.upgrades];
 
         kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 12).xp_hold).toNumber();
@@ -1490,4 +1538,5 @@ addLayer('xp', {
             element: layers.mag.elements['*'].element(type),
         });
     },
+    autoUpgrade() { return hasChallenge('b', 12) && player.xp.auto.upgrade; },
 });
