@@ -1,5 +1,7 @@
 'use strict';
 
+//todo c achievements
+//todo p achievements
 addLayer('suc', {
     name: 'Successes',
     image: `./resources/images/cracked-disc.svg`,
@@ -73,6 +75,61 @@ addLayer('suc', {
     },
     achievements: {
         //#region Normal Successes
+        21: {
+            name: 'New friend',
+            tooltip: 'Tame an innocent slime',
+            done() { return player.xp_alt.monsters.slime.tamed.gte(1); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.xp_alt.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.xp_alt.color;
+                return s;
+            },
+        },
+        22: {
+            name: 'You monster',
+            tooltip: 'Kill a friendly slime',
+            done() { return player.xp_alt.unlocked && player.xp.enemies.slime.kills.gte(1); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.xp_alt.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.xp_alt.color;
+                return s;
+            },
+        },
+        23: {
+            name: 'Passive friendship',
+            tooltip: 'Passively tame slimes',
+            done() { return hasUpgrade('xp_alt', 22); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.xp_alt.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.xp_alt.color;
+                return s;
+            },
+        },
+        24: {
+            name: 'Snack time',
+            tooltip: 'Buy all 3 snack upgrades',
+            done() { return [11, 21, 31].every(id => hasUpgrade('xp_alt', id)); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.xp_alt.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.xp_alt.color;
+                return s;
+            },
+        },
+        25: {
+            name: 'Newer friend',
+            tooltip: 'Tame a goblin',
+            done() { return D.gt(player.xp_alt.monsters.goblin.tamed, 0); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.xp_alt.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.xp_alt.color;
+                return s;
+            },
+        },
         //#endregion Normal Successes
         //#region Bonus Successes
         11: {
@@ -191,7 +248,7 @@ addLayer('suc', {
         switch (type) {
             case 'normal':
             default:
-                rows = [];
+                rows = [2];
                 break;
             case 'bonus':
                 rows = [1];

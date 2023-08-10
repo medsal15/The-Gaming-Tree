@@ -100,7 +100,7 @@ addLayer('star', {
             canClick: true,
             onClick() {
                 showNavTab('tree-tab');
-                showTab('xp');
+                showTab(tmp.xp.layerShown ? 'xp' : 'a');
                 player.star.time = tmp.star.star.time;
             },
             tooltip: 'Escape the star and return to XP',
@@ -108,7 +108,15 @@ addLayer('star', {
     },
     /** @type {Layers['star']['star']} */
     star: {
-        time() { return D.div(5, D.add(tmp.xp.enemies.star.level, 1).pow(2)); },
+        time() {
+            let base_time = D(5);
+
+            if (hasUpgrade('xp_alt', 33)) base_time = base_time.add(upgradeEffect('xp_alt', 33));
+
+            let time = D.div(base_time, D.add(tmp.xp.enemies.star.level, 1).pow(2));
+
+            return time;
+        },
         size() { return D(3).add(tmp.xp.enemies.star.level).min(10); },
         targets() { return D.add(tmp.xp.enemies.star.level, 1); },
     },
@@ -134,7 +142,7 @@ addLayer('star', {
 
                 if (player.star.auto_leave && D.lte(player.xp.enemies.star.health, 0)) {
                     showNavTab('tree-tab');
-                    showTab('xp');
+                    showTab(tmp.xp.layerShown ? 'xp' : 'a');
                 } else {
                     player.star.targets = [];
                     for (let i = 0; D.lt(i, tmp.star.star.targets); i++) {

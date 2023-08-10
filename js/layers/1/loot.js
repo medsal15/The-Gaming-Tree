@@ -2641,8 +2641,10 @@ addLayer('lo', {
                 /** @type {[drop_sources, string]} */
                 const [from, sub] = type.split(':');
                 switch (from) {
-                    case 'enemy': return tmp.xp.enemies[sub].name;
-                    case 'mining': return `${layers.m.ore.mode(sub)} ${tmp.m.name.toLowerCase()}`.trim();
+                    case 'enemy':
+                        return tmp.xp.enemies[sub].name;
+                    case 'mining':
+                        return `${layers.m.ore.mode(sub)} ${tmp.m.name.toLowerCase()}`.trim();
                     case 'tree':
                         if (sub == 'convertion') return 'Convertion';
                         return `Chopping ${tmp.t.trees[sub].name}`;
@@ -2651,6 +2653,8 @@ addLayer('lo', {
                         if (sub == 'fuel') text += 'fueling';
                         if (sub == 'smelt') text += 'smelting';
                         return text;
+                    case 'tamed': case 'tamed_kill':
+                        return `tamed ${tmp.xp_alt.monsters[sub].name}`;
                 }
             },
             can_drop(type) {
@@ -2658,10 +2662,21 @@ addLayer('lo', {
                 /** @type {[drop_sources, string]} */
                 const [from, sub] = type.split(':');
 
-                if (from == 'enemy') return hasUpgrade('lo', 11) || hasUpgrade('s', 22) || sub == 'star';
-                if (from == 'mining') return tmp.m.layerShown;
-                if (from == 'tree') return tmp.t.layerShown;
-                if (from == 'forge') return tmp.f.layerShown;
+                switch (from) {
+                    case 'enemy':
+                        return hasUpgrade('lo', 11) || hasUpgrade('s', 22) || sub == 'star';
+                    case 'mining':
+                        return tmp.m.layerShown;
+                    case 'tree':
+                        return tmp.t.layerShown;
+                    case 'forge':
+                        return tmp.f.layerShown;
+                    case 'tamed_kill':
+                        if (!hasUpgrade('lo', 11) && !hasUpgrade('s', 22)) return false;
+                    case 'tamed':
+                        return tmp.xp_alt.layerShown && (tmp.xp_alt.monsters[sub].unlocked ?? true);
+                }
+
                 return false;
             },
             amount() { return Object.values(player.lo.items).reduce((sum, { amount }) => D.add(sum, amount), D.dZero); },
@@ -2751,9 +2766,24 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
 
-                    if (hasUpgrade('xp', 43)) chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                    if (hasUpgrade('xp', 43)) chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
 
+                    chances['tamed_kill:slime'] = chances['enemy:slime'];
                     return chances;
+                },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.xp_alt.layerShown) {
+                        const monsters = tmp.xp_alt.monsters;
+                        Object.keys(monsters)
+                            .filter(type => type != '*' && (monsters[type].unlocked ?? true) && Array.isArray(monsters[type].produces) && monsters[type].produces.some(([item,]) => item == this.id))
+                            .forEach(type => {
+                                per_second[`tamed:${type}`] = tmp.xp_alt.monsters[type].produces.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
                 },
             },
             name: 'slime goo',
@@ -2774,9 +2804,24 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
 
-                    if (hasUpgrade('xp', 43)) chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                    if (hasUpgrade('xp', 43)) chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
 
+                    chances['tamed_kill:slime'] = chances['enemy:slime'];
                     return chances;
+                },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.xp_alt.layerShown) {
+                        const monsters = tmp.xp_alt.monsters;
+                        Object.keys(monsters)
+                            .filter(type => type != '*' && (monsters[type].unlocked ?? true) && Array.isArray(monsters[type].produces) && monsters[type].produces.some(([item,]) => item == this.id))
+                            .forEach(type => {
+                                per_second[`tamed:${type}`] = tmp.xp_alt.monsters[type].produces.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
                 },
             },
             name: 'slime core shard',
@@ -2797,8 +2842,9 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
 
-                    if (hasUpgrade('xp', 43)) chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                    if (hasUpgrade('xp', 43)) chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
 
+                    chances['tamed_kill:slime'] = chances['enemy:slime'];
                     return chances;
                 },
             },
@@ -2821,7 +2867,25 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
 
+                    chances['tamed_kill:goblin'] = chances['enemy:goblin'];
                     return chances;
+                },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.xp_alt.layerShown) {
+                        const monsters = tmp.xp_alt.monsters;
+                        Object.keys(monsters)
+                            .filter(type => type != '*' &&
+                                (monsters[type].unlocked ?? true) &&
+                                Array.isArray(monsters[type].produces) &&
+                                monsters[type].produces.some(([item,]) => item == this.id))
+                            .forEach(type => {
+                                per_second[`tamed:${type}`] = tmp.xp_alt.monsters[type].produces.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
                 },
             },
             name: 'red fabric',
@@ -2843,7 +2907,22 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
 
+                    chances['tamed_kill:goblin'] = chances['enemy:goblin'];
                     return chances;
+                },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.xp_alt.layerShown) {
+                        const monsters = tmp.xp_alt.monsters;
+                        Object.keys(monsters)
+                            .filter(type => type != '*' && (monsters[type].unlocked ?? true) && Array.isArray(monsters[type].produces) && monsters[type].produces.some(([item,]) => item == this.id))
+                            .forEach(type => {
+                                per_second[`tamed:${type}`] = tmp.xp_alt.monsters[type].produces.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
                 },
             },
             name: 'pyrite coin',
@@ -2865,6 +2944,7 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
 
+                    chances['tamed_kill:goblin'] = chances['enemy:goblin'];
                     return chances;
                 },
             },
@@ -2888,7 +2968,22 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 41)) chances['enemy:zombie'] = D.times(chances['enemy:zombie'], 2);
 
+                    chances['tamed_kill:zombie'] = chances['enemy:zombie'];
                     return chances;
+                },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.xp_alt.layerShown) {
+                        const monsters = tmp.xp_alt.monsters;
+                        Object.keys(monsters)
+                            .filter(type => type != '*' && (monsters[type].unlocked ?? true) && Array.isArray(monsters[type].produces) && monsters[type].produces.some(([item,]) => item == this.id))
+                            .forEach(type => {
+                                per_second[`tamed:${type}`] = tmp.xp_alt.monsters[type].produces.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
                 },
             },
             name: 'rotten flesh',
@@ -2910,7 +3005,22 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 41)) chances['enemy:zombie'] = D.times(chances['enemy:zombie'], 2);
 
+                    chances['tamed_kill:zombie'] = chances['enemy:zombie'];
                     return chances;
+                },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.xp_alt.layerShown) {
+                        const monsters = tmp.xp_alt.monsters;
+                        Object.keys(monsters)
+                            .filter(type => type != '*' && (monsters[type].unlocked ?? true) && Array.isArray(monsters[type].produces) && monsters[type].produces.some(([item,]) => item == this.id))
+                            .forEach(type => {
+                                per_second[`tamed:${type}`] = tmp.xp_alt.monsters[type].produces.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
                 },
             },
             name: 'brain',
@@ -2933,7 +3043,22 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 42)) chances['enemy:ent'] = chances['enemy:ent'].times(2);
 
+                    chances['tamed_kill:ent'] = chances['enemy:ent'];
                     return chances;
+                },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.xp_alt.layerShown) {
+                        const monsters = tmp.xp_alt.monsters;
+                        Object.keys(monsters)
+                            .filter(type => type != '*' && (monsters[type].unlocked ?? true) && Array.isArray(monsters[type].produces) && monsters[type].produces.some(([item,]) => item == this.id))
+                            .forEach(type => {
+                                per_second[`tamed:${type}`] = tmp.xp_alt.monsters[type].produces.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
                 },
             },
             name: 'leaf',
@@ -2955,7 +3080,22 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 42)) chances['enemy:ent'] = chances['enemy:ent'].times(2);
 
+                    chances['tamed_kill:ent'] = chances['enemy:ent'];
                     return chances;
+                },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.xp_alt.layerShown) {
+                        const monsters = tmp.xp_alt.monsters;
+                        Object.keys(monsters)
+                            .filter(type => type != '*' && (monsters[type].unlocked ?? true) && Array.isArray(monsters[type].produces) && monsters[type].produces.some(([item,]) => item == this.id))
+                            .forEach(type => {
+                                per_second[`tamed:${type}`] = tmp.xp_alt.monsters[type].produces.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
                 },
             },
             name: 'seed',
@@ -3440,7 +3580,7 @@ addLayer('lo', {
     type: 'static',
     baseAmount: D.dZero,
     requires: D.dOne,
-    branches: ['xp'],
+    branches: [() => tmp.xp.layerShown ? 'xp' : ['xp_alt', 3]],
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 

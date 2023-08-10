@@ -687,7 +687,7 @@ addLayer('ach', {
         192: {
             name: 'Uncaught TypeError: player.xp is undefined',
             tooltip: 'No more murder',
-            done() { return false; },
+            done() { return hasUpgrade('a', 11); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.a.color); },
             style() {
                 let s = {};
@@ -702,7 +702,7 @@ addLayer('ach', {
         193: {
             name: 'Uncaught TypeError: player.m is null',
             tooltip: 'Stop mining',
-            done() { return false; },
+            done() { return hasUpgrade('a', 12); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.a.color); },
             style() {
                 let s = {};
@@ -717,7 +717,7 @@ addLayer('ach', {
         194: {
             name: 'Uncaught TypeError: player.t is unset',
             tooltip: 'Lose your trees',
-            done() { return false; },
+            done() { return hasUpgrade('a', 13); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Achievement Unlocked!", 3, tmp.a.color); },
             style() {
                 let s = {};

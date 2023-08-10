@@ -28,7 +28,9 @@ addLayer('xp', {
         return `${formatWhole(player.xp.points)} experience<br>${formatWhole(tmp.xp.total.kills)} kills`;
     },
     color() { return tmp.xp.enemies[player.xp.type].color; },
-    color_kill: '#9F9F5F',
+    layerShown() { return !tmp.xp.deactivated; },
+    deactivated() { return hasUpgrade('a', 11); },
+    color_kill: '#999955',
     row: 0,
     position: 0,
     resource: 'experience',
@@ -36,7 +38,7 @@ addLayer('xp', {
         {
             key: 'X',
             description: 'Shift + X: Display experience points layer',
-            unlocked() { return player.xp.unlocked; },
+            unlocked() { return player.xp.unlocked && !tmp.xp.deactivated; },
             onPress() { if (player.xp.unlocked) showTab('xp'); },
         },
         {
@@ -99,7 +101,10 @@ addLayer('xp', {
                             and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')}${kill_text} kills`;
                     },
                 ],
-                () => { if (tmp.xp.enemies['*'].drops_mult.neq(1) && layers.lo.items['*'].can_drop('enemy:')) return ['display-text', `Drop chances multiplier: *${format(tmp.xp.enemies['*'].drops_mult)}`]; },
+                () => {
+                    if (tmp.xp.enemies['*'].drops_mult.neq(1) && layers.lo.items['*'].can_drop('enemy:'))
+                        return ['display-text', `Drop chances multiplier: *${format(tmp.xp.enemies['*'].drops_mult)}`];
+                },
                 'blank',
                 ['bar', 'health'],
                 ['display-text', () => {
@@ -829,10 +834,16 @@ addLayer('xp', {
                 if (hasUpgrade('xp', 23)) mult = mult.times(upgradeEffect('xp', 23));
                 if (hasUpgrade('xp', 42)) mult = mult.times(upgradeEffect('xp', 42));
 
+                mult = mult.times(tmp.l.skills.learning.effect);
+
                 mult = mult.times(buyableEffect('lo', 11));
 
                 if (inChallenge('b', 12) && !hasUpgrade('s', 41)) mult = mult.div(player.xp.points.add(10).log10());
                 if (hasUpgrade('s', 41)) mult = mult.div(upgradeEffect('s', 41));
+
+                // Alt
+                if (hasUpgrade('xp_alt', 21)) mult = mult.times(upgradeEffect('xp_alt', 21).pow(tmp.a.change_efficiency));
+                if (hasUpgrade('xp_alt', 23)) mult = mult.times(upgradeEffect('xp_alt', 23).pow(tmp.a.change_efficiency));
 
                 return mult;
             },
