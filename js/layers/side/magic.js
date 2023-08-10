@@ -291,4 +291,5 @@ addLayer('mag', {
 
         addPoints('mag', D.times(tmp.mag.mana.gain, diff));
     },
+    prestigeNotify() { return player.mag.points.gte(tmp.mag.mana.cost); },
 });
