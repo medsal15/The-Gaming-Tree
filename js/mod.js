@@ -33,6 +33,7 @@ let modInfo = {
 		'layers/2/boss.js', 'layers/2/shop.js', 'layers/2/alternator.js',
 
 		'alternate/side/successes.js',
+		'alternate/0/experience.js',
 	],
 	/**
 	 * If you have a Discord server or other discussion place, you can add a link to it.
@@ -65,17 +66,20 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.6',
+	num: 'R0.A',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
-	name: 'Gluttony',
+	name: 'Reconstruct',
 };
 
 /**
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.A</h3><br>
+		- Added 3 new layers.<br>
+		- Update endgame: Get all 3 new layers.<br>
 	<h3>v0.6</h3><br>
 		- Added 3 new layers.<br>
 		- Added the 4th boss, miniboss, and relic.<br>
@@ -188,7 +192,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return hasChallenge('b', 22);
+	return [11, 12, 13].every(id => hasUpgrade('a', id));
 }
 
 

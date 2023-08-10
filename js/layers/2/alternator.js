@@ -49,12 +49,19 @@ addLayer('a', {
                 'blank',
                 ['display-text', `<span style="color:#AA5555;">Alternating a layer will radically change its function and effects</span>`],
                 ['display-text', `<span style="color:#AA5555;">Alternating a layer will increase the cost to alternate other layers</span>`],
+                ['display-text', () => `<span style="color:#AA5555;">Layer effects are ^${format(tmp.a.change_efficiency)} as efficient between alternate and normal layers</span>`],
+                'blank',
                 ['upgrade-tree', [
                     [11, 12, 13],
                     [21, 22, 23],
                     [31, 32, 33],
                     [14, 24, 34, 44, 54],
                 ]],
+                () => {
+                    if (hasUpgrade('a', 11)) {
+                        return ['clickable', 11];
+                    }
+                },
             ],
             buttonStyle: {
                 'border-image-source'() { return tmp.a.nodeStyle['background-image']; },
@@ -62,11 +69,27 @@ addLayer('a', {
             },
         },
     },
+    clickables: {
+        11: {
+            style: {
+                'background-image': `url('./resources/images/gladius.svg')`,
+                'background-color'() { return tmp.xp.enemies.star.color; },
+                'background-origin': 'border-box',
+            },
+            onClick() {
+                player.star.time = tmp.star.star.time;
+                showTab('none');
+                showNavTab('star');
+            },
+            tooltip: 'Fight the star to earn more stardust',
+            canClick: true,
+        },
+    },
     /** @type {Layers['a']['upgrades']} */
     upgrades: {
         11: {
             title: 'Alternate XP',
-            description: 'Not Yet Implemented',
+            description: 'Maybe murder is bad',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -76,9 +99,10 @@ addLayer('a', {
                 const style = {};
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.xp_alt.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.xp.color}, ${tmp.xp_alt.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.xp.color;
                 }
@@ -89,11 +113,14 @@ addLayer('a', {
                 const color = [11, 12, 13].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[21, color], [22, color]];
             },
-            canAfford: false,
+            onPurchase() {
+                player.xp_alt.unlocked = true;
+                doReset('s', true);
+            },
         },
         12: {
             title: 'Alternate Mining',
-            description: 'Not Yet Implemented',
+            description: 'There\'s no need to destroy',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -120,7 +147,7 @@ addLayer('a', {
         },
         13: {
             title: 'Alternate Tree',
-            description: 'Not Yet Implemented',
+            description: 'Go green',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -147,6 +174,7 @@ addLayer('a', {
         },
         14: {
             title: 'Alternate Achievements',
+            description: 'Does the same, but for the others',
             cost: D.dZero,
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -173,7 +201,7 @@ addLayer('a', {
         },
         21: {
             title: 'Alternate Levels',
-            description: 'Not Yet Implemented<br>Requires all 1st row layer alternates',
+            description: 'Not Yet Implemented<br>Higher, higher!<br><br>Requires all 1st row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -200,7 +228,7 @@ addLayer('a', {
         },
         22: {
             title: 'Alternate Loot',
-            description: 'Not Yet Implemented<br>Requires all 1st row layer alternates',
+            description: 'Not Yet Implemented<br>Items are great, but you can\'t eat them<br><br>Requires all 1st row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -227,7 +255,7 @@ addLayer('a', {
         },
         23: {
             title: 'Alternate Forge',
-            description: 'Not Yet Implemented<br>Requires all 1st row layer alternates',
+            description: 'Not Yet Implemented<br>Don\'t touch the thermostat<br><br>Requires all 1st row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -254,7 +282,7 @@ addLayer('a', {
         },
         24: {
             title: 'Alternate Clock',
-            description: 'Not Yet Implemented',
+            description: 'Not Yet Implemented<br>It\'s rewind time',
             cost: D.dTwo,
             item: 'stardust',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -280,7 +308,7 @@ addLayer('a', {
         },
         31: {
             title: 'Alternate Bosses',
-            description: 'Not Yet Implemented<br>Requires all 2nd row layer alternates',
+            description: 'Not Yet Implemented<br>You get to choose (or do you?)<br><br>Requires all 2nd row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -303,7 +331,7 @@ addLayer('a', {
         },
         32: {
             title: 'Alternate Shop',
-            description: 'Not Yet Implemented<br>Requires all 2nd row layer alternates',
+            description: 'Not Yet Implemented<br>Did anything change?<br><br>Requires all 2nd row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -326,7 +354,7 @@ addLayer('a', {
         },
         33: {
             title: 'Alternate Alternator',
-            description: 'Not Yet Implemented<br>Requires all other 3rd row layer alternates',
+            description: 'Not Yet Implemented<br>But what if we could have both?<br><br>Requires all other 3rd row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -350,7 +378,7 @@ addLayer('a', {
         },
         34: {
             title: 'Alternate Casino',
-            description: 'Not Yet Implemented',
+            description: 'Not Yet Implemented<br>More gambling',
             cost: D(4),
             item: 'stardust',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -376,7 +404,7 @@ addLayer('a', {
         },
         44: {
             title: 'Alternate Magic',
-            description: 'Not Yet Implemented',
+            description: 'Not Yet Implemented<br>???',
             cost: D(6),
             item: 'stardust',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -402,7 +430,7 @@ addLayer('a', {
         },
         54: {
             title: 'Alternate Stats',
-            description: 'Not Yet Implemented',
+            description: 'Not Yet Implemented<br>???',
             cost: D(8),
             item: 'stardust',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -426,7 +454,6 @@ addLayer('a', {
             },
             unlocked() { return tmp.sta.layerShown; },
         },
-        //todo 54
     },
     type: 'none',
     doReset(layer) {
@@ -437,4 +464,7 @@ addLayer('a', {
         layerDataReset(this.layer, keep);
     },
     branches: ['f'],
+    change_efficiency() {
+        return D(.5);
+    },
 });

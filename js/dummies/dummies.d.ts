@@ -1863,7 +1863,7 @@ declare class LayerData {
     buyables: { [id: number]: Decimal }
 }
 
-type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge';
+type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill';
 
 type Layers = {
     // Side
@@ -2349,6 +2349,8 @@ type Layers = {
         upgrades: {
             [id: number]: Upgrade & { item: string }
         }
+        /** Efficiency of alt effects on normal gains and vice versa as an exponent */
+        change_efficiency(): Decimal
     }
     // Alt Side
     suc: Layer<Player['ach']> & {
@@ -2356,6 +2358,55 @@ type Layers = {
         getFailures(type?: AchievementTypes): string[]
         totalFailures(type?: AchievementTypes): Decimal
         ownedFailures(type?: AchievementTypes): Decimal
+    }
+    // Alt Row 0
+    xp_alt: Layer<Player['xp_alt']> & {
+        color_tame: string
+        monsters: {
+            '*': {
+                /** List of currently unlocked monsters */
+                list(): string[]
+                /** Sum of experience gained per second */
+                experience(): Decimal
+                experience_mult(): Decimal
+                progress_mult(): Decimal
+                difficulty_add(): Decimal
+                difficulty_mult(): Decimal
+                produce_mult(): Decimal
+            }
+        } & {
+            [type: string]: {
+                readonly type: string
+                /** Color of the monster */
+                color: Computable<string>
+                name: Computable<string>
+                /** Amount of progress needed to tame */
+                difficulty(): Decimal
+                progress_gain(): Decimal
+                /** Total amount of experience produced every second */
+                experience(): Decimal
+                tames(): Decimal
+                /**
+                 * Determines whether the monster is visible
+                 *
+                 * If absent, defaults to true
+                 */
+                unlocked?: Computable<boolean>
+                /** Total items produced per second */
+                produces(): [string, Decimal][]
+                /** Amount of the monster gained every second */
+                passive_tame(): Decimal
+                /**
+                 * Get drops as if the enemy were killed
+                 *
+                 * **Does a loot roll (only important if casino is unlocked)**
+                 */
+                get_drops(kills: DecimalSource): [string, Decimal][]
+            }
+        }
+        total: {
+            tamed(): Decimal
+        }
     }
     // Special
     star: Layer<Player['star']> & {
@@ -2400,6 +2451,8 @@ type Temp = {
     a: TempLayer & RComputed<Layers['a']>
     // Alt Side
     suc: TempLayer & RComputed<Layers['suc']>
+    // Alt Row 0
+    xp_alt: TempLayer & RComputed<Layers['xp_alt']>
     // Special
     star: TempLayer & RComputed<Layers['star']>
 };
@@ -2589,6 +2642,21 @@ type Player = {
     // Alt Side
     suc: LayerData & {
         short_mode: boolean
+    }
+    // Alt Row 0
+    xp_alt: LayerData & {
+        type: string
+        clicked: boolean
+        monsters: {
+            [monster: string]: {
+                /** Monster progress left */
+                progress: Decimal
+                tamed: Decimal
+                last_drops: [string, Decimal][]
+                /** Amount of times the value in last_drops was dropped */
+                last_drops_times: Decimal
+            }
+        }
     }
     // Special
     star: LayerData & {

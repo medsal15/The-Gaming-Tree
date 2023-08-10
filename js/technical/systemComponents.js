@@ -141,7 +141,7 @@ var systemComponents = {
         Tip: All clickables can be held (for carpal tunnel prevention)<br><br>
         <h3>Hotkeys</h3><br>
 		<span v-for="keys in layered_hotkeys">
-		<span v-for="key in keys" v-if="player[key.layer].unlocked && tmp[key.layer].hotkeys[key.id].unlocked"><br>{{key.description}}</span>
+		<span v-for="key in keys" v-if="player[key.layer].unlocked && tmp[key.layer].hotkeys[key.id].unlocked"><br>{{run(key.description)}}</span>
 		</span>
 		</div>
     `

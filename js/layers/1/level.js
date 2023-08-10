@@ -304,16 +304,26 @@ addLayer('l', {
             },
             unlocked() { return hasMilestone('l', 4); },
             text() {
+                /** @type {[keyof Layers, number][]} */
+                const upgrades = [
+                    ['xp', 23],
+                    ['xp', 32],
+                    ['xp_alt', 23],
+                    ['xp_alt', 32],
+                    ['s', 23],
+                ],
+                    list = listFormat.format(upgrades.filter(([layer]) => tmp[layer].layerShown).map(([layer, upgrade]) => layerColor(layer, tmp[layer].upgrades[upgrade].title)));
+
                 if (!shiftDown) {
                     return `Reading level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to reading<br>\
-                    ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects +${format(tmp.l.skills[this.id].effect)}`;
+                    ${list} effects +${format(tmp.l.skills[this.id].effect)}`;
                 } else {
                     let effect_formula = 'level / 100';
 
                     return `Reading level ${formatWhole(player.l.skills[this.id].level)}<br>\
                     ${format(player.l.skills[this.id].points)} points assigned to reading<br>\
-                    ${layerColor('xp', tmp.xp.upgrades[23].title)} and ${layerColor('xp', tmp.xp.upgrades[32].title)} effects +[${effect_formula}]`;
+                    ${list} effects +[${effect_formula}]`;
                 }
             },
             name: 'reading',
@@ -439,12 +449,15 @@ addLayer('l', {
     },
     type: 'static',
     baseResource: 'experience points',
-    baseAmount() { return player.xp.points; },
+    baseAmount() {
+        if (tmp.xp.layerShown) return player.xp.points;
+        return player.xp_alt.points;
+    },
     requires: D(12_500),
     base: D.dTwo,
     exponent: D.dTwo,
     roundUpCost: true,
-    branches: ['xp'],
+    branches: [() => tmp.xp.layerShown ? 'xp' : ['xp_alt', 3]],
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
