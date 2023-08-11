@@ -1345,7 +1345,7 @@ addLayer('f', {
     The reasoning is the same.
     */
     clickables: new Proxy({}, {
-        /** @returns {Clickable} */
+        /** @returns {Clickable<'f'>} */
         get(obj, prop) {
             // Required to not break the auto stuff
             if (prop == 'constructor') return obj.constructor;
@@ -1558,7 +1558,7 @@ addLayer('f', {
         },
     }),
     bars: new Proxy({}, {
-        /** @returns {Bar} */
+        /** @returns {Bar<'f'>} */
         get(obj, prop) {
             // Required to not break the auto stuff
             if (prop == 'constructor') return obj.constructor;

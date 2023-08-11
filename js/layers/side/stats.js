@@ -147,11 +147,11 @@ addLayer('sta', {
     prestigeNotify() { return tmp.sta.stats['*'].left.gte(1); },
     // Oh boy! More Proxies
     clickables: new Proxy({}, {
-        /** @returns {Clickable} */
+        /** @returns {Clickable<'sta'>} */
         get(obj, prop) {
             // Required to not break the auto stuff
             if (prop == 'constructor') return obj.constructor;
-            if (prop == 'layer') return 'l';
+            if (prop == 'layer') return 'sta';
 
             if (prop in obj) return obj[prop];
 

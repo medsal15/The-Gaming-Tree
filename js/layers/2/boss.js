@@ -457,7 +457,7 @@ addLayer('b', {
 
             if (!hasUpgrade('s', 41)) {
                 player.xp.points = player.xp.points.minus(get_loss(player.xp.points)).max(0);
-                player.xp_alt.points = player.xp_alt.points.minus(get_loss(player.xp_alt.points)).max(0);
+                player.xp_alt.points = player.xp_alt.points.minus(get_loss(player.xp_alt.points).pow(tmp.a.change_efficiency)).max(0);
             }
             if (!hasUpgrade('s', 42)) {
                 const total = tmp.xp.total.kills,
@@ -469,7 +469,7 @@ addLayer('b', {
             }
             if (!false) {
                 const total = tmp.xp_alt.total.tamed,
-                    loss = get_loss(total);
+                    loss = get_loss(total).pow(tmp.a.change_efficiency);
                 if (loss.gt(0)) Object.entries(player.xp_alt.monsters).forEach(([type, data]) => {
                     const l = data.tamed.div(total).times(loss);
                     data.tamed = data.tamed.minus(l).max(0);

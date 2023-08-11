@@ -223,11 +223,11 @@ addLayer('cas', {
     regex: /^swap_(chances|weights)_(left|right)_([a-z_]+)$/,
     // The M in TMT stands for More proxies
     clickables: new Proxy({}, {
-        /** @returns {Clickable} */
+        /** @returns {Clickable<'cas'>} */
         get(obj, prop) {
             // Required to not break the auto stuff
             if (prop == 'constructor') return obj.constructor;
-            if (prop == 'layer') return 'f';
+            if (prop == 'layer') return 'cas';
 
             if (prop in obj) return obj[prop];
 
