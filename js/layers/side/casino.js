@@ -262,7 +262,8 @@ addLayer('cas', {
                         }
                     },
                     display() {
-                        if (!(r_mode in item().sources)) return '';
+                        if (inChallenge('b', 52) && r_mode == 'weights') return '';
+                        if (!inChallenge('b', 52) && !(r_mode in item().sources)) return '';
 
                         let mode_text = {
                             challenge: 'challenge',
@@ -281,15 +282,18 @@ addLayer('cas', {
                         return true;
                     },
                     style() {
-                        if (!(r_mode in item().sources)) return {
-                            'height': '80px',
-                            'width': '80px',
-                            'min-height': 'unset',
-                            'background-color': 'transparent',
-                            'box-shadow': 'none',
-                            'border-width': '0',
-                            'cursor': 'initial',
-                        };
+                        if (inChallenge('b', 52) && r_mode == 'weights') return { 'display': 'none', };
+                        if (!inChallenge('b', 52) && !(r_mode in item().sources)) {
+                            return {
+                                'height': '80px',
+                                'width': '80px',
+                                'min-height': 'unset',
+                                'background-color': 'transparent',
+                                'box-shadow': 'none',
+                                'border-width': '0',
+                                'cursor': 'initial',
+                            };
+                        }
 
                         const style = Object.assign({
                             'height': '80px',
