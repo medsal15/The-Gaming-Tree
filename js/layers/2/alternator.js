@@ -130,9 +130,10 @@ addLayer('a', {
                 const style = {};
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.a.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.m.color}, ${tmp.c.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.m.color;
                 }
@@ -143,7 +144,10 @@ addLayer('a', {
                 const color = [11, 12, 13].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[22, color]];
             },
-            canAfford: false,
+            onPurchase() {
+                player.c.unlocked = true;
+                doReset('s', true);
+            },
         },
         13: {
             title: 'Alternate Tree',

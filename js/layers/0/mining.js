@@ -33,7 +33,7 @@ addLayer('m', {
         }
     },
     layerShown() { return (hasChallenge('b', 11) || inChallenge('b', 11)) && !tmp[this.layer].deactivated; },
-    deactivated() { return inChallenge('b', 31); },
+    deactivated() { return inChallenge('b', 31) || hasUpgrade('a', 12); },
     color() {
         switch (player.m.mode) {
             case 'deep': return '#BBBBBB';
