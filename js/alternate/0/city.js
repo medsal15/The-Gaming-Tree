@@ -35,7 +35,6 @@ addLayer('c', {
             content: [
                 [
                     'display-text',
-                    () => `Current mode: ${player.c.mode}`,
                     () => {
                         const mode = {
                             'place': 'placing buildings',
@@ -43,11 +42,13 @@ addLayer('c', {
                             'toggle': 'toggling buildings',
                         }[player.c.mode];
                         return `Current mode: ${mode}`;
-                    }
+                    },
                 ],
                 ['row', [
                     ['clickable', 'place'],
+                    'blank',
                     ['clickable', 'destroy'],
+                    'blank',
                     ['clickable', 'toggle'],
                 ]],
                 'blank',
@@ -56,7 +57,7 @@ addLayer('c', {
         },
         'Buildings': {
             content: [
-                //todo
+                ['column', () => Object.keys(layers.c.buildings).map(id => layers.c.buildings['*'].show_building(id))],
             ],
         },
         'Research': {
@@ -79,7 +80,9 @@ addLayer('c', {
         getCanClick(data, _) {
             switch (player.c.mode) {
                 case 'place':
-                    return data.building == '' && player.c.building != '';
+                    return data.building == '' &&
+                        player.c.building != '' &&
+                        D.gte(getBuyableAmount('c', player.c.building), D.add(tmp.c.buildings['*'].placed[player.c.building], 1));
                 case 'destroy':
                 case 'toggle':
                     return data.building != '';
@@ -92,7 +95,7 @@ addLayer('c', {
                     if (
                         data.building == '' &&
                         player.c.building != '' &&
-                        false //todo amount left >= 1
+                        D.gte(getBuyableAmount('c', player.c.building), D.add(tmp.c.buildings['*'].placed[player.c.building], 1))
                     ) data.building = player.c.building;
                     return;
                 case 'destroy':
@@ -110,7 +113,9 @@ addLayer('c', {
             const building = tmp.c.buildings[data.building];
 
             return Object.assign(
-                {}, // Ensures that general style is not overwritten
+                {
+                    'font-size': '1em',
+                }, // Ensures that general style is not overwritten
                 building.style.general,
                 building.style.grid ?? {},
             );
@@ -119,6 +124,10 @@ addLayer('c', {
         getTooltip(data, _) {
             if (data?.building in tmp.c.buildings) return capitalize(tmp.c.buildings[data.building].name);
             return 'Empty';
+        },
+        /** @param {Player['c']['grid'][number]} data */
+        getDisplay(data, _) {
+            if (data?.building in tmp.c.buildings) return data.enabled ? 'ON' : 'OFF';
         },
     },
     buyables: new Proxy({}, {
@@ -154,10 +163,21 @@ addLayer('c', {
                         addBuyables(this.layer, this.id, 1);
                     },
                     style() {
+                        const style = {
+                            'height': '120px',
+                            'width': '120px',
+                            'min-height': 'unset',
+                        },
+                            cant = {
+                                'background': '#bf8f8f',
+                                'cursor': 'not-allowed',
+                            };
+
                         return Object.assign(
-                            {},
+                            style,
                             tmpuilding().style.general,
                             tmpuilding().style.buyable ?? {},
+                            canBuyBuyable(this.layer, this.id) ? {} : cant,
                         );
                     },
                 };
@@ -208,22 +228,51 @@ addLayer('c', {
                 /** @type {[string, 'select', string]} */
                 const [, , building] = matches;
 
-                return {
+                return obj[prop] ??= {
                     canClick() { return D.gte(getBuyableAmount('c', building), D.add(tmp.c.buildings['*'].placed[building], 1)); },
-                    onClick() { player.c.building = building; },
+                    onClick() {
+                        if (player.c.building == building) player.c.building = '';
+                        else player.c.building = building;
+                    },
                     display() { return `Select ${tmp.c.buildings[building].name}`; },
                     style() {
+                        const base = {},
+                            cant = {
+                                'background': '#bf8f8f',
+                                'cursor': 'not-allowed',
+                            };
+
+                        if (player.c.building == building) base['box-shadow'] = `${tmp.c.color} 0 0 20px`;
+
                         return Object.assign(
-                            {},
+                            base,
                             tmp.c.buildings[building].style.general,
                             tmp.c.buildings[building].style.select,
+                            tmp[this.layer].clickables[this.id].canClick ? {} : cant,
                         );
                     },
+                    unlocked: true,
                 };
             }
         },
+        getOwnPropertyDescriptor(_, prop) {
+            if (prop == 'layer' ||
+                layers.c.buildings['*'].regex.exec(prop) ||
+                ['place', 'destroy', 'toggle'].includes(prop)) return {
+                    enumerable: true,
+                    configurable: true,
+                };
+        },
+        has(_, prop) { return layers.c.buildings['*'].regex.exec(prop) || ['place', 'destroy', 'toggle'].includes(prop); },
+        ownKeys(_) {
+            return [
+                'place',
+                'destroy',
+                'toggle',
+                ...Object.keys(layers.c.buildings).map(id => `select_${id}`),
+            ];
+        },
     }),
-    //todo proxy clickables (place/destroy/enable/disable) (select building for placement)
     //todo upgrades
     /** @type {Layers['c']['resources']} */
     resources: {
@@ -257,7 +306,7 @@ addLayer('c', {
                     'blank',
                     ['display-text', tmp.c.buildings[building].description],
                     'blank',
-                    //['clickable', `select_${building}`],
+                    ['clickable', `select_${building}`],
                 ]];
             },
             produce_mult() {
@@ -272,7 +321,6 @@ addLayer('c', {
                 const building = tmp.c.buildings[this.id],
                     placed = tmp.c.buildings['*'].placed[this.id] ?? D.dZero,
                     total = getBuyableAmount('c', this.id),
-                    left = total.minus(placed),
                     /** @type {string[]} */
                     production_parts = [],
                     produces = building.produces;
@@ -280,7 +328,7 @@ addLayer('c', {
                 if ('items' in produces) {
                     production_parts.push(
                         ...produces.items
-                            .map(([item, amount]) => `+${format(amount)} ${tmp.lo.items[item].name} /s`)
+                            .map(([item, amount]) => `+${format(amount)} ${tmp.lo.items[item].name}`)
                     );
                 }
                 if ('resources' in produces) {
@@ -290,22 +338,19 @@ addLayer('c', {
                     );
                 }
 
-                return `Your ${formatWhole(placed)} ${building.name} produce ${listFormat.format(production_parts)} /s<br>\
-                    You have ${formatWhole(left)} / ${formatWhole(total)} ${building.name}`;
+                return `You have ${formatWhole(placed)} / ${formatWhole(total)} ${building.name}<br>\
+                    They produce ${listFormat.format(production_parts)} /s<br>`;
             },
             style: {
                 general: {
                     'background-color': '#BBBBBB',
-                },
-                grid: {
-                    //todo image
                 },
             },
             produces(amount_placed) {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].placed[this.id]);
 
                 /** @type {[string, Decimal][]} */
-                const items = [['stone', D(1 / 90)]];
+                const items = [['stone', D(1 / 15)]];
 
                 items.forEach(([item, amount], i) => {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult);
@@ -325,16 +370,98 @@ addLayer('c', {
                 };
             },
             cost(amount_built) {
-                const built = D(amount_built ?? 0);
+                const built = D(amount_built ?? getBuyableAmount('c', this.id));
 
-                //todo
+                let stone = D.pow(built, 1.1).times(10);
 
-                return [['stone', 0]];
+                return [['stone', stone]];
             },
             formulas: {
-                cost: [['stone', '0']],
+                cost: [['stone', '(built ^ 1.1) * 10']],
             },
         },
+        mine: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
+            name: 'mine',
+            description() {
+                const building = tmp.c.buildings[this.id],
+                    placed = tmp.c.buildings['*'].placed[this.id] ?? D.dZero,
+                    total = getBuyableAmount('c', this.id),
+                    /** @type {string[]} */
+                    production_parts = [],
+                    produces = building.produces;
+
+                if ('items' in produces) {
+                    production_parts.push(
+                        ...produces.items
+                            .map(([item, amount]) => `+${format(amount)} ${tmp.lo.items[item].name}`)
+                    );
+                }
+                if ('resources' in produces) {
+                    production_parts.push(
+                        ...produces.resources
+                            .map(([resource, amount]) => `<span style="color:${tmp.c.resources[resource].color};">+${format(amount)}</span> ${tmp.c.resources[resource].name}`)
+                    );
+                }
+
+                return `You have ${formatWhole(placed)} / ${formatWhole(total)} ${building.name}<br>\
+                    They produce ${listFormat.format(production_parts)} /s<br>`;
+            },
+            style: {
+                general: {
+                    'background': 'linear-gradient(to right, #BB7733, #CCBB88)',
+                    'background-origin': 'border-box',
+                },
+            },
+            produces(amount_placed) {
+                const placed = D(amount_placed ?? tmp.c.buildings['*'].placed[this.id]);
+
+                /** @type {[string, Decimal][]} */
+                const items = [['copper_ore', D(1 / 35)], ['tin_ore', D(1 / 140)]];
+
+                items.forEach(([item, amount], i) => {
+                    let mult = placed.times(tmp.c.buildings['*'].produce_mult);
+                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
+
+                    if (upg && hasUpgrade('s', upg)) {
+                        mult = mult.times(upgradeEffect('s', upg));
+                    } else if (inChallenge('b', 12)) {
+                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10());
+                    }
+
+                    items[i][1] = D.times(amount, mult);
+                });
+
+                return {
+                    items,
+                };
+            },
+            cost(amount_built) {
+                const built = D(amount_built ?? getBuyableAmount('c', this.id));
+
+                let stone = D.pow(1.5, built).times(15),
+                    planks = D.pow(1.25, built).times(50);
+
+                return [['stone', stone], ['plank', planks]];
+            },
+            formulas: {
+                cost: [['stone', '1.5 ^ built * 10'], ['plank', '1.5 ^ built * 50']],
+            },
+        },
+    },
+    update(diff) {
+        Object.keys(layers.c.buildings).forEach(building => {
+            const build = tmp.c.buildings[building];
+
+            if (!(build.unlocked ?? true)) return;
+
+            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                const production = build.produces.items.map(([item, amount]) => [item, D.times(amount, diff)]);
+
+                layers.lo.items['*'].gain_drops(production);
+            }
+        });
     },
     //todo update
     type: 'none',

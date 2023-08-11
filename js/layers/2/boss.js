@@ -510,6 +510,7 @@ addLayer('b', {
         return D.dInf;
     },
     canReset() {
+        if (player.b.activeChallenge) return false;
         if (player.b.points.lt(1)) return player.xp.enemies.slime.kills.gte(1_000);
         if (player.b.points.lt(2)) return player.xp.enemies.goblin.kills.gte(1_000);
         if (player.b.points.lt(3)) return player.xp.enemies.zombie.kills.gte(1_000);

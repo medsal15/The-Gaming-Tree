@@ -262,7 +262,8 @@ addLayer('cas', {
                         }
                     },
                     display() {
-                        if (!(r_mode in item().sources)) return '';
+                        if (inChallenge('b', 52) && r_mode == 'weights') return '';
+                        if (!inChallenge('b', 52) && !(r_mode in item().sources)) return '';
 
                         let mode_text = {
                             challenge: 'challenge',
