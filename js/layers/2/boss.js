@@ -457,13 +457,22 @@ addLayer('b', {
 
             if (!hasUpgrade('s', 41)) {
                 player.xp.points = player.xp.points.minus(get_loss(player.xp.points)).max(0);
+                player.xp_alt.points = player.xp_alt.points.minus(get_loss(player.xp_alt.points)).max(0);
             }
             if (!hasUpgrade('s', 42)) {
                 const total = tmp.xp.total.kills,
                     loss = get_loss(total);
                 if (loss.gt(0)) Object.entries(player.xp.enemies).forEach(([type, data]) => {
                     const l = data.kills.div(total).times(loss);
-                    data.kills[type] = data.kills.minus(l).max(0);
+                    data.kills = data.kills.minus(l).max(0);
+                });
+            }
+            if (!false) {
+                const total = tmp.xp_alt.total.tamed,
+                    loss = get_loss(total);
+                if (loss.gt(0)) Object.entries(player.xp_alt.monsters).forEach(([type, data]) => {
+                    const l = data.tamed.div(total).times(loss);
+                    data.tamed = data.tamed.minus(l).max(0);
                 });
             }
             if (!hasUpgrade('s', 43)) {

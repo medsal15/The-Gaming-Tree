@@ -1018,7 +1018,7 @@ addLayer('ach', {
         141: {
             name: 'Nullified',
             tooltip: 'Pay off all your debts/loans in the goblin CEO',
-            done() { return player.s.upgrades.filter(layers.s.investloans.is_loan).length >= 13 && inChallenge('b', 12); },
+            done() { return player.s.upgrades.filter(layers.s.investloans.is_upg_loan).length >= 13 && inChallenge('b', 12); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
             style: { 'background-color': 'rgb(127,0,255)' },
             unlocked() { return hasAchievement(this.layer, this.id); },
@@ -1026,7 +1026,7 @@ addLayer('ach', {
         142: {
             name: 'Direct',
             tooltip: 'Pay off only the boss debt/loan',
-            done() { return player.s.upgrades.filter(layers.s.investloans.is_loan) == 1 && hasUpgrade('s', 81) && (inChallenge('b', 12) || inChallenge('b', 32)); },
+            done() { return player.s.upgrades.filter(layers.s.investloans.is_upg_loan) == 1 && hasUpgrade('s', 81) && (inChallenge('b', 12) || inChallenge('b', 32)); },
             onComplete() { if (tmp.ach.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Achievement Unlocked!", 3, 'rgb(127,0,255)'); },
             style: { 'background-color': 'rgb(127,0,255)' },
             unlocked() { return hasAchievement(this.layer, this.id); },

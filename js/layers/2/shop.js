@@ -66,9 +66,9 @@ addLayer('s', {
                 ['display-text', () => `You have ${tmp.s.coins.format}`],
                 'prestige-button',
                 'blank',
-                ['display-text', () => `You have ${formatWhole(tmp.s.investloans.amount)} effective ${tmp.s.investloans.is_loans ? 'repaid loans' : 'investments'}`],
-                ['display-text', () => `<span style="color:#AA5555;">Buying a${tmp.s.investloans.is_loans ? ' loan' : 'n investment'} increases the price of all the others</span>`],
-                () => tmp.s.investloans.is_loans ? '' : ['display-text', '<span style="color:#AA5555;">Investments are reset on boss reset</span>'],
+                ['display-text', () => `You have ${formatWhole(tmp.s.investloans.amount)} effective ${tmp.s.investloans.use_loans ? 'repaid loans' : 'investments'}`],
+                ['display-text', () => `<span style="color:#AA5555;">Buying a${tmp.s.investloans.use_loans ? ' loan' : 'n investment'} increases the price of all the others</span>`],
+                () => tmp.s.investloans.use_loans ? '' : ['display-text', '<span style="color:#AA5555;">Investments are reset on boss reset</span>'],
                 'blank',
                 ['clickable', 11],
                 ['upgrades', [4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 8]],
@@ -92,18 +92,18 @@ addLayer('s', {
         //#region Loans/Investments
         41: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Experience ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Experience ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Experience';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate experience challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate experience challenge penality';
                 if (!shiftDown) return 'Boost experience gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -118,18 +118,18 @@ addLayer('s', {
         },
         42: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Kills ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Kills ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Kills';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate kills challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate kills challenge penality';
                 if (!shiftDown) return 'Boost kills gain based on investments owned';
                 let formula = 'investments / 100 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 100).add(1);
             },
             effectDisplay() {
@@ -144,18 +144,18 @@ addLayer('s', {
         },
         43: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Levels ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Levels ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Levels';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate levels challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate levels challenge penality';
                 if (!shiftDown) return 'Reduce level cost based on investments owned';
                 let formula = 'investments / 5 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 5).add(1);
             },
             effectDisplay() {
@@ -170,18 +170,18 @@ addLayer('s', {
         },
         51: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Slime Goo ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Slime Goo ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Slime Goo';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate slime goo challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate slime goo challenge penality';
                 if (!shiftDown) return 'Boost slime goo gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -196,18 +196,18 @@ addLayer('s', {
         },
         52: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Slime Core Shards ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Slime Core Shards ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Slime Core Shards';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate slime core shards challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate slime core shards challenge penality';
                 if (!shiftDown) return 'Boost slime core shard gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -222,18 +222,18 @@ addLayer('s', {
         },
         53: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Slime Cores ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Slime Cores ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Slime Cores';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate slime cores challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate slime cores challenge penality';
                 if (!shiftDown) return 'Boost slime core gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -248,18 +248,18 @@ addLayer('s', {
         },
         61: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Stone ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Stone ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Stone';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate stone challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate stone challenge penality';
                 if (!shiftDown) return 'Boost stone gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -274,18 +274,18 @@ addLayer('s', {
         },
         62: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Copper Ore ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Copper Ore ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Copper Ore';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate copper ore challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate copper ore challenge penality';
                 if (!shiftDown) return 'Boost copper ore gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -300,18 +300,18 @@ addLayer('s', {
         },
         63: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Tin Ore ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Tin Ore ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Tin Ore';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate tin ore challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate tin ore challenge penality';
                 if (!shiftDown) return 'Boost tin ore gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -326,18 +326,18 @@ addLayer('s', {
         },
         71: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Red Fabric ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Red Fabric ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Red Fabric';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate red fabric challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate red fabric challenge penality';
                 if (!shiftDown) return 'Boost red fabric gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -352,18 +352,18 @@ addLayer('s', {
         },
         72: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Pyrite Coin ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Pyrite Coin ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Pyrite Coins';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate pyrite coin challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate pyrite coin challenge penality';
                 if (!shiftDown) return 'Boost pyrite coin gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -378,18 +378,18 @@ addLayer('s', {
         },
         73: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Rusty Gear ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Rusty Gear ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Rusty Gears';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate rusty gear challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate rusty gear challenge penality';
                 if (!shiftDown) return 'Boost rusty gear gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -404,22 +404,22 @@ addLayer('s', {
         },
         81: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Boss ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Boss ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Bosses';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Allows completion of the challenge';
+                if (tmp.s.investloans.use_loans) return 'Allows completion of the challenge';
                 if (!shiftDown) return 'Boost investments amount by bosses';
                 let formula = 'bosses';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dZero;
+                if (tmp.s.investloans.use_loans) return D.dZero;
                 return player.b.points;
             },
             effectDisplay() {
-                if (tmp.s.investloans.is_loans) return '';
+                if (tmp.s.investloans.use_loans) return '';
                 return `+${format(upgradeEffect(this.layer, this.id))}`;
             },
             cost() {
@@ -440,18 +440,18 @@ addLayer('s', {
         },
         91: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Rotten Flesh ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Rotten Flesh ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Rotten Flesh';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate rotten flesh challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate rotten flesh challenge penality';
                 if (!shiftDown) return 'Boost rotten flesh gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -467,18 +467,18 @@ addLayer('s', {
         },
         92: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Brain ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Brain ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Brains';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate brain challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate brain challenge penality';
                 if (!shiftDown) return 'Boost brain gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -494,18 +494,18 @@ addLayer('s', {
         },
         101: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Coal ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Coal ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Coal';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate coal challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate coal challenge penality';
                 if (!shiftDown) return 'Boost coal gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -521,18 +521,18 @@ addLayer('s', {
         },
         102: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Iron Ore ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Iron Ore ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Iron Ore';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate iron ore challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate iron ore challenge penality';
                 if (!shiftDown) return 'Boost iron ore gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -548,18 +548,18 @@ addLayer('s', {
         },
         103: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Gold Ore ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Gold Ore ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Gold Ore';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate gold ore challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate gold ore challenge penality';
                 if (!shiftDown) return 'Boost gold ore gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -575,18 +575,18 @@ addLayer('s', {
         },
         111: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Soaked Log ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Soaked Log ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Soaked Logs';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate soaked log challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate soaked log challenge penality';
                 if (!shiftDown) return 'Boost soaked log gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -602,18 +602,18 @@ addLayer('s', {
         },
         112: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Normal Log ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Normal Log ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Normal Logs';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate normal log challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate normal log challenge penality';
                 if (!shiftDown) return 'Boost normal log gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -629,18 +629,18 @@ addLayer('s', {
         },
         113: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Plank ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Plank ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Planks';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate plank challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate plank challenge penality';
                 if (!shiftDown) return 'Boost plank gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -656,18 +656,18 @@ addLayer('s', {
         },
         121: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Heat ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Heat ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Heat';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate heat challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate heat challenge penality';
                 if (!shiftDown) return 'Boost heat gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -683,18 +683,18 @@ addLayer('s', {
         },
         122: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Bronze Ingot ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Bronze Ingot ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Bronze Ingots';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate bronze ingot challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate bronze ingot challenge penality';
                 if (!shiftDown) return 'Boost bronze ingot gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -710,18 +710,18 @@ addLayer('s', {
         },
         123: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Steel Ingot ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Steel Ingot ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Steel Ingots';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate steel ingot challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate steel ingot challenge penality';
                 if (!shiftDown) return 'Boost steel ingot gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -737,18 +737,18 @@ addLayer('s', {
         },
         131: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Stone Brick ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Stone Brick ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Stone Bricks';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate stone brick challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate stone brick challenge penality';
                 if (!shiftDown) return 'Boost stone brick gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -764,18 +764,18 @@ addLayer('s', {
         },
         132: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Copper Ingot ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Copper Ingot ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Copper Ingots';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate copper ingot challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate copper ingot challenge penality';
                 if (!shiftDown) return 'Boost copper ingot gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -791,18 +791,18 @@ addLayer('s', {
         },
         133: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Tin Ingot ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Tin Ingot ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Tin Ingots';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate tin ingot challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate tin ingot challenge penality';
                 if (!shiftDown) return 'Boost tin ingot gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -818,18 +818,18 @@ addLayer('s', {
         },
         141: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Iron Ingot ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Iron Ingot ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Iron Ingots';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate iron ingot challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate iron ingot challenge penality';
                 if (!shiftDown) return 'Boost iron ingot gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -845,18 +845,18 @@ addLayer('s', {
         },
         142: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Gold Ingot ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Gold Ingot ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Gold Ingots';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate gold ingot challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate gold ingot challenge penality';
                 if (!shiftDown) return 'Boost gold ingot gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -872,18 +872,18 @@ addLayer('s', {
         },
         143: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Holy Water ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Holy Water ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Holy Water';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate holy water challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate holy water challenge penality';
                 if (!shiftDown) return 'Boost holy water gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -899,18 +899,18 @@ addLayer('s', {
         },
         151: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Leaf ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Leaf ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Leaves';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate leaf challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate leaf challenge penality';
                 if (!shiftDown) return 'Boost leaf gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -926,18 +926,18 @@ addLayer('s', {
         },
         152: {
             title() {
-                if (tmp.s.investloans.is_loans) return `Repay Seed ${capitalize(tmp.s.investloans.type)}`;
+                if (tmp.s.investloans.use_loans) return `Repay Seed ${capitalize(tmp.s.investloans.type)}`;
                 return 'Invest in Seeds';
             },
             description() {
-                if (tmp.s.investloans.is_loans) return 'Negate seed challenge penality';
+                if (tmp.s.investloans.use_loans) return 'Negate seed challenge penality';
                 if (!shiftDown) return 'Boost seed gain based on investments owned';
                 let formula = 'investments / 10 + 1';
 
                 return `Formula: ${formula}`;
             },
             effect() {
-                if (tmp.s.investloans.is_loans) return D.dOne;
+                if (tmp.s.investloans.use_loans) return D.dOne;
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
@@ -997,7 +997,7 @@ addLayer('s', {
             cost: D(5),
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
             effect() {
-                let mult = D(.95).pow(player.s.upgrades.filter(id => !layers.s.investloans.is_loan(id)).length);
+                let mult = D(.95).pow(player.s.upgrades.filter(id => !layers.s.investloans.is_upg_loan(id)).length);
 
                 return mult;
             },
@@ -1063,9 +1063,9 @@ addLayer('s', {
         32: {
             title: 'Cash Shop',
             description() {
-                if (!shiftDown) return `${tmp.s.investloans.is_loans ? 'Loans' : 'Investments'} decrease level costs`;
+                if (!shiftDown) return `${tmp.s.investloans.use_loans ? 'Loans' : 'Investments'} decrease level costs`;
 
-                let formula = `2√(${tmp.s.investloans.is_loans ? 'loans' : 'investments'} + 2)`;
+                let formula = `2√(${tmp.s.investloans.use_loans ? 'loans' : 'investments'} + 2)`;
 
                 return `Formula: ${formula}`;
             },
@@ -1116,7 +1116,7 @@ addLayer('s', {
 
             return amount;
         },
-        is_loans() { return inChallenge('b', 12) || inChallenge('b', 32); },
+        use_loans() { return inChallenge('b', 12) || inChallenge('b', 32); },
         type() {
             if (inChallenge('b', 12)) return 'loan';
             if (inChallenge('b', 32)) return 'debt';
@@ -1134,7 +1134,7 @@ addLayer('s', {
             'iron_ingot': 141, 'gold_ingot': 142, 'holy_water': 143,
             'leaf': 151, 'seed': 152,
         },
-        is_loan(id) {
+        is_upg_loan(id) {
             if (!id) return false;
 
             return id >= 41;
@@ -1161,7 +1161,7 @@ addLayer('s', {
         const kept_upgrades = [];
         if (layer == 'b') {
             // Keep non investments
-            kept_upgrades.push(...player.s.upgrades.filter(id => !layers.s.investloans.is_loan(id)));
+            kept_upgrades.push(...player.s.upgrades.filter(id => !layers.s.investloans.is_upg_loan(id)));
         }
 
         layerDataReset(this.layer, []);

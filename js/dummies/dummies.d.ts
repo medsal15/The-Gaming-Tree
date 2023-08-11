@@ -2335,14 +2335,14 @@ type Layers = {
              */
             amount(real?: boolean): Decimal
             /** Determines whether the player is in a loan/debt challenge */
-            is_loans(): boolean
+            use_loans(): boolean
             type(): 'loan' | 'debt' | 'investment'
             /** List of investments/loans linked to specific items */
             item_upgrade: {
                 [item: string]: number | undefined
             }
             /** Checks whether the upgrade id is an investment/loan/debt */
-            is_loan(id?: number): boolean
+            is_upg_loan(id?: number): boolean
         }
     }
     a: Layer<Player['b']> & {
@@ -2373,6 +2373,7 @@ type Layers = {
                 difficulty_add(): Decimal
                 difficulty_mult(): Decimal
                 produce_mult(): Decimal
+                tames_mult(): Decimal
             }
         } & {
             [type: string]: {
@@ -2384,7 +2385,7 @@ type Layers = {
                 difficulty(): Decimal
                 progress_gain(): Decimal
                 /** Total amount of experience produced every second */
-                experience(): Decimal
+                experience(tamed?: DecimalSource): Decimal
                 tames(): Decimal
                 /**
                  * Determines whether the monster is visible
@@ -2393,7 +2394,7 @@ type Layers = {
                  */
                 unlocked?: Computable<boolean>
                 /** Total items produced per second */
-                produces(): [string, Decimal][]
+                produces(tamed?: DecimalSource): [string, Decimal][]
                 /** Amount of the monster gained every second */
                 passive_tame(): Decimal
                 /**
@@ -2406,6 +2407,28 @@ type Layers = {
         }
         total: {
             tamed(): Decimal
+        }
+    }
+    c: Layer<Player['c']> & {
+        buildings: {
+            '*': {
+                produce_mult(): Decimal
+            }
+        } & {
+            [building: string]: {
+                readonly id: string
+                name?: Computable<string>
+                style: CSSStyles
+                produces(amount?: DecimalSource): {
+                    /** Total items produced per second */
+                    items?: [string, Decimal][]
+                    /** Total resources produced per second */
+                    resources?: [keyof Player['c']['resources'], Decimal][]
+                }
+                /** Cost in items at amount */
+                cost(amount?: DecimalSource): [string, Decimal][]
+                unlocked?: Computable<boolean>
+            }
         }
     }
     // Special
@@ -2453,6 +2476,7 @@ type Temp = {
     suc: TempLayer & RComputed<Layers['suc']>
     // Alt Row 0
     xp_alt: TempLayer & RComputed<Layers['xp_alt']>
+    c: TempLayer & RComputed<Layers['c']>
     // Special
     star: TempLayer & RComputed<Layers['star']>
 };
@@ -2656,6 +2680,11 @@ type Player = {
                 /** Amount of times the value in last_drops was dropped */
                 last_drops_times: Decimal
             }
+        }
+    }
+    c: LayerData & {
+        resources: {
+            research: Decimal
         }
     }
     // Special

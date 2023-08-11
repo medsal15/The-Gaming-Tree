@@ -523,6 +523,15 @@ addLayer('xp_alt', {
 
                 return mult;
             },
+            tames_mult() {
+                let mult = D.dOne;
+
+                if (inChallenge('b', 12) && !false) {
+                    mult = mult.div(tmp.xp_alt.total.tamed.add(10).log10());
+                }
+
+                return mult;
+            },
         },
         // Normal monsters
         slime: {
@@ -551,30 +560,44 @@ addLayer('xp_alt', {
 
                 return gain;
             },
-            experience() {
+            experience(tamed) {
+                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+
                 let exp = D(.01);
 
                 exp = exp.times(tmp.xp_alt.monsters['*'].experience_mult);
 
                 exp = exp.times(D.pow(buyableEffect('lo', 11), .1).pow(tmp.a.change_efficiency));
 
-                return exp.times(player.xp_alt.monsters[player.xp_alt.type].tamed);
+                return exp.times(monst);
             },
             tames() {
                 let tames = D.dOne;
 
+                tames = tames.times(tmp.xp_alt.monsters['*'].tames_mult);
+
                 return tames;
             },
-            produces() {
+            produces(tamed) {
+                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+
                 /** @type {[string, Decimal][]} */
                 const base = [
                     ['slime_goo', D(1 / 30),],
                     ['slime_core_shard', D(1 / 160),],
                 ];
 
-                base.forEach(([, amount], i) => {
-                    base[i][1] = D.times(amount, player.xp_alt.monsters[this.type].tamed)
-                        .times(tmp.xp_alt.monsters['*'].produce_mult);
+                base.forEach(([item, amount], i) => {
+                    let mult = monst.times(tmp.xp_alt.monsters['*'].produce_mult);
+                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
+
+                    if (upg && hasUpgrade('s', upg)) {
+                        mult = mult.times(upgradeEffect('s', upg));
+                    } else if (inChallenge('b', 12)) {
+                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10());
+                    }
+
+                    base[i][1] = D.times(amount, mult)
                 });
 
                 return base;
@@ -612,28 +635,42 @@ addLayer('xp_alt', {
 
                 return gain;
             },
-            experience() {
+            experience(tamed) {
+                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+
                 let exp = D(.04);
 
                 exp = exp.times(tmp.xp_alt.monsters['*'].experience_mult);
 
-                return exp.times(player.xp_alt.monsters[player.xp_alt.type].tamed);
+                return exp.times(monst);
             },
             tames() {
                 let tames = D.dOne;
 
+                tames = tames.times(tmp.xp_alt.monsters['*'].tames_mult);
+
                 return tames;
             },
-            produces() {
+            produces(tamed) {
+                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+
                 /** @type {[string, Decimal][]} */
                 const base = [
                     ['red_fabric', D(1 / 40),],
                     ['pyrite_coin', D(1 / 250),],
                 ];
 
-                base.forEach(([, amount], i) => {
-                    base[i][1] = D.times(amount, player.xp_alt.monsters[this.type].tamed)
-                        .times(tmp.xp_alt.monsters['*'].produce_mult);
+                base.forEach(([item, amount], i) => {
+                    let mult = monst.times(tmp.xp_alt.monsters['*'].produce_mult);
+                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
+
+                    if (upg && hasUpgrade('s', upg)) {
+                        mult = mult.times(upgradeEffect('s', upg));
+                    } else if (inChallenge('b', 12)) {
+                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10());
+                    }
+
+                    base[i][1] = D.times(amount, mult)
                 });
 
                 return base;
@@ -670,28 +707,42 @@ addLayer('xp_alt', {
 
                 return gain;
             },
-            experience() {
+            experience(tamed) {
+                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+
                 let exp = D(.08);
 
                 exp = exp.times(tmp.xp_alt.monsters['*'].experience_mult);
 
-                return exp.times(player.xp_alt.monsters[player.xp_alt.type].tamed);
+                return exp.times(monst);
             },
             tames() {
                 let tames = D.dOne;
 
+                tames = tames.times(tmp.xp_alt.monsters['*'].tames_mult);
+
                 return tames;
             },
-            produces() {
+            produces(tamed) {
+                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+
                 /** @type {[string, Decimal][]} */
                 const base = [
                     ['rotten_flesh', D(1 / 50),],
                     ['brain', D(1 / 3430),],
                 ];
 
-                base.forEach(([, amount], i) => {
-                    base[i][1] = D.times(amount, player.xp_alt.monsters[this.type].tamed)
-                        .times(tmp.xp_alt.monsters['*'].produce_mult);
+                base.forEach(([item, amount], i) => {
+                    let mult = monst.times(tmp.xp_alt.monsters['*'].produce_mult);
+                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
+
+                    if (upg && hasUpgrade('s', upg)) {
+                        mult = mult.times(upgradeEffect('s', upg));
+                    } else if (inChallenge('b', 12)) {
+                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10());
+                    }
+
+                    base[i][1] = D.times(amount, mult)
                 });
 
                 return base;
@@ -728,28 +779,42 @@ addLayer('xp_alt', {
 
                 return gain;
             },
-            experience() {
+            experience(tamed) {
+                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+
                 let exp = D(.16);
 
                 exp = exp.times(tmp.xp_alt.monsters['*'].experience_mult);
 
-                return exp.times(player.xp_alt.monsters[player.xp_alt.type].tamed);
+                return exp.times(monst);
             },
             tames() {
                 let tames = D.dOne;
 
+                tames = tames.times(tmp.xp_alt.monsters['*'].tames_mult);
+
                 return tames;
             },
-            produces() {
+            produces(tamed) {
+                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+
                 /** @type {[string, Decimal][]} */
                 const base = [
                     ['leaf', D(1 / 60),],
                     ['seed', D(1 / 5120),],
                 ];
 
-                base.forEach(([, amount], i) => {
-                    base[i][1] = D.times(amount, player.xp_alt.monsters[this.type].tamed)
-                        .times(tmp.xp_alt.monsters['*'].produce_mult);
+                base.forEach(([item, amount], i) => {
+                    let mult = monst.times(tmp.xp_alt.monsters['*'].produce_mult);
+                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
+
+                    if (upg && hasUpgrade('s', upg)) {
+                        mult = mult.times(upgradeEffect('s', upg));
+                    } else if (inChallenge('b', 12)) {
+                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10());
+                    }
+
+                    base[i][1] = D.times(amount, mult)
                 });
 
                 return base;
@@ -772,7 +837,7 @@ addLayer('xp_alt', {
         if (!force && layers[layer].row <= this.row) return;
 
         /** @type {(keyof player['xp_alt'])[]} */
-        const keep = ['type', 'auto'],
+        const keep = ['type'],
             kept_ups = [...player.xp_alt.upgrades];
 
         kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 12).xp_hold.pow(tmp.a.change_efficiency).floor()).toNumber();
