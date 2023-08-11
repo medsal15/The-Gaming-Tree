@@ -2661,6 +2661,8 @@ addLayer('lo', {
                         return text;
                     case 'tamed': case 'tamed_kill':
                         return `tamed ${tmp.xp_alt.monsters[sub].name}`;
+                    case 'building':
+                        return `built ${tmp.c.buildings[sub].name}`;
                 }
             },
             can_drop(type) {
@@ -2681,6 +2683,8 @@ addLayer('lo', {
                         if (!hasUpgrade('lo', 11) && !hasUpgrade('s', 22)) return false;
                     case 'tamed':
                         return tmp.xp_alt.layerShown && (tmp.xp_alt.monsters[sub].unlocked ?? true);
+                    case 'building':
+                        return tmp.c.layerShown;
                 }
 
                 return false;
@@ -3151,6 +3155,23 @@ addLayer('lo', {
 
                     return weights;
                 },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings)
+                            .filter(building => building != '*' &&
+                                (buildings[building].unlocked ?? true) &&
+                                Array.isArray(buildings[building].produces.items) &&
+                                buildings[building].produces.items.some(([item]) => item == this.id))
+                            .forEach(building => {
+                                per_second[`building:${building}`] = tmp.c.buildings[building].produces.items.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
+                },
                 other() {
                     const sources = [];
 
@@ -3165,7 +3186,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/stone-block.svg')`,
                 'background-color': '#BBBBBB',
             },
-            unlocked() { return tmp.m.layerShown; },
+            unlocked() { return tmp.m.layerShown || tmp.c.layerShown; },
         },
         copper_ore: {
             _id: null,
@@ -3191,13 +3212,30 @@ addLayer('lo', {
 
                     return weights;
                 },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings)
+                            .filter(building => building != '*' &&
+                                (buildings[building].unlocked ?? true) &&
+                                Array.isArray(buildings[building].produces.items) &&
+                                buildings[building].produces.items.some(([item]) => item == this.id))
+                            .forEach(building => {
+                                per_second[`building:${building}`] = tmp.c.buildings[building].produces.items.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
+                },
             },
             name: 'copper ore',
             style: {
                 'background-image': `url('./resources/images/ore.svg')`,
                 'background-color': '#BB7733',
             },
-            unlocked() { return tmp.m.layerShown; },
+            unlocked() { return tmp.m.layerShown || tmp.c.layerShown; },
         },
         tin_ore: {
             _id: null,
@@ -3223,13 +3261,30 @@ addLayer('lo', {
 
                     return weights;
                 },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings)
+                            .filter(building => building != '*' &&
+                                (buildings[building].unlocked ?? true) &&
+                                Array.isArray(buildings[building].produces.items) &&
+                                buildings[building].produces.items.some(([item]) => item == this.id))
+                            .forEach(building => {
+                                per_second[`building:${building}`] = tmp.c.buildings[building].produces.items.find(([item]) => item == this.id)[1];
+                            });
+                    }
+
+                    return per_second;
+                },
             },
             name: 'tin ore',
             style: {
                 'background-image': `url('./resources/images/ore.svg')`,
                 'background-color': '#CCBB88',
             },
-            unlocked() { return tmp.m.layerShown; },
+            unlocked() { return tmp.m.layerShown || tmp.c.layerShown; },
         },
         coal: {
             _id: null,

@@ -1712,7 +1712,7 @@ declare class LayerData {
     buyables: { [id: number]: Decimal }
 }
 
-type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill';
+type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building';
 
 type Layers = {
     // Side
