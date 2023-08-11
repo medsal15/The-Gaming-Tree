@@ -121,6 +121,7 @@ let winText = `Congratulations! You have finished the current content in the gam
  * ```
  */
 var doNotCallTheseFunctionsEveryTick = [
+	'show_building',
 	'show_skill',
 	'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop', 'gain_drops',
 	'show_fuel', 'show_smelt',

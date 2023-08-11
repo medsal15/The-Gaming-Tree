@@ -302,12 +302,12 @@ declare class Decimal {
     //#endregion Methods
 }
 
-declare class Layer<T extends LayerData> {
+declare class Layer<L extends string> {
     /**
      * It's the same value as the name of this layer, so you can do `player[this.layer].points` or similar to access the saved value.
      * It makes copying code to new layers easier. It is also assigned to all upgrades and buyables and such.
      */
-    readonly layer: string
+    readonly layer: L
     /**
      * Used in reset confirmations (and the default infobox title).
      * If absent, it just uses the layer's id.
@@ -317,7 +317,7 @@ declare class Layer<T extends LayerData> {
      * A function to return the default save data for this layer.
      * Add any variables you have to it. Make sure to use `Decimal` values rather than normal numbers.
      */
-    startData(): T
+    startData(): Player[L]
     /**
      * A color associated with this layer, used in many places. (A string in hex format with a #)
      */
@@ -425,16 +425,16 @@ declare class Layer<T extends LayerData> {
     /**
      * A set of one-time purchases which can have unique upgrade conditions, currency costs, and bonuses.
      */
-    upgrades: { [id: number]: Upgrade }
+    upgrades: { [id: number]: Upgrade<L> }
     /**
      * A list of bonuses gained upon reaching certain thresholds of a resource. Often used for automation/QOL.
      */
-    milestones: { [id: number]: Milestone }
+    milestones: { [id: number]: Milestone<L> }
     /**
      * The player can enter challenges, which make the game harder.
      * If they reach a goal and beat the challenge, they recieve a bonus.
      */
-    challenges?: { [id: number]: Challenge }
+    challenges?: { [id: number]: Challenge<L> }
     /**
      * Effectively upgrades that can be bought multiple times, and are optionally respeccable. Many uses.
      */
@@ -461,7 +461,7 @@ declare class Layer<T extends LayerData> {
          * A custom confirmation message on respec, in place of the default one.
          */
         respecMessage?: Computable<string>
-        [id: number]: Buyable,
+        [id: number]: Buyable<L>,
     }
     /**
      * Extremely versatile and generalized buttons which can only be clicked sometimes.
@@ -533,11 +533,11 @@ declare class Layer<T extends LayerData> {
     /**
      * Display some information as a progress bar, gague, or similar. They are highly customizable, and can be vertical as well.
      */
-    bars?: { [id: string]: Bar }
+    bars?: { [id: string]: Bar<L> }
     /**
      * Kind of like milestones, but with a different display style and some other differences. Extra features are on the way at a later date!
      */
-    achievements?: { [id: number]: Achievement }
+    achievements?: { [id: number]: Achievement<L> }
     /**
      * If false, disables popup message when you get the achievement. True by default.
      */
@@ -549,7 +549,7 @@ declare class Layer<T extends LayerData> {
     /**
      * Displays some text in a box that can be shown or hidden.
      */
-    infoboxes?: { [id: string]: Infobox }
+    infoboxes?: { [id: string]: Infobox<L> }
     /**
      * A grid of buttons that behave the same, but have their own data.
      */
@@ -871,124 +871,13 @@ declare class Layer<T extends LayerData> {
     prestigeNotify?(): boolean
 }
 
-declare class TempLayer {
-    readonly layer: string
-    readonly name?: string
-    readonly color: string
-    readonly row: number | 'side'
-    readonly displayRow?: number
-    readonly resource: string
-    readonly effect?: any
-    readonly layerShown?: boolean
-    readonly style?: CSSStyles
-    readonly tabFormat?: {
-        [id: string]: {
-            content: (string | [string, any])[],
-            style?: CSSStyles,
-            buttonStyle?: CSSStyles,
-            unlocked?: boolean,
-            shouldNotify?: boolean,
-            prestigeNotify?: boolean,
-            glowColor?: string,
-            embedLayer?: string,
-        }
-    }
-    readonly midsection?: (string | [string, any])[]
-
-    readonly upgrades?: { [id: number]: Upgrade }
-    readonly milestones?: { [id: number]: Milestone }
-    readonly challenges?: { [id: number]: Challenge }
-    readonly buyables?: {
-        respecText?: string,
-        showRespec?: boolean,
-        respecMessage?: string,
-        [id: number]: Buyable,
-    }
-    readonly clickables?: {
-        masterButtonText?: string,
-        showMasterButton?: boolean,
-        [id: number]: Clickable,
-    }
-    readonly microtabs?: {
-        [id: string]: {
-            [id: string]: {
-                content: (string | [string, any])[],
-                style?: CSSStyles,
-                buttonStyle?: CSSStyles,
-                unlocked?: boolean,
-                shouldNotify?: boolean,
-                prestigeNotify?: boolean,
-                glowColor?: string,
-                embedLayer?: string,
-            }
-        }
-    }
-    readonly bars?: { [id: string]: Bar }
-    readonly achievements?: { [id: number]: Achievement }
-    readonly achievementPopups?: boolean
-    readonly milestonePopups?: boolean
-    readonly infoboxes?: { [id: string]: Infobox }
-    readonly grid?: {
-        readonly layer: string,
-
-        readonly rows: number,
-        readonly cols: number,
-        readonly maxRows: number,
-        readonly maxCols: number,
-    }
-
-    readonly type?: 'normal' | 'static' | 'custom' | 'none'
-    readonly baseResource: string
-    readonly baseAmount: Decimal
-    readonly requires: Decimal
-    readonly exponent: Decimal
-    readonly base?: Decimal
-    readonly roundUpCost?: boolean
-    readonly gainMult?: Decimal
-    readonly gainExp?: Decimal
-    readonly directMult?: Decimal
-    readonly softcap?: Decimal
-    readonly softcapPower?: Decimal
-
-    readonly canBuyMax?: boolean
-    readonly onPrestige?: void
-    readonly resetDescription?: string
-    readonly prestigeButtonText?: string
-    readonly passiveGeneration?: number
-    readonly autoPrestige?: boolean
-
-    readonly symbol?: string
-    readonly image?: string
-    readonly position?: number
-    readonly branches?: string[] | [string, string | 1 | 2 | 3, number?][]
-    readonly nodeStyle: CSSStyles
-    readonly tooltip?: string
-    readonly tooltipLocked?: string
-    readonly marked?: string
-
-    readonly autoUpgrade?: boolean
-    readonly resetsNothing?: boolean
-    readonly increaseUnlockOrder?: string[]
-    readonly shouldNotify?: boolean
-    readonly glowColor?: string
-    readonly componentStyles?: { [k: string]: CSSStyles }
-    readonly leftTab?: boolean
-    readonly previousTab?: string
-    readonly deactivated?: boolean
-
-    readonly getResetGain?: Decimal
-    readonly getNextAt?: Decimal
-    readonly canReset?: boolean
-    readonly prestigeNotify?: boolean
-}
-
-declare class Achievement {
+declare class Achievement<L extends string> {
     /**
      * **assigned automagically**
      *
      * It's the same value as the name of this layer, so you can do `player[this.layer].points` or similar.
      */
-    readonly layer: string;
+    readonly layer: L;
     /**
      * **assigned automagically**
      *
@@ -1057,13 +946,13 @@ declare class Achievement {
     doneTooltip?: Computable<string>;
 }
 
-declare class Bar {
+declare class Bar<L extends string> {
     /**
      * **assigned automagically**
      *
      * It's the same value as the name of this layer, so you can do `player[this.layer].points` or similar.
      */
-    readonly layer: string;
+    readonly layer: L;
     /**
      * **assigned automagically**
      *
@@ -1131,13 +1020,13 @@ declare class Bar {
     instant?: Computable<boolean>
 }
 
-declare class Buyable {
+declare class Buyable<L extends string> {
     /**
      * **assigned automagically**
      *
      * It's the same value as the name of this layer, so you can do `player[this.layer].points` or similar.
      */
-    readonly layer: string;
+    readonly layer: L;
     /**
      * **assigned automagically**
      *
@@ -1239,13 +1128,13 @@ declare class Buyable {
     branches?: Computable<string[] | [string, string | 1 | 2 | 3, number?][]>
 }
 
-declare class Challenge {
+declare class Challenge<L extends string> {
     /**
      * **assigned automagically**
      *
      * It's the same value as the name of this layer, so you can do `player[this.layer].points` or similar.
      */
-    readonly layer: string;
+    readonly layer: L;
     /**
      * **assigned automagically**
      *
@@ -1339,54 +1228,14 @@ declare class Challenge {
      */
     marked?: Computable<boolean | string>
 }
-/**
- * @deprecated
- */
-declare class OldChallenge<T> extends Challenge {
-    /**
-     * @deprecated
-     *
-     * A Decimal for the amount of currency required to beat the challenge.
-     * By default, the goal is in basic Points.
-     * The goal can also be a function if its value changes.
-     */
-    goal: Computable<Decimal>
-    /**
-     * @deprecated
-     *
-     * The name to display for the currency for the goal.
-     */
-    currencyDisplayName: Computable<string>
-    /**
-     * @deprecated
-     *
-     * The internal name for that currency.
-     */
-    currencyInternalName: keyof T
-    /**
-     * @deprecated
-     *
-     * The internal name of the layer that currency is stored in.
-     * If it's not in a layer, omit.
-     * If it's not stored directly in a layer, instead use the next feature.
-     */
-    currencyLayer?: string
-    /**
-     * @deprecated
-     *
-     * If your currency is stored in something inside a layer (e.g. a buyable's amount), you can access it this way.
-     * This is a function returning the object in "player" that contains the value (like `player[this.layer].buyables`).
-     */
-    currencyLocation?(): T
-}
 
-declare class Clickable {
+declare class Clickable<L extends string> {
     /**
      * **assigned automagically**
      *
      * It's the same value as the name of this layer, so you can do `player[this.layer].points` or similar.
      */
-    readonly layer: string;
+    readonly layer: L;
     /**
      * **assigned automagically**
      *
@@ -1450,13 +1299,13 @@ declare class Clickable {
     branches?: Computable<string[] | [string, string | 1 | 2 | 3, number?][]>
 }
 
-declare class Infobox {
+declare class Infobox<L extends string> {
     /**
      * **assigned automagically**
      *
      * It's the same value as the name of this layer, so you can do `player[this.layer].points` or similar.
      */
-    readonly layer: string;
+    readonly layer: L;
     /**
      * **assigned automagically**
      *
@@ -1511,13 +1360,13 @@ declare class Hotkey {
     unlocked?: Computable<boolean>
 }
 
-declare class Milestone {
+declare class Milestone<L extends string> {
     /**
      * **assigned automagically**
      *
      * It's the same value as the name of this layer, so you can do `player[this.layer].points` or similar.
      */
-    readonly layer: string;
+    readonly layer: L;
     /**
      * **assigned automagically**
      *
@@ -1734,13 +1583,13 @@ declare class TreeNode {
     position?: number
 }
 
-declare class Upgrade {
+declare class Upgrade<L extends string> {
     /**
      * **assigned automagically**
      *
      * It's the same value as the name of this layer, so you can do `player[this.layer].points` or similar.
      */
-    readonly layer: string;
+    readonly layer: L;
     /**
      * **assigned automagically**
      *
@@ -1829,7 +1678,7 @@ declare class Upgrade {
      */
     branches?: Computable<string[] | [string, string | 1 | 2 | 3, number?][]>
 }
-declare class CurrencyUpgrade<T> extends Upgrade {
+declare class CurrencyUpgrade<T, L extends string> extends Upgrade<L> {
     /**
      * The name to display for the currency for the upgrade.
      */
@@ -1867,19 +1716,19 @@ type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kil
 
 type Layers = {
     // Side
-    ach: Layer<Player['ach']> & {
+    ach: Layer<'ach'> & {
         getAchievementsRows(type?: AchievementTypes): number[]
         getAchievements(type?: AchievementTypes): string[]
         totalAchievements(type?: AchievementTypes): Decimal
         ownedAchievements(type?: AchievementTypes): Decimal
     }
-    clo: Layer<Player['clo']> & {
+    clo: Layer<'clo'> & {
         upgrades: {
-            [id: number]: Upgrade & { price: [string, Decimal][] }
+            [id: number]: Upgrade<'clo'> & { price: [string, Decimal][] }
         }
         time_speed(layer?: string, visual?: boolean): Decimal
     }
-    cas: Layer<Player['cas']> & {
+    cas: Layer<'cas'> & {
         items: {
             /** Reverse lookup for item drops */
             sources(item: string): {
@@ -1922,7 +1771,7 @@ type Layers = {
         }
         regex: RegExp
     }
-    mag: Layer<Player['mag']> & {
+    mag: Layer<'mag'> & {
         elements: {
             '*': {
                 /** Damage multiplier when an element is used against a stronger one */
@@ -1970,7 +1819,7 @@ type Layers = {
             cost: Computable<Decimal>
         }
     }
-    sta: Layer<Player['sta']> & {
+    sta: Layer<'sta'> & {
         stats: {
             '*': {
                 total(): Decimal
@@ -1997,7 +1846,7 @@ type Layers = {
         }
     }
     // Row 0
-    xp: Layer<Player['xp']> & {
+    xp: Layer<'xp'> & {
         color_kill: string
         enemies: {
             '*': {
@@ -2055,9 +1904,9 @@ type Layers = {
             kills(): Decimal
         }
     }
-    m: Layer<Player['m']> & {
+    m: Layer<'m'> & {
         upgrades: {
-            [id: number]: Upgrade & { item: string }
+            [id: number]: Upgrade<'m'> & { item: string }
         }
         ore: {
             health(): Decimal
@@ -2071,9 +1920,9 @@ type Layers = {
             mine_mult(): Decimal
         }
     }
-    t: Layer<Player['t']> & {
+    t: Layer<'t'> & {
         upgrades: {
-            [id: number]: Upgrade & { item: string }
+            [id: number]: Upgrade<'t'> & { item: string }
         }
         trees: {
             '*': {
@@ -2126,7 +1975,7 @@ type Layers = {
         }
     }
     // Row 1
-    l: Layer<Player['l']> & {
+    l: Layer<'l'> & {
         regex: RegExp
         skills: {
             '*': {
@@ -2148,9 +1997,9 @@ type Layers = {
             }
         }
     }
-    lo: Layer<Player['lo']> & {
-        buyables: Layer<any>['buyables'] & {
-            [id: number]: Buyable & { value(): Decimal }
+    lo: Layer<'lo'> & {
+        buyables: Layer<'lo'>['buyables'] & {
+            [id: number]: Buyable<'lo'> & { value(): Decimal }
         }
         items: {
             '*': {
@@ -2216,7 +2065,7 @@ type Layers = {
             }
         }
     }
-    f: Layer<Player['f']> & {
+    f: Layer<'f'> & {
         fuels: {
             '*': {
                 regex: RegExp
@@ -2317,8 +2166,8 @@ type Layers = {
         }
     }
     // Row 2
-    b: Layer<Player['b']> & {}
-    s: Layer<Player['s']> & {
+    b: Layer<'b'> & {}
+    s: Layer<'s'> & {
         coins: {
             /** List of coins */
             types: [name: string, color: string][]
@@ -2345,22 +2194,22 @@ type Layers = {
             is_upg_loan(id?: number): boolean
         }
     }
-    a: Layer<Player['b']> & {
+    a: Layer<'a'> & {
         upgrades: {
-            [id: number]: Upgrade & { item: string }
+            [id: number]: Upgrade<'a'> & { item: string }
         }
         /** Efficiency of alt effects on normal gains and vice versa as an exponent */
         change_efficiency(): Decimal
     }
     // Alt Side
-    suc: Layer<Player['ach']> & {
+    suc: Layer<'ach'> & {
         getFailuresRows(type?: AchievementTypes): number[]
         getFailures(type?: AchievementTypes): string[]
         totalFailures(type?: AchievementTypes): Decimal
         ownedFailures(type?: AchievementTypes): Decimal
     }
     // Alt Row 0
-    xp_alt: Layer<Player['xp_alt']> & {
+    xp_alt: Layer<'xp_alt'> & {
         color_tame: string
         monsters: {
             '*': {
@@ -2409,30 +2258,58 @@ type Layers = {
             tamed(): Decimal
         }
     }
-    c: Layer<Player['c']> & {
+    c: Layer<'c'> & {
+        resources: {
+            [resource: string]: {
+                readonly id: string
+                name: Computable<string>
+                color: Computable<string>
+            }
+        }
         buildings: {
             '*': {
+                regex: RegExp
+                placed(): { [building: string]: Decimal }
+                show_building(building: string): ['row', [
+                    ['buyable', string],
+                    'blank',
+                    ['display-text', string],
+                    'blank',
+                    ['clickable', string],
+                ]] | undefined
                 produce_mult(): Decimal
             }
         } & {
             [building: string]: {
                 readonly id: string
-                name?: Computable<string>
-                style: CSSStyles
-                produces(amount?: DecimalSource): {
+                name: Computable<string>
+                style: {
+                    /** General style shared by all others */
+                    general: CSSStyles
+                    buyable?: CSSStyles
+                    select?: CSSStyles
+                    grid?: CSSStyles
+                }
+                description: Computable<string>
+                produces(amount_placed?: DecimalSource): {
                     /** Total items produced per second */
                     items?: [string, Decimal][]
                     /** Total resources produced per second */
                     resources?: [keyof Player['c']['resources'], Decimal][]
                 }
+                effect?(amount_placed?: Decimal): any
                 /** Cost in items at amount */
-                cost(amount?: DecimalSource): [string, Decimal][]
+                cost(amount_built?: DecimalSource): [item: string, cost: Decimal][]
+                formulas: {
+                    cost: Computable<[item: string, formula: string][]>
+                    effect?: Computable<string>
+                }
                 unlocked?: Computable<boolean>
             }
         }
     }
     // Special
-    star: Layer<Player['star']> & {
+    star: Layer<'star'> & {
         star: {
             /** Time to hit a target, in seconds */
             time: Computable<Decimal>
@@ -2455,30 +2332,30 @@ type Temp = {
     pointGen: Decimal
     scrolled: boolean
     // Side
-    ach: TempLayer & RComputed<Layers['ach']>
-    clo: TempLayer & RComputed<Layers['clo']>
-    cas: TempLayer & RComputed<Layers['cas']>
-    mag: TempLayer & RComputed<Layers['mag']>
-    sta: TempLayer & RComputed<Layers['sta']>
+    ach: RComputed<Layers['ach']>
+    clo: RComputed<Layers['clo']>
+    cas: RComputed<Layers['cas']>
+    mag: RComputed<Layers['mag']>
+    sta: RComputed<Layers['sta']>
     // Row 0
-    xp: TempLayer & RComputed<Layers['xp']>
-    m: TempLayer & RComputed<Layers['m']>
+    xp: RComputed<Layers['xp']>
+    m: RComputed<Layers['m']>
     t: RComputed<Layers['t']>
     // Row 1
-    l: TempLayer & RComputed<Layers['l']>
-    lo: TempLayer & RComputed<Layers['lo']>
-    f: TempLayer & RComputed<Layers['f']>
+    l: RComputed<Layers['l']>
+    lo: RComputed<Layers['lo']>
+    f: RComputed<Layers['f']>
     // Row 2
-    b: TempLayer & RComputed<Layers['b']>
-    s: TempLayer & RComputed<Layers['s']>
-    a: TempLayer & RComputed<Layers['a']>
+    b: RComputed<Layers['b']>
+    s: RComputed<Layers['s']>
+    a: RComputed<Layers['a']>
     // Alt Side
-    suc: TempLayer & RComputed<Layers['suc']>
+    suc: RComputed<Layers['suc']>
     // Alt Row 0
-    xp_alt: TempLayer & RComputed<Layers['xp_alt']>
-    c: TempLayer & RComputed<Layers['c']>
+    xp_alt: RComputed<Layers['xp_alt']>
+    c: RComputed<Layers['c']>
     // Special
-    star: TempLayer & RComputed<Layers['star']>
+    star: RComputed<Layers['star']>
 };
 type Player = {
     devSpeed: string
@@ -2683,9 +2560,20 @@ type Player = {
         }
     }
     c: LayerData & {
-        resources: {
-            research: Decimal
+        grid: {
+            [id: number]: {
+                /** Building placed on that tile */
+                building: string
+                /** Whether the building is active */
+                enabled: boolean
+            }
         }
+        resources: {
+            science: Decimal
+        }
+        mode: 'place' | 'destroy' | 'toggle'
+        /** Currently selected building for placement */
+        building: string
     }
     // Special
     star: LayerData & {

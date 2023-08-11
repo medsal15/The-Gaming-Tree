@@ -223,11 +223,11 @@ addLayer('cas', {
     regex: /^swap_(chances|weights)_(left|right)_([a-z_]+)$/,
     // The M in TMT stands for More proxies
     clickables: new Proxy({}, {
-        /** @returns {Clickable} */
+        /** @returns {Clickable<'cas'>} */
         get(obj, prop) {
             // Required to not break the auto stuff
             if (prop == 'constructor') return obj.constructor;
-            if (prop == 'layer') return 'f';
+            if (prop == 'layer') return 'cas';
 
             if (prop in obj) return obj[prop];
 
@@ -281,15 +281,18 @@ addLayer('cas', {
                         return true;
                     },
                     style() {
-                        if (!(r_mode in item().sources)) return {
-                            'height': '80px',
-                            'width': '80px',
-                            'min-height': 'unset',
-                            'background-color': 'transparent',
-                            'box-shadow': 'none',
-                            'border-width': '0',
-                            'cursor': 'initial',
-                        };
+                        if (inChallenge('b', 52) && r_mode == 'weights') return { 'display': 'none', };
+                        if (!inChallenge('b', 52) && !(r_mode in item().sources)) {
+                            return {
+                                'height': '80px',
+                                'width': '80px',
+                                'min-height': 'unset',
+                                'background-color': 'transparent',
+                                'box-shadow': 'none',
+                                'border-width': '0',
+                                'cursor': 'initial',
+                            };
+                        }
 
                         const style = Object.assign({
                             'height': '80px',

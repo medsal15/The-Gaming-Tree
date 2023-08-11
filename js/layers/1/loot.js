@@ -1,5 +1,6 @@
 'use strict';
 
+//todo include city to per_second
 //todo add buyMax to buyables
 addLayer('lo', {
     name: 'Loot',
@@ -2434,7 +2435,6 @@ addLayer('lo', {
             if (!item_id) return { 'display': 'none', };
 
             const item = tmp.lo.items[item_id];
-            if (!(item.unlocked ?? true)) return { 'display': 'none', };
 
             return Object.assign(
                 {
@@ -2445,6 +2445,12 @@ addLayer('lo', {
                 },
                 item.style,
             );
+        },
+        getUnlocked(id) {
+            const item = layers.lo.items["*"].grid_to_item(id);
+            if (!item) return false;
+
+            return tmp.lo.items[item].unlocked ?? true;
         },
         getTitle(_, id) {
             const item_id = layers.lo.items["*"].grid_to_item(id);

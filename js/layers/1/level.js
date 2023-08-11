@@ -83,7 +83,7 @@ addLayer('l', {
     */
     regex: /^(add|remove)_([a-z_]+)$/,
     clickables: new Proxy({}, {
-        /** @returns {Clickable} */
+        /** @returns {Clickable<'l'>} */
         get(obj, prop) {
             // Required to not break the auto stuff
             if (prop == 'constructor') return obj.constructor;
@@ -130,7 +130,7 @@ addLayer('l', {
         },
     }),
     bars: new Proxy({}, {
-        /** @returns {Bar} */
+        /** @returns {Bar<'l'>} */
         get(obj, prop) {
             // Required to not break the auto stuff
             if (prop == 'constructor') return obj.constructor;

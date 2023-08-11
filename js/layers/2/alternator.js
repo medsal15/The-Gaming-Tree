@@ -130,7 +130,7 @@ addLayer('a', {
                 const style = {};
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    style['background-color'] = tmp.a.color;
+                    style['background-color'] = tmp.c.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
                     style['background-image'] = `linear-gradient(to right, ${tmp.m.color}, ${tmp.c.color})`;
                     style['background-origin'] = `border-box`;

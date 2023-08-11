@@ -140,7 +140,10 @@ addLayer('xp_alt', {
                             const monster = tmp.xp_alt.monsters[type],
                                 tames = monster.tames,
                                 height = Math.max(1, monster.produces.length),
-                                items = Array.from({ length: height }, (_, i) => `+${format(monster.produces[i][1])} ${tmp.lo.items[monster.produces[i][0]].name} /s`);
+                                items = Array.from(
+                                    { length: height },
+                                    (_, i) => `+${format(monster.produces[i][1])} ${tmp.lo.items[monster.produces[i][0]].name} /s`
+                                );
 
                             /** @type {string[]} */
                             let tame_pieces = [];
