@@ -463,7 +463,7 @@ addLayer('b', {
                     loss = get_loss(total);
                 if (loss.gt(0)) Object.entries(player.xp.enemies).forEach(([type, data]) => {
                     const l = data.kills.div(total).times(loss);
-                    data.kills[type] = data.kills.minus(l).max(0);
+                    data.kills = data.kills.minus(l).max(0);
                 });
             }
             if (!hasUpgrade('s', 43)) {
