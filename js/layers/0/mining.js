@@ -867,5 +867,5 @@ addLayer('m', {
             'border-radius': 0,
         }
     },
-    autoUpgrade() { return hasChallenge('b', 21) && player.m.auto_upgrade; },
+    autoUpgrade() { return hasChallenge('b', 21) && player.m.auto_upgrade && !tmp.m.deactivated; },
 });

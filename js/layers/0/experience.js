@@ -845,6 +845,8 @@ addLayer('xp', {
                 if (hasUpgrade('xp_alt', 21)) mult = mult.times(upgradeEffect('xp_alt', 21).pow(tmp.a.change_efficiency));
                 if (hasUpgrade('xp_alt', 23)) mult = mult.times(upgradeEffect('xp_alt', 23).pow(tmp.a.change_efficiency));
 
+                if (hasUpgrade('c', 33)) mult = mult.times(upgradeEffect('c', 33).pow(tmp.a.change_efficiency));
+
                 return mult;
             },
             exp_cap() {
@@ -1512,6 +1514,8 @@ addLayer('xp', {
 
                 let health = D.pow(2, level).times(10);
 
+                health = health.minus(tmp.c.buildings.observatory.effect).max(1);
+
                 return health;
             },
             experience: D.dZero,
@@ -1549,5 +1553,5 @@ addLayer('xp', {
             element: layers.mag.elements['*'].element(type),
         });
     },
-    autoUpgrade() { return hasChallenge('b', 12) && player.xp.auto.upgrade; },
+    autoUpgrade() { return hasChallenge('b', 12) && player.xp.auto.upgrade && !tmp.xp.deactivated; },
 });

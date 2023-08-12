@@ -379,7 +379,11 @@ addLayer('xp_alt', {
             title: 'Slime Trap',
             description() {
                 if (!shiftDown) {
-                    return 'Passively catch slimes';
+                    let monsters = ['slimes'];
+
+                    if (hasUpgrade('c', 43)) monsters.push('goblins');
+
+                    return `Passively catch ${listFormat.format(monsters)}`;
                 } else {
                     let formula = 'progress gain / difficulty';
 
@@ -477,6 +481,8 @@ addLayer('xp_alt', {
                 if (hasUpgrade('xp_alt', 21)) mult = mult.times(upgradeEffect('xp_alt', 21));
                 if (hasUpgrade('xp_alt', 23)) mult = mult.times(upgradeEffect('xp_alt', 23));
 
+                if (hasUpgrade('c', 33)) mult = mult.times(upgradeEffect('c', 33));
+
                 // Main
                 if (hasUpgrade('xp', 12)) mult = mult.times(upgradeEffect('xp', 12).experience.pow(tmp.a.change_efficiency));
                 if (hasUpgrade('xp', 13)) mult = mult.times(upgradeEffect('xp', 13).pow(tmp.a.change_efficiency));
@@ -501,6 +507,8 @@ addLayer('xp_alt', {
                 if (hasUpgrade('xp_alt', 11)) mult = mult.times(upgradeEffect('xp_alt', 11));
                 if (hasUpgrade('xp_alt', 13)) mult = mult.times(upgradeEffect('xp_alt', 13));
                 if (hasUpgrade('xp_alt', 31)) mult = mult.times(upgradeEffect('xp_alt', 31));
+
+                if (hasUpgrade('c', 23)) mult = mult.times(upgradeEffect('c', 23));
 
                 return mult;
             },
@@ -595,9 +603,9 @@ addLayer('xp_alt', {
                     const upg = tmp.s.investloans.item_upgrade[item] ?? false;
 
                     if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg));
+                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10());
+                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     base[i][1] = D.times(amount, mult)
@@ -608,7 +616,9 @@ addLayer('xp_alt', {
             passive_tame() {
                 if (!hasUpgrade('xp_alt', 22)) return D.dZero;
 
-                return D.div(tmp.xp_alt.monsters[this.type].progress_gain, tmp.xp_alt.monsters[this.type].difficulty).times(tmp.xp_alt.monsters[this.type].tames);
+                const monster = tmp.xp_alt.monsters[this.type];
+
+                return D.div(monster[this.type].progress_gain, monster[this.type].difficulty).times(monster[this.type].tames);
             },
             get_drops(kills) { return layers.xp.enemies[this.type].get_drops(kills); },
         },
@@ -668,9 +678,9 @@ addLayer('xp_alt', {
                     const upg = tmp.s.investloans.item_upgrade[item] ?? false;
 
                     if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg));
+                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10());
+                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     base[i][1] = D.times(amount, mult)
@@ -679,7 +689,11 @@ addLayer('xp_alt', {
                 return base;
             },
             passive_tame() {
-                return D.dZero;
+                if (!hasUpgrade('xp_alt', 22) || !hasUpgrade('c', 43)) return D.dZero;
+
+                const monster = tmp.xp_alt.monsters[this.type];
+
+                return D.div(monster[this.type].progress_gain, monster[this.type].difficulty).times(monster[this.type].tames);
             },
             get_drops(kills) { return layers.xp.enemies[this.type].get_drops(kills); },
             unlocked() { return hasUpgrade('xp_alt', 33) },
@@ -740,9 +754,9 @@ addLayer('xp_alt', {
                     const upg = tmp.s.investloans.item_upgrade[item] ?? false;
 
                     if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg));
+                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10());
+                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     base[i][1] = D.times(amount, mult)
@@ -812,9 +826,9 @@ addLayer('xp_alt', {
                     const upg = tmp.s.investloans.item_upgrade[item] ?? false;
 
                     if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg));
+                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10());
+                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     base[i][1] = D.times(amount, mult)

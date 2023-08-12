@@ -462,7 +462,7 @@ addLayer('b', {
             if (!hasUpgrade('s', 42)) {
                 const total = tmp.xp.total.kills,
                     loss = get_loss(total);
-                if (loss.gt(0)) Object.entries(player.xp.enemies).forEach(([type, data]) => {
+                if (loss.gt(0)) Object.entries(player.xp.enemies).forEach(([, data]) => {
                     const l = data.kills.div(total).times(loss);
                     data.kills = data.kills.minus(l).max(0);
                 });
@@ -470,23 +470,29 @@ addLayer('b', {
             if (!false) {
                 const total = tmp.xp_alt.total.tamed,
                     loss = get_loss(total).pow(tmp.a.change_efficiency);
-                if (loss.gt(0)) Object.entries(player.xp_alt.monsters).forEach(([type, data]) => {
+                if (loss.gt(0)) Object.entries(player.xp_alt.monsters).forEach(([, data]) => {
                     const l = data.tamed.div(total).times(loss);
                     data.tamed = data.tamed.minus(l).max(0);
                 });
             }
             if (!hasUpgrade('s', 43)) {
-                player.l.points = player.l.points.minus(get_loss(player.l.points));
+                player.l.points = player.l.points.minus(get_loss(player.l.points)).max(0);
             }
             if (!hasUpgrade('s', 121)) {
-                player.f.points = player.f.points.minus(get_loss(player.f.points));
+                player.f.points = player.f.points.minus(get_loss(player.f.points)).max(0);
             }
             // Items
-            Object.entries(player.lo.items).forEach(([item, { amount }]) => {
+            Object.entries(player.lo.items).forEach(([item, data]) => {
                 if (item == 'stardust') return;
 
                 const upg = layers.s.investloans.item_upgrade[item] ?? false;
-                if (!upg || !hasUpgrade('s', upg)) player.lo.items[item].amount = D.minus(amount, get_loss(amount));
+                if (!upg || !hasUpgrade('s', upg)) data.amount = D.minus(data.amount, get_loss(data.amount)).max(0);
+            });
+            // Resources
+            Object.entries(player.resources).forEach(([resource, data]) => {
+                if (tmp.resources[resource].negate_b32) return;
+
+                data.amount = D.minus(data.amount, get_loss(data.amount)).max(0);
             });
         }
     },

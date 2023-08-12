@@ -1,6 +1,5 @@
 'use strict';
 
-//todo c achievements
 //todo p achievements
 addLayer('suc', {
     name: 'Successes',
@@ -85,6 +84,7 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.xp_alt.color;
                 return s;
             },
+            unlocked() { return tmp.xp_alt.layerShown; },
         },
         22: {
             name: 'You monster',
@@ -96,6 +96,7 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.xp_alt.color;
                 return s;
             },
+            unlocked() { return tmp.xp_alt.layerShown; },
         },
         23: {
             name: 'Passive friendship',
@@ -107,6 +108,7 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.xp_alt.color;
                 return s;
             },
+            unlocked() { return tmp.xp_alt.layerShown; },
         },
         24: {
             name: 'Snack time',
@@ -118,6 +120,7 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.xp_alt.color;
                 return s;
             },
+            unlocked() { return tmp.xp_alt.layerShown; },
         },
         25: {
             name: 'Newer friend',
@@ -129,6 +132,76 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.xp_alt.color;
                 return s;
             },
+            unlocked() { return tmp.xp_alt.layerShown; },
+        },
+        31: {
+            name: 'Free Things',
+            tooltip: 'Build and place a quarry and a forest',
+            done() {
+                const placed = tmp.c.buildings['*'].placed;
+                return D.gt(placed.quarry, 0) && D.gt(placed.forest, 0);
+            },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.c.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.c.color;
+                return s;
+            },
+            unlocked() { return tmp.c.layerShown; },
+        },
+        32: {
+            name: 'Going Down',
+            tooltip: 'Build and place a mine',
+            done() {
+                const placed = tmp.c.buildings['*'].placed;
+                return D.gt(placed.mine, 0);
+            },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.c.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.c.color;
+                return s;
+            },
+            unlocked() { return tmp.c.layerShown; },
+        },
+        33: {
+            name: 'Knowledge is power',
+            tooltip: 'Get 1 science',
+            done() { return D.gte(player.resources.science.amount, 1); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.c.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.c.color;
+                return s;
+            },
+            unlocked() { return tmp.c.layerShown; },
+        },
+        34: {
+            name: 'Power is... knowledge? No, that can\'t be right',
+            tooltip: 'Get 1 energy',
+            done() { return D.gte(player.resources.energy.amount, 1); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.c.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.c.color;
+                return s;
+            },
+            unlocked() { return tmp.c.layerShown; },
+        },
+        35: {
+            name: 'Dupe glitch',
+            tooltip: 'Build and place a duplicator',
+            done() {
+                const placed = tmp.c.buildings['*'].placed;
+                return D.gt(placed.duplicator, 0);
+            },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.c.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.c.color;
+                return s;
+            },
+            unlocked() { return tmp.c.layerShown; },
         },
         //#endregion Normal Successes
         //#region Bonus Successes
@@ -177,11 +250,11 @@ addLayer('suc', {
             unlocked() { return hasChallenge('b', 22); },
         },
         14: {
-            name: '???',
+            name: 'Tasty',
             tooltip() {
                 if (!hasChallenge('b', 31)) return 'Unseal ???';
 
-                return 'Unseal ???';
+                return 'Unseal Condiments';
             },
             done() { return false; },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
@@ -248,7 +321,7 @@ addLayer('suc', {
         switch (type) {
             case 'normal':
             default:
-                rows = [2];
+                rows = [2, 3];
                 break;
             case 'bonus':
                 rows = [1];

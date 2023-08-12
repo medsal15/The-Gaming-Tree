@@ -30,9 +30,11 @@ function setupTemp() {
 	tmp.displayThings = []
 	tmp.scrolled = 0
 	tmp.gameEnded = false
+	tmp.resources = {}
 	funcs = {}
 
 	setupTempData(layers, tmp, funcs)
+	setupTempData(resources, tmp.resources, funcs);
 	for (const layer in layers) {
 		tmp[layer].resetGain = {}
 		tmp[layer].nextAt = {}
@@ -98,6 +100,7 @@ function updateTemp() {
 		setupTemp()
 
 	updateTempData(layers, tmp, funcs)
+	updateTempData(resources, tmp.resources, funcs);
 
 	for (const layer in layers) {
 		tmp[layer].resetGain = getResetGain(layer)
@@ -108,7 +111,6 @@ function updateTemp() {
 		tmp[layer].notify = shouldNotify(layer)
 		tmp[layer].prestigeNotify = prestigeNotify(layer)
 		if (tmp[layer].passiveGeneration === true) tmp[layer].passiveGeneration = 1 // new Decimal(true) = decimalZero
-
 	}
 
 	tmp.pointGen = getPointGen()

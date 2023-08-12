@@ -1057,5 +1057,5 @@ addLayer('t', {
     },
     branches: [() => player.f.unlocked ? 'f' : 'lo'],
     prestigeNotify() { return !hasUpgrade('t', 22) && player.t.current; },
-    autoUpgrade() { return hasChallenge('b', 22) && player.t.auto_upgrade; },
+    autoUpgrade() { return hasChallenge('b', 22) && player.t.auto_upgrade && !tmp.t.deactivated; },
 });
