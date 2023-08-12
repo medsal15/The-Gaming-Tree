@@ -1712,24 +1712,6 @@ declare class LayerData {
     buyables: { [id: number]: Decimal }
 }
 
-declare class Resource<R extends string> {
-    readonly resource: R
-    name: Computable<string>
-    color: Computable<string>
-    getStartData(): Player['resources'][R]
-    /** Gain multipliers, prepared for both altnerate and normal layers */
-    gain_mult(): {
-        /** For normal layers */
-        normal: Decimal,
-        /** For alternate layers */
-        alt: Decimal,
-    }
-    /** If true, the resource is from an alternate layer */
-    alternate: boolean
-    /** If b 32 (-1% /s) has no effect on the resource */
-    negate_b32: Computable<boolean>
-}
-
 type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building';
 
 type Layers = {
@@ -2279,7 +2261,7 @@ type Layers = {
     c: Layer<'c'> & {
         upgrades: {
             [id: number]: Upgrade<'c'> & {
-                resource_costs?: Computable<[keyof typeof resources, Decimal][]>
+                resource_costs?: Computable<[string, Decimal][]>
                 item_costs?: Computable<[string, Decimal][]>
             }
         }
@@ -2295,6 +2277,7 @@ type Layers = {
                     'blank',
                     ['clickable', string],
                 ]] | undefined
+                description(building_id: string, effect?: string): string
                 produce_mult(): Decimal
                 item_produce_mult(): Decimal
                 consume_mult(): Decimal
@@ -2317,13 +2300,13 @@ type Layers = {
                     /** Total items produced per second */
                     items?: [string, Decimal][]
                     /** Total resources produced per second */
-                    resources?: [keyof Player['resources'], Decimal][]
+                    resources?: [string, Decimal][]
                 }
                 consumes?(amount_placed?: DecimalSource): {
                     /** Total items consumed per second */
                     items?: [string, Decimal][]
                     /** Total resources consumed per second */
-                    resources?: [keyof Player['resources'], Decimal][]
+                    resources?: [string, Decimal][]
                 }
                 effect?(amount_placed?: Decimal): any
                 /** Cost in items at amount */
@@ -2333,6 +2316,17 @@ type Layers = {
                     effect?: Computable<string>
                 }
                 unlocked?: Computable<boolean>
+            }
+        }
+        resources: {
+            '*': {
+            }
+        } & {
+            [resource: string]: {
+                readonly id: string
+                name: Computable<string>
+                color: Computable<string>
+                gain_mult(): Decimal
             }
         }
     }
@@ -2359,7 +2353,6 @@ type Temp = {
     }
     pointGen: Decimal
     scrolled: boolean
-    resources: RComputed<typeof resources>
     // Side
     ach: RComputed<Layers['ach']>
     clo: RComputed<Layers['clo']>
@@ -2406,7 +2399,6 @@ type Player = {
     timePlayed: number
     version: string
     versionType: string
-    resources: { [R in keyof typeof resources]: ReturnType<(typeof resources)[R]['getStartData']> }
     // Side
     ach: LayerData & {
         short_mode: boolean
@@ -2601,6 +2593,11 @@ type Player = {
         mode: 'place' | 'destroy' | 'toggle'
         /** Currently selected building for placement */
         building: string
+        resources: {
+            [resource: string]: {
+                amount: Decimal
+            }
+        }
     }
     // Special
     star: LayerData & {

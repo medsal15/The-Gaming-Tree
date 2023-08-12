@@ -167,7 +167,7 @@ addLayer('suc', {
         33: {
             name: 'Knowledge is power',
             tooltip: 'Get 1 science',
-            done() { return D.gte(player.resources.science.amount, 1); },
+            done() { return D.gte(player.c.resources.science.amount, 1); },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.c.color); },
             style() {
                 let s = {};
@@ -179,7 +179,7 @@ addLayer('suc', {
         34: {
             name: 'Power is... knowledge? No, that can\'t be right',
             tooltip: 'Get 1 energy',
-            done() { return D.gte(player.resources.energy.amount, 1); },
+            done() { return D.gte(player.c.resources.energy.amount, 1); },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.c.color); },
             style() {
                 let s = {};
