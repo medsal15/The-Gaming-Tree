@@ -1,6 +1,5 @@
 'use strict';
 
-//todo include city to per_second
 //todo add buyMax to buyables
 addLayer('lo', {
     name: 'Loot',
@@ -2718,7 +2717,7 @@ addLayer('lo', {
                         return sum.add(item.sources.weights[type]);
                     }, D.dZero);
             },
-            has_anvil() { return hasUpgrade('m', 33) || hasUpgrade('s', 22); },
+            has_anvil() { return hasUpgrade('m', 33) || hasUpgrade('s', 22) || hasUpgrade('c', 51); },
             value() {
                 return Object.values(tmp.lo.buyables).reduce((sum, buyable) => {
                     if (typeof buyable != 'object' || !('value' in buyable)) return sum;
@@ -3160,14 +3159,31 @@ addLayer('lo', {
 
                     if (tmp.c.layerShown) {
                         const buildings = tmp.c.buildings;
-                        Object.keys(buildings)
-                            .filter(building => building != '*' &&
-                                (buildings[building].unlocked ?? true) &&
-                                Array.isArray(buildings[building].produces.items) &&
-                                buildings[building].produces.items.some(([item]) => item == this.id))
-                            .forEach(building => {
-                                per_second[`building:${building}`] = tmp.c.buildings[building].produces.items.find(([item]) => item == this.id)[1];
-                            });
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
                     }
 
                     return per_second;
@@ -3217,14 +3233,31 @@ addLayer('lo', {
 
                     if (tmp.c.layerShown) {
                         const buildings = tmp.c.buildings;
-                        Object.keys(buildings)
-                            .filter(building => building != '*' &&
-                                (buildings[building].unlocked ?? true) &&
-                                Array.isArray(buildings[building].produces.items) &&
-                                buildings[building].produces.items.some(([item]) => item == this.id))
-                            .forEach(building => {
-                                per_second[`building:${building}`] = tmp.c.buildings[building].produces.items.find(([item]) => item == this.id)[1];
-                            });
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
                     }
 
                     return per_second;
@@ -3266,14 +3299,31 @@ addLayer('lo', {
 
                     if (tmp.c.layerShown) {
                         const buildings = tmp.c.buildings;
-                        Object.keys(buildings)
-                            .filter(building => building != '*' &&
-                                (buildings[building].unlocked ?? true) &&
-                                Array.isArray(buildings[building].produces.items) &&
-                                buildings[building].produces.items.some(([item]) => item == this.id))
-                            .forEach(building => {
-                                per_second[`building:${building}`] = tmp.c.buildings[building].produces.items.find(([item]) => item == this.id)[1];
-                            });
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
                     }
 
                     return per_second;
@@ -3315,6 +3365,35 @@ addLayer('lo', {
                         }
                     }
 
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
                     return per_second;
                 },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
@@ -3352,6 +3431,40 @@ addLayer('lo', {
 
                     return { 'mining:deep': deep, };
                 },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
             },
             name: 'iron ore',
             style: {
@@ -3377,6 +3490,40 @@ addLayer('lo', {
                     deep = deep.times(buyableEffect('lo', 72));
 
                     return { 'mining:deep': deep, };
+                },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
                 },
             },
             name: 'gold ore',
@@ -3577,6 +3724,35 @@ addLayer('lo', {
                         }
                     }
 
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
                     return per_second;
                 },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
@@ -3608,6 +3784,35 @@ addLayer('lo', {
                         if (forge_consume.gt(0)) {
                             per_second['forge:fuel'] = forge_consume.neg();
                         }
+                    }
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
                     }
 
                     return per_second;

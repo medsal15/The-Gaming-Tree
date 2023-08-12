@@ -65,7 +65,7 @@ function layerBuyableAmount(layer) {
 
     let sum = new Decimal(0);
     for (let id in tmp[layer].buyables) {
-        if (isNaN(id)) continue;
+        if (typeof tmp[layer].buyables != 'object') continue;
         sum = sum.add(getBuyableAmount(layer, id));
     }
     return sum;
@@ -220,4 +220,58 @@ function hue_to_rgb(p, q, t) {
  */
 function random_string_alpha(length) {
     return Array.from({ length }, () => String.fromCharCode(Math.floor(Math.random() * 26) + 65)).join('');
+}
+/**
+ * Creates the description of a city building
+ *
+ * @param {string} building
+ * @param {string} [effect='']
+ * @returns {string}
+ */
+function city_building_description(building_id, effect = '') {
+    const building = tmp.c.buildings[building_id],
+        placed = tmp.c.buildings['*'].placed[building_id] ?? D.dZero,
+        total = getBuyableAmount('c', building_id),
+        /** @type {string[]} */
+        production_parts = [],
+        produces = building.produces ?? {},
+        /** @type {string[]} */
+        consumption_parts = [],
+        consumes = building.consumes ?? {};
+
+    if ('items' in produces) {
+        production_parts.push(
+            ...produces.items
+                .map(([item, amount]) => `+${format(amount)} ${tmp.lo.items[item].name}`)
+        );
+    }
+    if ('resources' in produces) {
+        production_parts.push(
+            ...produces.resources
+                .map(([resource, amount]) => `<span style="color:${tmp.resources[resource].color};">+${format(amount)}</span> ${tmp.resources[resource].name}`)
+        );
+    }
+
+    if ('items' in consumes) {
+        consumption_parts.push(
+            ...consumes.items
+                .map(([item, amount]) => `-${format(amount)} ${tmp.lo.items[item].name}`)
+        );
+    }
+    if ('resources' in consumes) {
+        consumption_parts.push(
+            ...consumes.resources
+                .map(([resource, amount]) => `<span style="color:${tmp.resources[resource].color};">-${format(amount)}</span> ${tmp.resources[resource].name}`)
+        );
+    }
+
+    const produce_text = production_parts.length > 0 ? `They produce ${listFormat.format(production_parts)} /s<br>` : '',
+        consume_text = consumption_parts.length > 0 ? `They consume ${listFormat.format(consumption_parts)} /s<br>` : '';
+
+    if (effect.length) effect += '<br>';
+
+    return `You have ${formatWhole(placed)} / ${formatWhole(total)} ${building.name}<br>\
+        ${effect}\
+        ${consume_text}\
+        ${produce_text}`;
 }

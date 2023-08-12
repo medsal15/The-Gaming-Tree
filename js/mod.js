@@ -24,7 +24,7 @@ let modInfo = {
 	 * Using smaller files makes it easier to find what you're looking for.
 	 */
 	modFiles: [
-		'moreutils.js', 'tree.js',
+		'moreutils.js', 'resources.js', 'tree.js',
 		'layers/hotkeys.js', 'layers/star.js',
 
 		'layers/side/achievements.js', 'layers/side/clock.js', 'layers/side/casino.js', 'layers/side/magic.js', 'layers/side/stats.js',
@@ -157,6 +157,7 @@ function getPointGen() {
 	return new Decimal(0);
 }
 
+//todo move player.lo.items in here
 /**
  * A function that returns any non-layer-related data that you want to be added to the save data and "player" object.
  *
@@ -168,7 +169,12 @@ function getPointGen() {
  * ```
  */
 function addedPlayerData() {
-	return {};
+	return {
+		resources: Object.fromEntries(
+			Object.entries(resources)
+				.map(([resource, data]) => [resource, data.getStartData()]),
+		),
+	};
 }
 
 /**
