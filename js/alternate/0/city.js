@@ -10,6 +10,12 @@ addLayer('c', {
             unlocked: false,
             mode: 'place',
             building: '',
+            resources: Object.fromEntries(
+                Object.keys(layers.c.resources)
+                    .map(resource => [resource, {
+                        amount: D.dZero,
+                    }])
+            ),
         };
     },
     tooltip() { return `${formatWhole(layerBuyableAmount('c'))} buildings`; },
@@ -55,7 +61,7 @@ addLayer('c', {
             content: [
                 () => {
                     if (hasUpgrade('c', 51)) return ['column', [
-                        ['display-text', `You have ${resourceColor('energy', format(player.resources.energy.amount), 'font-size:1.5em;')} ${tmp.resources.energy.name}`],
+                        ['display-text', `You have <span style="color:${tmp.c.resources.energy.color};font-size:1.5em;">${format(player.c.resources.energy.amount)}</span> ${tmp.c.resources.energy.name}`],
                         'blank',
                     ]];
                 },
@@ -64,7 +70,7 @@ addLayer('c', {
         },
         'Research': {
             content: [
-                ['display-text', () => `You have ${resourceColor('science', format(player.resources.science.amount), 'font-size:1.5em;')} ${tmp.resources.science.name}`],
+                ['display-text', () => `You have <span style="color:${tmp.c.resources.science.color};font-size:1.5em;">${format(player.c.resources.science.amount)}</span> ${tmp.c.resources.science.name}`],
                 'blank',
                 ['upgrade-tree', [
                     [11],
@@ -74,9 +80,9 @@ addLayer('c', {
                     [51],
                 ]],
             ],
-            unlocked() { return D.gt(player.resources.science.total, 0); },
+            unlocked() { return D.gt(player.c.resources.science.amount, 0); },
             buttonStyle: {
-                'border-color'() { return tmp.resources.science.color; },
+                'border-color'() { return tmp.c.resources.science.color; },
             },
         },
     },
@@ -176,7 +182,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -193,7 +199,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -202,13 +208,13 @@ addLayer('c', {
                 return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                     .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
         },
         21: {
@@ -225,7 +231,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -242,7 +248,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -251,13 +257,13 @@ addLayer('c', {
                 return hasUpgrade('c', 11) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                     .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [11],
         },
@@ -275,7 +281,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -292,7 +298,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -301,13 +307,13 @@ addLayer('c', {
                 return hasUpgrade('c', 11) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                     .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [11],
         },
@@ -325,7 +331,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -342,7 +348,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -351,13 +357,13 @@ addLayer('c', {
                 return hasUpgrade('c', 11) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                     .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [11],
             unlocked() { return player.xp_alt.unlocked; },
@@ -376,7 +382,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -393,7 +399,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -402,13 +408,13 @@ addLayer('c', {
                 return hasUpgrade('c', 21) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                     .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [21],
         },
@@ -426,7 +432,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -443,7 +449,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -452,13 +458,13 @@ addLayer('c', {
                 return hasUpgrade('c', 22) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                     .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [22],
         },
@@ -476,7 +482,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -493,7 +499,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -502,13 +508,13 @@ addLayer('c', {
                 return hasUpgrade('c', 23) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                     .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [23],
             unlocked() { return player.xp_alt.unlocked; },
@@ -527,7 +533,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -545,7 +551,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -554,13 +560,13 @@ addLayer('c', {
                 return hasUpgrade('c', 31) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                     .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [31],
         },
@@ -578,7 +584,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -596,7 +602,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -605,13 +611,13 @@ addLayer('c', {
                 return hasUpgrade('c', 32) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                     .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [32],
         },
@@ -627,7 +633,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -645,7 +651,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -654,13 +660,13 @@ addLayer('c', {
                 return hasUpgrade('c', 33) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                     .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [33],
             unlocked() { return player.xp_alt.unlocked; },
@@ -679,7 +685,7 @@ addLayer('c', {
 
                     if (Array.isArray(tmphis.resource_costs) &&
                         tmphis.resource_costs.length > 0) {
-                        color = tmp.resources[tmphis.resource_costs[0][0]].color;
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
                     } else {
                         color = tmp.c.color;
                     }
@@ -696,7 +702,7 @@ addLayer('c', {
                     ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
                     ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.resources[resource].name}`),
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
                 ];
 
                 return `Cost: ${listFormat.format(cost_pieces)}`;
@@ -706,13 +712,13 @@ addLayer('c', {
                     (tmp[this.layer].upgrades[this.id].item_costs ?? [])
                         .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
                     (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
-                        .every(([resource, cost]) => D.gte(player.resources[resource].amount, cost));
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
                     .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => addResource(resource, cost.neg()));
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [41, 42, 43],
         },
@@ -909,6 +915,55 @@ addLayer('c', {
                     ['clickable', `select_${building}`],
                 ]];
             },
+            description(building_id, effect = '') {
+                if (!building_id) return '';
+
+                const building = tmp.c.buildings[building_id],
+                    placed = tmp.c.buildings['*'].placed[building_id] ?? D.dZero,
+                    total = getBuyableAmount('c', building_id),
+                    /** @type {string[]} */
+                    production_parts = [],
+                    produces = building.produces ?? {},
+                    /** @type {string[]} */
+                    consumption_parts = [],
+                    consumes = building.consumes ?? {};
+
+                if ('items' in produces) {
+                    production_parts.push(
+                        ...produces.items
+                            .map(([item, amount]) => `+${format(amount)} ${tmp.lo.items[item].name}`)
+                    );
+                }
+                if ('resources' in produces) {
+                    production_parts.push(
+                        ...produces.resources
+                            .map(([resource, amount]) => `<span style="color:${tmp.c.resources[resource].color};">+${format(amount)}</span> ${tmp.c.resources[resource].name}`)
+                    );
+                }
+
+                if ('items' in consumes) {
+                    consumption_parts.push(
+                        ...consumes.items
+                            .map(([item, amount]) => `-${format(amount)} ${tmp.lo.items[item].name}`)
+                    );
+                }
+                if ('resources' in consumes) {
+                    consumption_parts.push(
+                        ...consumes.resources
+                            .map(([resource, amount]) => `<span style="color:${tmp.c.resources[resource].color};">-${format(amount)}</span> ${tmp.c.resources[resource].name}`)
+                    );
+                }
+
+                const produce_text = production_parts.length > 0 ? `They produce ${listFormat.format(production_parts)} /s<br>` : '',
+                    consume_text = consumption_parts.length > 0 ? `They consume ${listFormat.format(consumption_parts)} /s<br>` : '';
+
+                if (effect.length) effect += '<br>';
+
+                return `You have ${formatWhole(placed)} / ${formatWhole(total)} ${building.name}<br>\
+                    ${effect}\
+                    ${consume_text}\
+                    ${produce_text}`;
+            },
             produce_mult() {
                 let mult = D.dOne;
 
@@ -946,7 +1001,7 @@ addLayer('c', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
             name: 'stone quarry',
-            description() { return city_building_description(this.id); },
+            description() { return layers.c.buildings['*'].description(this.id); },
             style: {
                 general: {
                     'background-color'() { return tmp.lo.items.stone.style['background-color']; },
@@ -1004,7 +1059,7 @@ addLayer('c', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
             name: 'mine',
-            description() { return city_building_description(this.id); },
+            description() { return layers.c.buildings['*'].description(this.id); },
             style: {
                 general: {
                     'background-image'() {
@@ -1067,7 +1122,7 @@ addLayer('c', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
             name: 'forest',
-            description() { return city_building_description(this.id); },
+            description() { return layers.c.buildings['*'].description(this.id); },
             style: {
                 general: {
                     'background-color'() { return tmp.lo.items.normal_log.style['background-color']; },
@@ -1126,7 +1181,7 @@ addLayer('c', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
             name: 'sawmill',
-            description() { return city_building_description(this.id); },
+            description() { return layers.c.buildings['*'].description(this.id); },
             style: {
                 general: {
                     'background-color'() { return tmp.lo.items.plank.style['background-color']; },
@@ -1205,22 +1260,22 @@ addLayer('c', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
             name: 'research center',
-            description() { return city_building_description(this.id); },
+            description() { return layers.c.buildings['*'].description(this.id); },
             style: {
                 general: {
-                    'background-color'() { return tmp.resources.science.color; },
+                    'background-color'() { return tmp.c.resources.science.color; },
                 },
             },
             produces(amount_placed) {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
                     .add(tmp.c.buildings.duplicator.effect[this.id]);
 
-                /** @type {[keyof typeof player.resources, Decimal][]} */
+                /** @type {[keyof typeof player.c.resources, Decimal][]} */
                 const resources = [['science', D(1 / 10)]];
 
                 resources.forEach(([resource, amount], i) => {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult)
-                        .times(tmp.resources[resource].gain_mult.alt);
+                        .times(tmp.c.resources[resource].gain_mult);
 
                     resources[i][1] = D.times(amount, mult);
                 });
@@ -1255,7 +1310,7 @@ addLayer('c', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
             name: 'deep mine',
-            description() { return city_building_description(this.id); },
+            description() { return layers.c.buildings['*'].description(this.id); },
             style: {
                 general: {
                     'background-image'() {
@@ -1322,7 +1377,7 @@ addLayer('c', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
             name: 'coal generator',
-            description() { return city_building_description(this.id); },
+            description() { return layers.c.buildings['*'].description(this.id); },
             style: {
                 general: {
                     'background-color'() { return tmp.lo.items.coal.style['background-color']; },
@@ -1333,12 +1388,12 @@ addLayer('c', {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
                     .add(tmp.c.buildings.duplicator.effect[this.id]);
 
-                /** @type {[keyof typeof player.resources, Decimal][]} */
+                /** @type {[keyof typeof player.c.resources, Decimal][]} */
                 const resources = [['energy', D(1 / 20)]];
 
                 resources.forEach(([resource, amount], i) => {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult)
-                        .times(tmp.resources[resource].gain_mult.alt);
+                        .times(tmp.c.resources[resource].gain_mult);
 
                     resources[i][1] = D.times(amount, mult);
                 });
@@ -1396,11 +1451,11 @@ addLayer('c', {
                 const building = tmp.c.buildings[this.id],
                     effect = shiftDown ? `[${building.formulas.effect}]` : format(building.effect),
                     effect_text = `They reduce star health by ${effect} (minimum 1 health)`;
-                return city_building_description(this.id, effect_text);
+                return layers.c.buildings['*'].description(this.id, effect_text);
             },
             style: {
                 general: {
-                    'background-image'() { return `linear-gradient(to right, ${tmp.resources.energy.color}, ${tmp.resources.science.color})`; },
+                    'background-image'() { return `linear-gradient(to right, ${tmp.c.resources.energy.color}, ${tmp.c.resources.science.color})`; },
                     'background-origin': 'border-box',
                 },
             },
@@ -1408,12 +1463,12 @@ addLayer('c', {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
                     .add(tmp.c.buildings.duplicator.effect[this.id]);
 
-                /** @type {[keyof typeof player.resources, Decimal][]} */
+                /** @type {[keyof typeof player.c.resources, Decimal][]} */
                 const resources = [['science', D(1)]];
 
                 resources.forEach(([resource, amount], i) => {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult)
-                        .times(tmp.resources[resource].gain_mult.alt);
+                        .times(tmp.c.resources[resource].gain_mult);
 
                     resources[i][1] = D.times(amount, mult);
                 });
@@ -1426,12 +1481,12 @@ addLayer('c', {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
                     .add(tmp.c.buildings.duplicator.effect[this.id]);
 
-                /** @type {[keyof typeof player.resources, Decimal][]} */
+                /** @type {[keyof typeof player.c.resources, Decimal][]} */
                 const resources = [['energy', D(1 / 10)]];
 
                 resources.forEach(([resource, amount], i) => {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult)
-                        .times(tmp.resources[resource].gain_mult.alt);
+                        .times(tmp.c.resources[resource].gain_mult);
 
                     resources[i][1] = D.times(amount, mult);
                 });
@@ -1478,7 +1533,7 @@ addLayer('c', {
                     /** @type {[string, Decimal]} */
                     effect = Object.entries(building.effect),
                     effect_text = 'They give ' + (effect.length ? listFormat.format(effect.map(([building, amount]) => `${format(amount)} effective ${tmp.c.buildings[building]?.name}`)) : 'no effective buildings');
-                return city_building_description(this.id, effect_text);
+                return layers.c.buildings['*'].description(this.id, effect_text);
             },
             style: {
                 general: {
@@ -1530,6 +1585,47 @@ addLayer('c', {
             unlocked() { return hasUpgrade('c', 51); },
         },
     },
+    /** @type {Layers['c']['resources']} */
+    resources: {
+        '*': {
+        },
+        science: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.c.resources).find(res => layers.c.resources[res] == this); },
+            name: 'science',
+            color: '#AA99FF',
+            gain_mult() {
+                let mult = D.dOne;
+
+                const upg = false;
+                if (upg && hasUpgrade('s', upg)) {
+                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                } else {
+                    mult = mult.div(D.add(player.c.resources[this.id].amount, 10).log10().pow(tmp.a.change_efficiency));
+                }
+
+                return mult;
+            },
+        },
+        energy: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.c.resources).find(res => layers.c.resources[res] == this); },
+            name: 'energy',
+            color: '#FFEE00',
+            gain_mult() {
+                let mult = D.dOne;
+
+                const upg = false;
+                if (upg && hasUpgrade('s', upg)) {
+                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                } else {
+                    mult = mult.div(D.add(player.c.resources[this.id].amount, 10).log10().pow(tmp.a.change_efficiency));
+                }
+
+                return mult;
+            },
+        },
+    },
     update(diff) {
         Object.keys(layers.c.buildings).forEach(building => {
             const build = tmp.c.buildings[building];
@@ -1543,7 +1639,7 @@ addLayer('c', {
                     can_consume &&= build.consumes.items.every(([item, amount]) => D.gte(player.lo.items[item].amount, D.times(amount, diff)));
                 }
                 if (can_consume && 'resources' in build.consumes && Array.isArray(build.consumes.resources)) {
-                    can_consume &&= build.consumes.resources.every(([resource, amount]) => D.gte(player.resources[resource].amount, D.times(amount, diff)));
+                    can_consume &&= build.consumes.resources.every(([resource, amount]) => D.gte(player.c.resources[resource].amount, D.times(amount, diff)));
                 }
 
                 if (!can_consume) return;
@@ -1556,7 +1652,7 @@ addLayer('c', {
 
                 if ('resources' in build.consumes && Array.isArray(build.consumes.resources)) {
                     build.consumes.resources.forEach(([resource, amount]) => {
-                        addResource(resource, D.times(amount, diff).neg());
+                        player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, D.times(amount, diff));
                     });
                 }
             }
@@ -1568,7 +1664,7 @@ addLayer('c', {
                 }
                 if ('resources' in build.produces && Array.isArray(build.produces.resources)) {
                     build.produces.resources.forEach(([resource, amount]) => {
-                        addResource(resource, D.times(amount, diff));
+                        player.c.resources[resource].amount = D.add(player.c.resources[resource].amount, D.times(amount, diff));
                     });
                 }
             }
@@ -1587,8 +1683,7 @@ addLayer('c', {
 
         layerDataReset(this.layer, keep);
         player[this.layer].upgrades.push(...kept_ups);
-        player.resources.science = resources.science.getStartData();
-        player.resources.energy = resources.energy.getStartData();
+        Object.keys(player.c.resources).forEach(res => player.c.resources[res] = { amount: D.dZero, });
     },
     branches: [['lo', 3]],
 });

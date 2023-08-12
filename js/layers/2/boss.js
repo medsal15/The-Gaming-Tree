@@ -489,8 +489,8 @@ addLayer('b', {
                 if (!upg || !hasUpgrade('s', upg)) data.amount = D.minus(data.amount, get_loss(data.amount)).max(0);
             });
             // Resources
-            Object.entries(player.resources).forEach(([resource, data]) => {
-                if (tmp.resources[resource].negate_b32) return;
+            Object.entries(player.c.resources).forEach(([resource, data]) => {
+                if (!false) return;
 
                 data.amount = D.minus(data.amount, get_loss(data.amount)).max(0);
             });

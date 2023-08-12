@@ -30,11 +30,9 @@ function setupTemp() {
 	tmp.displayThings = []
 	tmp.scrolled = 0
 	tmp.gameEnded = false
-	tmp.resources = {}
 	funcs = {}
 
 	setupTempData(layers, tmp, funcs)
-	setupTempData(resources, tmp.resources, funcs);
 	for (const layer in layers) {
 		tmp[layer].resetGain = {}
 		tmp[layer].nextAt = {}
@@ -100,7 +98,6 @@ function updateTemp() {
 		setupTemp()
 
 	updateTempData(layers, tmp, funcs)
-	updateTempData(resources, tmp.resources, funcs);
 
 	for (const layer in layers) {
 		tmp[layer].resetGain = getResetGain(layer)
