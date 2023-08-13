@@ -33,7 +33,7 @@ let modInfo = {
 		'layers/2/boss.js', 'layers/2/shop.js', 'layers/2/alternator.js',
 
 		'alternate/side/successes.js',
-		'alternate/0/experience.js', 'alternate/0/city.js',
+		'alternate/0/experience.js', 'alternate/0/city.js', 'alternate/0/plants.js',
 	],
 	/**
 	 * If you have a Discord server or other discussion place, you can add a link to it.

@@ -161,9 +161,10 @@ addLayer('a', {
                 const style = {};
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.p.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.t.color}, ${tmp.p.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.t.color;
                 }
@@ -174,7 +175,10 @@ addLayer('a', {
                 const color = [11, 12, 13].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[23, color]];
             },
-            canAfford: false,
+            onPurchase() {
+                player.p.unlocked = true;
+                doReset('s', true);
+            },
         },
         14: {
             title: 'Alternate Achievements',

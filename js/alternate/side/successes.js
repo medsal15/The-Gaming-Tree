@@ -1,6 +1,6 @@
 'use strict';
 
-//todo p achievements
+//todo p achievements 43, 44, 45
 addLayer('suc', {
     name: 'Successes',
     image: `./resources/images/cracked-disc.svg`,
@@ -203,6 +203,32 @@ addLayer('suc', {
             },
             unlocked() { return tmp.c.layerShown; },
         },
+        /*
+        41: {
+            name: 'Green thumb',
+            tooltip: 'Harvest a plant',
+            done() { return Object.values(player.p.plants).some(data => D.gte(data.harvested, 1)); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.p.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.p.color;
+                return s;
+            },
+            unlocked() { return tmp.p.layerShown; },
+        },
+        42: {
+            name: 'Brown thumb',
+            tooltip: 'Let a plant die',
+            done() { return Object.values(player.p.plants).some(data => D.gte(data.dead, 1)); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.p.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.p.color;
+                return s;
+            },
+            unlocked() { return tmp.p.layerShown; },
+        },
+        */
         //#endregion Normal Successes
         //#region Bonus Successes
         11: {
@@ -321,7 +347,7 @@ addLayer('suc', {
         switch (type) {
             case 'normal':
             default:
-                rows = [2, 3];
+                rows = [2, 3, 4];
                 break;
             case 'bonus':
                 rows = [1];

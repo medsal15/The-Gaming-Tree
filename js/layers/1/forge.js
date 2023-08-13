@@ -790,7 +790,7 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.add(60, amount.times(5));
+                let time = D.add(40, amount.times(5));
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
@@ -798,7 +798,7 @@ addLayer('f', {
             },
             formulas: {
                 'normal_log': 'amount * 20',
-                'time': 'amount * 5 + 60',
+                'time': 'amount * 5 + 40',
             },
             unlocked() { return (tmp.lo.items['normal_log'].unlocked ?? true) && (tmp.lo.items['coal'].unlocked ?? true); },
         },
@@ -811,7 +811,7 @@ addLayer('f', {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
                 const items = {
-                    'stone': amount.pow(1.25).times(25),
+                    'stone': amount.pow(1.25).times(20),
                 };
 
                 if (hasUpgrade('f', 33)) {
@@ -847,7 +847,7 @@ addLayer('f', {
                 return time;
             },
             formulas: {
-                'stone': '(amount ^ 1.25) * 25',
+                'stone': '(amount ^ 1.25) * 20',
                 'time': 'amount * 5 + 25',
             },
         },
@@ -859,7 +859,7 @@ addLayer('f', {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
                 const items = {
-                    'copper_ore': amount.pow(1.25).times(100),
+                    'copper_ore': amount.pow(1.25).times(75),
                 };
 
                 if (hasUpgrade('f', 33)) {
@@ -888,15 +888,15 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.add(40, amount.times(20));
+                let time = D.add(40, amount.times(10));
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
             formulas: {
-                'copper_ore': '(amount ^ 1.25) * 100',
-                'time': 'amount * 20 + 40',
+                'copper_ore': '(amount ^ 1.25) * 75',
+                'time': 'amount * 10 + 40',
             },
         },
         tin_ingot: {
@@ -907,7 +907,7 @@ addLayer('f', {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
                 const items = {
-                    'tin_ore': amount.pow(1.25).times(75),
+                    'tin_ore': amount.pow(1.25).times(50),
                 };
 
                 if (hasUpgrade('f', 33)) {
@@ -936,15 +936,15 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.add(30, amount.times(15));
+                let time = D.add(30, amount.times(10));
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
             formulas: {
-                'tin_ore': '(amount ^ 1.25) * 75',
-                'time': 'amount * 15 + 30',
+                'tin_ore': '(amount ^ 1.25) * 50',
+                'time': 'amount * 10 + 30',
             },
         },
         iron_ingot: {
@@ -955,7 +955,7 @@ addLayer('f', {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
                 const items = {
-                    'iron_ore': amount.pow(1.25).times(150),
+                    'iron_ore': amount.pow(1.25).times(100),
                 };
 
                 if (hasUpgrade('f', 33)) {
@@ -984,15 +984,15 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.add(75, amount.times(25));
+                let time = D.add(60, amount.times(15));
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
             formulas: {
-                'iron_ore': '(amount ^ 1.25) * 150',
-                'time': 'amount * 25 + 75',
+                'iron_ore': '(amount ^ 1.25) * 100',
+                'time': 'amount * 15 + 60',
             },
         },
         gold_ingot: {
@@ -1003,7 +1003,7 @@ addLayer('f', {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
                 const items = {
-                    'gold_ore': amount.pow(1.25).times(50),
+                    'gold_ore': amount.pow(1.25).times(25),
                 };
 
                 if (hasUpgrade('f', 33)) {
@@ -1032,15 +1032,15 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.add(50, amount.times(25));
+                let time = D.add(40, amount.times(20));
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
             formulas: {
-                'gold_ore': '(amount ^ 1.25) * 50',
-                'time': 'amount * 25 + 50',
+                'gold_ore': '(amount ^ 1.25) * 25',
+                'time': 'amount * 20 + 40',
             },
         },
         // Alloys
@@ -1082,7 +1082,7 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.pow(1.125, amount).times(25).add(120);
+                let time = D.pow(1.125, amount).times(30).add(60);
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
@@ -1091,7 +1091,7 @@ addLayer('f', {
             formulas: {
                 'copper_ore': '(amount ^ 1.5) * 300',
                 'tin_ore': '(amount ^ 1.5) * 100',
-                'time': '(1.125 ^ amount) * 25 + 120',
+                'time': '(1.125 ^ amount) * 30 + 60',
             },
             unlocked() { return hasUpgrade('f', 12); },
         },
@@ -1133,7 +1133,7 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.times(25, amount).add(180);
+                let time = D.times(30, amount).add(60);
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
@@ -1142,7 +1142,7 @@ addLayer('f', {
             formulas: {
                 'copper_ingot': '(amount ^ 1.4) * 3',
                 'tin_ingot': 'amount ^ 1.4',
-                'time': 'amount * 25 + 180',
+                'time': 'amount * 30 + 60',
             },
             unlocked() { return hasUpgrade('f', 12); },
         },
@@ -1184,7 +1184,7 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.pow(1.125, amount).times(50).add(240);
+                let time = D.pow(1.125, amount).times(40).add(120);
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
@@ -1193,7 +1193,7 @@ addLayer('f', {
             formulas: {
                 'iron_ore': '(amount ^ 1.5) * 300',
                 'coal': '(amount ^ 1.5) * 100',
-                'time': '(1.125 ^ amount) * 50 + 240',
+                'time': '(1.125 ^ amount) * 40 + 120',
             },
             unlocked() { return hasUpgrade('f', 12); },
         },
@@ -1235,16 +1235,16 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.times(amount, 50).add(300);
+                let time = D.times(amount, 40).add(120);
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
                 return time;
             },
             formulas: {
-                'iron_ingot': '(amount ^ 1.5) * 300',
+                'iron_ingot': '(amount ^ 1.5) * 10',
                 'coal': '(amount ^ 1.5) * 100',
-                'time': 'amount * 50 + 300',
+                'time': 'amount * 40 + 120',
             },
             unlocked() { return hasUpgrade('f', 12); },
         },
@@ -1288,7 +1288,7 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.times(amount, 60).add(600);
+                let time = D.times(amount, 60).add(300);
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
@@ -1298,7 +1298,7 @@ addLayer('f', {
                 'slime_goo': 'amount * 100',
                 'copper_ingot': '(amount ^ 1.25) * 50',
                 'gold_ingot': 'amount ^ 1.25',
-                'time': 'amount * 60 + 600',
+                'time': 'amount * 60 + 300',
             },
             unlocked() { return tmp.lo.items['holy_water'].unlocked ?? true; },
         },

@@ -480,7 +480,7 @@ declare class Layer<L extends string> {
          */
         showMasterButton?(): boolean,
     } & {
-        [id: number | string]: Clickable,
+        [id: number]: Clickable<L>,
     }
     /**
      * An area that functions like a set of subtabs,
@@ -580,7 +580,7 @@ declare class Layer<L extends string> {
         /**
          * Creates the default data for the gridable at this position. This can be an object, or a regular value.
          */
-        getStartData(id: number): any,
+        getStartData(id: number): Player[L]['grid'][number],
         /**
          * Returns true if the gridable at this position should be visible.
          */
@@ -588,39 +588,39 @@ declare class Layer<L extends string> {
         /**
          * Returns text that should displayed at the top in a larger font, based on the position and data of the gridable.
          */
-        getTitle?(data: any, id: number): string,
+        getTitle?(data: Player[L]['grid'][number], id: number): string,
         /**
          * Returns everything that should be displayed on the gridable after the title, based on the position and data of the gridable.
          */
-        getDisplay?(data: any, id: number): string,
+        getDisplay?(data: Player[L]['grid'][number], id: number): string,
         /**
          * Returns CSS to apply to this gridable, in the form of an object where the keys are CSS attributes,
          * and the values are the values for those attributes (both as strings).
          */
-        getStyle?(data: any, id: number): CSSStyles,
+        getStyle?(data: Player[L]['grid'][number], id: number): CSSStyles,
         /**
          * A function returning a bool to determine if you can click a gridable,
          * based on its data and position. If absent, you can always click it.
          */
-        getCanClick?(data: any, id: number): boolean,
+        getCanClick?(data: Player[L]['grid'][number], id: number): boolean,
         /**
          * A function that implements clicking on the gridable, based on its position and data.
          */
-        onClick(data: any, id: number): void,
+        onClick(data: Player[L]['grid'][number], id: number): void,
         /**
          * A function that is called 20x/sec when the button is held for at least 0.25 seconds.
          */
-        onHold?(data: any, id: number): void,
+        onHold?(data: Player[L]['grid'][number], id: number): void,
         /**
          * A function that calculates and returns a gridable's effect,
          * based on its position and data. (Whatever that means for a gridable)
          */
-        getEffect?(data: any, id: number): void,
+        getEffect?(data: Player[L]['grid'][number], id: number): void,
         /**
          * Adds a tooltip to the gridables, appears when they hovered over.
          * Can use basic HTML. Default is no tooltip. If this returns an empty value, that also disables the tooltip.
          */
-        getTooltip?(data: any, id: number): string,
+        getTooltip?(data: Player[L]['grid'][number], id: number): string,
     }
 
     /**
@@ -1712,7 +1712,7 @@ declare class LayerData {
     buyables: { [id: number]: Decimal }
 }
 
-type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building';
+type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building' | 'plant';
 
 type Layers = {
     // Side
@@ -2330,6 +2330,43 @@ type Layers = {
             }
         }
     }
+    p: Layer<'p'> & {
+        plants: {
+            '*': {
+            }
+        } & {
+            [plant: string]: {
+                readonly id: string
+                name: Computable<string>
+                style: {
+                    /** General style shared by all others */
+                    general: CSSStyles
+                    grid?: CSSStyles
+                }
+                /**
+                 * List of ages, in seconds as (min, max]
+                 *
+                 * Going beyond the highest will kill the plant
+                 */
+                ages: Computable<[from: DecimalSource, to: DecimalSource][]>
+                /** Time to maturation (as in, first age it can be harvest for something) */
+                maturation: Computable<DecimalSource>
+                /** List of images to display for the age */
+                images: string[]
+                /** Items produced at an age */
+                produce(age: Decimal): [string, Decimal][]
+                /** Full list of produced items */
+                produces: string[]
+                /** Amount of seeds earned from harvest */
+                seeds(age: Decimal): Decimal
+                effects?(): any
+                effects_text?(): string
+                /** If true, the plant will notify the player it's ready */
+                notify(): boolean
+                unlocked?: Computable<boolean>
+            }
+        }
+    }
     // Special
     star: Layer<'star'> & {
         star: {
@@ -2376,6 +2413,7 @@ type Temp = {
     // Alt Row 0
     xp_alt: RComputed<Layers['xp_alt']>
     c: RComputed<Layers['c']>
+    p: RComputed<Layers['p']>
     // Special
     star: RComputed<Layers['star']>
 };
@@ -2430,6 +2468,8 @@ type Player = {
         }
         /** Amount of times swapped */
         count: Decimal
+        /** Amount of times respecced */
+        respecs: Decimal
     }
     mag: LayerData & {
         /** Current selected element */
@@ -2596,6 +2636,27 @@ type Player = {
         resources: {
             [resource: string]: {
                 amount: Decimal
+            }
+        }
+    }
+    p: LayerData & {
+        grid: {
+            [id: number]: {
+                /** Plant placed on that tile */
+                plant: string
+                /** Age of the plant */
+                age: Decimal
+            }
+        }
+        mode: 'place' | 'harvest'
+        /** Currently selected plant for placement */
+        plant: string
+        plants: {
+            [plant: string]: {
+                /** Amount of seeds in storage */
+                seeds: Decimal
+                harvested: Decimal
+                dead: Decimal
             }
         }
     }

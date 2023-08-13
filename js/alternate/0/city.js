@@ -19,6 +19,7 @@ addLayer('c', {
         };
     },
     tooltip() { return `${formatWhole(layerBuyableAmount('c'))} buildings`; },
+    deactivated() { return inChallenge('b', 31); },
     layerShown() { return player.c.unlocked; },
     color: '#666677',
     row: 0,
@@ -90,6 +91,7 @@ addLayer('c', {
             },
         },
     },
+    /** @type {Layer<'c'>['grid']} */
     grid: {
         cols() {
             let cols = 5;
@@ -115,7 +117,6 @@ addLayer('c', {
                 enabled: true,
             };
         },
-        /** @param {Player['c']['grid'][number]} data */
         getCanClick(data, _) {
             switch (player.c.mode) {
                 case 'place':
@@ -127,7 +128,6 @@ addLayer('c', {
                     return data.building != '';
             }
         },
-        /** @param {Player['c']['grid'][number]} data */
         onClick(data, _) {
             switch (player.c.mode) {
                 case 'place':
@@ -148,7 +148,6 @@ addLayer('c', {
                     return;
             }
         },
-        /** @param {Player['c']['grid'][number]} data */
         getStyle(data, _) {
             if (!(data.building in tmp.c.buildings)) return {};
 
@@ -162,12 +161,10 @@ addLayer('c', {
                 building.style.grid ?? {},
             );
         },
-        /** @param {Player['c']['grid'][number]} data */
         getTooltip(data, _) {
             if (data?.building in tmp.c.buildings) return capitalize(tmp.c.buildings[data.building].name);
             return 'Empty';
         },
-        /** @param {Player['c']['grid'][number]} data */
         getDisplay(data, _) {
             if (data?.building in tmp.c.buildings) return data.enabled ? 'ON' : 'OFF';
         },
@@ -1567,6 +1564,9 @@ addLayer('c', {
                 general: {
                     'background-color'() { return tmp.lo.items.stone.style['background-color']; },
                 },
+                grid: {
+                    'background-image'() { return tmp.lo.items.stone.style['background-image']; },
+                },
             },
             produces(amount_placed) {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
@@ -1631,6 +1631,12 @@ addLayer('c', {
                     },
                     'background-origin': 'border-box',
                 },
+                grid: {
+                    'background-image'() {
+                        return `url('./resources/images/ore.svg'), linear-gradient(to right, ${tmp.lo.items.copper_ore.style['background-color']},\
+                        ${tmp.lo.items.tin_ore.style['background-color']})`;
+                    },
+                },
             },
             produces(amount_placed) {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
@@ -1692,6 +1698,9 @@ addLayer('c', {
                 general: {
                     'background-color'() { return tmp.lo.items.normal_log.style['background-color']; },
                 },
+                grid: {
+                    'background-image'() { return tmp.lo.items.normal_log.style['background-image']; },
+                },
             },
             produces(amount_placed) {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
@@ -1752,6 +1761,9 @@ addLayer('c', {
             style: {
                 general: {
                     'background-color'() { return tmp.lo.items.plank.style['background-color']; },
+                },
+                grid: {
+                    'background-image'() { return tmp.lo.items.plank.style['background-image']; },
                 },
             },
             produces(amount_placed) {
@@ -1836,6 +1848,9 @@ addLayer('c', {
                 general: {
                     'background-color'() { return tmp.c.resources.science.color; },
                 },
+                grid: {
+                    'background-image': `url('./resources/images/erlenmeyer.svg')`,
+                },
             },
             produces(amount_placed) {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
@@ -1890,6 +1905,13 @@ addLayer('c', {
                         ${tmp.lo.items.gold_ore.style['background-color']})`;
                     },
                     'background-origin': 'border-box',
+                },
+                grid: {
+                    'background-image'() {
+                        return `url('./resources/images/ore.svg'), linear-gradient(to right, ${tmp.lo.items.coal.style['background-color']},\
+                        ${tmp.lo.items.iron_ore.style['background-color']},\
+                        ${tmp.lo.items.gold_ore.style['background-color']})`;
+                    },
                 },
             },
             produces(amount_placed) {
@@ -1955,7 +1977,9 @@ addLayer('c', {
             style: {
                 general: {
                     'background-color'() { return tmp.lo.items.coal.style['background-color']; },
-                    'color': '#666666',
+                },
+                grid: {
+                    'background-image': `url('./resources/images/electric.svg')`,
                 },
             },
             produces(amount_placed) {
@@ -2035,6 +2059,11 @@ addLayer('c', {
                 general: {
                     'background-image'() { return `linear-gradient(to right, ${tmp.c.resources.energy.color}, ${tmp.c.resources.science.color})`; },
                     'background-origin': 'border-box',
+                },
+                grid: {
+                    'background-image'() {
+                        return `url('./resources/images/observatory.svg'), linear-gradient(to right, ${tmp.c.resources.energy.color}, ${tmp.c.resources.science.color})`;
+                    },
                 },
             },
             produces(amount_placed) {
@@ -2117,6 +2146,9 @@ addLayer('c', {
                 general: {
                     'background-color'() { return tmp.c.color; },
                 },
+                grid: {
+                    'background-image': `url('./resources/images/mirror-mirror.svg')`,
+                },
             },
             effect(_) {
                 const places = Object.keys(player.c.grid)
@@ -2162,6 +2194,18 @@ addLayer('c', {
             },
             unlocked() { return hasUpgrade('c', 51); },
         },
+        /**
+         * TODO
+         *
+         * Well -> produces water
+         *
+         * Restaurant -> cooks
+         * Factory -> crafts
+         * Smelter -> smelts
+         * Shop -> auto sells
+         *
+         * Launch Pad -> research + stardust
+         */
     },
     /** @type {Layers['c']['resources']} */
     resources: {
