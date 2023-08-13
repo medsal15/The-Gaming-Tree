@@ -2426,7 +2426,7 @@ addLayer('lo', {
         },
     },
     grid: {
-        rows: 9,
+        rows: 10,
         cols: 6,
         getStartData(_) { return {}; },
         getStyle(_, id) {
@@ -2662,6 +2662,8 @@ addLayer('lo', {
                         return `tamed ${tmp.xp_alt.monsters[sub].name}`;
                     case 'building':
                         return `built ${tmp.c.buildings[sub].name}`;
+                    case 'plant':
+                        return `grown ${tmp.p.plants[sub].name}`;
                 }
             },
             can_drop(type) {
@@ -2684,6 +2686,8 @@ addLayer('lo', {
                         return tmp.xp_alt.layerShown && (tmp.xp_alt.monsters[sub].unlocked ?? true);
                     case 'building':
                         return tmp.c.layerShown;
+                    case 'plant':
+                        return tmp.p.layerShown;
                 }
 
                 return false;
@@ -3404,7 +3408,7 @@ addLayer('lo', {
                 'background-color': '#444444',
                 'color': '#888888',
             },
-            unlocked() { return player.m.show_deep; },
+            unlocked() { return player.m.show_deep || tmp.c.layerShown; },
         },
         iron_ore: {
             _id: null,
@@ -3418,6 +3422,7 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 41)) chances['enemy:zombie'] = D.times(chances['enemy:zombie'], 2);
 
+                    chances['tamed_kill:zombie'] = chances['enemy:zombie'];
                     return chances;
                 },
                 weights() {
@@ -3471,7 +3476,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/ore.svg')`,
                 'background-color': '#888888',
             },
-            unlocked() { return hasChallenge('b', 12); },
+            unlocked() { return hasChallenge('b', 12) || tmp.c.layerShown; },
         },
         gold_ore: {
             _id: null,
@@ -3531,7 +3536,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/ore.svg')`,
                 'background-color': 'gold',
             },
-            unlocked() { return player.m.show_deep; },
+            unlocked() { return player.m.show_deep || tmp.c.layerShown; },
         },
         // Forge
         stone_brick: {
@@ -3702,6 +3707,8 @@ addLayer('lo', {
                         chances['enemy:ent'] = D(1 / 49);
 
                         if (hasChallenge('b', 42)) chances['enemy:ent'] = chances['enemy:ent'].times(2);
+
+                        chances['tamed_kill:ent'] = chances['enemy:ent'];
                     }
                     if (hasChallenge('b', 42)) {
                         chances['tree:baobab'] = D(1);
@@ -3762,7 +3769,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/log.svg')`,
                 'background-color': '#AA7755',
             },
-            unlocked() { return tmp.t.layerShown ?? true; },
+            unlocked() { return tmp.t.layerShown || tmp.c.layerShown; },
         },
         plank: {
             _id: null,
@@ -3823,7 +3830,30 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/planks.svg')`,
                 'background-color': '#997744',
             },
-            unlocked() { return tmp.t.layerShown; },
+            unlocked() { return tmp.t.layerShown || tmp.c.layerShown; },
+        },
+        // Plants
+        wheat: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1001,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                other() {
+                    const list = [];
+
+                    if (tmp.p.layerShown) list.push('plant:wheat');
+
+                    return list;
+                },
+            },
+            name: 'wheat',
+            style: {
+                'background-image': `url('./resources/images/wheat.svg')`,
+                'background-color': '#FFDDBB',
+            },
+            unlocked() { return tmp.p.layerShown ?? true; },
         },
         // Special
         holy_water: {

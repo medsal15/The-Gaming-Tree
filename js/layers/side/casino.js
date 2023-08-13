@@ -14,6 +14,7 @@ addLayer('cas', {
                 weights: {},
             },
             count: D.dZero,
+            respecs: D.dZero,
             swapping: {
                 challenge: false,
                 chances: false,
@@ -34,6 +35,7 @@ addLayer('cas', {
                 ['display-text', () => `Your next swap will cost ${shiftDown ? `[${tmp.cas.items.swap_cost_formula}]` : format(tmp.cas.items.swap_cost)} tokens`],
                 ['display-text', () => `You have swapped ${format(player.cas.count)} times`],
                 ['display-text', () => `You have ${format(tmp.cas.token.chance.times(100))}% to get a token every item drop roll`],
+                ['display-text', () => `<span style="color:#AA5555;">You need to swap ${format(player.cas.respecs)} times to respec</span>`],
                 'blank',
                 ['display-text', 'Click an item on the left column to select it.'],
                 ['display-text', 'Click an item on the right column to swap with the selected item.'],
@@ -313,7 +315,7 @@ addLayer('cas', {
 
             if (prop == 'respec_swaps') {
                 return {
-                    canClick() { return player.cas.count.gt(0); },
+                    canClick() { return player.cas.count.gt(player.cas.respecs); },
                     onClick() {
                         if (!confirm('Are you sure you want to respec your casino layer?')) return;
 

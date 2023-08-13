@@ -37,7 +37,7 @@ addLayer('t', {
         }
     },
     layerShown() { return player[this.layer].unlocked && !tmp[this.layer].deactivated; },
-    deactivated() { return inChallenge('b', 31); },
+    deactivated() { return inChallenge('b', 31) || hasUpgrade('a', 13); },
     color: '#CC7700',
     row: 0,
     position: 2,
@@ -103,6 +103,13 @@ addLayer('t', {
                     return `Cut ${drops}${count}`;
                 }],
                 'blank',
+                () => {
+                    if (options.noRNG) return ['row', [
+                        ['display-text', 'Current tree focused (leave blank for none)'],
+                        'blank',
+                        ['drop-down', ['focus', ['', ...Object.keys(layers.t.trees).filter(tree => tree != '*' && (tmp.t.trees[tree].unlocked ?? true))]]],
+                    ]];
+                },
                 ['display-text', () => {
                     /** @param {string} tree */
                     const row = tree => {
@@ -117,9 +124,9 @@ addLayer('t', {
 
                     return `<table class="layer-table" style="--color:${tmp.t.color}">\
                         <tr>\
-                            <td>Tree</td>\
-                            <td>Amount</td>\
-                            <td>Size</td>\
+                            <th>Tree</th>\
+                            <th>Amount</th>\
+                            <th>Size</th>\
                         </tr>\
                         ${Object.keys(tmp.t.trees).filter(tree => tree != '*' && tmp.t.trees[tree].unlocked).map(row).join('')}\
                     </table>`;
@@ -166,30 +173,6 @@ addLayer('t', {
                 if (canAffordLayerUpgrade('t')) style['box-shadow'] = 'var(--hqProperty2a), 0 0 20px #ff0000';
                 return style;
             },
-        },
-        'Focus': {
-            content: [
-                ['display-text', () => {
-                    const line = item => {
-                        const itemp = tmp.lo.items[item],
-                            color = itemp.style['background-color'],
-                            change = layers.t.convertion.per_second(item),
-                            change_str = change.abs().gt(.001) && player.t.convert ? ` (<span style="color:${color};text-shadow:${color} 0 0 10px">${change.gt(0) ? '+' : ''}${format(change)}</span> /s)` : '';
-                        return `<span style="color:${color};text-shadow:${color} 0 0 10px;font-size:1.5em;">\
-                        ${formatWhole(player.lo.items[item].amount)}\
-                        </span>${change_str} ${itemp.name}`;
-                    };
-
-                    return `You have ${listFormat.format(tmp.t.trees['*'].items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
-                }],
-                'blank',
-                () => { if (!options.noRNG) return ['display-text', '<span style="color:#AA5555;">This tab does nothing when luck is enabled</span>'] },
-                ['display-text', 'Focusing on a tree will automatically select it when your current tree is felled.'],
-                ['display-text', 'If there are none of it, a random tree will be selected.'],
-                'blank',
-                ['clickables', [2]],
-            ],
-            unlocked() { return options.noRNG; },
         },
     },
     clickables: {

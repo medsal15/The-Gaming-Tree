@@ -341,8 +341,8 @@ addLayer('b', {
         61: {
             name: 'Differences',
             challengeDescription: 'Enemies are given a random element which is randomized on death. Not using an element effectively disables row 1 layers.',
-            goalDescription: 'Kill a thousand enemies',
-            canComplete() { return tmp.xp.total.kills.gte(1e3); },
+            goalDescription: 'Kill 250 enemies',
+            canComplete() { return tmp.xp.total.kills.gte(250); },
             rewardDescription: 'Unlock Magic.',
             unlocked() { return hasChallenge('b', 41); },
             buttonStyle() {
