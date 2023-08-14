@@ -479,7 +479,7 @@ var popupID = 0;
 
 // Function to show popups
 /**
- * @param {String} type
+ * @param {'achievement'|'challenge'|'none'} type
  * @param {String} text
  * @param {String} title
  * @param {Number} timer time in seconds to display it

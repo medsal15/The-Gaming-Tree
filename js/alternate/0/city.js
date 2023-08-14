@@ -878,7 +878,57 @@ addLayer('c', {
             branches: [51],
             unlocked() { return hasUpgrade('c', 51); },
         },
-        //todo 64
+        64: {
+            title: 'Sickle',
+            description: '+50% plant harvest items',
+            effect() { return D(1.5); },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1).times(100))}%`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(2).pow([61, 62, 63, 64].filter(id => hasUpgrade('c', id)).length).times(20)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return hasUpgrade('c', 51) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
+            },
+            branches: [51],
+            unlocked() { return hasUpgrade('c', 51); },
+        },
         71: {
             title: 'Root Strengthening',
             description() {
@@ -1066,7 +1116,57 @@ addLayer('c', {
             branches: [63],
             unlocked() { return hasUpgrade('c', 51); },
         },
-        //todo 74
+        74: {
+            title: 'Greenhouse',
+            description: '+10% plant grow speed',
+            effect() { return D(1.1); },
+            effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(2).pow([71, 72, 73, 74].filter(id => hasUpgrade('c', id)).length).times(30)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return hasUpgrade('c', 64) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
+            },
+            branches: [64],
+            unlocked() { return hasUpgrade('c', 51); },
+        },
         81: {
             title: 'Terrain Expansion',
             description: '+1 city rows',
@@ -1220,6 +1320,57 @@ addLayer('c', {
                     .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [73],
+            unlocked() { return hasUpgrade('c', 51); },
+        },
+        84: {
+            title: 'Bigger Garden',
+            description: '+1 garden columns',
+            effect() { return 1; },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
+            resource_costs() { return [['science', D(2).pow([81, 82, 83, 84].filter(id => hasUpgrade('c', id)).length).times(50)]]; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return hasUpgrade('c', 74) && (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => player.lo.items[item].amount = D.minus(player.lo.items[item].amount, cost));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
+            },
+            branches: [74],
             unlocked() { return hasUpgrade('c', 51); },
         },
         //todo 84

@@ -510,6 +510,8 @@ addLayer('xp_alt', {
 
                 if (hasUpgrade('c', 23)) mult = mult.times(upgradeEffect('c', 23));
 
+                mult = mult.times(tmp.p.plants.candy_corn.effect);
+
                 return mult;
             },
             difficulty_add() {

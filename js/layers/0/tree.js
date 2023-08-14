@@ -105,9 +105,16 @@ addLayer('t', {
                 'blank',
                 () => {
                     if (options.noRNG) return ['row', [
-                        ['display-text', 'Current tree focused (leave blank for none)'],
+                        ['display-text', 'Current tree focused'],
                         'blank',
-                        ['drop-down', ['focus', ['', ...Object.keys(layers.t.trees).filter(tree => tree != '*' && (tmp.t.trees[tree].unlocked ?? true))]]],
+                        ['drop-down-double',
+                            ['focus', [
+                                ['', 'none'],
+                                ...Object.keys(layers.t.trees)
+                                    .filter(tree => tree != '*' && (tmp.t.trees[tree].unlocked ?? true))
+                                    .map(tree => [tree, tmp.t.trees[tree].name])
+                            ]],
+                        ],
                     ]];
                 },
                 ['display-text', () => {
