@@ -82,7 +82,7 @@ addLayer('s', {
             onClick() {
                 if (!confirm(`Doing this will not refund your ${tmp.s.investloans.type}s and will force a Shop reset.\nAre you sure?`)) return;
 
-                player.s.upgrades = player.s.upgrades.filter(id => id >= 61 && id < 90);
+                player.s.upgrades = player.s.upgrades.filter(id => !layers.s.investloans.is_upg_loan(id));
                 doReset('s', true);
             },
             canClick() { return tmp.s.investloans.amount.gt(0); },
