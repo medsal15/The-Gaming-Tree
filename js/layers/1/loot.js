@@ -3855,6 +3855,28 @@ addLayer('lo', {
             },
             unlocked() { return tmp.p.layerShown ?? true; },
         },
+        corn: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1002,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                other() {
+                    const list = [];
+
+                    if (tmp.p.layerShown) list.push('plant:corn');
+
+                    return list;
+                },
+            },
+            name: 'corn',
+            style: {
+                'background-image': `url('./resources/images/corn.svg')`,
+                'background-color': '#FFEE55',
+            },
+            unlocked() { return tmp.p.layerShown ?? true; },
+        },
         // Special
         holy_water: {
             _id: null,

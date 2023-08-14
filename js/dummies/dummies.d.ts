@@ -2333,6 +2333,10 @@ type Layers = {
     p: Layer<'p'> & {
         plants: {
             '*': {
+                /** List of unlocked plants */
+                list(): string[]
+                harvest_mult(): Decimal
+                grow_mult(): Decimal
             }
         } & {
             [plant: string]: {
@@ -2359,11 +2363,12 @@ type Layers = {
                 produces: string[]
                 /** Amount of seeds earned from harvest */
                 seeds(age: Decimal): Decimal
-                effects?(): any
-                effects_text?(): string
+                effect?(): any
+                effect_text?(): string
                 /** If true, the plant will notify the player it's ready */
                 notify(): boolean
                 unlocked?: Computable<boolean>
+                infusions: { [item: string]: string }
             }
         }
     }
@@ -2651,12 +2656,21 @@ type Player = {
         mode: 'place' | 'harvest'
         /** Currently selected plant for placement */
         plant: string
+        infuse_target: string
+        infuse_item: string
+        /** Last crop type harvested */
+        last_harvest: string
         plants: {
             [plant: string]: {
                 /** Amount of seeds in storage */
                 seeds: Decimal
                 harvested: Decimal
                 dead: Decimal
+                /** Known infusions */
+                infusions: string[]
+                last_harvest: [string, Decimal][]
+                last_harvest_seeds: Decimal
+                last_harvest_count: Decimal
             }
         }
     }

@@ -586,6 +586,16 @@ function loadVue() {
 			</select>
 		`
 	})
+
+	Vue.component('drop-down-double', {
+		props: ['layer', 'data'],
+		template: `
+			<select v-model="player[layer][data[0]]">
+				<option v-for="[item, name] in data[1]" v-bind:value="item">{{name}}</option>
+			</select>
+		`
+	});
+
 	// These are for buyables, data is the id of the corresponding buyable
 	Vue.component('sell-one', {
 		props: ['layer', 'data'],
