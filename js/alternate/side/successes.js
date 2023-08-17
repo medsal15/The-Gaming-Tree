@@ -1,6 +1,5 @@
 'use strict';
 
-//todo p achievements 43, 44, 45
 addLayer('suc', {
     name: 'Successes',
     image: `./resources/images/cracked-disc.svg`,
@@ -203,7 +202,6 @@ addLayer('suc', {
             },
             unlocked() { return tmp.c.layerShown; },
         },
-        /*
         41: {
             name: 'Green thumb',
             tooltip: 'Harvest a plant',
@@ -228,7 +226,42 @@ addLayer('suc', {
             },
             unlocked() { return tmp.p.layerShown; },
         },
-        */
+        43: {
+            name: 'Solar plant',
+            tooltip: 'Get some sunflower seeds',
+            done() { return D.gt(player.p.plants.sunflower.seeds, 0); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.p.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.p.color;
+                return s;
+            },
+            unlocked() { return tmp.p.layerShown; },
+        },
+        44: {
+            name: 'Stranger plant',
+            tooltip: 'Get a weird plant\'s seed',
+            done() { return ['copper_wheat', 'candy_corn', 'clockberry', 'starflower', 'potato_battery', 'egg_plant'].some(plant => D.gt(player.p.plants[plant].seeds, 0)); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.p.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.p.color;
+                return s;
+            },
+            unlocked() { return tmp.p.layerShown; },
+        },
+        45: {
+            name: '"egg"',
+            tooltip: 'Get an egg',
+            done() { return D.gt(player.lo.items.egg.amount, 0); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.p.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.p.color;
+                return s;
+            },
+            unlocked() { return tmp.p.layerShown; },
+        },
         //#endregion Normal Successes
         //#region Bonus Successes
         11: {

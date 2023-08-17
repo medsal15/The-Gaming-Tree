@@ -2395,6 +2395,8 @@ addLayer('c', {
                     mult = mult.div(D.add(player.c.resources[this.id].amount, 10).log10().pow(tmp.a.change_efficiency));
                 }
 
+                mult = mult.times(tmp.p.plants.potato_battery.effect);
+
                 return mult;
             },
         },

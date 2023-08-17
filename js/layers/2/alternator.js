@@ -290,7 +290,7 @@ addLayer('a', {
         },
         24: {
             title: 'Alternate Clock',
-            description: 'Not Yet Implemented<br>It\'s rewind time',
+            description: 'It\'s rewind time',
             cost: D.dTwo,
             item: 'stardust',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -409,6 +409,7 @@ addLayer('a', {
                 return style;
             },
             unlocked() { return tmp.cas.layerShown; },
+            canAfford: false,
         },
         44: {
             title: 'Alternate Magic',
@@ -435,6 +436,7 @@ addLayer('a', {
                 return style;
             },
             unlocked() { return tmp.mag.layerShown; },
+            canAfford: false,
         },
         54: {
             title: 'Alternate Stats',
@@ -461,6 +463,7 @@ addLayer('a', {
                 return style;
             },
             unlocked() { return tmp.sta.layerShown; },
+            canAfford: false,
         },
     },
     type: 'none',

@@ -136,20 +136,33 @@ addLayer('b', {
                     const row = challenge => {
                         let color,
                             beaten;
-                        switch (Math.floor(challenge / 10)) {
-                            default:
-                            case 1:
-                            case 2:
+                        switch (+challenge) {
+                            case 11:
+                            case 12:
+                            case 21:
+                            case 22:
                                 color = '#AA5555';
                                 break;
-                            case 3:
-                            case 4:
+                            case 31:
+                            case 32:
+                            case 41:
+                            case 42:
                                 color = '#CC6666';
                                 break;
-                            case 5:
-                            case 6:
+                            case 51:
+                            case 52:
+                            case 61:
+                            case 62:
                                 color = '#7777EE';
                                 break;
+                            case 81:
+                            //todo color = alt clock
+                            case 82:
+                            //todo color = alt casino
+                            case 91:
+                            //todo color = alt magic
+                            case 92:
+                            //todo color = alt stats
                         }
                         if (inChallenge('b', 71)) {
                             if (player.b.final_challenges.includes(challenge)) beaten = 'active';
@@ -431,6 +444,11 @@ addLayer('b', {
                 }
             },
         },
+        // Seals
+        //todo 81
+        //todo 82
+        //todo 91
+        //todo 92
     },
     automate() {
         if (player.b.auto_start && !player.b.activeChallenge) {
