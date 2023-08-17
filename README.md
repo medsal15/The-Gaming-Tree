@@ -10,6 +10,7 @@ SVGs available from [game-icons.net](https://game-icons.net), ([license](https:/
 
 By [Lorc](https://lorcblog.blogspot.com/):
 
+- [eggplant](https://game-icons.net/1x1/lorc/aubergine.html)
 - [brain](https://game-icons.net/1x1/lorc/brain.html)
 - [cog](https://game-icons.net/1x1/lorc/cog.html)
 - [cracked disk](https://game-icons.net/1x1/lorc/cracked-disc.html)
@@ -37,11 +38,13 @@ By [Delapouite](https://delapouite.com/):
 - [next button](https://game-icons.net/1x1/delapouite/next-button.html)
 - [observatory](https://game-icons.net/1x1/delapouite/observatory.html)
 - [pickaxe](https://game-icons.net/1x1/delapouite/war-pick.html)
+- [potato](https://game-icons.net/1x1/delapouite/potato.html)
 - [planks](https://game-icons.net/1x1/delapouite/planks.html)
 - [previous button](https://game-icons.net/1x1/delapouite/previous-button.html)
 - [rolled cloth](https://game-icons.net/1x1/delapouite/rolled-cloth.html)
 - [round star](https://game-icons.net/1x1/delapouite/round-star.html)
 - [sesame](https://game-icons.net/1x1/delapouite/sesame.html)
+- [strawberry](https://game-icons.net/1x1/delapouite/strawberry.html)
 - [token](https://game-icons.net/1x1/delapouite/token.html)
 
 By Skoll:
@@ -55,6 +58,7 @@ By [Faithtoken](http://www.faithtoken.com/)
 
 By [sbed](http://opengameart.org/content/95-game-icons)
 
+- [big egg](https://game-icons.net/1x1/sbed/big-egg.html)
 - [electric](https://game-icons.net/1x1/sbed/electric.html)
 
 Images available from [OpenGameArt](https://opengameart.org)

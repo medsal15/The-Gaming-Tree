@@ -2501,7 +2501,8 @@ addLayer('lo', {
             }
             if ('other' in sources && sources.other) {
                 lines.push(
-                    ...sources.other.map(type => capitalize(star.type_name(type))),
+                    ...sources.other.filter(type => star.can_drop(type))
+                        .map(type => capitalize(star.type_name(type))),
                 );
             }
 
@@ -2687,7 +2688,7 @@ addLayer('lo', {
                     case 'building':
                         return tmp.c.layerShown;
                     case 'plant':
-                        return tmp.p.layerShown;
+                        return tmp.p.layerShown && (tmp.p.plants[sub].unlocked ?? true);
                 }
 
                 return false;
@@ -3843,7 +3844,7 @@ addLayer('lo', {
                 other() {
                     const list = [];
 
-                    if (tmp.p.layerShown) list.push('plant:wheat');
+                    if (tmp.p.layerShown) list.push('plant:wheat', 'plant:copper_wheat');
 
                     return list;
                 },
@@ -3865,7 +3866,7 @@ addLayer('lo', {
                 other() {
                     const list = [];
 
-                    if (tmp.p.layerShown) list.push('plant:corn');
+                    if (tmp.p.layerShown) list.push('plant:corn', 'plant:candy_corn');
 
                     return list;
                 },
@@ -3874,6 +3875,94 @@ addLayer('lo', {
             style: {
                 'background-image': `url('./resources/images/corn.svg')`,
                 'background-color': '#FFEE55',
+            },
+            unlocked() { return tmp.p.layerShown ?? true; },
+        },
+        strawberry: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1003,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                other() {
+                    const list = [];
+
+                    if (tmp.p.layerShown) list.push('plant:strawberry', 'plant:clockberry');
+
+                    return list;
+                },
+            },
+            name: 'strawberry',
+            style: {
+                'background-image': `url('./resources/images/strawberry.svg')`,
+                'background-color': '#FF4444',
+            },
+            unlocked() { return tmp.p.layerShown ?? true; },
+        },
+        potato: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1004,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                other() {
+                    const list = [];
+
+                    if (tmp.p.layerShown) list.push('plant:potato', 'plant:potato_battery');
+
+                    return list;
+                },
+            },
+            name: 'potato',
+            style: {
+                'background-image': `url('./resources/images/potato.svg')`,
+                'background-color': '#FFCC88',
+            },
+            unlocked() { return tmp.p.layerShown ?? true; },
+        },
+        eggplant: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1005,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                other() {
+                    const list = [];
+
+                    if (tmp.p.layerShown) list.push('plant:eggplant');
+
+                    return list;
+                },
+            },
+            name: 'eggplant',
+            style: {
+                'background-image': `url('./resources/images/aubergine.svg')`,
+                'background-color': '#664455',
+            },
+            unlocked() { return tmp.p.layerShown ?? true; },
+        },
+        egg: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1006,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                other() {
+                    const list = [];
+
+                    if (tmp.p.layerShown) list.push('plant:egg_plant');
+
+                    return list;
+                },
+            },
+            name: 'egg',
+            style: {
+                'background-image': `url('./resources/images/big-egg.svg')`,
+                'background-color': '#FFEEDD',
             },
             unlocked() { return tmp.p.layerShown ?? true; },
         },
