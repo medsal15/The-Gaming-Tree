@@ -1,5 +1,6 @@
 'use strict';
 
+//todo apply tic time speed where clo time speed is used
 //todo add buyMax to buyables
 addLayer('clo', {
     name: 'Clock',
@@ -11,7 +12,7 @@ addLayer('clo', {
             use_advanced: false,
         };
     },
-    layerShown() { return inChallenge('b', 51) || hasChallenge('b', 51); },
+    layerShown() { return (inChallenge('b', 51) || hasChallenge('b', 51)) && !hasUpgrade('a', 24); },
     color: '#FFFFFF',
     row: 'side',
     resource: 'time',
@@ -1068,9 +1069,15 @@ addLayer('clo', {
                 'xp': 11, 'm': 12, 't': 13,
                 'l': 21, 'lo': 22, 'f': 23,
                 'b': 31, 's': 32, 'a': 33,
+
+                'xp_alt': 11, 'c': 12, 'p': 13,
             };
             if (!(layer in links) || !hasUpgrade(this.layer, links[layer])) return speed;
         }
+
+        const alt = [
+            'xp_alt', 'c', 'p',
+        ];
 
         /** @type {number|'side'} */
         let row = tmp[layer]?.displayRow ?? tmp[layer]?.row ?? 0;
@@ -1088,6 +1095,8 @@ addLayer('clo', {
         speed = speed.add(buyableEffect('clo', 51));
 
         speed = speed.root(D.dTwo.pow(row));
+
+        if (alt.includes(layer)) speed = speed.pow(tmp.a.change_efficiency);
 
         return speed;
     },

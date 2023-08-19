@@ -156,7 +156,8 @@ addLayer('b', {
                                 color = '#7777EE';
                                 break;
                             case 81:
-                            //todo color = alt clock
+                                color = tmp.tic.color;
+                                break;
                             case 82:
                             //todo color = alt casino
                             case 91:
@@ -445,7 +446,22 @@ addLayer('b', {
             },
         },
         // Seals
-        //todo 81
+        81: {
+            name: 'Unseal the Time Cubes',
+            challengeDescription: `\
+                Time is multiplied by a random number between -1 and 2 every second<br><br>\
+                <span style="color:#AA5555;">This works like a Boss challenge</span>`,
+            goalDescription: '???',
+            canComplete: false,
+            rewardDescription: 'Unlock Time Cubes',
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    style = { 'background-color': '#FF00FF', };
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
+            unlocked: true,
+        },
         //todo 82
         //todo 91
         //todo 92

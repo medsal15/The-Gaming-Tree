@@ -76,6 +76,16 @@ addLayer('xp_alt', {
     tabFormat: {
         'Monster': {
             content: [
+                () => {
+                    const speed = layers.clo.time_speed('p');
+
+                    if (speed.neq(1)) return [
+                        'column', [
+                            ['display-text', `Time speed: *${format(speed)}`],
+                            'blank',
+                        ],
+                    ];
+                },
                 [
                     'display-text',
                     () => {
@@ -871,6 +881,8 @@ addLayer('xp_alt', {
         });
     },
     update(diff) {
+        if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+
         addPoints('xp_alt', D.times(tmp.xp_alt.monsters['*'].experience, diff));
 
         for (const type of tmp.xp_alt.monsters['*'].list) {

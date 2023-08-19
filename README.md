@@ -33,6 +33,7 @@ By [Delapouite](https://delapouite.com/):
 - [clay brick](https://game-icons.net/1x1/delapouite/clay-brick.html)
 - [crafting](https://game-icons.net/1x1/delapouite/crafting.html)
 - [corn](https://game-icons.net/1x1/delapouite/corn.html)
+- [cube](https://game-icons.net/1x1/delapouite/cube.html)
 - [exit door](https://game-icons.net/1x1/delapouite/exit-door.html)
 - [log](https://game-icons.net/1x1/delapouite/log.html)
 - [next button](https://game-icons.net/1x1/delapouite/next-button.html)

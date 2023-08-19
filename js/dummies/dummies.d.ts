@@ -2202,11 +2202,14 @@ type Layers = {
         change_efficiency(): Decimal
     }
     // Alt Side
-    suc: Layer<'ach'> & {
+    suc: Layer<'suc'> & {
         getFailuresRows(type?: AchievementTypes): number[]
         getFailures(type?: AchievementTypes): string[]
         totalFailures(type?: AchievementTypes): Decimal
         ownedFailures(type?: AchievementTypes): Decimal
+    }
+    tic: Layer<'tic'> & {
+        time_speed(layer?: string): Decimal
     }
     // Alt Row 0
     xp_alt: Layer<'xp_alt'> & {
@@ -2415,6 +2418,7 @@ type Temp = {
     a: RComputed<Layers['a']>
     // Alt Side
     suc: RComputed<Layers['suc']>
+    tic: RComputed<Layers['tic']>
     // Alt Row 0
     xp_alt: RComputed<Layers['xp_alt']>
     c: RComputed<Layers['c']>
@@ -2610,6 +2614,15 @@ type Player = {
     // Alt Side
     suc: LayerData & {
         short_mode: boolean
+    }
+    tic: LayerData & {
+        /** If true, time speed is inverted and produce time cubes */
+        invert: boolean
+        /** Challenge only */
+        chal: {
+            speed: Decimal
+            time: Decimal
+        }
     }
     // Alt Row 0
     xp_alt: LayerData & {
