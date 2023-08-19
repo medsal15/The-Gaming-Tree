@@ -2335,14 +2335,14 @@ type Layers = {
              */
             amount(real?: boolean): Decimal
             /** Determines whether the player is in a loan/debt challenge */
-            is_loans(): boolean
+            use_loans(): boolean
             type(): 'loan' | 'debt' | 'investment'
             /** List of investments/loans linked to specific items */
             item_upgrade: {
                 [item: string]: number | undefined
             }
             /** Checks whether the upgrade id is an investment/loan/debt */
-            is_loan(id?: number): boolean
+            is_upg_loan(id?: number): boolean
         }
     }
     a: Layer<Player['b']> & {
