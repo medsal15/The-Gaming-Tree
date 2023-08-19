@@ -1,6 +1,5 @@
 'use strict';
 
-//todo plant effects
 addLayer('p', {
     name: 'Plants',
     symbol: 'P',
@@ -44,6 +43,16 @@ addLayer('p', {
     tabFormat: {
         'Garden': {
             content: [
+                () => {
+                    const speed = layers.clo.time_speed('p');
+
+                    if (speed.neq(1)) return [
+                        'column', [
+                            ['display-text', `Time speed: *${format(speed)}`],
+                            'blank',
+                        ],
+                    ];
+                },
                 ['clickables', [1]],
                 'blank',
                 'grid',
@@ -80,6 +89,16 @@ addLayer('p', {
         },
         'Plants': {
             content: [
+                () => {
+                    const speed = layers.clo.time_speed('p');
+
+                    if (speed.neq(1)) return [
+                        'column', [
+                            ['display-text', `Time speed: *${format(speed)}`],
+                            'blank',
+                        ],
+                    ];
+                },
                 ['row', [
                     ['display-text', 'Currently planting'],
                     'blank',
@@ -297,8 +316,15 @@ addLayer('p', {
             if (!(data.plant in layers.p.plants)) return {};
 
             const plant = tmp.p.plants[data.plant],
-                stage = plant.ages.findIndex(([from, to]) => D.gt(data.age, from) && D.lte(data.age, to)),
-                image = plant.images[stage];
+                nega = data.age.lt(0),
+                /** @type {number} */
+                stage = plant.ages.findIndex(([from, to]) => D.gt(data.age.abs(), from) && D.lte(data.age.abs(), to)),
+                image = plant.images[stage],
+                negastyle = {
+                    'transform': `scaleY(-1)`,
+                    'filter': `invert(1)`,
+                    'z-index': 10,
+                };
 
             return Object.assign(
                 {},
@@ -310,6 +336,7 @@ addLayer('p', {
                     'background-origin': 'border-box',
                     'background-position': 'center',
                 },
+                nega ? negastyle : {},
             );
         },
         getTooltip(data, _) {
@@ -1551,6 +1578,8 @@ addLayer('p', {
          */
     },
     update(diff) {
+        if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+
         Object.entries(player.p.grid).forEach(([, data]) => {
             if (data.plant == '') return;
 

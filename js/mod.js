@@ -32,7 +32,7 @@ let modInfo = {
 		'layers/1/level.js', 'layers/1/loot.js', 'layers/1/forge.js',
 		'layers/2/boss.js', 'layers/2/shop.js', 'layers/2/alternator.js',
 
-		'alternate/side/successes.js',
+		'alternate/side/successes.js', 'alternate/side/time_cubes.js',
 		'alternate/0/experience.js', 'alternate/0/city.js', 'alternate/0/plants.js',
 	],
 	/**

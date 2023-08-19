@@ -61,6 +61,16 @@ addLayer('c', {
         'Buildings': {
             content: [
                 () => {
+                    const speed = layers.clo.time_speed('c');
+
+                    if (speed.neq(1)) return [
+                        'column', [
+                            ['display-text', `Time speed: *${format(speed)}`],
+                            'blank',
+                        ],
+                    ];
+                },
+                () => {
                     if (hasUpgrade('c', 51)) return ['column', [
                         ['display-text', `You have <span style="color:${tmp.c.resources.energy.color};font-size:1.5em;">${format(player.c.resources.energy.amount)}</span> ${tmp.c.resources.energy.name}`],
                         'blank',
@@ -2402,6 +2412,8 @@ addLayer('c', {
         },
     },
     update(diff) {
+        if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+
         Object.keys(layers.c.buildings).forEach(building => {
             const build = tmp.c.buildings[building];
 

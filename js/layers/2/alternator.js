@@ -313,6 +313,7 @@ addLayer('a', {
                 return style;
             },
             unlocked() { return tmp.clo.layerShown; },
+            onPurchase() { player.tic.unlocked = true; },
         },
         31: {
             title: 'Alternate Bosses',
