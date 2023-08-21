@@ -43,7 +43,7 @@ addLayer('l', {
                 'prestige-button',
                 'blank',
                 () => {
-                    const speed = layers.clo.time_speed('l');
+                    const speed = D.times(layers.clo.time_speed('l'), layers.tic.time_speed('l'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -275,7 +275,7 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(270); },
             effect() {
-                if (tmp.l.deactivated) return D.dOne;
+                if (tmp.l.deactivated) return D.dZero;
                 return D(1 / 50).times(player.l.skills[this.id].level).add(1);
             },
             unlocked() { return hasMilestone('l', 3); },
@@ -299,7 +299,7 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(130); },
             effect() {
-                if (tmp.l.deactivated) return D.dOne;
+                if (tmp.l.deactivated) return D.dZero;
                 return D(1 / 100).times(player.l.skills[this.id].level);
             },
             unlocked() { return hasMilestone('l', 4); },
@@ -357,7 +357,7 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(2.5).times(50); },
             effect() {
-                if (tmp.l.deactivated) return D.dOne;
+                if (tmp.l.deactivated) return D.dZero;
                 return D.div(player.l.skills[this.id].level, 20);
             },
             unlocked() { return hasChallenge('b', 21); },
@@ -403,6 +403,7 @@ addLayer('l', {
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.tic.layerShown) diff = D.times(diff, layers.tic.time_speed(this.layer));
 
         let skill_speed = D.times(diff, tmp.l.skills["*"].speed);
 
@@ -438,7 +439,7 @@ addLayer('l', {
 
         div = div.div(buyableEffect('lo', 71));
 
-        if (inChallenge('b', 12) && !hasUpgrade('s', 43)) div = div.div(player.l.points.add(10).log10());
+        if (inChallenge('b', 12) && !hasUpgrade('s', 43)) div = div.div(player.l.points.max(0).add(10).log10());
         if (hasUpgrade('s', 43)) div = div.div(upgradeEffect('s', 43));
 
         if (hasUpgrade('s', 32)) div = div.div(upgradeEffect('s', 32));

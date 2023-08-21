@@ -61,7 +61,7 @@ addLayer('c', {
         'Buildings': {
             content: [
                 () => {
-                    const speed = layers.clo.time_speed('c');
+                    const speed = D.times(layers.clo.time_speed('c'), layers.tic.time_speed('c'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -95,9 +95,15 @@ addLayer('c', {
                     [91],
                 ]],
             ],
-            unlocked() { return D.gt(player.c.resources.science.amount, 0); },
-            buttonStyle: {
-                'border-color'() { return tmp.c.resources.science.color; },
+            unlocked() { return D.gt(player.c.resources.science.amount, 0) || player.c.upgrades.length > 0; },
+            buttonStyle() {
+                // If you figure out why shouldNotify does nothing when it returns true, I'll use it again.
+                // Until then, it's done manually
+                const style = {
+                    'border-color': tmp.c.resources.science.color,
+                };
+                if (canAffordLayerUpgrade('c')) style['box-shadow'] = 'var(--hqProperty2a), 0 0 20px #ff0000';
+                return style;
             },
         },
     },
@@ -937,13 +943,13 @@ addLayer('c', {
                     .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [51],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) && player.p.unlocked; },
         },
         71: {
             title: 'Root Strengthening',
             description() {
                 if (!shiftDown) {
-                    return 'Quarries and forests boost each other\'s productions';
+                    return 'Bought quarries and forests boost each other\'s productions';
                 }
                 let formula_forest = '2√(quarries + 1)',
                     formula_quarry = '2√(forests + 1)';
@@ -1011,7 +1017,7 @@ addLayer('c', {
             title: 'Metal Recycling',
             description() {
                 if (!shiftDown) {
-                    return 'Mines and sawmills boost each other\'s productions and consumptions';
+                    return 'Bought mines and sawmills boost each other\'s productions and consumptions';
                 }
                 let formula_sawmill = '3√(mines + 1)',
                     formula_mine = '3√(sawmills + 1)';
@@ -1175,7 +1181,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [64],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) && player.p.unlocked; },
         },
         81: {
             title: 'Terrain Expansion',
@@ -1381,11 +1387,10 @@ addLayer('c', {
                     .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [74],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) && player.p.unlocked; },
         },
-        //todo 84
         91: {
-            title: 'Improved Blueprints',
+            title: 'Reimproved Blueprints',
             description() {
                 if (!shiftDown) {
                     return 'Science reduces buildings consumption and boosts buildings production';
@@ -1394,7 +1399,7 @@ addLayer('c', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return D.pow(1.1, player.c.resources.science.amount.add(10).log10()); },
+            effect() { return D.pow(1.1, player.c.resources.science.amount.max(0).add(10).log10()); },
             effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}`; },
             style() {
                 const style = {};
@@ -1441,12 +1446,8 @@ addLayer('c', {
                     .forEach(([resource, cost]) => player.c.resources[resource].amount = D.minus(player.c.resources[resource].amount, cost));
             },
             branches: [81, 82, 83, 84],
+            unlocked() { return hasUpgrade('c', 51); },
         },
-        /**
-         * TODO
-         *
-         * 64-84 -> boost p (and t when applicable), increase price of other paths
-         */
     },
     buyables: new Proxy({}, {
         /** @returns {Buyable<'c'>} */
@@ -1747,7 +1748,7 @@ addLayer('c', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = D.times(amount, mult);
@@ -1811,13 +1812,13 @@ addLayer('c', {
 
                     if (hasUpgrade('c', 21)) mult = mult.times(upgradeEffect('c', 21));
                     if (hasUpgrade('c', 62)) mult = mult.times(upgradeEffect('c', 62));
-                    if (hasUpgrade('c', 82)) mult = mult.times(upgradeEffect('c', 82).mine);
+                    if (hasUpgrade('c', 72)) mult = mult.times(upgradeEffect('c', 72).mine);
 
                     const upg = tmp.s.investloans.item_upgrade[item] ?? false;
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = D.times(amount, mult);
@@ -1882,7 +1883,7 @@ addLayer('c', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = D.times(amount, mult);
@@ -1939,14 +1940,20 @@ addLayer('c', {
 
                     if (hasUpgrade('c', 22)) mult = mult.times(upgradeEffect('c', 22));
                     if (hasUpgrade('c', 62)) mult = mult.times(upgradeEffect('c', 62));
-                    if (hasUpgrade('c', 82)) mult = mult.times(upgradeEffect('c', 82).sawmill);
+                    if (hasUpgrade('c', 72)) mult = mult.times(upgradeEffect('c', 72).sawmill);
+
+                    if (item == 'plank') {
+                        mult = mult.times(D.add(1, D.pow(buyableEffect('lo', 63).plank, tmp.a.change_efficiency)));
+
+                        if (inChallenge('b', 22)) mult = mult.times(D.pow(1 / 2, tmp.a.change_efficiency));
+                    }
 
                     const upg = tmp.s.investloans.item_upgrade[item] ?? false;
 
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = D.times(amount, mult);
@@ -1968,7 +1975,7 @@ addLayer('c', {
 
                     if (hasUpgrade('c', 22)) mult = mult.times(upgradeEffect('c', 22));
                     if (hasUpgrade('c', 62)) mult = mult.times(upgradeEffect('c', 62));
-                    if (hasUpgrade('c', 82)) mult = mult.times(upgradeEffect('c', 82).sawmill);
+                    if (hasUpgrade('c', 72)) mult = mult.times(upgradeEffect('c', 72).sawmill);
 
                     items[i][1] = D.times(amount, mult);
                 });
@@ -2018,7 +2025,7 @@ addLayer('c', {
                     .add(tmp.c.buildings.duplicator.effect[this.id]);
 
                 /** @type {[keyof typeof player.c.resources, Decimal][]} */
-                const resources = [['science', D(1 / 10)]];
+                const resources = [['science', D(1 / 20)]];
 
                 resources.forEach(([resource, amount], i) => {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult)
@@ -2096,7 +2103,7 @@ addLayer('c', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = D.times(amount, mult);
@@ -2213,7 +2220,7 @@ addLayer('c', {
             description() {
                 const building = tmp.c.buildings[this.id],
                     effect = shiftDown ? `[${building.formulas.effect}]` : format(building.effect),
-                    effect_text = `They reduce star health by ${effect} (minimum 1 health)`;
+                    effect_text = `They multiply star health by ${effect} (minimum 1 health)`;
                 return layers.c.buildings['*'].description(this.id, effect_text);
             },
             style: {
@@ -2267,14 +2274,14 @@ addLayer('c', {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
                     .add(tmp.c.buildings.duplicator.effect[this.id]);
 
-                return placed;
+                return D(.95).pow(placed);
             },
             cost(amount_built) {
                 const built = D(amount_built ?? getBuyableAmount('c', this.id));
 
                 /** @type {[string, Decimal][]} */
                 const cost = [
-                    ['iron_ore', D.pow(1.2, built).times(15)],
+                    ['iron_ore', D.pow(1.2, built).times(10)],
                     ['gold_ore', D.pow(1.1, built)],
                 ];
 
@@ -2287,8 +2294,8 @@ addLayer('c', {
                 return cost;
             },
             formulas: {
-                cost: [['iron_ore', '(1.2 ^ built) * 15'], ['gold_ore', '1.1 ^ built']],
-                effect: 'amount placed',
+                cost: [['iron_ore', '(1.2 ^ built) * 10'], ['gold_ore', '1.1 ^ built']],
+                effect: '0.95 ^ (amount placed)',
             },
             unlocked() { return hasUpgrade('c', 51); },
         },
@@ -2365,7 +2372,10 @@ addLayer('c', {
          * Smelter -> smelts
          * Shop -> auto sells
          *
-         * Launch Pad -> research + stardust
+         * Oil Well -> oil
+         * Refinery -> energy + oil => fuel
+         * Fuel Generator -> fuel => energy
+         * Launch Pad -> fuel => research + stardust
          */
     },
     /** @type {Layers['c']['resources']} */
@@ -2384,7 +2394,7 @@ addLayer('c', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.c.resources[this.id].amount, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.c.resources[this.id].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 return mult;
@@ -2402,7 +2412,7 @@ addLayer('c', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.c.resources[this.id].amount, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.c.resources[this.id].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 mult = mult.times(tmp.p.plants.potato_battery.effect);
@@ -2413,6 +2423,7 @@ addLayer('c', {
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.tic.layerShown) diff = D.times(diff, layers.tic.time_speed(this.layer));
 
         Object.keys(layers.c.buildings).forEach(building => {
             const build = tmp.c.buildings[building];

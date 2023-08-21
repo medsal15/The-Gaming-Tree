@@ -39,7 +39,7 @@ addLayer('b', {
                 },
                 'blank',
                 () => {
-                    const speed = layers.clo.time_speed('b');
+                    const speed = D.times(layers.clo.time_speed('b'), layers.tic.time_speed('b'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -64,7 +64,7 @@ addLayer('b', {
                 },
                 'blank',
                 () => {
-                    const speed = layers.clo.time_speed('b');
+                    const speed = D.times(layers.clo.time_speed('b'), layers.tic.time_speed('b'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -92,7 +92,7 @@ addLayer('b', {
                 },
                 'blank',
                 () => {
-                    const speed = layers.clo.time_speed('b');
+                    const speed = D.times(layers.clo.time_speed('b'), layers.tic.time_speed('b'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -119,7 +119,7 @@ addLayer('b', {
                 },
                 'blank',
                 () => {
-                    const speed = layers.clo.time_speed('b');
+                    const speed = D.times(layers.clo.time_speed('b'), layers.tic.time_speed('b'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -187,7 +187,10 @@ addLayer('b', {
         11: {
             name: 'Slime King\'s Wrath',
             challengeDescription: 'Slime health is multiplied by 5, unlock a new layer.',
-            goalDescription: 'Kill another thousand slimes.',
+            goalDescription() {
+                const progress = tmp.xp.total.kills.min(1_000);
+                return `Kill another ${formatWhole(progress)}/${formatWhole(1_000)} slimes`;
+            },
             canComplete() { return tmp.xp.total.kills.gte(1_000); },
             rewardDescription() {
                 if (!hasChallenge(this.layer, this.id)) {
@@ -207,7 +210,7 @@ addLayer('b', {
         12: {
             name: 'The Goblin CEO',
             challengeDescription: 'All resource gains are divided by log10(amount + 10), unlock a new layer.',
-            goalDescription: 'Pay off your loan.',
+            goalDescription: 'Pay off the final loan.',
             canComplete() { return hasUpgrade('s', 81); },
             rewardDescription() {
                 return `Unlock zombies and keep the new layer.\
@@ -240,7 +243,10 @@ addLayer('b', {
         22: {
             name: 'Kudzu',
             challengeDescription: 'Enemy level is squared, plank gain is halved, third column tree upgrades\' effects are square rooted.',
-            goalDescription: 'Reach a thousand heat',
+            goalDescription() {
+                const progress = player.f.points.min(1e3);
+                return `Reach ${formatWhole(progress)}/${formatWhole(1e3)} heat`;
+            },
             canComplete() { return player.f.points.gte(1e3); },
             rewardDescription: 'Unlock stars, the alternator, a skill for trees, and automate tree upgrades.',
             unlocked() { return player.b.points.gte(4); },
@@ -255,7 +261,10 @@ addLayer('b', {
         31: {
             name: 'Slime Prince\'s Anger',
             challengeDescription: 'You can only fight slimes, and their health is multiplied by 2.5. Most other layers are disabled.',
-            goalDescription: 'Kill 250 slimes',
+            goalDescription() {
+                const progress = tmp.xp.total.kills.min(250);
+                return `Kill ${formatWhole(progress)}/${formatWhole(250)} slimes`;
+            },
             canComplete() { return tmp.xp.total.kills.gte(250); },
             rewardDescription: 'New XP upgrades, slime item drops are doubled.',
             unlocked() { return hasChallenge('b', 11); },
@@ -270,7 +279,7 @@ addLayer('b', {
         32: {
             name: 'The Goblin President',
             challengeDescription: 'Lose 1% (rounded down) of your lower rows resources every second.<br>Get new debts to pay off.<br>Double price of final debt.',
-            goalDescription: 'Pay off your debt',
+            goalDescription: 'Pay off your final debt',
             canComplete() { return hasUpgrade('s', 81); },
             rewardDescription: 'Your portfolio grows, goblin item drops are doubled.',
             unlocked() { return hasChallenge('b', 12); },
@@ -284,7 +293,10 @@ addLayer('b', {
         41: {
             name: 'The Incomplete Ghost',
             challengeDescription: 'Fight all the enemies at once. As one.',
-            goalDescription: 'We\'re gonna need more holy water. Maybe 5 should be enough.',
+            goalDescription() {
+                const progress = player.lo.items.holy_water.amount.min(5);
+                return `'We're gonna need more holy water. ${formatWhole(progress)}/${formatWhole(5)} should be enough`;
+            },
             canComplete() { return player.lo.items.holy_water.amount.gte(5); },
             rewardDescription: 'Double zombie drops, and trees regenerate 1% of their health.',
             unlocked() { return hasChallenge('b', 21); },
@@ -355,7 +367,10 @@ addLayer('b', {
         61: {
             name: 'Differences',
             challengeDescription: 'Enemies are given a random element which is randomized on death. Not using an element effectively disables row 1 layers.',
-            goalDescription: 'Kill 250 enemies',
+            goalDescription() {
+                const progress = tmp.xp.total.kills.min(250);
+                return `Kill ${formatWhole(progress)}/${formatWhole(250)} enemies`;
+            },
             canComplete() { return tmp.xp.total.kills.gte(250); },
             rewardDescription: 'Unlock Magic.',
             unlocked() { return hasChallenge('b', 41); },
@@ -380,7 +395,10 @@ addLayer('b', {
         62: {
             name: 'True Fight',
             challengeDescription: 'Enemies strike back. If you die, your row 1 layers are reset. Unlock a toggle for auto attacking and a new layer to help.',
-            goalDescription: 'Kill 250 enemies',
+            goalDescription() {
+                const progress = tmp.xp.total.kills.min(250);
+                return `Kill ${formatWhole(progress)}/${formatWhole(250)} enemies`;
+            },
             canComplete() { return tmp.xp.total.kills.gte(250); },
             rewardDescription: 'Unlock Stats.',
             unlocked() { return hasChallenge('b', 42); },
@@ -400,9 +418,9 @@ addLayer('b', {
         71: {
             name: 'Big Crunch',
             challengeDescription() {
-                let text = 'Enter all your beaten challenges at once. They are automatically completed but affect both sides.';
+                let text = 'Enter all your beaten challenges at once. They are automatically completed and affect both sides.';
                 if (!false) {
-                    text = `<span style="color:#AA5555;">Your world is too small for this challenge.</span><br>\
+                    text = `<b style="color:#AA5555;">Your world is too small for this challenge.</b><br>\
                     ${text}`;
                 }
 
@@ -451,8 +469,20 @@ addLayer('b', {
             challengeDescription: `\
                 Time is multiplied by a random number between -1 and 2 every second<br><br>\
                 <span style="color:#AA5555;">This works like a Boss challenge</span>`,
-            goalDescription: '???',
-            canComplete: false,
+            goalDescription() {
+                if (tmp.xp_alt.layerShown) {
+                    return `Tame ${formatWhole(tmp.xp_alt.total.tamed.min(100))}/${formatWhole(100)} monsters`;
+                } else {
+                    return `Kill ${formatWhole(tmp.xp.total.kills.min(250))}/${formatWhole(250)} enemies`;
+                }
+            },
+            canComplete() {
+                if (tmp.xp_alt.layerShown) {
+                    return tmp.xp_alt.total.tamed.gte(100);
+                } else {
+                    return tmp.xp.total.kills.gte(250);
+                }
+            },
             rewardDescription: 'Unlock Time Cubes',
             buttonStyle() {
                 const active = activeChallenge('b'),
@@ -460,7 +490,8 @@ addLayer('b', {
                 if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
-            unlocked: true,
+            unlocked() { return hasUpgrade('a', 24); },
+            onComplete() { player.subtabs.tic = 'Generation'; },
         },
         //todo 82
         //todo 91
@@ -474,6 +505,7 @@ addLayer('b', {
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.tic.layerShown) diff = D.times(diff, layers.tic.time_speed(this.layer));
 
         if (inChallenge('b', 21)) {
             Object.entries(player.l.skills).forEach(([skill, { progress }]) => {
@@ -558,23 +590,36 @@ addLayer('b', {
         return false;
     },
     prestigeButtonText() {
-        if (player.b.points.eq(0)) return `Your next boss will be at ${format(getNextAt('b'))} ${tmp.xp.enemies['slime'].name} kills`;
+        if (player.b.points.eq(0)) return `Your next boss will be at ${formatWhole(getNextAt('b'))} ${tmp.xp.enemies['slime'].name} kills`;
         if (player.b.points.eq(1)) {
             const name = hasChallenge('b', 11) ? tmp.xp.enemies['goblin'].name : '???';
-            return `Your next boss will be at ${format(getNextAt('b'))} ${name} kills`;
+            return `Your next boss will be at ${formatWhole(getNextAt('b'))} ${name} kills`;
         }
         if (player.b.points.eq(2)) {
             const name = hasChallenge('b', 12) ? tmp.xp.enemies['zombie'].name : '???';
-            return `Your next boss will be at ${format(getNextAt('b'))} ${name} kills`;
+            return `Your next boss will be at ${formatWhole(getNextAt('b'))} ${name} kills`;
         }
         if (player.b.points.eq(3)) {
             const name = hasChallenge('b', 21) ? tmp.xp.enemies['ent'].name : '???';
-            return `Your next boss will be at ${format(getNextAt('b'))} ${name} kills`;
+            return `Your next boss will be at ${formatWhole(getNextAt('b'))} ${name} kills`;
         }
         return 'There are no more bosses to fight';
     },
     prestigeNotify() { return tmp.b.getResetGain.gte(1); },
+    shouldNotify() { return activeChallenge('b') !== false && activeChallenge('b') < 80 && canCompleteChallenge('b', player.b.activeChallenge); },
     roundUpCost: true,
     autoPrestige: true,
-    branches: [() => inChallenge('b', 31) ? 'xp' : 'l'],
+    branches() {
+        /** @type {string[]} */
+        const branches = [];
+
+        if (inChallenge('b', 31)) {
+            if (tmp.xp.layerShown) branches.push('xp');
+            else branches.push('xp_alt');
+        } else {
+            branches.push('l');
+        }
+
+        return branches;
+    },
 });

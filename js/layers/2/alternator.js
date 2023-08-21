@@ -31,7 +31,7 @@ addLayer('a', {
         'Alternate': {
             content: [
                 () => {
-                    const speed = layers.clo.time_speed('a');
+                    const speed = D.times(layers.clo.time_speed('a'), layers.tic.time_speed('a'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -293,6 +293,7 @@ addLayer('a', {
             description: 'It\'s rewind time',
             cost: D.dTwo,
             item: 'stardust',
+            currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
@@ -303,16 +304,18 @@ addLayer('a', {
                 };
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.tic.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.clo.color}, ${tmp.tic.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.clo.color;
                 }
 
                 return style;
             },
-            unlocked() { return tmp.clo.layerShown; },
+            unlocked() { return tmp.clo.layerShown || tmp.tic.layerShown; },
+            canAfford() { return hasChallenge('b', 51); },
             onPurchase() { player.tic.unlocked = true; },
         },
         31: {

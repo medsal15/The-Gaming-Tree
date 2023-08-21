@@ -54,7 +54,7 @@ addLayer('t', {
         'Forest': {
             content: [
                 () => {
-                    const speed = layers.clo.time_speed('t');
+                    const speed = D.times(layers.clo.time_speed('t'), layers.tic.time_speed('t'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -923,7 +923,7 @@ addLayer('t', {
             if (item == 'plank') {
                 let gain = this.from.map(item => this.rate(item).times(this.efficiency(item))).reduce(D.add, D.dZero);
 
-                if (inChallenge('b', 12)) gain = gain.div(D.add(player.lo.items.plank.amount, 10).log10());
+                if (inChallenge('b', 12)) gain = gain.div(D.add(player.lo.items.plank.amount.max(0), 10).log10());
 
                 return gain;
             }
@@ -937,7 +937,8 @@ addLayer('t', {
     update(diff) {
         if (!player.t.unlocked || !tmp.t.layerShown) return;
 
-        if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed('t'));
+        if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.tic.layerShown) diff = D.times(diff, layers.tic.time_speed(this.layer));
 
         // Convert logs to planks
         if (player.t.convert && tmp.t.convertion.per_second.gt(0)) {

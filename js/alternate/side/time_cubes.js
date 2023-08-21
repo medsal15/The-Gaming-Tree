@@ -1,6 +1,5 @@
 'use strict';
 
-//todo
 addLayer('tic', {
     name: 'Time Cubes',
     image: './resources/images/cube.svg',
@@ -38,8 +37,8 @@ addLayer('tic', {
         },
         'Generation': {
             content: [
-                ['display-text', () => `Base time speed: ${format(tmp.tic.time_speed)} seconds/s`],
-                ['display-text', () => `${layerColor('tic', format(player.tic.points), 'font-size:1.5em;')} time cubes`],
+                ['display-text', () => `Base time speed: ${shiftDown ? '[log10(cubes + 10)]' : format(tmp.tic.time_speed)} seconds/s`],
+                ['display-text', () => `${layerColor('tic', format(player.tic.points), 'font-size:1.5em;')} (+${layerColor('tic', format(tmp.tic.cubes.gain))} /s) time cubes`],
                 'blank',
                 ['clickable', 11],
             ],
@@ -53,11 +52,19 @@ addLayer('tic', {
                 else return 'Reverse time speed but start producing time cubes';
             },
             onClick() { player.tic.invert = !player.tic.invert; },
+            canClick: true,
+        },
+    },
+    /** @type {typeof layers.tic.cubes} */
+    cubes: {
+        gain() {
+            if (player.tic.invert) return D.dOne;
+            return D.dZero;
         },
     },
     /** @type {typeof layers.tic.time_speed} */
     time_speed(layer) {
-        let speed = player.tic.points.add(10).log10();
+        let speed = player.tic.points.max(0).add(10).log10();
 
         const main = [
             'xp', 'm', 't',
@@ -77,11 +84,13 @@ addLayer('tic', {
         if (inChallenge('b', 81)) {
             player.tic.chal.time = D.add(player.tic.chal.time, diff);
             if (player.tic.chal.time.gte(1)) {
-                player.tic.chal.speed = D(Math.random() * 3 - 1);
+                player.tic.chal.speed = D.add(player.tic.chal.speed, Math.random() - .5).max(-1).min(2);
+                player.tic.chal.time = D.dZero;
             }
         }
         if (player.tic.invert) {
-            addPoints('tic', diff);
+            addPoints('tic', D.times(tmp.tic.cubes.gain, diff));
         }
     },
+    shouldNotify() { return inChallenge('b', 81) && canCompleteChallenge('b', 81); },
 });

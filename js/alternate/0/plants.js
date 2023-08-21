@@ -1,5 +1,6 @@
 'use strict';
 
+//todo recycle plant seeds into seeds (item)
 addLayer('p', {
     name: 'Plants',
     symbol: 'P',
@@ -44,7 +45,7 @@ addLayer('p', {
         'Garden': {
             content: [
                 () => {
-                    const speed = layers.clo.time_speed('p');
+                    const speed = D.times(layers.clo.time_speed('p'), layers.tic.time_speed('p'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -90,7 +91,7 @@ addLayer('p', {
         'Plants': {
             content: [
                 () => {
-                    const speed = layers.clo.time_speed('p');
+                    const speed = D.times(layers.clo.time_speed('p'), layers.tic.time_speed('p'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -428,7 +429,7 @@ addLayer('p', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = amount.times(mult);
@@ -444,7 +445,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -519,7 +520,7 @@ addLayer('p', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = amount.times(mult);
@@ -535,7 +536,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -607,7 +608,7 @@ addLayer('p', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = amount.times(mult);
@@ -623,7 +624,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -699,7 +700,7 @@ addLayer('p', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = amount.times(mult);
@@ -715,7 +716,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -742,6 +743,8 @@ addLayer('p', {
                         const i = ages.findIndex(([from, to]) => data.age.gt(from) && data.age.lte(to));
 
                         set[i] = D.add(set[i], 1);
+
+                        return set;
                     }, {}),
                     sum = D.times(amounts[0], .01)
                         .add(D.times(amounts[1], .1))
@@ -750,7 +753,7 @@ addLayer('p', {
                         .add(amounts[4])
                         .add(D.times(amounts[5], .5));
 
-                return sum.add(2).log2();
+                return sum.max(0).add(2).log2();
             },
             effect_text() {
                 let effect;
@@ -822,7 +825,7 @@ addLayer('p', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = amount.times(mult);
@@ -838,7 +841,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -912,7 +915,7 @@ addLayer('p', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = amount.times(mult);
@@ -928,7 +931,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -955,6 +958,8 @@ addLayer('p', {
                         const i = ages.findIndex(([from, to]) => data.age.gt(from) && data.age.lte(to));
 
                         set[i] = D.add(set[i], 1);
+
+                        return set;
                     }, {}),
                     sum = D.times(amounts[0], .01)
                         .add(D.times(amounts[1], .1))
@@ -1028,7 +1033,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -1058,6 +1063,8 @@ addLayer('p', {
                         const i = ages.findIndex(([from, to]) => data.age.gt(from) && data.age.lte(to));
 
                         set[i] = D.add(set[i], 1);
+
+                        return set;
                     }, {}),
                     sum = D.times(amounts[0], .01)
                         .add(D.times(amounts[1], .1))
@@ -1066,7 +1073,7 @@ addLayer('p', {
                         .add(amounts[4])
                         .add(D.times(amounts[5], .5));
 
-                return sum.add(4).log(4);
+                return sum.max(0).add(4).log(4);
             },
             effect_text() {
                 let effect;
@@ -1131,7 +1138,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -1158,6 +1165,8 @@ addLayer('p', {
                         const i = ages.findIndex(([from, to]) => data.age.gt(from) && data.age.lte(to));
 
                         set[i] = D.add(set[i], 1);
+
+                        return set;
                     }, {}),
                     sum = D.times(amounts[0], .01)
                         .add(D.times(amounts[1], .1))
@@ -1166,7 +1175,7 @@ addLayer('p', {
                         .add(amounts[4])
                         .add(D.times(amounts[5], .5));
 
-                return sum.add(4).log(4);
+                return sum.max(0).add(4).log(4);
             },
             effect_text() {
                 let effect;
@@ -1238,7 +1247,7 @@ addLayer('p', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = amount.times(mult);
@@ -1254,7 +1263,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -1328,7 +1337,7 @@ addLayer('p', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = amount.times(mult);
@@ -1344,7 +1353,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -1371,6 +1380,8 @@ addLayer('p', {
                         const i = ages.findIndex(([from, to]) => data.age.gt(from) && data.age.lte(to));
 
                         set[i] = D.add(set[i], 1);
+
+                        return set;
                     }, {}),
                     sum = D.times(amounts[0], .01)
                         .add(D.times(amounts[1], .1))
@@ -1379,7 +1390,7 @@ addLayer('p', {
                         .add(amounts[4])
                         .add(D.times(amounts[5], .5));
 
-                return sum.add(4).log(4);
+                return sum.max(0).add(4).log(4);
             },
             effect_text() {
                 let effect;
@@ -1451,7 +1462,7 @@ addLayer('p', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = amount.times(mult);
@@ -1467,7 +1478,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -1541,7 +1552,7 @@ addLayer('p', {
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                     } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount, 10).log10().pow(tmp.a.change_efficiency));
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
                     items[i][1] = amount.times(mult);
@@ -1557,7 +1568,7 @@ addLayer('p', {
                 if (upg && hasUpgrade('s', upg)) {
                     mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds, 10).log10().pow(tmp.a.change_efficiency));
+                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
@@ -1570,15 +1581,10 @@ addLayer('p', {
             infusions: {},
             unlocked() { return player.p.plants.wheat.infusions.includes(this.id); },
         },
-        /**
-         * TODO
-         *
-         * coffee
-         *  -> ???
-         */
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.tic.layerShown) diff = D.times(diff, layers.tic.time_speed(this.layer));
 
         Object.entries(player.p.grid).forEach(([, data]) => {
             if (data.plant == '') return;
@@ -1628,17 +1634,14 @@ addLayer('p', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
-        const keep = ['mode', 'plant', 'infuse_target', 'infuse_item'],
-            kept_ups = [...player.p.upgrades];
-
-        kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 62).t_hold.pow(tmp.a.change_efficiency)).toNumber();
+        const keep = ['mode', 'plant', 'infuse_target', 'infuse_item'];
 
         layerDataReset(this.layer, keep);
-        player.p.upgrades.push(...kept_ups);
         Object.keys(player.p.plants).forEach(plant => Object.assign(player.p.plants[plant], {
             dead: D.dZero,
             harvested: D.dZero,
-            seeds: D.dZero,
+            // Since there are no upgrades, keep an amount of seeds
+            seeds: player.p.plants[plant].seeds.min(buyableEffect('lo', 62).t_hold.pow(tmp.a.change_efficiency)),
             last_harvest: [],
             last_harvest_seeds: D.dZero,
             last_harvest_count: D.dZero,
