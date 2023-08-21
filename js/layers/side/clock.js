@@ -1072,29 +1072,29 @@ addLayer('clo', {
 
                 'xp_alt': 11, 'c': 12, 'p': 13,
             };
-            if (!(layer in links) || !hasUpgrade(this.layer, links[layer])) return speed;
+            if (layer in links && hasUpgrade(this.layer, links[layer])) {
+                speed = speed.add(buyableEffect('clo', 11));
+                speed = speed.add(buyableEffect('clo', 12));
+                speed = speed.add(buyableEffect('clo', 13));
+                speed = speed.add(buyableEffect('clo', 14));
+                speed = speed.add(buyableEffect('clo', 21));
+                speed = speed.add(buyableEffect('clo', 22));
+                speed = speed.add(buyableEffect('clo', 31));
+                speed = speed.add(buyableEffect('clo', 41));
+                speed = speed.add(buyableEffect('clo', 42));
+                speed = speed.add(buyableEffect('clo', 51));
+
+                /** @type {number|'side'} */
+                let row = tmp[layer]?.displayRow ?? tmp[layer]?.row ?? 0;
+                if (row == 'side') row = 0;
+
+                speed = speed.root(D.dTwo.pow(row));
+            }
         }
 
         const alt = [
             'xp_alt', 'c', 'p',
         ];
-
-        /** @type {number|'side'} */
-        let row = tmp[layer]?.displayRow ?? tmp[layer]?.row ?? 0;
-        if (row == 'side') row = 0;
-
-        speed = speed.add(buyableEffect('clo', 11));
-        speed = speed.add(buyableEffect('clo', 12));
-        speed = speed.add(buyableEffect('clo', 13));
-        speed = speed.add(buyableEffect('clo', 14));
-        speed = speed.add(buyableEffect('clo', 21));
-        speed = speed.add(buyableEffect('clo', 22));
-        speed = speed.add(buyableEffect('clo', 31));
-        speed = speed.add(buyableEffect('clo', 41));
-        speed = speed.add(buyableEffect('clo', 42));
-        speed = speed.add(buyableEffect('clo', 51));
-
-        speed = speed.root(D.dTwo.pow(row));
 
         if (alt.includes(layer)) speed = speed.pow(tmp.a.change_efficiency);
 

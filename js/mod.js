@@ -78,8 +78,8 @@ let VERSION = {
  */
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.A</h3><br>
-		- Added 3 new layers.<br>
-		- Update endgame: Get all 3 new layers.<br>
+		- Added 4 new layers.<br>
+		- Update endgame: Get all 3 new row 0 layers.<br>
 	<h3>v0.6</h3><br>
 		- Added 3 new layers.<br>
 		- Added the 4th boss, miniboss, and relic.<br>

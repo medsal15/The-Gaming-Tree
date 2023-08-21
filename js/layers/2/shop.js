@@ -48,7 +48,7 @@ addLayer('s', {
                 ['display-text', () => `Your items have ${format(tmp.s.baseAmount)} total value`],
                 'blank',
                 () => {
-                    const speed = layers.clo.time_speed('s');
+                    const speed = D.times(layers.clo.time_speed('s'), layers.tic.time_speed('s'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -108,8 +108,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.xp.points, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.xp.points, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.xp.points.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.xp.points.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -134,8 +134,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(tmp.xp.total.kills, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(tmp.xp.total.kills, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(tmp.xp.total.kills.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(tmp.xp.total.kills.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -160,8 +160,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `cost *${format(D.add(player.l.points, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.l.points, 100).floor())}/s`;
+                    case 'loan': return `cost *${format(D.add(player.l.points.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.l.points.max(0), 100).floor())}/s`;
                     case 'investment': return `cost /${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -186,8 +186,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.slime_goo.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.slime_goo.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.slime_goo.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.slime_goo.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -212,8 +212,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.slime_core_shard.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.slime_core_shard.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.slime_core_shard.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.slime_core_shard.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -238,8 +238,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.slime_core.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.slime_core.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.slime_core.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.slime_core.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -264,8 +264,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.stone.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.stone.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.stone.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.stone.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -290,8 +290,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.copper_ore.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.copper_ore.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.copper_ore.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.copper_ore.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -316,8 +316,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.tin_ore.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.tin_ore.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.tin_ore.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.tin_ore.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -342,8 +342,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.red_fabric.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.red_fabric.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.red_fabric.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.red_fabric.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -368,8 +368,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.pyrite_coin.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.pyrite_coin.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.pyrite_coin.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.pyrite_coin.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -394,8 +394,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.rusty_gear.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.rusty_gear.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.rusty_gear.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.rusty_gear.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -456,8 +456,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.rotten_flesh.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.rotten_flesh.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.rotten_flesh.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.rotten_flesh.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -483,8 +483,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.brain.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.brain.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.brain.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.brain.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -510,8 +510,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.coal.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.coal.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.coal.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.coal.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -537,8 +537,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.iron_ore.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.iron_ore.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.iron_ore.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.iron_ore.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -564,8 +564,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.gold_ore.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.gold_ore.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.gold_ore.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.gold_ore.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -591,8 +591,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.soaked_log.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.soaked_log.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.soaked_log.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.soaked_log.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -618,8 +618,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.normal_log.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.normal_log.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.normal_log.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.normal_log.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -645,8 +645,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.plank.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.plank.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.plank.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.plank.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -672,8 +672,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.f.points, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.f.points, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.f.points.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.f.points.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -699,8 +699,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.bronze_ingot.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.bronze_ingot.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.bronze_ingot.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.bronze_ingot.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -726,8 +726,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.steel_ingot.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.steel_ingot.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.steel_ingot.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.steel_ingot.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -753,8 +753,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.stone_brick.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.stone_brick.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.stone_brick.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.stone_brick.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -780,8 +780,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.copper_ingot.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.copper_ingot.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.copper_ingot.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.copper_ingot.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -807,8 +807,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.tin_ingot.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.tin_ingot.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.tin_ingot.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.tin_ingot.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -834,8 +834,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.iron_ingot.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.iron_ingot.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.iron_ingot.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.iron_ingot.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -861,8 +861,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.gold_ingot.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.gold_ingot.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.gold_ingot.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.gold_ingot.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -888,8 +888,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.holy_water.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.holy_water.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.holy_water.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.holy_water.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -915,8 +915,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.leaf.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.leaf.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.leaf.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.leaf.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -942,8 +942,8 @@ addLayer('s', {
             },
             effectDisplay() {
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.lo.items.seed.amount, 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.lo.items.seed.amount, 100).floor())}/s`;
+                    case 'loan': return `/${format(D.add(player.lo.items.seed.amount.max(0), 10).log10())}`;
+                    case 'debt': return `-${format(D.div(player.lo.items.seed.amount.max(0), 100).floor())}/s`;
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -1015,7 +1015,7 @@ addLayer('s', {
             cost: D(10),
             costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
             effect() {
-                let mult = player.s.points.add(8).log(8);
+                let mult = player.s.points.max(0).add(8).log(8);
 
                 if (hasUpgrade('s', 33)) mult = mult.add(upgradeEffect('s', 33));
 

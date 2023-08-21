@@ -72,7 +72,7 @@ addLayer('xp', {
         'Enemy': {
             content: [
                 () => {
-                    const speed = layers.clo.time_speed('xp');
+                    const speed = D.times(layers.clo.time_speed('xp'), layers.tic.time_speed('xp'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -385,7 +385,7 @@ addLayer('xp', {
                 }
             },
             effect() {
-                let effect = tmp.xp.total.kills.add(10).log10();
+                let effect = tmp.xp.total.kills.max(0).add(10).log10();
 
                 effect = effect.times(tmp.l.skills.vampirism.effect);
 
@@ -471,7 +471,7 @@ addLayer('xp', {
                     return `Formula: ${formula}`;
                 }
             },
-            effect() { return player.xp.points.max(0).add(5).log(5); },
+            effect() { return player.xp.points.max(0).max(0).add(5).log(5); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return tmp.xp.total.kills.gte(100) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(400),
@@ -509,7 +509,7 @@ addLayer('xp', {
                     return `Formula: ${formula}`;
                 }
             },
-            effect() { return tmp.xp.total.kills.add(9).log(9); },
+            effect() { return tmp.xp.total.kills.max(0).add(9).log(9); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
             cost: D(195),
@@ -593,6 +593,7 @@ addLayer('xp', {
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.tic.layerShown) diff = D.times(diff, layers.tic.time_speed(this.layer));
 
         for (const type of tmp.xp.enemies['*'].list) {
             if (player.xp.enemies[type].health.lte(0)) continue;
@@ -838,12 +839,13 @@ addLayer('xp', {
 
                 mult = mult.times(buyableEffect('lo', 11));
 
-                if (inChallenge('b', 12) && !hasUpgrade('s', 41)) mult = mult.div(player.xp.points.add(10).log10());
+                if (inChallenge('b', 12) && !hasUpgrade('s', 41)) mult = mult.div(player.xp.points.max(0).add(10).log10());
                 if (hasUpgrade('s', 41)) mult = mult.div(upgradeEffect('s', 41));
 
                 // Alt
                 if (hasUpgrade('xp_alt', 21)) mult = mult.times(upgradeEffect('xp_alt', 21).pow(tmp.a.change_efficiency));
                 if (hasUpgrade('xp_alt', 23)) mult = mult.times(upgradeEffect('xp_alt', 23).pow(tmp.a.change_efficiency));
+                if (hasUpgrade('xp_alt', 42)) mult = mult.times(upgradeEffect('xp_alt', 42).pow(tmp.a.change_efficiency));
 
                 if (hasUpgrade('c', 33)) mult = mult.times(upgradeEffect('c', 33).pow(tmp.a.change_efficiency));
 
@@ -859,7 +861,7 @@ addLayer('xp', {
             kill_mult() {
                 let mult = D.dOne;
 
-                if (inChallenge('b', 12) && !hasUpgrade('s', 42)) mult = mult.div(tmp.xp.total.kills.add(10).log10());
+                if (inChallenge('b', 12) && !hasUpgrade('s', 42)) mult = mult.div(tmp.xp.total.kills.max(0).add(10).log10());
                 if (hasUpgrade('s', 42)) mult = mult.times(upgradeEffect('s', 42));
 
                 return mult;
@@ -1378,7 +1380,7 @@ addLayer('xp', {
                 return health;
             },
             experience(level) {
-                let exp = D.pow(level ?? tmp.xp.enemies[this.type].level, 2).times(D.log10(tmp.xp.total.kills.add(1)));
+                let exp = D.pow(level ?? tmp.xp.enemies[this.type].level, 2).times(D.log10(tmp.xp.total.kills.max(0).add(1)));
 
                 exp = exp.times(tmp.xp.enemies['*'].exp_mult);
 
@@ -1514,7 +1516,7 @@ addLayer('xp', {
 
                 let health = D.pow(2, level).times(10);
 
-                health = health.minus(tmp.c.buildings.observatory.effect).max(1);
+                health = health.times(tmp.c.buildings.observatory.effect).max(1);
 
                 return health;
             },

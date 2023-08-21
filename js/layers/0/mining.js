@@ -80,7 +80,7 @@ addLayer('m', {
         'Mining': {
             content: [
                 () => {
-                    const speed = layers.clo.time_speed('m');
+                    const speed = D.times(layers.clo.time_speed('m'), layers.tic.time_speed('m'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -271,7 +271,7 @@ addLayer('m', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return player.m.health.add(7).log(7); },
+            effect() { return player.m.health.max(0).add(7).log(7); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(5),
             item: 'copper_ore',
@@ -302,7 +302,7 @@ addLayer('m', {
             effect() {
                 let ore_chance = D.dOne,
                     mine_chance = D.dOne,
-                    effect = tmp.xp.total.kills.add(3).log(3);
+                    effect = tmp.xp.total.kills.max(0).add(3).log(3);
 
                 if (hasUpgrade('m', 32)) {
                     mine_chance = effect.root(2);
@@ -408,7 +408,7 @@ addLayer('m', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return D.add(player.lo.items.stone.amount, 10).log10(); },
+            effect() { return D.add(player.lo.items.stone.amount.max(0), 10).log10(); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(250),
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
@@ -511,7 +511,7 @@ addLayer('m', {
 
                 return `Formula: ${formula}`;
             },
-            effect() { return tmp.xp.total.kills.add(100).log(100); },
+            effect() { return tmp.xp.total.kills.max(0).add(100).log(100); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(1),
             item: 'iron_ore',
@@ -603,7 +603,7 @@ addLayer('m', {
 
                 gold = gold.add(buyableEffect('lo', 53));
 
-                return gold.add(18).log(18);
+                return gold.max(0).add(18).log(18);
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(3),
@@ -682,7 +682,7 @@ addLayer('m', {
 
                 gold = gold.add(buyableEffect('lo', 53));
 
-                return gold.add(9).log(9);
+                return gold.max(0).add(9).log(9);
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(9),
@@ -788,7 +788,7 @@ addLayer('m', {
             if (hasUpgrade('m', 32)) {
                 let stone = drops.reduce((sum, [, amount]) => D.add(sum, amount), D.dZero);
 
-                if (inChallenge('b', 12) && !hasUpgrade('s', 61)) stone = stone.div(D.add(player.lo.items.stone.amount, 10).log10());
+                if (inChallenge('b', 12) && !hasUpgrade('s', 61)) stone = stone.div(D.add(player.lo.items.stone.amount.max(0), 10).log10());
                 if (hasUpgrade('s', 61)) stone = stone.times(upgradeEffect('s', 61));
 
                 const entry = drops.find(([item]) => item == 'stone') ?? false;
@@ -822,6 +822,7 @@ addLayer('m', {
     },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
+        if (tmp.tic.layerShown) diff = D.times(diff, layers.tic.time_speed(this.layer));
 
         if (player.m.health.lt(tmp.m.ore.health)) {
             const regen = tmp.m.ore.regen.times(diff);

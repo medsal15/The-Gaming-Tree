@@ -2210,6 +2210,9 @@ type Layers = {
     }
     tic: Layer<'tic'> & {
         time_speed(layer?: string): Decimal
+        cubes: {
+            gain(): Decimal
+        }
     }
     // Alt Row 0
     xp_alt: Layer<'xp_alt'> & {

@@ -42,7 +42,7 @@ addLayer('lo', {
             content: [
                 () => {
                     // I know it's irrelevant, but it's still here for consitency
-                    const speed = layers.clo.time_speed('lo');
+                    const speed = D.times(layers.clo.time_speed('lo'), layers.tic.time_speed('lo'));
 
                     if (speed.neq(1)) return [
                         'column', [
@@ -2247,7 +2247,7 @@ addLayer('lo', {
             effect(x) {
                 if (tmp.l.deactivated) x = D.dZero;
 
-                return D.add(x, 5).log(5);
+                return D.add(x, 5).max(0).log(5);
             },
             canAfford() {
                 return Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
@@ -2608,7 +2608,7 @@ addLayer('lo', {
                     const upg = layers.s.investloans.item_upgrade[item] ?? false;
                     if (inChallenge('b', 12)) {
                         if (upg && hasUpgrade('s', upg)) return;
-                        results[item] = gain.div(D.add(player.lo.items[item].amount, 10).log10());
+                        results[item] = gain.div(D.add(player.lo.items[item].amount.max(0), 10).log10());
                     }
                     let gain_mult = tmp.lo.items["*"].gain_multiplier;
 
@@ -2682,7 +2682,6 @@ addLayer('lo', {
                     case 'forge':
                         return tmp.f.layerShown;
                     case 'tamed_kill':
-                        if (!hasUpgrade('lo', 11) && !hasUpgrade('s', 22)) return false;
                     case 'tamed':
                         return tmp.xp_alt.layerShown && (tmp.xp_alt.monsters[sub].unlocked ?? true);
                     case 'building':
