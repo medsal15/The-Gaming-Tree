@@ -1713,6 +1713,17 @@ declare class LayerData {
 }
 
 type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building' | 'plant';
+type resources = 'science' | 'energy';
+type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
+    'red_fabric' | 'pyrite_coin' | 'rusty_gear' |
+    'rotten_flesh' | 'brain' |
+    'leaf' | 'seed' |
+    'stardust' | 'holy_water' |
+    'stone' | 'copper_ore' | 'tin_ore' | 'coal' | 'iron_ore' | 'gold_ore' |
+    'stone_brick' | 'copper_ingot' | 'tin_ingot' | 'iron_ingot' | 'gold_ingot' |
+    'bronze_ingot' | 'steel_ingot' |
+    'soaked_log' | 'normal_log' | 'plank' |
+    'wheat' | 'corn' | 'strawberry' | 'potato' | 'eggplant' | 'egg';
 
 type Layers = {
     // Side
@@ -2004,14 +2015,17 @@ type Layers = {
         items: {
             '*': {
                 /** Converts a grid id to an item id (or false if there is none) */
-                grid_to_item: ((id: number) => string | false) & {
+                grid_to_item: ((id: number) => items | false) & {
                     cache: { [k: number]: string | false }
                 }
                 global_chance_multiplier(): Decimal
                 /** Computes the drops from a type */
-                get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: DecimalSource): [string, Decimal][]
-                /** Adds the drops in question to the player data */
-                gain_drops(drops: [string, Decimal][]): void
+                get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: DecimalSource): [items, Decimal][]
+                /** Adds the items in question to the player data */
+                gain_items(items: [items, DecimalSource][]): void
+                /** Adds the item in question to the player data */
+                gain_items(item: items, amount: DecimalSource): void
+                gain_items(item: items | [items, DecimalSource][], amount?: DecimalSource): void
                 format_chance(chance: Decimal): string
                 type_name(type: `${drop_sources}:${string}`): string
                 can_drop(type: `${drop_sources}:${string}`): boolean
@@ -2028,16 +2042,16 @@ type Layers = {
                 craft_consumption: Computable<Decimal>
                 /** Items dropped by a type, split between chances and weights */
                 items(type: `${drop_sources}:${string}`): {
-                    chances?: { [item_id: string]: Decimal }
-                    weights?: { [item_id: string]: Decimal }
+                    chances?: { [item_id in items]: Decimal }
+                    weights?: { [item_id in items]: Decimal }
                 }
             }
         } & {
-            [id: string]: {
-                readonly id: string
+            [id in items]: {
+                readonly id: id
                 readonly grid: number
                 sources: {
-                    readonly id: string
+                    readonly id: id
                     /**
                      * Odds for the item to drop from a given type
                      *
@@ -2267,7 +2281,7 @@ type Layers = {
     c: Layer<'c'> & {
         upgrades: {
             [id: number]: Upgrade<'c'> & {
-                resource_costs?: Computable<[string, Decimal][]>
+                resource_costs?: Computable<[resources, Decimal][]>
                 item_costs?: Computable<[string, Decimal][]>
             }
         }
@@ -2326,10 +2340,11 @@ type Layers = {
         }
         resources: {
             '*': {
+                gain_resource(resource: resources, amount: DecimalSource)
             }
         } & {
-            [resource: string]: {
-                readonly id: string
+            [resource in resources]: {
+                readonly id: resource
                 name: Computable<string>
                 color: Computable<string>
                 gain_mult(): Decimal
@@ -2568,7 +2583,11 @@ type Player = {
     lo: LayerData & {
         /** Replaces `unlocked` to allow buying the only upgrade */
         shown: boolean
-        items: { [id: string]: { amount: Decimal, } }
+        items: {
+            [id in items]: {
+                amount: Decimal,
+            }
+        }
     }
     f: LayerData & {
         /**
@@ -2655,7 +2674,7 @@ type Player = {
         /** Currently selected building for placement */
         building: string
         resources: {
-            [resource: string]: {
+            [resource in resources]: {
                 amount: Decimal
             }
         }

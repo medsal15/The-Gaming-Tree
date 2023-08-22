@@ -199,7 +199,7 @@ addLayer('m', {
                     player.m.last_drops = drops;
                 }
 
-                layers.lo.items['*'].gain_drops(drops);
+                layers.lo.items['*'].gain_items(drops);
             },
             onHold() {
                 player.m.health = player.m.health.minus(1);
@@ -225,7 +225,7 @@ addLayer('m', {
                     player.m.last_drops = drops;
                 }
 
-                layers.lo.items['*'].gain_drops(drops);
+                layers.lo.items['*'].gain_items(drops);
             },
         },
         13: {
@@ -842,7 +842,7 @@ addLayer('m', {
                 player.m.last_drops_times = D.dOne;
                 player.m.last_drops = drops;
             }
-            layers.lo.items["*"].gain_drops(drops);
+            layers.lo.items["*"].gain_items(drops);
             player.m.health = D.dZero;
         }
 

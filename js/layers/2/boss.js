@@ -552,13 +552,13 @@ addLayer('b', {
                 if (item == 'stardust') return;
 
                 const upg = layers.s.investloans.item_upgrade[item] ?? false;
-                if (!upg || !hasUpgrade('s', upg)) data.amount = D.minus(data.amount, get_loss(data.amount)).max(0);
+                if (!upg || !hasUpgrade('s', upg)) layers.lo.items['*'].gain_items(item, get_loss(data.amount).neg());
             });
             // Resources
             Object.entries(player.c.resources).forEach(([resource, data]) => {
                 if (!false) return;
 
-                data.amount = D.minus(data.amount, get_loss(data.amount)).max(0);
+                layers.c.resources['*'].gain_resource(resource, get_loss(data.amount).neg());
             });
         }
     },

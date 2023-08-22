@@ -195,7 +195,7 @@ addLayer('f', {
                 const fuel = tmp.f.fuels[fuel_id],
                     item_id = fuel.item;
 
-                player.lo.items[item_id].amount = D.minus(player.lo.items[item_id].amount, fuel.consuming.times(diff));
+                layers.lo.items['*'].gain_items(item_id, D.times(fuel.consuming, diff).neg());
                 addPoints('f', fuel.producing.times(diff));
             });
 
@@ -212,7 +212,7 @@ addLayer('f', {
                 precipe.progress = precipe.progress.add(diff);
 
                 if (precipe.progress.gte(recipe.time)) {
-                    player.lo.items[recipe.produces].amount = D.add(player.lo.items[recipe.produces].amount, precipe.amount_smelting);
+                    layers.lo.items['*'].gain_items(recipe.produces, precipe.amount_smelting);
                     precipe.progress = D.dZero;
                     precipe.amount_smelting = D.dZero;
                 }
@@ -1461,7 +1461,7 @@ addLayer('f', {
                             const amount = precipe().amount_target;
 
                             recipe().consumes.forEach(([item, amount]) => {
-                                player.lo.items[item].amount = D.minus(player.lo.items[item].amount, amount);
+                                layers.lo.items['*'].gain_items(item, D.neg(amount));
                             });
                             precipe().amount_smelting = amount;
                         }
