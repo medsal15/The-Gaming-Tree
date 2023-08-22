@@ -59,8 +59,9 @@ addLayer('p', {
                 'grid',
                 'blank',
                 ['display-text', () => {
-                    const last = player.p.last_harvest,
-                        drops = [],
+                    const last = player.p.last_harvest;
+                    if (!last) return '';
+                    const drops = [],
                         count = player.p.plants[last].last_harvest_count;
 
                     if (!last) return '';
@@ -151,8 +152,19 @@ addLayer('p', {
                         'infuse_item',
                         () => [
                             ['', 'nothing'],
-                            ...Object.keys(layers.lo.items).filter(item => item != '*' && (tmp.lo.items[item].unlocked ?? true))
-                                .map(item => [item, tmp.lo.items[item].name])
+                            ...[
+                                'slime_goo',
+                                'slime_core',
+                                'red_fabric',
+                                'copper_ore',
+                                'coal',
+                                'iron_ore',
+                                'gold_ore',
+                                'wheat',
+                                'corn',
+                                'potato',
+                                'stardust',
+                            ].map(item => [item, tmp.lo.items[item].name]),
                         ]
                     ]],
                     'blank',
@@ -236,7 +248,7 @@ addLayer('p', {
                     player.p.plants[target].seeds = D.minus(player.p.plants[target].seeds, 1);
                     const result = tmp.p.plants[target].infusions[item];
                     if (!player.p.plants[target].infusions.includes(result)) player.p.plants[target].infusions.push(result);
-                    player.lo.items[item].amount = D.minus(player.lo.items[item].amount, 1);
+                    layers.lo.items['*'].gain_items(item, -1);
                     player.p.plants[result].seeds = D.add(player.p.plants[result].seeds, 1);
                 }
             },
@@ -292,7 +304,7 @@ addLayer('p', {
                                 seeds.eq(player_data.last_harvest_seeds) &&
                                 drops.every(([item, amount]) => player_data.last_harvest.some(([litem, lamount]) => litem == item && D.eq(lamount, amount)));
 
-                        layers.lo.items['*'].gain_drops(drops);
+                        layers.lo.items['*'].gain_items(drops);
                         player_data.seeds = D.add(player_data.seeds, seeds);
 
                         if (equal) {
@@ -508,7 +520,7 @@ addLayer('p', {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
                 /** @type {[string, Decimal][]} */
-                const items = [['copper_ore', D(.25)], ['wheat', D.dOne]];
+                const items = [['copper_ore', D.dOne], ['wheat', D.dOne]];
 
                 items.forEach(([item, amount], i) => {
                     let mult = tmp.p.plants['*'].harvest_mult;
@@ -854,7 +866,7 @@ addLayer('p', {
             infusions: {
                 'iron_ore': 'clockberry',
             },
-            unlocked() { return player.p.plants.wheat.infusions.includes(this.id); },
+            unlocked() { return player.p.plants.corn.infusions.includes(this.id); },
         },
         clockberry: {
             _id: null,
@@ -1010,7 +1022,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(10 * 60);
+                let maturation = D(8 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
@@ -1276,7 +1288,7 @@ addLayer('p', {
             infusions: {
                 'gold_ore': 'potato_battery',
             },
-            unlocked() { return player.p.plants.corn.infusions.includes(this.id); },
+            unlocked() { return player.p.plants.sunflower.infusions.includes(this.id); },
         },
         potato_battery: {
             _id: null,
@@ -1579,7 +1591,7 @@ addLayer('p', {
             },
             notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
             infusions: {},
-            unlocked() { return player.p.plants.wheat.infusions.includes(this.id); },
+            unlocked() { return player.p.plants.eggplant.infusions.includes(this.id); },
         },
     },
     update(diff) {
@@ -1608,7 +1620,7 @@ addLayer('p', {
                 }
                 player.p.last_harvest = data.plant;
 
-                layers.lo.items['*'].gain_drops(drops);
+                layers.lo.items['*'].gain_items(drops);
                 player_data.seeds = D.add(player_data.seeds, seeds);
 
                 player_data.dead = D.add(player_data.dead, 1);

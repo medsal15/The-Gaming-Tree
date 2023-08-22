@@ -215,7 +215,7 @@ addLayer('t', {
                     player.t.trees[type].last_drops = drops;
                 }
 
-                layers.lo.items["*"].gain_drops(drops);
+                layers.lo.items["*"].gain_items(drops);
             },
             onHold() {
                 player.t.clicked = true;
@@ -246,7 +246,7 @@ addLayer('t', {
                     player.t.trees[type].last_drops = drops;
                 }
 
-                layers.lo.items["*"].gain_drops(drops);
+                layers.lo.items["*"].gain_items(drops);
             },
         },
         // Focus clickables
@@ -946,7 +946,7 @@ addLayer('t', {
                 const gain = layers.t.convertion.per_second(item);
                 if (gain.eq(0)) return;
 
-                player.lo.items[item].amount = D.add(player.lo.items[item].amount, gain.times(diff));
+                layers.lo.items['*'].gain_items(item, gain.times(diff));
             });
         }
 
@@ -971,7 +971,7 @@ addLayer('t', {
                     drops = layers.t.trees[tree].get_drops(damage);
 
                 if (drops.length) {
-                    layers.lo.items['*'].gain_drops(drops);
+                    layers.lo.items['*'].gain_items(drops);
 
                     const equal = drops.length == player_tree.last_drops.length &&
                         drops.every(([item, amount]) => player_tree.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
@@ -996,7 +996,7 @@ addLayer('t', {
 
                     player.t.trees[tree].last_drops.push(...drops);
                     player.t.trees[tree].last_drops_times = D.dOne;
-                    layers.lo.items['*'].gain_drops(drops);
+                    layers.lo.items['*'].gain_items(drops);
                 }
 
                 player.t.trees[tree].health = tmp.t.trees[tree].health;

@@ -656,7 +656,7 @@ addLayer('xp', {
                             player_data.last_drops_times = D.dOne;
                             player_data.last_drops = drops;
                         }
-                        layers.lo.items['*'].gain_drops(drops);
+                        layers.lo.items['*'].gain_items(drops);
                     }
 
                     if (inChallenge('b', 61)) {

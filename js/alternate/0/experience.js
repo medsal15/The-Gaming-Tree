@@ -263,7 +263,7 @@ addLayer('xp_alt', {
                         player_data.last_drops = drops;
                     }
 
-                    layers.lo.items['*'].gain_drops(drops);
+                    layers.lo.items['*'].gain_items(drops);
                 }
 
                 if (inChallenge('b', 62) || hasChallenge('b', 62)) {
@@ -294,7 +294,7 @@ addLayer('xp_alt', {
                         player_data.last_drops = drops;
                     }
 
-                    layers.lo.items['*'].gain_drops(drops);
+                    layers.lo.items['*'].gain_items(drops);
                 }
 
                 if (inChallenge('b', 62) || hasChallenge('b', 62)) {
@@ -1009,7 +1009,7 @@ addLayer('xp_alt', {
                 /** @type {[string, Decimal][]} */
                 const production = tmp.xp_alt.monsters[type].produces.map(([item, amount]) => [item, D.times(diff, amount)]);
 
-                layers.lo.items['*'].gain_drops(production);
+                layers.lo.items['*'].gain_items(production);
             }
             if (D.gt(tmp.xp_alt.monsters[type].passive_tame, 0)) {
                 player.xp_alt.monsters[type].tamed = D.add(player.xp_alt.monsters[type].tamed, D.times(tmp.xp_alt.monsters[type].passive_tame, diff));

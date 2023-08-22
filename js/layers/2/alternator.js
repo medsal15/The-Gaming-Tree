@@ -228,7 +228,7 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)); },
+            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)) && false; },
             branches() {
                 const color = [21, 22, 23].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[31, color]];
@@ -255,7 +255,7 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)); },
+            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)) && false; },
             branches() {
                 const color = [21, 22, 23].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[32, color], 23];
@@ -282,7 +282,7 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)); },
+            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)) && false; },
             branches() {
                 const color = [31, 32].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[33, color]];
@@ -339,7 +339,7 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [21, 22, 23].every(id => hasUpgrade('a', id)); },
+            canAfford() { return [21, 22, 23].every(id => hasUpgrade('a', id)) && false; },
         },
         32: {
             title: 'Alternate Shop',
@@ -362,7 +362,7 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [21, 22, 23].every(id => hasUpgrade('a', id)); },
+            canAfford() { return [21, 22, 23].every(id => hasUpgrade('a', id)) && false; },
         },
         33: {
             title: 'Alternate Alternator',
@@ -386,7 +386,7 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [31, 32].every(id => hasUpgrade('a', id)); },
+            canAfford() { return [31, 32].every(id => hasUpgrade('a', id)) && false; },
         },
         34: {
             title: 'Alternate Casino',
