@@ -325,11 +325,11 @@ addLayer('suc', {
             unlocked() { return hasChallenge('b', 22); },
         },
         15: {
-            name: '???',
+            name: 'Tell your friends',
             tooltip() {
                 if (!hasChallenge('b', 31)) return 'Unseal ???';
 
-                return 'Unseal ???';
+                return 'Unseal the Party';
             },
             done() { return false; },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },

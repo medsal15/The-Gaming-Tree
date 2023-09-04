@@ -2390,6 +2390,12 @@ type Layers = {
                 notify(): boolean
                 unlocked?: Computable<boolean>
                 infusions: { [item: string]: string }
+                /**
+                 * If not empty, a hint will be shown in the infusion tab
+                 *
+                 * The hint is not shown if the seed is unlocked
+                 */
+                hint?: Computable<string>
             }
         }
     }
@@ -2660,6 +2666,7 @@ type Player = {
                 last_drops_times: Decimal
             }
         }
+        auto_upgrade: boolean
     }
     c: LayerData & {
         grid: {
@@ -2678,6 +2685,7 @@ type Player = {
                 amount: Decimal
             }
         }
+        auto_research: boolean
     }
     p: LayerData & {
         grid: {

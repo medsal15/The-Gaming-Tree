@@ -444,7 +444,7 @@ addLayer('a', {
         },
         54: {
             title: 'Alternate Stats',
-            description: 'Not Yet Implemented<br>???',
+            description: 'Not Yet Implemented<br>Social Butterfly',
             cost: D(8),
             item: 'stardust',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },

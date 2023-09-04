@@ -1,5 +1,6 @@
 'use strict';
 
+//todo add energy/science gains per second
 addLayer('c', {
     name: 'City',
     symbol: 'C',
@@ -16,6 +17,7 @@ addLayer('c', {
                         amount: D.dZero,
                     }])
             ),
+            auto_research: true,
         };
     },
     tooltip() { return `${formatWhole(layerBuyableAmount('c'))} buildings`; },
@@ -72,7 +74,13 @@ addLayer('c', {
                 },
                 () => {
                     if (hasUpgrade('c', 51)) return ['column', [
-                        ['display-text', `You have <span style="color:${tmp.c.resources.energy.color};font-size:1.5em;">${format(player.c.resources.energy.amount)}</span> ${tmp.c.resources.energy.name}`],
+                        [
+                            'display-text',
+                            `You have <span style="color:${tmp.c.resources.energy.color};font-size:1.5em;">\
+                                ${format(player.c.resources.energy.amount)}\
+                                </span>\
+                                ${tmp.c.resources.energy.name}`,
+                        ],
                         'blank',
                     ]];
                 },
@@ -82,6 +90,11 @@ addLayer('c', {
         'Research': {
             content: [
                 ['display-text', () => `You have <span style="color:${tmp.c.resources.science.color};font-size:1.5em;">${format(player.c.resources.science.amount)}</span> ${tmp.c.resources.science.name}`],
+                ['row', [
+                    ['display-text', 'Automatically research'],
+                    'blank',
+                    ['toggle', ['c', 'auto_research']]
+                ]],
                 'blank',
                 ['upgrade-tree', [
                     [11],
@@ -1643,7 +1656,9 @@ addLayer('c', {
                     produces = building.produces ?? {},
                     /** @type {string[]} */
                     consumption_parts = [],
-                    consumes = building.consumes ?? {};
+                    consumes = building.consumes ?? {},
+                    bonus = D(tmp.c.buildings.duplicator.effect[building_id]),
+                    bonus_text = bonus.gt(0) ? ` (+${format(bonus)})` : '';
 
                 if ('items' in produces) {
                     production_parts.push(
@@ -1676,7 +1691,7 @@ addLayer('c', {
 
                 if (effect.length) effect += '<br>';
 
-                return `You have ${formatWhole(placed)} / ${formatWhole(total)} ${building.name}<br>\
+                return `You have ${formatWhole(placed)}${bonus_text} / ${formatWhole(total)} ${building.name}<br>\
                     ${effect}\
                     ${consume_text}\
                     ${produce_text}`;
@@ -2489,4 +2504,5 @@ addLayer('c', {
         Object.keys(player.c.resources).forEach(res => player.c.resources[res] = { amount: D.dZero, });
     },
     branches: [['lo', 3]],
+    autoUpgrade() { return hasChallenge('b', 21) && player.c.auto_research && player.c.unlocked; },
 });
