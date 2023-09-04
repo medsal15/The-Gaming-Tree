@@ -211,6 +211,19 @@ addLayer('p', {
                             ${infusions.map(([plant, item]) => row(plant, item)).join('')}\
                         </table>`;
                 }],
+                'blank',
+                ['display-text', 'Infusion hints'],
+                ['display-text', () => {
+                    /**
+                     * @param {string} plant
+                     */
+                    const row = plant => `${(tmp.p.plants[plant].unlocked ?? true) ? capitalize(tmp.p.plants[plant].name) : '???'}: ${tmp.p.plants[plant].hint}`;
+
+                    return Object.keys(tmp.p.plants)
+                        .filter(plant => plant != '*' && !tmp.p.plants[plant].unlocked && tmp.p.plants[plant].hint)
+                        .map(row)
+                        .join('<br>')
+                }],
             ],
         },
     },
@@ -560,6 +573,7 @@ addLayer('p', {
             notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
             infusions: {},
             unlocked() { return player.p.plants.wheat.infusions.includes(this.id); },
+            hint: 'Needs copper',
         },
         corn: {
             _id: null,
@@ -652,6 +666,7 @@ addLayer('p', {
                 'coal': 'sunflower',
             },
             unlocked() { return player.p.plants.wheat.infusions.includes(this.id); },
+            hint: 'Needs some slime',
         },
         candy_corn: {
             _id: null,
@@ -777,6 +792,7 @@ addLayer('p', {
 
                 return `Multiplies taming progress gain by ${effect}`;
             },
+            hint() { if (tmp.p.plants.corn.unlocked) return 'Combine 2 plants'; },
         },
         strawberry: {
             _id: null,
@@ -867,6 +883,7 @@ addLayer('p', {
                 'iron_ore': 'clockberry',
             },
             unlocked() { return player.p.plants.corn.infusions.includes(this.id); },
+            hint() { if (tmp.p.plants.corn.unlocked) return 'A redder version of corn'; },
         },
         clockberry: {
             _id: null,
@@ -992,6 +1009,7 @@ addLayer('p', {
 
                 return `Multiplies growing speed gain by ${effect}`;
             },
+            hint() { if (tmp.p.plants.strawberry.unlocked) return 'A bit of metal should work'; },
         },
         sunflower: {
             _id: null,
@@ -1097,6 +1115,7 @@ addLayer('p', {
 
                 return `Multiplies harvest yield by ${effect}`;
             },
+            hint() { if (tmp.p.plants.corn.unlocked) return 'Add some fuel'; },
         },
         starflower: {
             _id: null,
@@ -1199,6 +1218,7 @@ addLayer('p', {
 
                 return `Multiplies multiplies star time by ${effect}`;
             },
+            hint() { if (tmp.p.plants.sunflower.unlocked) return 'Shines only during the night'; },
         },
         potato: {
             _id: null,
@@ -1289,6 +1309,7 @@ addLayer('p', {
                 'gold_ore': 'potato_battery',
             },
             unlocked() { return player.p.plants.sunflower.infusions.includes(this.id); },
+            hint() { if (tmp.p.plants.sunflower.unlocked) return 'Combine 2 plants, again'; },
         },
         potato_battery: {
             _id: null,
@@ -1414,6 +1435,7 @@ addLayer('p', {
 
                 return `Multiplies energy gain by ${effect}`;
             },
+            hint() { if (tmp.p.plants.potato.unlocked) return 'Electricity flows through this one'; },
         },
         eggplant: {
             _id: null,
@@ -1504,6 +1526,7 @@ addLayer('p', {
                 'slime_core': 'egg_plant',
             },
             unlocked() { return player.p.plants.wheat.infusions.includes(this.id); },
+            hint() { if (tmp.p.plants.potato.unlocked) return 'Combine 2 plants, once more'; },
         },
         egg_plant: {
             _id: null,
@@ -1592,6 +1615,7 @@ addLayer('p', {
             notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
             infusions: {},
             unlocked() { return player.p.plants.eggplant.infusions.includes(this.id); },
+            hint() { if (tmp.p.plants.eggplant.unlocked) return 'Add something... circular?'; },
         },
     },
     update(diff) {

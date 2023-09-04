@@ -71,6 +71,7 @@ let VERSION = {
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
 	name: 'Reconstruct',
+	beta: true,
 };
 
 /**
@@ -177,6 +178,7 @@ function addedPlayerData() { }
  * @type {Computable<string>[]}
  */
 var displayThings = [
+	() => VERSION.beta ? '<span style="color:#AA5555;">Beta version, things might be a bit unstable</span>' : '',
 	() => isEndgame() ? '<span style="color:#60C0F0">You are past endgame. Content may not be balanced.</span>' : '',
 	() => {
 		const id = activeChallenge('b');

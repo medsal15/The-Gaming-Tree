@@ -1612,7 +1612,7 @@ addLayer('lo', {
 
                 return style;
             },
-            unlocked() { return tmp.t.layerShown || getBuyableAmount(this.layer, this.id).gte(1); },
+            unlocked() { return tmp.t.layerShown || tmp.p.layerShown || getBuyableAmount(this.layer, this.id).gte(1); },
             value() {
                 let value = D(5);
 
@@ -1706,7 +1706,7 @@ addLayer('lo', {
 
                 return style;
             },
-            unlocked() { return tmp.t.layerShown || getBuyableAmount(this.layer, this.id).gte(1); },
+            unlocked() { return tmp.t.layerShown || tmp.c.layerShown || getBuyableAmount(this.layer, this.id).gte(1); },
             value() {
                 let value = D(7);
 

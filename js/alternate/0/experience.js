@@ -19,6 +19,7 @@ addLayer('xp_alt', {
                         last_drops_times: D.dZero,
                     }])
             ),
+            auto_upgrade: true,
         };
     },
     tooltip() {
@@ -138,6 +139,11 @@ addLayer('xp_alt', {
                             and ${tame_style(formatWhole(tmp.xp_alt.total.tamed), 'font-size:1.5em')} tamed monsters`;
                     },
                 ],
+                () => hasChallenge('b', 12) ? ['row', [
+                    ['display-text', 'Automatically buy upgrades'],
+                    'blank',
+                    ['toggle', ['xp_alt', 'auto_upgrade']],
+                ]] : undefined,
                 'blank',
                 ['upgrades', [1, 2, 3, 4, 5]],
             ],
@@ -657,7 +663,7 @@ addLayer('xp_alt', {
 
                 exp = exp.times(D.pow(buyableEffect('lo', 11), .1).pow(tmp.a.change_efficiency));
 
-                return exp.times(monst).min(tmp.xp.enemies['*'].exp_cap.minus(player.xp_alt.points)).max(0);
+                return exp.times(monst).min(tmp.xp.enemies['*'].exp_cap.minus(player.xp_alt.points).add(1)).max(0);
             },
             tames() {
                 let tames = D.dOne;
@@ -732,7 +738,7 @@ addLayer('xp_alt', {
 
                 exp = exp.times(tmp.xp_alt.monsters['*'].experience_mult);
 
-                return exp.times(monst).min(tmp.xp.enemies['*'].exp_cap.minus(player.xp_alt.points)).max(0);
+                return exp.times(monst).min(tmp.xp.enemies['*'].exp_cap.minus(player.xp_alt.points).add(1)).max(0);
             },
             tames() {
                 let tames = D.dOne;
@@ -808,7 +814,7 @@ addLayer('xp_alt', {
 
                 exp = exp.times(tmp.xp_alt.monsters['*'].experience_mult);
 
-                return exp.times(monst).min(tmp.xp.enemies['*'].exp_cap.minus(player.xp_alt.points)).max(0);
+                return exp.times(monst).min(tmp.xp.enemies['*'].exp_cap.minus(player.xp_alt.points).add(1)).max(0);
             },
             tames() {
                 let tames = D.dOne;
@@ -880,7 +886,7 @@ addLayer('xp_alt', {
 
                 exp = exp.times(tmp.xp_alt.monsters['*'].experience_mult);
 
-                return exp.times(monst).min(tmp.xp.enemies['*'].exp_cap.minus(player.xp_alt.points)).max(0);
+                return exp.times(monst).min(tmp.xp.enemies['*'].exp_cap.minus(player.xp_alt.points).add(1)).max(0);
             },
             tames() {
                 let tames = D.dOne;
@@ -1030,4 +1036,5 @@ addLayer('xp_alt', {
         }
         if (!(tmp.xp_alt.monsters[player.xp_alt.type].unlocked ?? true)) player.xp_alt.type = 'slime';
     },
+    autoUpgrade() { return player.xp_alt.auto_upgrade && hasChallenge('b', 12) && player.xp_alt.unlocked; },
 });
