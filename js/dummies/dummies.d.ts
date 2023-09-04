@@ -2624,6 +2624,10 @@ type Player = {
                  * If amount_smelting > 0, increase this one until >= tmp.f.recipes.time(amount_smelting)
                  */
                 progress: Decimal
+                /**
+                 * If true, the recipe is rerun on completion
+                 */
+                auto: boolean
             }
         }
         /** If true, shows alloys upgrades and buyables */

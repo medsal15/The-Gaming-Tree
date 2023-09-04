@@ -752,7 +752,7 @@ addLayer('p', {
 
                 return D.times(1.1, mult);
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify: false,
             infusions: {},
             unlocked() { return player.p.plants.corn.infusions.includes(this.id); },
             effect() {
@@ -969,7 +969,7 @@ addLayer('p', {
 
                 return D.times(1.1, mult);
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify: false,
             infusions: {},
             unlocked() { return player.p.plants.strawberry.infusions.includes(this.id); },
             effect() {
@@ -1007,7 +1007,7 @@ addLayer('p', {
                     effect = '[2√(clockberry value + 1)]';
                 }
 
-                return `Multiplies growing speed gain by ${effect}`;
+                return `Multiplies growing speed by ${effect}`;
             },
             hint() { if (tmp.p.plants.strawberry.unlocked) return 'A bit of metal should work'; },
         },
@@ -1103,14 +1103,14 @@ addLayer('p', {
                         .add(amounts[4])
                         .add(D.times(amounts[5], .5));
 
-                return sum.max(0).add(4).log(4);
+                return sum.max(0).add(1).root(2);
             },
             effect_text() {
                 let effect;
                 if (!shiftDown) {
                     effect = format(tmp.p.plants[this.id].effect);
                 } else {
-                    effect = '[log4(sunflower value + 4)]';
+                    effect = '[2√(sunflower value + 1)]';
                 }
 
                 return `Multiplies harvest yield by ${effect}`;
@@ -1178,7 +1178,7 @@ addLayer('p', {
 
                 return D.times(1.1, mult);
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify: false,
             unlocked() { return player.p.plants.sunflower.infusions.includes(this.id); },
             infusions: {},
             effect() {
@@ -1395,7 +1395,7 @@ addLayer('p', {
 
                 return D.times(1.1, mult);
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify: false,
             infusions: {},
             unlocked() { return player.p.plants.potato.infusions.includes(this.id); },
             effect() {

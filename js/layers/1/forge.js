@@ -1,6 +1,5 @@
 'use strict';
 
-//todo add auto toggle for recipes
 addLayer('f', {
     name: 'Forge',
     symbol: 'F',
@@ -223,6 +222,7 @@ addLayer('f', {
         Object.entries(player.f.recipes)
             .forEach(([id, recipe]) => {
                 if (recipe.amount_target.gt(tmp.f.recipes['*'].size)) recipe.amount_target = tmp.f.recipes['*'].size;
+                if (recipe.auto) clickClickable('f', `recipe_display_${id}_${tmp.f.recipes[id].consumes.length}`);
             });
     },
     type: 'none',
@@ -661,7 +661,7 @@ addLayer('f', {
             regexes: {
                 bar: /^recipe_(heat|time)_([a-z_]+)$/,
                 display: /^recipe_(display)_([a-z_]+)_(\d+)$/,
-                amount: /^recipe_(increase|decrease)_([a-z_]+)$/,
+                amount: /^recipe_(increase|decrease|auto)_([a-z_]+)$/,
             },
             show_recipe(recipe_id) {
                 if (!recipe_id || !(tmp.f.recipes[recipe_id].unlocked ?? true)) return;
@@ -676,6 +676,7 @@ addLayer('f', {
                     ['clickable', `recipe_decrease_${recipe_id}`],
                     ['clickable', `recipe_display_${recipe_id}_${recipe.consumes.length}`],
                     ['clickable', `recipe_increase_${recipe_id}`],
+                    ['clickable', `recipe_auto_${recipe_id}`],
                 ]];
             },
             size() {
@@ -1334,9 +1335,19 @@ addLayer('f', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
-        const keep = ['alloys'];
+        const keep = ['alloys'],
+            // Keep amounts being made and automation
+            /** @type {[id: string, data: {amount_target: Decimal, auto: boolean}][]} */
+            rec = Object.fromEntries(player.f.recipes).map(([id, data]) => [id, {
+                amount_target: data.amount_target,
+                auto: data.auto,
+            }]);
 
         layerDataReset(this.layer, keep);
+        rec.forEach(([id, data]) => {
+            player.f.recipes[id].amount_target = data.amount_target
+            player.f.recipes[id].auto = data.auto;
+        });
     },
     branches: ['lo'],
     /*
@@ -1471,7 +1482,7 @@ addLayer('f', {
 
             const recipe_amount_matches = layers.f.recipes['*'].regexes.amount.exec(prop);
             if (recipe_amount_matches) {
-                /** @type {[string, 'increase'|'decrease', string]} */
+                /** @type {[string, 'increase'|'decrease'|'auto', string]} */
                 const [, mode, recipe_id] = recipe_amount_matches,
                     recipe = () => tmp.f?.recipes[recipe_id],
                     precipe = () => player.f?.recipes[recipe_id],
@@ -1498,10 +1509,23 @@ addLayer('f', {
                             case 'decrease':
                                 if (precipe().amount_target.lte(0)) return false;
                                 break;
+                            case 'auto':
+                                if (precipe().amount_target.lte(0)) return false;
+                                break;
                         }
                         return true;
                     },
-                    display() { return { 'increase': '+', 'decrease': '-' }[mode]; },
+                    display() {
+                        switch (mode) {
+                            case 'increase':
+                                return '+';
+                            case 'decrease':
+                                return '-';
+                            case 'auto':
+                                if (precipe().auto) return 'ON';
+                                return 'OFF';
+                        }
+                    },
                     unlocked() { return recipe().unlocked ?? true; },
                     style: {
                         'height': '40px',
@@ -1510,9 +1534,16 @@ addLayer('f', {
                     },
                     onClick() {
                         let amount = change();
-                        if (mode == 'decrease') amount = amount.neg();
-
-                        precipe().amount_target = precipe().amount_target.add(amount).min(tmp.f.recipes['*'].size).max(0);
+                        switch (mode) {
+                            case 'auto':
+                                precipe().auto = !precipe().auto;
+                                break;
+                            case 'decrease':
+                                amount = amount.neg();
+                            case 'increase':
+                                precipe().amount_target = precipe().amount_target.add(amount).min(tmp.f.recipes['*'].size).max(0);
+                                break;
+                        }
                     },
                 };
             }
@@ -1553,6 +1584,7 @@ addLayer('f', {
                             ...Array.from({ length }, (_, i) => `recipe_display_${recipe}_${i}`),
                             `recipe_increase_${recipe}`,
                             `recipe_decrease_${recipe}`,
+                            `recipe_auto_${recipe}`,
                         ];
                     })
                     .flat(),
