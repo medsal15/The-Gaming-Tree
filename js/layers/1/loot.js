@@ -3134,7 +3134,7 @@ addLayer('lo', {
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (hasChallenge('b', 22)) return ['enemy:star']; },
             },
-            name: 'Stardust',
+            name: 'stardust',
             style: {
                 'background-image': `url('./resources/images/powder.svg')`,
                 'background-color'() { return tmp.xp.enemies.star.color; },

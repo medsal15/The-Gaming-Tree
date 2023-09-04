@@ -407,12 +407,12 @@ addLayer('p', {
             ages() {
                 /** @type {[Decimal, Decimal][]} */
                 const ages = [
-                    [D(-1), D(1 * 60)],
-                    [D(1 * 60), D(3 * 60)],
-                    [D(3 * 60), D(4 * 60)],
-                    [D(4 * 60), D(5 * 60)],
-                    [D(5 * 60), D(10 * 60)], // mature
-                    [D(10 * 60), D(12 * 60)], // wilting
+                    [D(-1), D(.5 * 60)],
+                    [D(.5 * 60), D(1 * 60)],
+                    [D(1 * 60), D(1.5 * 60)],
+                    [D(1.5 * 60), D(2 * 60)],
+                    [D(2 * 60), D(5 * 60)], // mature
+                    [D(5 * 60), D(6 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
@@ -424,7 +424,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(5 * 60);
+                let maturation = D(2 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
@@ -498,12 +498,12 @@ addLayer('p', {
             ages() {
                 /** @type {[Decimal, Decimal][]} */
                 const ages = [
-                    [D(-1), D(2 * 60)],
-                    [D(2 * 60), D(4 * 60)],
-                    [D(4 * 60), D(7 * 60)],
-                    [D(7 * 60), D(10 * 60)],
-                    [D(10 * 60), D(18 * 60)], // mature
-                    [D(18 * 60), D(20 * 60)], // wilting
+                    [D(-1), D(1 * 60)],
+                    [D(1 * 60), D(2 * 60)],
+                    [D(2 * 60), D(3 * 60)],
+                    [D(3 * 60), D(4 * 60)],
+                    [D(4 * 60), D(5 * 60)], // mature
+                    [D(5 * 60), D(10 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
@@ -515,7 +515,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(10 * 60);
+                let maturation = D(5 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
@@ -533,7 +533,7 @@ addLayer('p', {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
                 /** @type {[string, Decimal][]} */
-                const items = [['copper_ore', D.dOne], ['wheat', D.dOne]];
+                const items = [['copper_ore', D(100)], ['wheat', D.dOne]];
 
                 items.forEach(([item, amount], i) => {
                     let mult = tmp.p.plants['*'].harvest_mult;
@@ -587,12 +587,12 @@ addLayer('p', {
             ages() {
                 /** @type {[Decimal, Decimal][]} */
                 const ages = [
-                    [D(-1), D(2 * 60)],
-                    [D(2 * 60), D(4 * 60)],
-                    [D(4 * 60), D(6 * 60)],
-                    [D(6 * 60), D(8 * 60)],
-                    [D(8 * 60), D(20 * 60)], // mature
-                    [D(20 * 60), D(22 * 60)], // wilting
+                    [D(-1), D(1 * 60)],
+                    [D(1 * 60), D(2 * 60)],
+                    [D(2 * 60), D(3 * 60)],
+                    [D(3 * 60), D(4 * 60)],
+                    [D(4 * 60), D(10 * 60)], // mature
+                    [D(10 * 60), D(11 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
@@ -604,7 +604,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(8 * 60);
+                let maturation = D(4 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
@@ -680,12 +680,12 @@ addLayer('p', {
             ages() {
                 /** @type {[Decimal, Decimal][]} */
                 const ages = [
-                    [D(-1), D(3 * 60)],
-                    [D(3 * 60), D(6 * 60)],
-                    [D(6 * 60), D(9 * 60)],
-                    [D(9 * 60), D(12 * 60)],
-                    [D(12 * 60), D(30 * 60)], // mature
-                    [D(30 * 60), D(33 * 60)], // wilting
+                    [D(-1), D(1.5 * 60)],
+                    [D(1.5 * 60), D(3 * 60)],
+                    [D(3 * 60), D(4.5 * 60)],
+                    [D(4.5 * 60), D(6 * 60)],
+                    [D(6 * 60), D(16 * 60)], // mature
+                    [D(16 * 60), D(18 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
@@ -697,7 +697,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(12 * 60);
+                let maturation = D(6 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
@@ -807,11 +807,11 @@ addLayer('p', {
                 /** @type {[Decimal, Decimal][]} */
                 const ages = [
                     [D(-1), D(1.5 * 60)],
-                    [D(1.5 * 60), D(3 * 60)],
-                    [D(3 * 60), D(5 * 60)],
-                    [D(5 * 60), D(7.5 * 60)],
-                    [D(7.5 * 60), D(13 * 60)], // mature
-                    [D(13 * 60), D(15 * 60)], // wilting
+                    [D(1.5 * 60), D(2.5 * 60)],
+                    [D(2.5 * 60), D(3.5 * 60)],
+                    [D(3.5 * 60), D(5.5 * 60)],
+                    [D(5.5 * 60), D(11 * 60)], // mature
+                    [D(11 * 60), D(13 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
@@ -823,7 +823,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(7.5 * 60);
+                let maturation = D(5.5 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
@@ -897,12 +897,12 @@ addLayer('p', {
             ages() {
                 /** @type {[Decimal, Decimal][]} */
                 const ages = [
-                    [D(-1), D(3 * 60)],
-                    [D(3 * 60), D(6 * 60)],
-                    [D(6 * 60), D(9 * 60)],
-                    [D(9 * 60), D(12 * 60)],
-                    [D(12 * 60), D(24 * 60)], // mature
-                    [D(24 * 60), D(30 * 60)], // wilting
+                    [D(-1), D(1.5 * 60)],
+                    [D(1.5 * 60), D(2.5 * 60)],
+                    [D(2.5 * 60), D(3.5 * 60)],
+                    [D(3.5 * 60), D(5.5 * 60)],
+                    [D(5.5 * 60), D(25.5 * 60)], // mature
+                    [D(25.5 * 60), D(30 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
@@ -914,7 +914,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(12 * 60);
+                let maturation = D(5.5 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
@@ -1024,11 +1024,11 @@ addLayer('p', {
                 /** @type {[Decimal, Decimal][]} */
                 const ages = [
                     [D(-1), D(2 * 60)],
-                    [D(2 * 60), D(4 * 60)],
+                    [D(2 * 60), D(3 * 60)],
+                    [D(3 * 60), D(4 * 60)],
                     [D(4 * 60), D(6 * 60)],
-                    [D(6 * 60), D(8 * 60)],
-                    [D(8 * 60), D(10 * 60)], // mature
-                    [D(10 * 60), D(12 * 60)], // wilting
+                    [D(6 * 60), D(9 * 60)], // mature
+                    [D(9 * 60), D(11 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
@@ -1040,7 +1040,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(8 * 60);
+                let maturation = D(6 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
@@ -1129,12 +1129,12 @@ addLayer('p', {
             ages() {
                 /** @type {[Decimal, Decimal][]} */
                 const ages = [
-                    [D(-1), D(4 * 60)],
-                    [D(4 * 60), D(8 * 60)],
-                    [D(8 * 60), D(12 * 60)],
-                    [D(12 * 60), D(16 * 60)],
-                    [D(16 * 60), D(30 * 60)], // mature
-                    [D(30 * 60), D(33 * 60)], // wilting
+                    [D(-1), D(2 * 60)],
+                    [D(2 * 60), D(4 * 60)],
+                    [D(4 * 60), D(6 * 60)],
+                    [D(6 * 60), D(8 * 60)],
+                    [D(8 * 60), D(38 * 60)], // mature
+                    [D(38 * 60), D(40 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
@@ -1146,7 +1146,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(16 * 60);
+                let maturation = D(8 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
@@ -1327,8 +1327,8 @@ addLayer('p', {
                     [D(1.5 * 60), D(3 * 60)],
                     [D(3 * 60), D(4.5 * 60)],
                     [D(4.5 * 60), D(6 * 60)],
-                    [D(6 * 60), D(9 * 60)], // mature
-                    [D(9 * 60), D(10 * 60)], // wilting
+                    [D(6 * 60), D(16 * 60)], // mature
+                    [D(16 * 60), D(20 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
@@ -1449,11 +1449,11 @@ addLayer('p', {
             ages() {
                 /** @type {[Decimal, Decimal][]} */
                 const ages = [
-                    [D(-1), D(2 * 60)],
-                    [D(2 * 60), D(4 * 60)],
-                    [D(4 * 60), D(6 * 60)],
-                    [D(6 * 60), D(9 * 60)],
-                    [D(9 * 60), D(13 * 60)], // mature
+                    [D(-1), D(1.5 * 60)],
+                    [D(1.5 * 60), D(3 * 60)],
+                    [D(3 * 60), D(4 * 60)],
+                    [D(4 * 60), D(5 * 60)],
+                    [D(5 * 60), D(13 * 60)], // mature
                     [D(13 * 60), D(15 * 60)], // wilting
                 ];
 
@@ -1466,7 +1466,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(9 * 60);
+                let maturation = D(5 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
@@ -1544,8 +1544,8 @@ addLayer('p', {
                     [D(2.5 * 60), D(5 * 60)],
                     [D(5 * 60), D(7.5 * 60)],
                     [D(7.5 * 60), D(11 * 60)],
-                    [D(11 * 60), D(15 * 60)], // mature
-                    [D(15 * 60), D(17 * 60)], // wilting
+                    [D(11 * 60), D(60 * 60)], // mature
+                    [D(60 * 60), D(65 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
