@@ -1540,8 +1540,9 @@ addLayer('xp', {
         if (!force && layers[layer].row <= this.row) return;
 
         /** @type {(keyof player['xp'])[]} */
-        const keep = ['type', 'auto'],
-            kept_ups = [...player.xp.upgrades];
+        const keep = ['type'],
+            kept_ups = [...player.xp.upgrades],
+            auto = { ...player.xp.auto };
 
         kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 12).xp_hold).toNumber();
 
@@ -1554,6 +1555,7 @@ addLayer('xp', {
             kills: D.dZero,
             element: layers.mag.elements['*'].element(type),
         });
+        player.xp.auto = auto;
     },
     autoUpgrade() { return hasChallenge('b', 12) && player.xp.auto.upgrade && !tmp.xp.deactivated; },
 });
