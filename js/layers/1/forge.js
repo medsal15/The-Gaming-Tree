@@ -1338,7 +1338,7 @@ addLayer('f', {
         const keep = ['alloys'],
             // Keep amounts being made and automation
             /** @type {[id: string, data: {amount_target: Decimal, auto: boolean}][]} */
-            rec = Object.fromEntries(player.f.recipes).map(([id, data]) => [id, {
+            rec = Object.entries(player.f.recipes).map(([id, data]) => [id, {
                 amount_target: data.amount_target,
                 auto: data.auto,
             }]);
