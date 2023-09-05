@@ -293,7 +293,7 @@ addLayer('suc', {
             unlocked() { return hasChallenge('b', 22); },
         },
         13: {
-            name: 'Broke',
+            name: 'This one is not for research',
             tooltip() {
                 if (!hasChallenge('b', 32)) return 'Unseal ???';
 
