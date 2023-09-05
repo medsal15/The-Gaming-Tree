@@ -71,7 +71,7 @@ let VERSION = {
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
 	name: 'Reconstruct',
-	beta: true,
+	beta: false,
 };
 
 /**
