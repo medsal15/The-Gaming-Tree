@@ -632,7 +632,7 @@ addLayer('t', {
             health() {
                 let health = D(5);
 
-                health = health.add(buyableEffect('lo', 61).soaked);
+                health = health.add(buyableEffect('lo', 61)?.soaked);
 
                 health = health.times(tmp.t.trees['*'].health_mult);
 

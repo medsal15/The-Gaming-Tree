@@ -237,7 +237,7 @@ function fixOldSave(oldVersion) {
 		);
 		Object.entries(player.t.trees)
 			.forEach(([tree, data]) => {
-				data.health = tree == (player.t.current || !(tree in layers.t.trees)) ? player.t.health : run(layers.t.trees[tree].health);
+				data.health = (tree == player.t.current || !(tree in layers.t.trees)) ? player.t.health : run(layers.t.trees[tree].health);
 				data.last_drops = tree == player.t.current ? player.t.last_drops : [];
 			});
 	}
