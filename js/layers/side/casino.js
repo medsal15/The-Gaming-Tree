@@ -325,9 +325,10 @@ addLayer('cas', {
                         player.cas.swapping.chances = false;
                         player.cas.swapping.weights = false;
                         player.cas.points = D.dZero;
+                        player.cas.respecs = D.add(player.cas.respecs, 1);
                     },
                     display: 'Respec Swaps',
-                    unlocked() { return hasChallenge('b', 52); },
+                    unlocked() { return hasChallenge('b', 52) && !inChallenge('b', 52); },
                 };
             }
         },
