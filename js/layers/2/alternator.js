@@ -209,7 +209,7 @@ addLayer('a', {
         },
         21: {
             title: 'Alternate Levels',
-            description: 'Not Yet Implemented<br>Higher, higher!<br><br>Requires all 1st row layer alternates',
+            description: 'Higher, higher!<br><br>Requires all 1st row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -219,19 +219,24 @@ addLayer('a', {
                 const style = {};
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.to.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.l.color}, ${tmp.to.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.l.color;
                 }
 
                 return style;
             },
-            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)) && false; },
+            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)); },
             branches() {
                 const color = [21, 22, 23].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[31, color]];
+            },
+            onPurchase() {
+                player.to.unlocked = true;
+                doReset('s', true);
             },
         },
         22: {

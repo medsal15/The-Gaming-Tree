@@ -14,6 +14,7 @@ By [Lorc](https://lorcblog.blogspot.com/):
 - [brain](https://game-icons.net/1x1/lorc/brain.html)
 - [cog](https://game-icons.net/1x1/lorc/cog.html)
 - [cracked disk](https://game-icons.net/1x1/lorc/cracked-disc.html)
+- [drop](https://game-icons.net/1x1/lorc/drop.html)
 - [erlenmeyer](https://game-icons.net/1x1/lorc/erlenmeyer.html)
 - [falling leaf](https://game-icons.net/1x1/lorc/falling-leaf.html)
 - [fleshy mass](https://game-icons.net/1x1/lorc/fleshy-mass.html)

@@ -18,6 +18,8 @@ addLayer('c', {
                     }])
             ),
             auto_research: true,
+            floors: [{}],
+            floor: 0,
         };
     },
     tooltip() { return `${formatWhole(layerBuyableAmount('c'))} buildings`; },
@@ -33,6 +35,26 @@ addLayer('c', {
             description: 'C: Display city layer',
             unlocked() { return tmp.c.layerShown; },
             onPress() { showTab('c'); },
+        },
+        {
+            key: 'ArrowUp',
+            description: '↑ (in C): Move to a higher floor',
+            unlocked() { return hasMilestone('to', 1); },
+            onPress() {
+                if (player.tab == 'c' && player.c.floor < tmp.c.floors.max) {
+                    player.c.floor++;
+                };
+            },
+        },
+        {
+            key: 'ArrowDown',
+            description: '↓ (in C): Move to a lower floor',
+            unlocked() { return hasMilestone('to', 1); },
+            onPress() {
+                if (player.tab == 'c' && player.c.floor > 0) {
+                    player.c.floor--;
+                };
+            },
         },
     ],
     tabFormat: {
@@ -58,6 +80,17 @@ addLayer('c', {
                 ]],
                 'blank',
                 'grid',
+                'blank',
+                () => {
+                    if (tmp.c.floors.max > 0) return ['column', [
+                        ['display-text', `Current floor: ${formatWhole(player.c.floor)}`],
+                        ['row', [
+                            ['clickable', 'up'],
+                            'blank',
+                            ['clickable', 'down'],
+                        ]],
+                    ]];
+                },
             ],
         },
         'Buildings': {
@@ -140,13 +173,12 @@ addLayer('c', {
             return rows;
         },
         maxRows: 7,
-        getStartData(_) {
-            return {
+        getStartData(_) { return {}; },
+        getCanClick(_, id) {
+            const data = player.c.floors[player.c.floor][id] ??= {
                 building: '',
                 enabled: true,
             };
-        },
-        getCanClick(data, _) {
             switch (player.c.mode) {
                 case 'place':
                     return data.building == '' &&
@@ -157,7 +189,11 @@ addLayer('c', {
                     return data.building != '';
             }
         },
-        onClick(data, _) {
+        onClick(_, id) {
+            const data = player.c.floors[player.c.floor][id] ??= {
+                building: '',
+                enabled: true,
+            };
             switch (player.c.mode) {
                 case 'place':
                     if (
@@ -177,8 +213,9 @@ addLayer('c', {
                     return;
             }
         },
-        getStyle(data, _) {
-            if (!(data.building in tmp.c.buildings)) return {};
+        getStyle(_, id) {
+            const data = player.c.floors[player.c.floor][id];
+            if (!(data?.building in tmp.c.buildings)) return {};
 
             const building = tmp.c.buildings[data.building];
 
@@ -190,11 +227,16 @@ addLayer('c', {
                 building.style.grid ?? {},
             );
         },
-        getTooltip(data, _) {
+        getTooltip(_, id) {
+            const data = player.c.floors[player.c.floor][id] ??= {
+                building: '',
+                enabled: true,
+            };
             if (data?.building in tmp.c.buildings) return capitalize(tmp.c.buildings[data.building].name);
             return 'Empty';
         },
-        getDisplay(data, _) {
+        getDisplay(_, id) {
+            const data = player.c.floors[player.c.floor][id];
             if (data?.building in tmp.c.buildings) return data.enabled ? 'ON' : 'OFF';
         },
     },
@@ -705,7 +747,11 @@ addLayer('c', {
         },
         51: {
             title: 'Improved Blueprints',
-            description: '+20% production and consumption<br>Unlock a new set of buildings',
+            description() {
+                let text = '+20% production and consumption<br>Unlock a new set of buildings';
+                if (tmp.lo.layerShown) text += '<br>Counts as an anvil';
+                return text;
+            },
             effect() { return D(1.2); },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1).times(100))}%`; },
             style() {
@@ -1480,7 +1526,7 @@ addLayer('c', {
                         const cost = listFormat.format(tmpuilding().cost.map(([item, cost]) => {
                             let c;
                             if (shiftDown) c = `[${tmpuilding().formulas.cost.find(([i]) => i == item)[1]}]`;
-                            else c = format(cost);
+                            else c = `${format(player.lo.items[item].amount)}/${format(cost)}`;
 
                             return `${c} ${tmp.lo.items[item].name}`;
                         }));
@@ -1554,6 +1600,31 @@ addLayer('c', {
                     onClick() { player.c.mode = 'toggle'; },
                 };
             }
+            if (prop == 'up') {
+                return {
+                    style: {
+                        'background-image': `url('./resources/images/previous-button.svg')`,
+                        'transform': 'rotate(90deg)',
+                    },
+                    canClick() { return player.c.floor < tmp.c.floors.max; },
+                    onClick() {
+                        player.c.floor++;
+                        if (typeof player.c.floors[player.c.floor] !== 'object') player.c.floors[player.c.floor] = {};
+                    },
+                    unlocked() { return tmp.c.floors.max > 0; },
+                };
+            }
+            if (prop == 'down') {
+                return {
+                    style: {
+                        'background-image': `url('./resources/images/previous-button.svg')`,
+                        'transform': 'rotate(-90deg)',
+                    },
+                    canClick() { return player.c.floor > 0; },
+                    onClick() { player.c.floor--; },
+                    unlocked() { return tmp.c.floors.max > 0; },
+                };
+            }
 
             const matches = layers.c.buildings['*'].regex.exec(prop);
             if (matches) {
@@ -1594,17 +1665,19 @@ addLayer('c', {
         getOwnPropertyDescriptor(_, prop) {
             if (prop == 'layer' ||
                 layers.c.buildings['*'].regex.exec(prop) ||
-                ['place', 'destroy', 'toggle'].includes(prop)) return {
+                ['place', 'destroy', 'toggle', 'up', 'down'].includes(prop)) return {
                     enumerable: true,
                     configurable: true,
                 };
         },
-        has(_, prop) { return layers.c.buildings['*'].regex.exec(prop) || ['place', 'destroy', 'toggle'].includes(prop); },
+        has(_, prop) { return layers.c.buildings['*'].regex.exec(prop) || ['place', 'destroy', 'toggle', 'up', 'down'].includes(prop); },
         ownKeys(_) {
             return [
                 'place',
                 'destroy',
                 'toggle',
+                'up',
+                'down',
                 ...Object.keys(layers.c.buildings).map(id => `select_${id}`),
             ];
         },
@@ -1614,25 +1687,36 @@ addLayer('c', {
         '*': {
             regex: /^(select)_([a-z_]+)$/,
             placed() {
-                return Object.entries(player.c.grid).reduce((sum, [id, data]) => {
-                    // Check if id is in the grid
-                    if (
-                        Math.floor(id / 100) <= tmp.c.grid.rows &&
-                        id % 100 <= tmp.c.grid.cols
-                    ) sum[data.building] = D.add(sum[data.building], 1);
-                    return sum;
-                }, {});
+                return player.c.floors.reduce(
+                    /** @param {{[building: string]: Decimal}} full */
+                    (full, grid) => {
+                        return Object.entries(grid)
+                            .reduce((sum, [id, data]) => {
+                                // Check if id is in the grid
+                                if (
+                                    Math.floor(id / 100) <= tmp.c.grid.rows &&
+                                    id % 100 <= tmp.c.grid.cols
+                                ) sum[data.building] = D.add(sum[data.building], 1);
+                                return sum;
+                            }, full);
+                    }, {});
             },
             enabled() {
-                return Object.entries(player.c.grid).reduce((sum, [id, data]) => {
-                    // Check if id is in the grid
-                    if (
-                        Math.floor(id / 100) <= tmp.c.grid.rows &&
-                        id % 100 <= tmp.c.grid.cols &&
-                        data.enabled
-                    ) sum[data.building] = D.add(sum[data.building], 1);
-                    return sum;
-                }, {});
+                return player.c.floors.reduce(
+                    /** @param {{[building: string]: Decimal}} full */
+                    (full, grid) => {
+                        return Object.entries(grid)
+                            .reduce((sum, [id, data]) => {
+                                // Check if id is in the grid
+                                if (
+                                    Math.floor(id / 100) <= tmp.c.grid.rows &&
+                                    id % 100 <= tmp.c.grid.cols &&
+                                    // Check if building is turned on
+                                    data.enabled
+                                ) sum[data.building] = D.add(sum[data.building], 1);
+                                return sum;
+                            }, full);
+                    }, {});
             },
             show_building(building) {
                 if (building == '*' || !(building in tmp.c.buildings) || !(tmp.c.buildings[building].unlocked ?? true)) return;
@@ -2148,7 +2232,7 @@ addLayer('c', {
                 return cost;
             },
             formulas: {
-                cost: [['stone', '(1.5 ^ built) * 40'], ['normal_log', '(1.5 ^ built) * 100']],
+                cost: [['stone', '(1.5 ^ built) * 40'], ['normal_log', '(1.25 ^ built) * 100']],
             },
             unlocked() { return hasUpgrade('c', 51); },
         },
@@ -2334,27 +2418,30 @@ addLayer('c', {
                 },
             },
             effect(_) {
-                const places = Object.keys(player.c.grid)
-                    .filter(id => player.c.grid[id].building == this.id && player.c.grid[id].enabled)
-                    .map(id => +id),
-                    neighbors = places.map(id => {
-                        const row = Math.floor(id / 100),
-                            col = id % 100,
-                            side_ids = [
-                                (row - 1) * 100 + col,
-                                (row + 1) * 100 + col,
-                                row * 100 + col - 1,
-                                row * 100 + col + 1,
-                            ];
+                return player.c.floors.reduce(
+                    /** @param {{[building: string]: Decimal}} full */
+                    (full, grid) => {
+                        const places = Object.keys(grid)
+                            .map(id => +id)
+                            .filter(id => grid[id]?.building == this.id && grid[id]?.enabled);
 
-                        return side_ids.filter(id => id in player.c.grid && !['', this.id].includes(player.c.grid[id].building) && player.c.grid[id].enabled)
-                            .map(id => player.c.grid[id].building);
-                    }).flat();
+                        places.map(id => {
+                            const row = Math.floor(id / 100),
+                                col = id % 100,
+                                side_ids = [
+                                    (row - 1) * 100 + col,
+                                    (row + 1) * 100 + col,
+                                    row * 100 + col - 1,
+                                    row * 100 + col + 1,
+                                ];
 
-                return neighbors.reduce((dict, type) => {
-                    dict[type] = D.add(dict[type], .1);
-                    return dict;
-                }, {});
+                            return side_ids
+                                .filter(id => id in grid && !['', this.id].includes(grid[id]?.building ?? '') && grid[id]?.enabled)
+                                .forEach(id => full[grid[id].building] = D.add(full[grid[id].building], .1));
+                        });
+
+                        return full;
+                    }, {});
             },
             cost(amount_built) {
                 const built = D(amount_built ?? getBuyableAmount('c', this.id));
@@ -2377,6 +2464,7 @@ addLayer('c', {
             },
             unlocked() { return hasUpgrade('c', 51); },
         },
+        // Other
         /**
          * TODO
          *
@@ -2441,6 +2529,16 @@ addLayer('c', {
             },
         },
     },
+    /** @type {Layers['c']['floors']} */
+    floors: {
+        max() {
+            let max = D.dZero;
+
+            if (hasMilestone('to', 1)) max = max.add(tmp.to.milestones[1].effect);
+
+            return max.toNumber();
+        },
+    },
     update(diff) {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
         if (tmp.tic.layerShown) diff = D.times(diff, layers.tic.time_speed(this.layer));
@@ -2488,6 +2586,10 @@ addLayer('c', {
             }
         });
     },
+    automate() {
+        if (player.c.floor > tmp.c.floors.max) player.c.floor = tmp.c.floors.max;
+        if (player.c.floor < 0) player.c.floor = 0;
+    },
     type: 'none',
     /** @this {Layers['c']} */
     doReset(layer) {
@@ -2502,6 +2604,7 @@ addLayer('c', {
         layerDataReset(this.layer, keep);
         player[this.layer].upgrades.push(...kept_ups);
         Object.keys(player.c.resources).forEach(res => player.c.resources[res] = { amount: D.dZero, });
+        player.c.floors = [{}];
     },
     branches: [['lo', 3]],
     autoUpgrade() { return hasChallenge('b', 21) && player.c.auto_research && player.c.unlocked; },

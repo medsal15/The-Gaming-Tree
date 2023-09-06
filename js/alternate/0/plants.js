@@ -502,8 +502,8 @@ addLayer('p', {
                     [D(1 * 60), D(2 * 60)],
                     [D(2 * 60), D(3 * 60)],
                     [D(3 * 60), D(4 * 60)],
-                    [D(4 * 60), D(5 * 60)], // mature
-                    [D(5 * 60), D(10 * 60)], // wilting
+                    [D(4 * 60), D(8 * 60)], // mature
+                    [D(8 * 60), D(10 * 60)], // wilting
                 ];
 
                 ages.forEach(([from, to], i) => {
@@ -515,7 +515,7 @@ addLayer('p', {
                 return ages;
             },
             maturation() {
-                let maturation = D(5 * 60);
+                let maturation = D(4 * 60);
 
                 maturation = maturation.div(tmp.p.plants['*'].grow_mult);
 
