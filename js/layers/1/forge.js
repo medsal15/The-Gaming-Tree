@@ -1500,14 +1500,12 @@ addLayer('f', {
 
                 return obj[prop] ??= {
                     canClick() {
-                        if (precipe().amount_smelting.gt(0)) return false;
-
                         switch (mode) {
                             case 'increase':
-                                if (precipe().amount_target.gte(tmp.f.recipes['*'].size)) return false;
+                                if (precipe().amount_smelting.gt(0) || precipe().amount_target.gte(tmp.f.recipes['*'].size)) return false;
                                 break;
                             case 'decrease':
-                                if (precipe().amount_target.lte(0)) return false;
+                                if (precipe().amount_smelting.gt(0) || precipe().amount_target.lte(0)) return false;
                                 break;
                             case 'auto':
                                 if (precipe().amount_target.lte(0)) return false;
