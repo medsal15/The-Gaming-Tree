@@ -1545,6 +1545,11 @@ addLayer('f', {
                                 break;
                         }
                     },
+                    tooltip() {
+                        if (mode == 'auto') {
+                            return 'Automatically run the recipe';
+                        }
+                    },
                 };
             }
         },
