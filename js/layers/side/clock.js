@@ -11,7 +11,8 @@ addLayer('clo', {
             use_advanced: false,
         };
     },
-    layerShown() { return (inChallenge('b', 51) || hasChallenge('b', 51)) && !hasUpgrade('a', 24); },
+    layerShown() { return (inChallenge('b', 51) || hasChallenge('b', 51)) && !tmp[this.layer].deactivated; },
+    deactivated() { return hasUpgrade('a', 24); },
     color: '#FFFFFF',
     row: 'side',
     resource: 'time',
@@ -1051,7 +1052,7 @@ addLayer('clo', {
     tooltip() { return `Time speed: *${format(tmp.clo.time_speed)}`; },
     /** @type {typeof layers.clo.time_speed} */
     time_speed(layer, visual = false) {
-        if (!inChallenge('b', 51) && !hasChallenge('b', 51)) return D.dOne;
+        if (!inChallenge('b', 51) && !hasChallenge('b', 51) || tmp[this.layer].deactivated) return D.dOne;
 
         let speed = D.dOne;
 
@@ -1063,15 +1064,24 @@ addLayer('clo', {
             if (hasUpgrade('clo', 43)) speed = speed.times(upgradeEffect('clo', 43));
         }
 
-        if (!visual && layer) {
-            const links = {
-                'xp': 11, 'm': 12, 't': 13,
-                'l': 21, 'lo': 22, 'f': 23,
-                'b': 31, 's': 32, 'a': 33,
+        if (visual || layer || (!visual && !layer)) {
+            let allow = true;
 
-                'xp_alt': 11, 'c': 12, 'p': 13,
-            };
-            if (layer in links && hasUpgrade(this.layer, links[layer])) {
+            // Check whether we can actually speed up the layer
+            if (layer && !visual) {
+                const links = {
+                    'xp': 11, 'm': 12, 't': 13,
+                    'l': 21, 'lo': 22, 'f': 23,
+                    'b': 31, 's': 32, 'a': 33,
+
+                    'xp_alt': 11, 'c': 12, 'p': 13,
+                };
+
+                allow = layer in links && hasUpgrade(this.layer, links[layer]);
+            }
+
+            // Add speed from buyables
+            if (allow) {
                 speed = speed.add(buyableEffect('clo', 11));
                 speed = speed.add(buyableEffect('clo', 12));
                 speed = speed.add(buyableEffect('clo', 13));
@@ -1082,20 +1092,22 @@ addLayer('clo', {
                 speed = speed.add(buyableEffect('clo', 41));
                 speed = speed.add(buyableEffect('clo', 42));
                 speed = speed.add(buyableEffect('clo', 51));
+            }
 
-                /** @type {number|'side'} */
+            // Root as per row and alt
+            if (layer) {
                 let row = tmp[layer]?.displayRow ?? tmp[layer]?.row ?? 0;
                 if (row == 'side') row = 0;
 
                 speed = speed.root(D.dTwo.pow(row));
+
+                const alt = [
+                    'xp_alt', 'c', 'p',
+                ];
+
+                if (alt.includes(layer)) speed = speed.pow(tmp.a.change_efficiency);
             }
         }
-
-        const alt = [
-            'xp_alt', 'c', 'p',
-        ];
-
-        if (alt.includes(layer)) speed = speed.pow(tmp.a.change_efficiency);
 
         return speed;
     },
