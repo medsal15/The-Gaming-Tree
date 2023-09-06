@@ -17,7 +17,7 @@ addLayer('l', {
         };
     },
     layerShown() { return (player.l.unlocked || hasUpgrade('xp', 33)) && !tmp[this.layer].deactivated; },
-    deactivated() { return inChallenge('b', 31); },
+    deactivated() { return inChallenge('b', 31) || hasUpgrade('a', 21); },
     color: '#6699BB',
     row: 1,
     position: 0,
