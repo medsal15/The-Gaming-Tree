@@ -140,7 +140,7 @@ function shouldNotify(layer) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @returns {Boolean}
  */
 function canReset(layer) {
@@ -200,8 +200,8 @@ function layerDataReset(layer, keep = []) {
 
 
 /**
- * @param {String} layer
- * @param {Number|String|Decimal} gain
+ * @param {keyof Layers} layer
+ * @param {DecimalSource} gain
  */
 function addPoints(layer, gain) {
 	player[layer].points = player[layer].points.add(gain).max(0)
@@ -218,7 +218,7 @@ function generatePoints(layer, diff) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {Boolean} force
  */
 function doReset(layer, force = false) {
@@ -264,7 +264,7 @@ function doReset(layer, force = false) {
 		if (row >= layers[layerResetting].row && (!force || layerResetting != layer)) completeChallenge(layerResetting)
 	}
 
-	player.points = (row == 0 ? decimalZero : getStartPoints())
+	player.points = decimalZero;
 
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
 	for (const r in OTHER_LAYERS) {
@@ -291,7 +291,7 @@ function resetRow(row) {
 		player[layer].unlocked = false
 		if (player[layer].unlockOrder) player[layer].unlockOrder = 0
 	}
-	player.points = getStartPoints()
+	player.points = decimalZero;
 	updateTemp();
 	resizeCanvas();
 }

@@ -1,7 +1,7 @@
 /**
  * Checks if an upgrade can be purchased in a layer
  *
- * @param {String} layer Layer to check for
+ * @param {keyof Layers} layer Layer to check for
  * @param {number[]} [rows] Rows to check for, by default all rows are checked
  * @returns {Boolean} True if an unlocked upgrade can be purchased
  */
@@ -23,7 +23,7 @@ function canAffordLayerUpgrade(layer, rows = { includes: n => true, length: 1 })
 /**
  * Checks if a buyable can be purchased in a layer
  *
- * @param {String} layer Layer to check for
+ * @param {keyof Layers} layer Layer to check for
  * @returns {Boolean} True if an unlocked buyable can be purchased
  */
 function canAffordLayerBuyable(layer) {
@@ -40,7 +40,7 @@ function canAffordLayerBuyable(layer) {
 /**
  * Checks if a challenge can be completed in a layer
  *
- * @param {String} layer Layer to check for
+ * @param {keyof Layers} layer Layer to check for
  * @returns {Boolean} True if an unlocked challenge can be completed
  */
 function canCompleteLayerChallenge(layer) {
@@ -57,7 +57,7 @@ function canCompleteLayerChallenge(layer) {
 /**
  * Sums the amount of purchased buyables in a layer
  *
- * @param {String} layer Layer to check in
+ * @param {keyof Layers} layer Layer to check in
  * @returns {Decimal} The amount of purchased buyables
  */
 function layerBuyableAmount(layer) {
@@ -73,7 +73,7 @@ function layerBuyableAmount(layer) {
 /**
  * Colors text with a layer's color
  *
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string} text
  * @param {string} [style]
  * @returns {string}
@@ -120,7 +120,7 @@ const D = new Proxy(val => new Decimal(val), {
 /**
  * Same as `player.<layer>.activeChallenge ?? false`
  *
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @returns {number|false}
  */
 function activeChallenge(layer) {
@@ -134,6 +134,14 @@ function activeChallenge(layer) {
  */
 function capitalize(text) {
     return `${text}`.replace(/^./, s => s.toUpperCase());
+}
+/**
+ * Capitalizes the first letter of each word
+ *
+ * @param {string} text
+ */
+function capitalize_words(text) {
+    return `${text}`.replaceAll(/^.| ./g, s => s.toUpperCase());
 }
 /**
  * Rounds a number to a multiple of a power of `pow`

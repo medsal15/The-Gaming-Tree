@@ -140,7 +140,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} books of slimes\
@@ -182,7 +182,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return D(1.25).pow(x);
             },
             canAfford() {
@@ -216,7 +216,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         /** @type {{xp_hold: Decimal, chance_mult: Decimal}} */
                         effect = buyableEffect(this.layer, this.id),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
@@ -259,7 +259,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return {
                     xp_hold: D(x),
                     chance_mult: D(.05).times(x).add(1),
@@ -295,7 +295,7 @@ addLayer('lo', {
                 const amount = getBuyableAmount(this.layer, this.id);
                 if (!shiftDown) {/** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} sticky traps\
@@ -333,7 +333,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return D(1.1).pow(x);
             },
             canAfford() {
@@ -372,7 +372,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)}${amount_bonus} stone furnace\
@@ -433,7 +433,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 let mult = D(1.125).pow(x);
 
                 if (hasUpgrade('m', 51)) mult = mult.pow(upgradeEffect('m', 51));
@@ -481,7 +481,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)}${amount_bonus} copper golems\
@@ -534,7 +534,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return D.div(x, 6).add(1);
             },
             canAfford() {
@@ -578,7 +578,7 @@ addLayer('lo', {
                     anvil_req = tmp.lo.items['*'].has_anvil ? '' : '<span style="color:#CC3333;">Requires an anvil</span><br>';
                 if (!shiftDown) {
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         /** @type {{m_hold: Decimal, chance_mult: Decimal}} */
                         effect = buyableEffect(this.layer, this.id),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
@@ -641,7 +641,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return {
                     m_hold: D(x),
                     chance_mult: D(.05).times(x).add(1)
@@ -685,7 +685,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} red slimes\
@@ -723,7 +723,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return D(.05).times(x).add(1);
             },
             canAfford() {
@@ -758,7 +758,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         /** @type {{chance_mult: Decimal, coin_mult: Decimal}} */
                         effect = buyableEffect(this.layer, this.id),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '',
@@ -801,7 +801,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return {
                     chance_mult: D(.05).times(x).add(1),
@@ -841,7 +841,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} gear golems\
@@ -901,7 +901,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return D(1.1).pow(x);
             },
             canAfford() {
@@ -937,7 +937,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '',
                         /** @type {{chance_mult: Decimal,}} */
                         effect = buyableEffect(this.layer, this.id);
@@ -977,7 +977,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return {
                     chance_mult: D(.05).times(x).add(1),
@@ -1016,7 +1016,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '',
                         /** @type {{xp_damage_mult: Decimal, tree_damage: Decimal,}} */
                         effect = buyableEffect(this.layer, this.id);
@@ -1074,7 +1074,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return {
                     xp_damage_mult: D(1.05).pow(x),
@@ -1113,7 +1113,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} knowledge balls\
@@ -1154,7 +1154,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return x;
             },
@@ -1192,7 +1192,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} coal braziers\
@@ -1247,7 +1247,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return x;
             },
@@ -1284,7 +1284,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} iron chests\
@@ -1348,7 +1348,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return x.times(2);
             },
@@ -1385,7 +1385,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))} (+${format(tmp.lo.buyables[this.id].value)})<br>` : '';
 
                     return `Your ${formatWhole(amount)} gold piles\
@@ -1435,7 +1435,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return x.times(10).root(2);
             },
@@ -1473,7 +1473,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} tiny dams\
@@ -1511,7 +1511,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return {
                     soaked: D(1.2).pow(x),
                 };
@@ -1549,7 +1549,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '',
                         /** @type {{cap: Decimal, t_hold: Decimal}} */
                         effect = buyableEffect(this.layer, this.id);
@@ -1590,7 +1590,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return {
                     cap: D(1.1).pow(x),
                     t_hold: D(x),
@@ -1629,7 +1629,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} plank rulers\
@@ -1685,7 +1685,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return {
                     plank: D(.01).times(x),
                 };
@@ -1725,7 +1725,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} bronze counters\
@@ -1765,7 +1765,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return D.div(x, 20).add(1);
             },
@@ -1803,7 +1803,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} steel minecarts\
@@ -1843,7 +1843,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return D.div(x, 20).add(1);
             },
@@ -1881,7 +1881,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} breeze alloys\
@@ -1924,7 +1924,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return D.div(x, 20).add(1);
             },
@@ -1962,7 +1962,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} blessings of levels\
@@ -2000,7 +2000,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return {
                     divide: D.div(x, 10).add(1),
                 };
@@ -2039,7 +2039,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} blessings of mining\
@@ -2092,7 +2092,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return {
                     regen: D.div(x, 10).add(1),
                 };
@@ -2130,7 +2130,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} blessings of growth\
@@ -2168,7 +2168,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
                 return {
                     size: D(x),
                 };
@@ -2207,7 +2207,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} leaves compost bins\
@@ -2245,7 +2245,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return D.add(x, 5).max(0).log(5);
             },
@@ -2282,7 +2282,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} fake trees\
@@ -2320,7 +2320,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return D.times(x, 10);
             },
@@ -2357,7 +2357,7 @@ addLayer('lo', {
                 if (!shiftDown) {
                     /** @type {{[item: string]: Decimal}} */
                     const cost_obj = this.cost(amount),
-                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(amount)} ${tmp.lo.items[item].name}`)),
+                        cost = listFormat.format(Object.entries(cost_obj).map(([item, amount]) => `${format(player.lo.items[item].amount)}/${format(amount)} ${tmp.lo.items[item].name}`)),
                         value = tmp.s.layerShown ? `Value: ${format(D.times(amount, tmp.lo.buyables[this.id].value))}<br>` : '';
 
                     return `Your ${formatWhole(amount)} planter boxes\
@@ -2395,7 +2395,7 @@ addLayer('lo', {
                 return cost;
             },
             effect(x) {
-                if (tmp.l.deactivated) x = D.dZero;
+                if (tmp.lo.deactivated) x = D.dZero;
 
                 return D.div(x, 20).add(1);
             },
@@ -2426,7 +2426,7 @@ addLayer('lo', {
         },
     },
     grid: {
-        rows: 10,
+        rows: 11,
         cols: 6,
         getStartData(_) { return {}; },
         getStyle(_, id) {
@@ -2674,7 +2674,7 @@ addLayer('lo', {
                 }
             },
             can_drop(type) {
-                if (tmp.l.deactivated) return false;
+                if (tmp.lo.deactivated) return false;
                 /** @type {[drop_sources, string]} */
                 const [from, sub] = type.split(':');
 
@@ -3128,7 +3128,7 @@ addLayer('lo', {
         stardust: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1002,
+            grid: 1102,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
@@ -3975,7 +3975,7 @@ addLayer('lo', {
         holy_water: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1001,
+            grid: 1101,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
@@ -4003,4 +4003,5 @@ addLayer('lo', {
 
         player.lo.items.stardust.amount = stardust;
     },
+    prestigeNotify() { return canAffordLayerBuyable('lo'); },
 });

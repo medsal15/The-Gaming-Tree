@@ -107,9 +107,16 @@ addLayer('s', {
                 return D.div(tmp.s.investloans.amount, 10).add(1);
             },
             effectDisplay() {
+                const pieces = [];
                 switch (tmp.s.investloans.type) {
-                    case 'loan': return `/${format(D.add(player.xp.points.max(0), 10).log10())}`;
-                    case 'debt': return `-${format(D.div(player.xp.points.max(0), 100).floor())}/s`;
+                    case 'loan':
+                        if (tmp.xp.layerShown) pieces.push(`/${format(D.add(player.xp.points.max(0), 10).log10())}`);
+                        if (tmp.xp_alt.layerShown) pieces.push(`/${format(D.add(player.xp_alt.points.max(0), 10).log10().pow(tmp.a.change_efficiency))}`);
+                        return pieces.join('<br>');
+                    case 'debt':
+                        if (tmp.xp.layerShown) pieces.push(`-${format(D.div(player.xp.points.max(0), 100).floor())}/s`);
+                        if (tmp.xp_alt.layerShown) pieces.push(`-${format(D.div(player.xp_alt.points.max(0), 100).pow(tmp.a.change_efficiency).floor())}/s`);
+                        return pieces.join('<br>');
                     case 'investment': return `*${format(upgradeEffect(this.layer, this.id))}`;
                 }
             },
@@ -141,6 +148,7 @@ addLayer('s', {
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            unlocked() { return tmp.xp.layerShown; },
         },
         43: {
             title() {
@@ -167,6 +175,7 @@ addLayer('s', {
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            unlocked() { return tmp.l.layerShown; },
         },
         51: {
             title() {
@@ -625,7 +634,7 @@ addLayer('s', {
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
-            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.t.layerShown; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && (tmp.t.layerShown || tmp.c.layerShown); },
         },
         113: {
             title() {
@@ -652,7 +661,7 @@ addLayer('s', {
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
             costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
-            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.t.layerShown; },
+            unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && (tmp.t.layerShown || tmp.c.layerShown); },
         },
         121: {
             title() {

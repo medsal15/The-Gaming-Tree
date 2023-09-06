@@ -44,7 +44,7 @@ addLayer('xp', {
         {
             key: 'ArrowUp',
             description: '↑ (in XP): Switch to previous enemy',
-            unlocked() { return tmp.xp.enemies['*'].list.length > 1; },
+            unlocked() { return tmp.xp.enemies['*'].list.length > 1 && !tmp.xp.deactivated; },
             onPress() {
                 const types = tmp.xp.enemies['*'].list;
                 if (player.tab == 'xp' && player.xp.type != types[0]) {
@@ -57,7 +57,7 @@ addLayer('xp', {
         {
             key: 'ArrowDown',
             description: '↓ (in XP): Switch to next enemy',
-            unlocked() { return tmp.xp.enemies['*'].list.length > 1; },
+            unlocked() { return tmp.xp.enemies['*'].list.length > 1 && !tmp.xp.deactivated; },
             onPress() {
                 const types = tmp.xp.enemies['*'].list;
                 if (player.tab == 'xp' && player.xp.type != types[types.length - 1]) {

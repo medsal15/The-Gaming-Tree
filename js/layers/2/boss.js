@@ -514,16 +514,18 @@ addLayer('b', {
         }
         if (inChallenge('b', 32)) {
             /** @param {DecimalSource} amount */
-            const get_loss = amount => {
+            const get_loss = (amount, alt = false) => {
                 if (D.lte(amount, 0)) return D.dZero;
-                const loss = D.div(amount, 100).floor().times(diff).min(amount);
+                let loss = D.div(amount, 100).floor();
+                if (alt) loss = loss.pow(tmp.a.change_efficiency);
+                loss = loss.times(diff).min(amount);
                 if (isNaN(loss.mag) || isNaN(loss.sign) || isNaN(loss.layer)) return D.dZero;
                 return loss;
             };
 
             if (!hasUpgrade('s', 41)) {
                 player.xp.points = player.xp.points.minus(get_loss(player.xp.points)).max(0);
-                player.xp_alt.points = player.xp_alt.points.minus(get_loss(player.xp_alt.points).pow(tmp.a.change_efficiency)).max(0);
+                player.xp_alt.points = player.xp_alt.points.minus(get_loss(player.xp_alt.points, true)).max(0);
             }
             if (!hasUpgrade('s', 42)) {
                 const total = tmp.xp.total.kills,
@@ -535,7 +537,7 @@ addLayer('b', {
             }
             if (!false) {
                 const total = tmp.xp_alt.total.tamed,
-                    loss = get_loss(total).pow(tmp.a.change_efficiency);
+                    loss = get_loss(total, true);
                 if (loss.gt(0)) Object.entries(player.xp_alt.monsters).forEach(([, data]) => {
                     const l = data.tamed.div(total).times(loss);
                     data.tamed = data.tamed.minus(l).max(0);
@@ -543,6 +545,9 @@ addLayer('b', {
             }
             if (!hasUpgrade('s', 43)) {
                 player.l.points = player.l.points.minus(get_loss(player.l.points)).max(0);
+            }
+            if (!false) {
+                player.to.points = player.to.points.minus(get_loss(player.to.points, true)).max(0);
             }
             if (!hasUpgrade('s', 121)) {
                 player.f.points = player.f.points.minus(get_loss(player.f.points)).max(0);
@@ -615,9 +620,10 @@ addLayer('b', {
 
         if (inChallenge('b', 31)) {
             if (tmp.xp.layerShown) branches.push('xp');
-            else branches.push('xp_alt');
+            else branches.push(['xp_alt', 3]);
         } else {
-            branches.push('l');
+            if (tmp.l.layerShown) branches.push('l');
+            else branches.push(['to', 3]);
         }
 
         return branches;

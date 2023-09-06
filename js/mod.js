@@ -34,6 +34,7 @@ let modInfo = {
 
 		'alternate/side/successes.js', 'alternate/side/time_cubes.js',
 		'alternate/0/experience.js', 'alternate/0/city.js', 'alternate/0/plants.js',
+		'alternate/1/tower.js',
 	],
 	/**
 	 * If you have a Discord server or other discussion place, you can add a link to it.
@@ -66,18 +67,21 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.A',
+	num: 'R0.B',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
-	name: 'Reconstruct',
-	beta: false,
+	name: 'Towering Temperatures',
+	beta: true,
 };
 
 /**
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.B</h3><br>
+		- Added 5 new layers.<br>
+		- Update endgame: Get all 3 new row 1 layers.<br>
 	<h3>v0.A</h3><br>
 		- Added 4 new layers.<br>
 		- Update endgame: Get all 3 new row 0 layers.<br>
@@ -130,35 +134,6 @@ var doNotCallTheseFunctionsEveryTick = [
 ];
 
 /**
- * A function to determine the amount of points the player starts with after a reset.
- *
- * @returns {Decimal}
- */
-function getStartPoints() {
-	return new Decimal(modInfo.initialStartPoints);
-}
-
-/**
- * A function returning a boolean for if points should be generated.
- * Use this if you want an upgrade to unlock generating points.
- *
- * @returns {Boolean}
- */
-function canGenPoints() {
-	return false;
-}
-
-/**
- * A function that calculates your points per second.
- * Anything that affects your point gain should go into the calculation here.
- *
- * @returns {Decimal}
- */
-function getPointGen() {
-	return new Decimal(0);
-}
-
-/**
  * A function that returns any non-layer-related data that you want to be added to the save data and "player" object.
  *
  * ```js
@@ -193,7 +168,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return [11, 12, 13].every(id => hasUpgrade('a', id));
+	return [21, 22, 23].every(id => hasUpgrade('a', id));
 }
 
 
@@ -248,5 +223,8 @@ function fixOldSave(oldVersion) {
 			if (id > 60) return id - 50;
 			else return id + 30;
 		});
+	}
+	if (oldVersion <= 'R0.A') {
+		if ('grid' in player.c) player.c.floors = [player.c?.grid];
 	}
 }

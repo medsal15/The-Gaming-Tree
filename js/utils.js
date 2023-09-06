@@ -191,9 +191,8 @@ var onTreeTab = true
 
 /**
  * @param {String} name
- * @param {null} prev unused
  */
-function showTab(name, prev) {
+function showTab(name) {
 	if (LAYERS.includes(name) && !layerunlocked(name)) return
 	if (player.tab !== name) clearParticles(function (p) { return p.layer === player.tab })
 	if (tmp[name] && player.tab === name && isPlainObject(tmp[name].tabFormat)) {

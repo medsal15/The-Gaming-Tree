@@ -806,7 +806,7 @@ declare class Layer<L extends string> {
      * the `unlockOrder` value for any not-yet-unlocked layers in this list increases.
      * This can be used to make them harder to unlock.
      */
-    increaseUnlockOrder?: string[]
+    //increaseUnlockOrder?: string[]
     /**
      * A function to return true if this layer should be highlighted in the tree.
      * The layer will automatically be highlighted if you can buy an upgrade whether you have this or not.
@@ -1380,6 +1380,10 @@ declare class Milestone<L extends string> {
      */
     requirementDescription: Computable<string>
     /**
+     * Current effect of the milestone
+     */
+    effect?: Computable<any>
+    /**
      * A string describing the reward for having the milestone.
      * *You will have to implement the reward elsewhere.*
      * Can use basic HTML.
@@ -1705,7 +1709,7 @@ declare class LayerData {
     points: Decimal
     total?: Decimal
     best?: Decimal
-    unlockOrder?: string[]
+    //unlockOrder?: string[]
     resetTime?: number
     upgrades?: number[]
     activeChallenge?: number | null
@@ -1735,14 +1739,14 @@ type Layers = {
     }
     clo: Layer<'clo'> & {
         upgrades: {
-            [id: number]: Upgrade<'clo'> & { price: [string, Decimal][] }
+            [id: number]: Upgrade<'clo'> & { price?: [items, Decimal][] }
         }
-        time_speed(layer?: string, visual?: boolean): Decimal
+        time_speed(layer?: keyof Layers, visual?: boolean): Decimal
     }
     cas: Layer<'cas'> & {
         items: {
             /** Reverse lookup for item drops */
-            sources(item: string): {
+            sources(item: items): {
                 chances: { [source: `${drop_sources}:${string}`]: Decimal }
                 weights: { [source: `${drop_sources}:${string}`]: Decimal }
                 per_second: { [source: `${drop_sources}:${string}`]: Decimal }
@@ -1753,21 +1757,21 @@ type Layers = {
              *
              * Points to the original item (that was swapped)
              */
-            base(item: string, type?: 'chances' | 'weights' | 'challenge'): string
+            base(item: items, type?: 'chances' | 'weights' | 'challenge'): string
             /** Copy of layers.lo.items.*.items but modified to apply swaps */
             items(source: `${drop_sources}:${string}`): {
-                chances?: { [item_id: string]: Decimal }
-                weights?: { [item_id: string]: Decimal }
+                chances?: { [item_id in items]: Decimal }
+                weights?: { [item_id in items]: Decimal }
             }
             shuffle(): Record<string, string>
             swap_cost(): Decimal
             swap_cost_formula(): string
             /** Makes an item be replaced with another */
-            swap(from: string, dest: string, type?: 'chances' | 'weights' | 'challenge'): void
+            swap(from: items, dest: items, type?: 'chances' | 'weights' | 'challenge'): void
             /** Removes items swapped with themselves from the player data */
             clean_swaps(): void
             /** Returns a row that displays the swapping */
-            show_row(item: string): ['row', [
+            show_row(item: items): ['row', [
                 ['clickable', `swap_chances_left_${string}`],
                 ['clickable', `swap_weights_left_${string}`],
                 'blank',
@@ -1908,7 +1912,7 @@ type Layers = {
                  *
                  * **Does a loot roll (only important if casino is unlocked)**
                  */
-                get_drops(kills: DecimalSource): [string, Decimal][]
+                get_drops(kills: DecimalSource): [items, Decimal][]
             }
         }
         total: {
@@ -1917,7 +1921,7 @@ type Layers = {
     }
     m: Layer<'m'> & {
         upgrades: {
-            [id: number]: Upgrade<'m'> & { item: string }
+            [id: number]: Upgrade<'m'> & { item: items }
         }
         ore: {
             health(): Decimal
@@ -1925,9 +1929,9 @@ type Layers = {
             chance(mode?: Player['m']['mode']): Decimal
             /** Name of the mode */
             mode(mode?: Player['m']['mode']): string
-            get_drops(amount: DecimalSource): [string, Decimal][]
+            get_drops(amount: DecimalSource): [items, Decimal][]
             /** List of items tracked by the layer */
-            items: string[]
+            items: items[]
             mine_mult(): Decimal
         }
     }
@@ -1968,7 +1972,7 @@ type Layers = {
                 regen: Computable<Decimal>
                 damage: Computable<Decimal>
                 dps: Computable<Decimal>
-                get_drops(amount: DecimalSource): [string, Decimal][]
+                get_drops(amount: DecimalSource): [items, Decimal][]
                 /** Amount of wood when felling a tree */
                 size: Computable<Decimal>
                 cap: Computable<Decimal>
@@ -1976,13 +1980,13 @@ type Layers = {
         }
         convertion: {
             /** Items that can be converted to planks */
-            from: string[]
+            from: items[]
             /** Amount of an item being converted at once */
-            rate(item?: string): Decimal
+            rate(item?: items): Decimal
             /** Multiplier to planks produced from an item */
-            efficiency(item?: string): Decimal
+            efficiency(item?: items): Decimal
             /** Actual amount of an item consumed/produced each second by convertion */
-            per_second(item?: string): Decimal
+            per_second(item?: items): Decimal
         }
     }
     // Row 1
@@ -2088,14 +2092,14 @@ type Layers = {
                 /** Maximum amount of a fuel that can be consumed per second */
                 size(): Decimal
                 /** Amount of the item being consumed every second */
-                consuming(item: string): Decimal
+                consuming(item: items): Decimal
             }
             [fuel: string]: {
                 readonly id: string
                 heat: Computable<Decimal>
                 /** @default true */
                 unlocked?: Computable<boolean>
-                item: string
+                item: items
                 /** Currently consuming amount of fuel */
                 consuming: Computable<Decimal>
                 /** Currently producing amount of heat */
@@ -2128,7 +2132,7 @@ type Layers = {
                  *
                  * May return a negative value if more is being consumed than produced
                  */
-                producing(item: string): Decimal
+                producing(item: items): Decimal
                 /** Computes a recipe's default amount (for tmp display) */
                 default_amount(recipe: string, amount?: Decimal): Decimal
                 speed(): Decimal
@@ -2145,9 +2149,9 @@ type Layers = {
                  *
                  * Defaults to currently being produced, or wanted produced
                  */
-                consumes(amount?: Decimal): [item: string, amount: Decimal][]
+                consumes(amount?: Decimal): [item: items, amount: Decimal][]
                 /** Produced item */
-                produces: string
+                produces: items
                 /**
                  * Time it takes to produce the item in seconds
                  * @param amount Target amount to produce
@@ -2202,7 +2206,7 @@ type Layers = {
             type(): 'loan' | 'debt' | 'investment'
             /** List of investments/loans linked to specific items */
             item_upgrade: {
-                [item: string]: number | undefined
+                [item in items]: number | undefined
             }
             /** Checks whether the upgrade id is an investment/loan/debt */
             is_upg_loan(id?: number): boolean
@@ -2210,7 +2214,7 @@ type Layers = {
     }
     a: Layer<'a'> & {
         upgrades: {
-            [id: number]: Upgrade<'a'> & { item: string }
+            [id: number]: Upgrade<'a'> & { item: items }
         }
         /** Efficiency of alt effects on normal gains and vice versa as an exponent */
         change_efficiency(): Decimal
@@ -2263,7 +2267,7 @@ type Layers = {
                  */
                 unlocked?: Computable<boolean>
                 /** Total items produced per second */
-                produces(tamed?: DecimalSource): [string, Decimal][]
+                produces(tamed?: DecimalSource): [items, Decimal][]
                 /** Amount of the monster gained every second */
                 passive_tame(): Decimal
                 /**
@@ -2271,7 +2275,7 @@ type Layers = {
                  *
                  * **Does a loot roll (only important if casino is unlocked)**
                  */
-                get_drops(kills: DecimalSource): [string, Decimal][]
+                get_drops(kills: DecimalSource): [items, Decimal][]
             }
         }
         total: {
@@ -2282,7 +2286,7 @@ type Layers = {
         upgrades: {
             [id: number]: Upgrade<'c'> & {
                 resource_costs?: Computable<[resources, Decimal][]>
-                item_costs?: Computable<[string, Decimal][]>
+                item_costs?: Computable<[items, Decimal][]>
             }
         }
         buildings: {
@@ -2318,21 +2322,21 @@ type Layers = {
                 description: Computable<string>
                 produces(amount_placed?: DecimalSource): {
                     /** Total items produced per second */
-                    items?: [string, Decimal][]
+                    items?: [items, Decimal][]
                     /** Total resources produced per second */
-                    resources?: [string, Decimal][]
+                    resources?: [resources, Decimal][]
                 }
                 consumes?(amount_placed?: DecimalSource): {
                     /** Total items consumed per second */
-                    items?: [string, Decimal][]
+                    items?: [items, Decimal][]
                     /** Total resources consumed per second */
-                    resources?: [string, Decimal][]
+                    resources?: [resources, Decimal][]
                 }
                 effect?(amount_placed?: Decimal): any
                 /** Cost in items at amount */
-                cost(amount_built?: DecimalSource): [item: string, cost: Decimal][]
+                cost(amount_built?: DecimalSource): [item: items, cost: Decimal][]
                 formulas: {
-                    cost: Computable<[item: string, formula: string][]>
+                    cost: Computable<[item: items, formula: string][]>
                     effect?: Computable<string>
                 }
                 unlocked?: Computable<boolean>
@@ -2349,6 +2353,14 @@ type Layers = {
                 color: Computable<string>
                 gain_mult(): Decimal
             }
+        }
+        floors: {
+            /**
+             * Highest available floor (at least 0)
+             *
+             * Effectively means that there are `max + 1` floors available
+             */
+            max: Computable<number>
         }
     }
     p: Layer<'p'> & {
@@ -2379,9 +2391,9 @@ type Layers = {
                 /** List of images to display for the age */
                 images: string[]
                 /** Items produced at an age */
-                produce(age: Decimal): [string, Decimal][]
+                produce(age: Decimal): [items, Decimal][]
                 /** Full list of produced items */
-                produces: string[]
+                produces: items[]
                 /** Amount of seeds earned from harvest */
                 seeds(age: Decimal): Decimal
                 effect?(): any
@@ -2389,7 +2401,7 @@ type Layers = {
                 /** If true, the plant will notify the player it's ready */
                 notify(): boolean
                 unlocked?: Computable<boolean>
-                infusions: { [item: string]: string }
+                infusions: { [item in items]: string }
                 /**
                  * If not empty, a hint will be shown in the infusion tab
                  *
@@ -2397,6 +2409,26 @@ type Layers = {
                  */
                 hint?: Computable<string>
             }
+        }
+    }
+    // Alt Row 1
+    to: Layer<'to'> & {
+        /**
+         * List of random materials for each random type
+         *
+         * Cost is `req * base ^ (exp ^ amount)`
+         */
+        materials: {
+            [type in 'low' | 'medium' | 'high']: Computable<{
+                [item in items]: {
+                    req: DecimalSource
+                    base: DecimalSource
+                    exp: DecimalSource
+                }
+            }>
+        } & {
+            /** Returns 3 random items, one per type */
+            randomize(): items[]
         }
     }
     // Special
@@ -2420,36 +2452,8 @@ type Temp = {
         screenWidth: number,
         screenHeight: number,
     }
-    pointGen: Decimal
     scrolled: boolean
-    // Side
-    ach: RComputed<Layers['ach']>
-    clo: RComputed<Layers['clo']>
-    cas: RComputed<Layers['cas']>
-    mag: RComputed<Layers['mag']>
-    sta: RComputed<Layers['sta']>
-    // Row 0
-    xp: RComputed<Layers['xp']>
-    m: RComputed<Layers['m']>
-    t: RComputed<Layers['t']>
-    // Row 1
-    l: RComputed<Layers['l']>
-    lo: RComputed<Layers['lo']>
-    f: RComputed<Layers['f']>
-    // Row 2
-    b: RComputed<Layers['b']>
-    s: RComputed<Layers['s']>
-    a: RComputed<Layers['a']>
-    // Alt Side
-    suc: RComputed<Layers['suc']>
-    tic: RComputed<Layers['tic']>
-    // Alt Row 0
-    xp_alt: RComputed<Layers['xp_alt']>
-    c: RComputed<Layers['c']>
-    p: RComputed<Layers['p']>
-    // Special
-    star: RComputed<Layers['star']>
-};
+} & RComputed<Layers>;
 type Player = {
     devSpeed: string
     hasNaN: boolean
@@ -2673,6 +2677,7 @@ type Player = {
         auto_upgrade: boolean
     }
     c: LayerData & {
+        /** @deprecated */
         grid: {
             [id: number]: {
                 /** Building placed on that tile */
@@ -2681,6 +2686,16 @@ type Player = {
                 enabled: boolean
             }
         }
+        floors: {
+            [id: number]: {
+                /** Building placed on that tile */
+                building: string
+                /** Whether the building is active */
+                enabled: boolean
+            }
+        }[]
+        /** Current floor to show */
+        floor: number
         mode: 'place' | 'destroy' | 'toggle'
         /** Currently selected building for placement */
         building: string
@@ -2720,6 +2735,10 @@ type Player = {
                 last_harvest_count: Decimal
             }
         }
+    }
+    // Alt Row 1
+    to: LayerData & {
+        random: items[]
     }
     // Special
     star: LayerData & {
