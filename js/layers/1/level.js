@@ -275,7 +275,7 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(270); },
             effect() {
-                if (tmp.l.deactivated) return D.dZero;
+                if (tmp.l.deactivated) return D.dOne;
                 return D(1 / 50).times(player.l.skills[this.id].level).add(1);
             },
             unlocked() { return hasMilestone('l', 3); },
