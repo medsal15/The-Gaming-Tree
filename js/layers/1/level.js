@@ -17,7 +17,7 @@ addLayer('l', {
         };
     },
     layerShown() { return (player.l.unlocked || hasUpgrade('xp', 33)) && !tmp[this.layer].deactivated; },
-    deactivated() { return inChallenge('b', 31); },
+    deactivated() { return inChallenge('b', 31) || hasUpgrade('a', 21); },
     color: '#6699BB',
     row: 1,
     position: 0,
@@ -26,13 +26,13 @@ addLayer('l', {
         {
             key: 'l',
             description: 'L: Reset for levels',
-            unlocked() { return player.l.unlocked; },
+            unlocked() { return tmp.l.layerShown; },
             onPress() { doReset('l'); },
         },
         {
             key: 'L',
             description: 'Shift + L: Display levels layer',
-            unlocked() { return player.l.unlocked; },
+            unlocked() { return tmp.l.layerShown; },
             onPress() { showTab('l'); },
         },
     ],
@@ -97,15 +97,15 @@ addLayer('l', {
                 const [, mode, skill] = matches,
                     pskill = () => player.l.skills[skill];
                 return obj[prop] ??= {
-                    canClick() { return player.l.change.lte(mode == 'add' ? tmp.l.skills["*"].left : pskill().points); },
+                    canClick() { return player.l.change.lte(mode == 'add' ? tmp.l.skills["*"].left : pskill().points) && player.l.change.gt(0); },
                     onClick() {
                         switch (mode) {
                             case 'add':
-                                if (tmp.l.skills['*'].left.lt(player.l.change)) break;
+                                if (tmp.l.skills['*'].left.lt(player.l.change) || player.l.change.lte(0)) break;
                                 pskill().points = pskill().points.add(player.l.change);
                                 break;
                             case 'remove':
-                                if (pskill().points.lt(player.l.change)) break;
+                                if (pskill().points.lt(player.l.change) || player.l.change.lte(0)) break;
                                 pskill().points = pskill().points.minus(player.l.change);
                                 break;
                         }
