@@ -734,7 +734,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -783,7 +783,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -833,7 +833,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -881,7 +881,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -929,7 +929,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -977,7 +977,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -1025,7 +1025,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[item].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -1075,7 +1075,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -1126,7 +1126,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -1177,7 +1177,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -1228,7 +1228,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
@@ -1281,7 +1281,7 @@ addLayer('f', {
                 } else if (inChallenge('b', 12)) {
                     Object.entries(items)
                         .forEach(([item, amount]) => {
-                            items[item] = amount.times(D.add(player.lo.items[this.produces].amount.max(0), 10).log10());
+                            items[item] = amount.times(D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10());
                         });
                 }
 
