@@ -491,7 +491,7 @@ addLayer('b', {
                 return style;
             },
             unlocked() { return hasUpgrade('a', 24); },
-            onComplete() { player.subtabs.tic = 'Generation'; },
+            onComplete() { player.subtabs.tic.mainTabs = 'Generation'; },
         },
         //todo 82
         //todo 91
