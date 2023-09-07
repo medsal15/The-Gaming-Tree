@@ -24,7 +24,7 @@ let modInfo = {
 	 * Using smaller files makes it easier to find what you're looking for.
 	 */
 	modFiles: [
-		'moreutils.js', 'tree.js',
+		'tree.js',
 		'layers/hotkeys.js', 'layers/star.js',
 
 		'layers/side/achievements.js', 'layers/side/clock.js', 'layers/side/casino.js', 'layers/side/magic.js', 'layers/side/stats.js',
