@@ -97,7 +97,7 @@ function formatCoins(decimal, coin_types) {
     const limit = new Decimal(100).pow(coin_types).times(1e9);
 
     if (d.gte(limit)) {
-        const arr = new Array(coin_types.length - 1).fill("0");
+        const arr = new Array(coin_types - 1).fill("0");
         arr.push(format(d.div(limit)));
         return arr;
     }
