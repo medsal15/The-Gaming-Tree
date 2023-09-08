@@ -383,6 +383,8 @@ addLayer('p', {
 
                 mult = mult.times(tmp.p.plants.sunflower.effect);
 
+                if (hasMilestone('to', 5)) mult = mult.times(tmp.to.milestones[5].effect);
+
                 return mult;
             },
             grow_mult() {

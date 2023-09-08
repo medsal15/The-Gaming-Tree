@@ -34,6 +34,10 @@ function fixValue(x, y = 0) {
     return x || new Decimal(y)
 }
 
+/**
+ * @param {{[k: string|number|symbol]: DecimalSource}} x
+ * @returns {Decimal}
+ */
 function sumValues(x) {
     x = Object.values(x)
     if (!x[0]) return decimalZero
@@ -86,6 +90,7 @@ function formatWhole(decimal) {
     return format(decimal, 0)
 }
 
+/** @param {number} s */
 function formatTime(s) {
     if (s < 60) return format(s) + "s"
     else if (s < 3600) return formatWhole(Math.floor(s / 60)) + "m " + format(s % 60) + "s"

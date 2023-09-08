@@ -781,7 +781,7 @@ declare class Layer<L extends string> {
      * If you want to only keep specific upgrades or something like that, save them in a separate variable,
      * then call `layerDataReset`, and then set `player[this.layer].upgrades` to the saved upgrades.
      */
-    doReset?(resettingLayer: string): void
+    doReset?(resettingLayer: keyof Layers): void
     /**
      * This function is called every game tick.
      * Use it for any passive resource production or time-based things.
