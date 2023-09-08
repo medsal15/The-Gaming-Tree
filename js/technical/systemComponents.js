@@ -158,6 +158,10 @@ var systemComponents = {
             <tr>
                 <td><button class="opt" onclick="exportSave()">Export to clipboard</button></td>
                 <td><button class="opt" onclick="importSave()">Import</button></td>
+                <td>
+					<label class="opt" for="importfromfile" style="display:flex;align-items:center;">Import from file</label>
+					<input id="importfromfile" type="file" onchange="importFromFile()" style="display:none;" />
+				</td>
                 <td><button class="opt" onclick="toggleOpt('offlineProd')">Offline Prod: {{ options.offlineProd?"ON":"OFF" }}</button></td>
             </tr>
             <tr>

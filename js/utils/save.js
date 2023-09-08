@@ -292,6 +292,16 @@ function importSave(imported = undefined, forced = false) {
 		return;
 	}
 }
+function importFromFile() {
+	/** @type {HTMLInputElement} */
+	const input = document.querySelector('input[type="file"]');
+	if (!input.files?.length) return;
+
+	const file = input.files.item(0);
+	if (!file) return;
+
+	file.text().then(data => importSave(data));
+}
 function versionCheck() {
 	let setVersion = true;
 
