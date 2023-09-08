@@ -1,5 +1,5 @@
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {boolean}
  */
@@ -8,7 +8,7 @@ function hasUpgrade(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {boolean}
  */
@@ -19,7 +19,7 @@ function hasMilestone(layer, id) {
 /**
  * Determine if the player has the Achievement.
  *
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {boolean}
  */
@@ -28,7 +28,7 @@ function hasAchievement(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {boolean}
  */
@@ -37,7 +37,7 @@ function hasChallenge(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {boolean}
  */
@@ -46,7 +46,7 @@ function maxedChallenge(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {number}
  */
@@ -55,7 +55,7 @@ function challengeCompletions(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {Decimal}
  */
@@ -64,7 +64,7 @@ function getBuyableAmount(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @param {Decimal} amt
  */
@@ -73,7 +73,7 @@ function setBuyableAmount(layer, id, amt) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @param {number|Decimal|string} amt
  */
@@ -82,7 +82,7 @@ function addBuyables(layer, id, amt) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {string|number}
  */
@@ -91,7 +91,7 @@ function getClickableState(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @param {string|number} state
  */
@@ -100,25 +100,27 @@ function setClickableState(layer, id, state) {
 }
 
 /**
- * @param {string} layer
+ * @template {keyof Layers} L
+ * @param {L} layer
  * @param {number} id
- * @returns {any}
+ * @returns {Player[L]['grid']}
  */
 function getGridData(layer, id) {
 	return (player[layer].grid[id])
 }
 
 /**
- * @param {string} layer
+ * @template {keyof Layers} L
+ * @param {L} layer
  * @param {number} id
- * @param {any} data
+ * @param {Player[L]['grid']} data
  */
 function setGridData(layer, id, data) {
 	player[layer].grid[id] = data
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {any}
  */
@@ -127,7 +129,7 @@ function upgradeEffect(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {any}
  */
@@ -136,7 +138,7 @@ function challengeEffect(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {any}
  */
@@ -145,7 +147,7 @@ function buyableEffect(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {any}
  */
@@ -156,7 +158,7 @@ function clickableEffect(layer, id) {
 /**
  * Returns the current effects of the achievement, if any.
  *
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {any}
  */
@@ -165,7 +167,7 @@ function achievementEffect(layer, id) {
 }
 
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {number} id
  * @returns {any}
  */

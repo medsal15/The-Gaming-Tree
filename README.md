@@ -62,6 +62,7 @@ By [sbed](http://opengameart.org/content/95-game-icons)
 
 - [big egg](https://game-icons.net/1x1/sbed/big-egg.html)
 - [electric](https://game-icons.net/1x1/sbed/electric.html)
+- [flamer](https://game-icons.net/1x1/sbed/flamer.html)
 
 Images available from [OpenGameArt](https://opengameart.org)
 

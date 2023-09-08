@@ -588,6 +588,8 @@ addLayer('xp_alt', {
 
                 if (hasUpgrade('c', 23)) mult = mult.times(upgradeEffect('c', 23));
 
+                if (hasMilestone('to', 2)) mult = mult.times(tmp.to.milestones[2].effect);
+
                 mult = mult.times(tmp.p.plants.candy_corn.effect);
 
                 return mult;

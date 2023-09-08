@@ -1,6 +1,11 @@
 /** @type {Temp} */
 var tmp = {}
 var temp = tmp // Proxy for tmp
+/**
+ * List of functions in layers as per their paths (e.g.: layers.foo.bar => funcs.foo.bar)
+ *
+ * The function is the same as the layer's (so, layers.foo.bar === funcs.foo.bar)
+ */
 var funcs = {}
 var NaNalert = false;
 
