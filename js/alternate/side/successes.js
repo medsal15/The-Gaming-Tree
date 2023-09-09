@@ -336,12 +336,11 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 22); },
         },
         12: {
             name: 'Out of Time',
             tooltip() {
-                if (!hasChallenge('b', 31)) return 'Unseal ???';
+                if (!hasChallenge('b', 51)) return 'Unseal ???';
 
                 return 'Unseal the Time Cubes';
             },
@@ -352,12 +351,12 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 22); },
+            unlocked() { return hasChallenge('b', 31); },
         },
         13: {
             name: 'This one is not for research',
             tooltip() {
-                if (!hasChallenge('b', 32)) return 'Unseal ???';
+                if (!hasChallenge('b', 52)) return 'Unseal ???';
 
                 return 'Unseal Bingo';
             },
@@ -368,12 +367,12 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 22); },
+            unlocked() { return hasChallenge('b', 32); },
         },
         14: {
             name: 'Tasty',
             tooltip() {
-                if (!hasChallenge('b', 31)) return 'Unseal ???';
+                if (!hasChallenge('b', 61)) return 'Unseal ???';
 
                 return 'Unseal Condiments';
             },
@@ -384,12 +383,12 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 22); },
+            unlocked() { return hasChallenge('b', 41); },
         },
         15: {
             name: 'Tell your friends',
             tooltip() {
-                if (!hasChallenge('b', 31)) return 'Unseal ???';
+                if (!hasChallenge('b', 62)) return 'Unseal ???';
 
                 return 'Unseal the Party';
             },
@@ -400,7 +399,7 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 22); },
+            unlocked() { return hasChallenge('b', 42); },
         },
         //#endregion Bonus Successes
         //#region Secret Successes

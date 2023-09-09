@@ -139,6 +139,27 @@ addLayer('xp_alt', {
                             and ${tame_style(formatWhole(tmp.xp_alt.total.tamed), 'font-size:1.5em')} tamed monsters`;
                     },
                 ],
+                () => {
+                    if (hasChallenge('b', 11)) return;
+
+                    /** @type {[number, DecimalSource][]} */
+                    const upgs = [
+                        [11, 5],
+                        [12, 10],
+                        [13, 15],
+                        [21, 30],
+                        [22, 50],
+                        [23, 70],
+                        [31, 100],
+                        [32, 125],
+                        [33, 150],
+                        [51, 567],
+                    ],
+                        next = upgs.find(([id, tames]) => !hasUpgrade('xp_alt', id) && !tmp.xp_alt.upgrades[id].unlocked && D.lt(tmp.xp_alt.total.tamed, tames));
+                    if (!next) return;
+
+                    return ['display-text', `You will unlock a new upgrades at ${formatWhole(next[1])} kills`];
+                },
                 () => hasChallenge('b', 12) ? ['row', [
                     ['display-text', 'Automatically buy upgrades'],
                     'blank',
