@@ -176,6 +176,26 @@ addLayer('xp', {
                             and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')} kills`;
                     },
                 ],
+                () => {
+                    if (hasChallenge('b', 11)) return;
+
+                    /** @type {[number, DecimalSource][]} */
+                    const upgs = [
+                        [11, 5],
+                        [12, 10],
+                        [13, 15],
+                        [21, 30],
+                        [22, 50],
+                        [23, 70],
+                        [31, 100],
+                        [32, 125],
+                        [33, 150],
+                    ],
+                        next = upgs.find(([id, kills]) => !hasUpgrade('xp', id) && !tmp.xp.upgrades[id].unlocked && D.lt(tmp.xp.total.kills, kills));
+                    if (!next) return;
+
+                    return ['display-text', `You will unlock a new upgrades at ${formatWhole(next[1])} kills`];
+                },
                 () => hasChallenge('b', 12) ? ['row', [
                     ['display-text', 'Automatically buy upgrades'],
                     'blank',
