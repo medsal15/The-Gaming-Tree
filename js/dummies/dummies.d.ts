@@ -1714,6 +1714,7 @@ declare class LayerData {
     upgrades?: number[]
     activeChallenge?: number | null
     buyables: { [id: number]: Decimal }
+    challenges: { [id: number]: number }
 }
 
 type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building' | 'plant';

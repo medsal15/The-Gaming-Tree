@@ -89,7 +89,7 @@ addLayer('to', {
             done() { return player.to.points.gte(5); },
         },
         //todo 6: well
-        //todo 7: more materials
+        //todo 7: more building materials
         //todo 8: arc furnace
     },
     /** @type {Layers['to']['buyables']} */
