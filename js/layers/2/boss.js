@@ -13,7 +13,7 @@ addLayer('b', {
         };
     },
     tooltipLocked() { return 'Danger approaches'; },
-    layerShown() { return player.b.unlocked || tmp.xp.total.kills.gte(500); },
+    layerShown() { return player.b.unlocked || tmp.xp.total.kills.gte(250); },
     color: '#AA5555',
     row: 3, // The shop exits the challenge otherwise
     displayRow: 2,
