@@ -276,18 +276,6 @@ addLayer('suc', {
             unlocked() { return tmp.to.layerShown; },
         },
         52: {
-            name: 'Secretary not included',
-            tooltip: 'Get a reception desk',
-            done() { return hasMilestone('to', 2); },
-            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.to.color); },
-            style() {
-                let s = {};
-                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.to.color;
-                return s;
-            },
-            unlocked() { return tmp.to.layerShown; },
-        },
-        53: {
             name: 'Use your brain',
             tooltip: 'Tame a zombie',
             done() { return player.xp_alt.monsters.zombie.tamed.gte(1); },
@@ -299,10 +287,25 @@ addLayer('suc', {
             },
             unlocked() { return tmp.to.layerShown; },
         },
+        53: {
+            name: 'Heating up',
+            tooltip: 'Build a smelter',
+            done() {
+                const placed = tmp.c.buildings['*'].placed;
+                return D.gt(placed.smelter, 0);
+            },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.to.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.to.color;
+                return s;
+            },
+            unlocked() { return tmp.to.layerShown; },
+        },
         54: {
             name: 'What is it build of?',
             tooltip: 'Get a greenhouse',
-            done() { return hasMilestone('to', 5); },
+            done() { return hasMilestone('to', 4); },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.to.color); },
             style() {
                 let s = {};
@@ -312,9 +315,9 @@ addLayer('suc', {
             unlocked() { return tmp.to.layerShown; },
         },
         55: {
-            name: 'Double mines',
-            tooltip: 'Upgrades your deep mines',
-            done() { return hasMilestone('to', 7); },
+            name: 'Art of the deal',
+            tooltip: 'Get a ???',
+            done() { return hasMilestone('to', 5); },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.to.color); },
             style() {
                 let s = {};

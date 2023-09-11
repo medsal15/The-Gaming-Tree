@@ -175,7 +175,7 @@ addLayer('c', {
         maxRows: 7,
         getStartData(_) { return {}; },
         getCanClick(_, id) {
-            const data = player.c.floors[player.c.floor][id] ??= {
+            const data = (player.c.floors[player.c.floor] ??= {})[id] ??= {
                 building: '',
                 enabled: true,
             };
@@ -190,7 +190,7 @@ addLayer('c', {
             }
         },
         onClick(_, id) {
-            const data = player.c.floors[player.c.floor][id] ??= {
+            const data = (player.c.floors[player.c.floor] ??= {})[id] ??= {
                 building: '',
                 enabled: true,
             };
@@ -214,7 +214,7 @@ addLayer('c', {
             }
         },
         getStyle(_, id) {
-            const data = player.c.floors[player.c.floor][id];
+            const data = (player.c.floors[player.c.floor] ??= {})[id];
             if (!(data?.building in tmp.c.buildings)) return {};
 
             const building = tmp.c.buildings[data.building];
@@ -228,7 +228,7 @@ addLayer('c', {
             );
         },
         getTooltip(_, id) {
-            const data = player.c.floors[player.c.floor][id] ??= {
+            const data = (player.c.floors[player.c.floor] ??= {})[id] ??= {
                 building: '',
                 enabled: true,
             };
@@ -236,7 +236,7 @@ addLayer('c', {
             return 'Empty';
         },
         getDisplay(_, id) {
-            const data = player.c.floors[player.c.floor][id];
+            const data = (player.c.floors[player.c.floor] ??= {})[id];
             if (data?.building in tmp.c.buildings) return data.enabled ? 'ON' : 'OFF';
         },
     },
@@ -2525,9 +2525,9 @@ addLayer('c', {
                 /** @type {[items, Decimal][]} */
                 const items = [
                     ['coal', D(1 / 5)],
-                    ['stone', D(20 / 6)],
-                    ['copper_ore', D(75 / 14)],
-                    ['tin_ore', D(50 / 56)],
+                    ['stone', D(10 / 3)],
+                    ['copper_ore', D(37.5 / 14)],
+                    ['tin_ore', D(25 / 28)],
                 ];
 
                 items.forEach(([, amount], i) => {
@@ -2564,7 +2564,7 @@ addLayer('c', {
             formulas: {
                 cost: [['stone', '(1.4 ^ built) * 100'], ['iron_ore', '(1.25 ^ built) * 25']],
             },
-            unlocked() { return hasMilestone('to', 4); },
+            unlocked() { return hasMilestone('to', 3); },
         },
         /**
          * TODO
