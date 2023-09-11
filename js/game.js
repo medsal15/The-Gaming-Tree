@@ -10,7 +10,7 @@ const TMT_VERSION = {
 const listFormat = new Intl.ListFormat('en');
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {'static'|'normal'|'none'|'custom'|null} useType
  * @return {Decimal}
  */
@@ -43,7 +43,7 @@ function getResetGain(layer, useType = null) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {Boolean} canMax
  * @param {'static'|'normal'|'none'|'custom'|null} useType
  * @returns {Decimal}
@@ -86,7 +86,7 @@ function getNextAt(layer, canMax = false, useType = null) {
 /**
  * @param {Decimal} value
  * @param {Decimal} cap
- * @param {Decimal|String|Number} power
+ * @param {DecimalSource} power
  * @returns {Decimal}
  */
 function softcap(value, cap, power = 0.5) {
@@ -98,7 +98,7 @@ function softcap(value, cap, power = 0.5) {
 /**
  * Return true if the layer should be highlighted. By default checks for upgrades only.
  *
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @returns {Boolean}
  */
 function shouldNotify(layer) {
@@ -156,7 +156,7 @@ function canReset(layer) {
 
 /**
  * @param {Number} row
- * @param {String} layer
+ * @param {keyof Layers} layer
  */
 function rowReset(row, layer) {
 	for (const lr in ROW_LAYERS[row]) {
@@ -210,8 +210,8 @@ function addPoints(layer, gain) {
 }
 
 /**
- * @param {String} layer
- * @param {String|Number|Decimal} diff time in seconds
+ * @param {keyof Layers} layer
+ * @param {DecimalSource} diff time in seconds
  */
 function generatePoints(layer, diff) {
 	addPoints(layer, tmp[layer].resetGain.times(diff))
@@ -297,7 +297,7 @@ function resetRow(row) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {Number} x
  */
 function startChallenge(layer, x) {
@@ -318,7 +318,7 @@ function startChallenge(layer, x) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {Number} x
  * @returns {Boolean}
  */
@@ -347,7 +347,7 @@ function canCompleteChallenge(layer, x) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {Number} x
  */
 function completeChallenge(layer, x) {
@@ -376,7 +376,7 @@ VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "
 
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  */
 function autobuyUpgrades(layer) {
 	if (!tmp[layer].upgrades) return

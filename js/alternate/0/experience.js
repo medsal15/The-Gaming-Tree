@@ -874,7 +874,7 @@ addLayer('xp_alt', {
                 return D.dZero;
             },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
-            unlocked: false,
+            unlocked() { return hasMilestone('to', 2); },
         },
         ent: {
             _type: null,

@@ -65,32 +65,27 @@ addLayer('to', {
             effect() { return D.pow(1.1, player.to.points); },
             effectDescription() {
                 const effect = shiftDown ? '[1.1 ^ floors]' : format(tmp[this.layer].milestones[this.id].effect);
-                return `Multiply taming progress gain by ${effect}`;
+                return `Multiply taming progress gain by ${effect} and unlock zombies`;
             },
             done() { return player.to.points.gte(2); },
         },
         3: {
             requirementDescription: 'Engineering: Build 3 floors',
-            effectDescription: 'Unlock more tower materials',
+            effectDescription: 'Unlock more tower materials and unlock the ability to build small smelter',
             done() { return player.to.points.gte(3); },
         },
         4: {
-            requirementDescription: 'Smelter: Build 4 floors',
-            effectDescription: 'Unlock the ability to build small smelters',
-            done() { return player.to.points.gte(4); },
-        },
-        5: {
-            requirementDescription: 'Greenhouse: Build 5 floors',
+            requirementDescription: 'Greenhouse: Build 4 floors',
             effect() { return D.pow(1.25, player.to.points); },
             effectDescription() {
                 const effect = shiftDown ? '[1.25 ^ floors]' : format(tmp[this.layer].milestones[this.id].effect);
                 return `Multiply harvest yield by ${effect}`;
             },
-            done() { return player.to.points.gte(5); },
+            done() { return player.to.points.gte(4); },
         },
+        //todo 5: more coins
         //todo 6: well
-        //todo 7: more building materials
-        //todo 8: arc furnace
+        //todo 7: more building materials & arc furnace
     },
     /** @type {Layers['to']['buyables']} */
     buyables: {
