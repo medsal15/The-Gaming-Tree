@@ -3,7 +3,6 @@
 addLayer('s', {
     name: 'Shop',
     symbol: 'S',
-    /** @returns {typeof player.s} */
     startData() {
         return {
             unlocked: false,
@@ -1102,7 +1101,6 @@ addLayer('s', {
         const next = player.s.points.gte(100) || getResetGain('s').gte(1_000) ? '' : `<br>Next at ${format(getNextAt('s'))} total value`;
         return `Sell your items for ${layers.s.coins.format(getResetGain('s'), false)}${next}`;
     },
-    /** @type {typeof layers.s.coins} */
     coins: {
         types: [['copper', '#BB7733'], ['bronze', '#C4995E'], ['iron', '#CCCCCC'], ['gold', '#FFDD00'], ['platinum', '#CCCCFF']],
         format(amount = player.s.points, color = true, split = false) {
@@ -1116,7 +1114,6 @@ addLayer('s', {
             return listFormat.format(lines);
         },
     },
-    /** @type {typeof layers.s.investloans} */
     investloans: {
         amount(real = false) {
             let amount = D(player.s.upgrades.filter(id => id >= 41).length);

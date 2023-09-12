@@ -3,7 +3,6 @@
 addLayer('ach', {
     name: 'Achievements',
     symbol: '⭐',
-    /** @returns {Player['ach']} */
     startData() {
         return {
             unlocked: true,
@@ -1086,7 +1085,6 @@ addLayer('ach', {
             return lines.join('<br />');
         }
     },
-    /** @param {AchievementTypes} [type] */
     getAchievementsRows(type = 'normal') {
         let rows = [];
 
@@ -1105,7 +1103,6 @@ addLayer('ach', {
 
         return rows;
     },
-    /** @param {AchievementTypes} [type] */
     getAchievements(type = 'normal') {
         let rows = layers.ach.getAchievementsRows(type);
 
@@ -1119,9 +1116,7 @@ addLayer('ach', {
             return rows.some(r => RegExp(`^${r}\\d$`).test(id));
         });
     },
-    /** @param {AchievementTypes} [type] */
     totalAchievements(type = 'normal') { return D(this.getAchievements(type).length); },
-    /** @param {AchievementTypes} [type] */
     ownedAchievements(type = 'normal') { return D(this.getAchievements(type).filter(id => hasAchievement('ach', id)).length); },
     achievementPopups: false,
 });

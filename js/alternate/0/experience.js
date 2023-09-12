@@ -3,7 +3,6 @@
 addLayer('xp_alt', {
     name: 'Experience Points',
     symbol: 'XP',
-    /** @returns {typeof player.xp_alt} */
     startData() {
         return {
             points: D.dZero,
@@ -561,7 +560,6 @@ addLayer('xp_alt', {
             cost: D(1234),
         },
     },
-    /** @type {Layers['xp_alt']['monsters']} */
     monsters: {
         '*': {
             list() {
@@ -1002,7 +1000,6 @@ addLayer('xp_alt', {
             unlocked() { return !inChallenge('b', 31) && inChallenge('b', 42); },
         },
     },
-    /** @type {Layers['xp_alt']['total']} */
     total: {
         tamed() {
             return Object.values(player.xp_alt.monsters).reduce((sum, data) => D.add(sum, data.tamed), D.dZero);

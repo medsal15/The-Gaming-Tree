@@ -3,7 +3,6 @@
 addLayer('m', {
     name: 'Mining',
     symbol: 'M',
-    /** @returns {typeof player.m} */
     startData() {
         return {
             points: D.dZero,
@@ -242,7 +241,6 @@ addLayer('m', {
             unlocked() { return hasUpgrade('m', 52); },
         },
     },
-    /** @type {typeof layers.m.upgrades} */
     upgrades: {
         11: {
             title: 'Stone Pickaxe',
@@ -715,7 +713,6 @@ addLayer('m', {
             textStyle: { 'color': 'gray', },
         },
     },
-    /** @type {typeof layers.m.ore} */
     ore: {
         health() {
             let health = D(10);

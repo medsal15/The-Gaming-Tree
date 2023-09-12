@@ -3,7 +3,6 @@
 addLayer('a', {
     name: 'alternator',
     symbol: 'A',
-    /** @returns {Player['a']} */
     startData() {
         return {
             points: D.dZero,
@@ -85,7 +84,6 @@ addLayer('a', {
             canClick: true,
         },
     },
-    /** @type {Layers['a']['upgrades']} */
     upgrades: {
         11: {
             title: 'Alternate XP',

@@ -3,7 +3,6 @@
 addLayer('sta', {
     name: 'Stats',
     symbol: '📈',
-    /** @returns {typeof player.sta} */
     startData() {
         return {
             points: D.dZero,
@@ -44,7 +43,6 @@ addLayer('sta', {
             ],
         }
     },
-    /** @type {Layers['sta']['stats']} */
     stats: {
         '*': {
             total() { return player.sta.points; },

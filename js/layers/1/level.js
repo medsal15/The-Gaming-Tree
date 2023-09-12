@@ -3,7 +3,6 @@
 addLayer('l', {
     name: 'Level',
     symbol: 'L',
-    /** @returns {typeof player.l} */
     startData() {
         return {
             unlocked: false,
@@ -184,7 +183,6 @@ addLayer('l', {
             done() { return player.l.points.gte(7); },
         },
     },
-    /** @type {typeof layers.l.skills} */
     skills: {
         '*': {
             max() {
@@ -227,8 +225,9 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(2).times(25); },
             effect() {
-                if (tmp.l.deactivated) return D.dOne;
-                return D(1.15).pow(player.l.skills[this.id].level);
+                let level = player.l.skills[this.id].level;
+                if (tmp.l.deactivated) level = D.dZero;
+                return D(1.15).pow(level);
             },
             unlocked() { return hasMilestone('l', 1); },
             text() {
@@ -251,8 +250,9 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(1.9).times(60); },
             effect() {
-                if (tmp.l.deactivated) return D.dOne;
-                return D(1.1).pow(player.l.skills[this.id].level);
+                let level = player.l.skills[this.id].level;
+                if (tmp.l.deactivated) level = D.dZero;
+                return D(1.1).pow(level);
             },
             unlocked() { return hasMilestone('l', 2); },
             text() {
@@ -275,8 +275,9 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(270); },
             effect() {
-                if (tmp.l.deactivated) return D.dOne;
-                return D(1 / 50).times(player.l.skills[this.id].level).add(1);
+                let level = player.l.skills[this.id].level;
+                if (tmp.l.deactivated) level = D.dZero;
+                return D(1 / 50).times(level).add(1);
             },
             unlocked() { return hasMilestone('l', 3); },
             text() {
@@ -299,8 +300,9 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(1.8).times(130); },
             effect() {
-                if (tmp.l.deactivated) return D.dZero;
-                return D(1 / 100).times(player.l.skills[this.id].level);
+                let level = player.l.skills[this.id].level;
+                if (tmp.l.deactivated) level = D.dZero;
+                return D(1 / 100).times(level);
             },
             unlocked() { return hasMilestone('l', 4); },
             text() {
@@ -333,8 +335,9 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(2).times(100); },
             effect() {
-                if (tmp.l.deactivated) return D.dOne;
-                return D(1.01).pow(player.l.skills[this.id].level);
+                let level = player.l.skills[this.id].level;
+                if (tmp.l.deactivated) level = D.dZero;
+                return D(1.01).pow(level);
             },
             unlocked() { return hasUpgrade('t', 32); },
             text() {
@@ -357,8 +360,9 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(2.5).times(50); },
             effect() {
-                if (tmp.l.deactivated) return D.dZero;
-                return D.div(player.l.skills[this.id].level, 20);
+                let level = player.l.skills[this.id].level;
+                if (tmp.l.deactivated) level = D.dZero;
+                return D.div(level, 20);
             },
             unlocked() { return hasChallenge('b', 21); },
             text() {
@@ -381,8 +385,9 @@ addLayer('l', {
             get id() { return this._id ??= Object.keys(layers.l.skills).find(id => layers.l.skills[id] == this); },
             needed() { return player.l.skills[this.id].level.add(1).pow(3).times(25); },
             effect() {
-                if (tmp.l.deactivated) return D.dOne;
-                return D.pow(1.05, player.l.skills[this.id].level);
+                let level = player.l.skills[this.id].level;
+                if (tmp.l.deactivated) level = D.dZero;
+                return D.pow(1.05, level);
             },
             unlocked() { return hasChallenge('b', 22); },
             text() {

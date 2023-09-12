@@ -8,7 +8,6 @@ addLayer('suc', {
         'background-position': 'center',
         'background-size': 'contain',
     },
-    /** @returns {Player['suc']} */
     startData() {
         return {
             unlocked: true,
@@ -437,7 +436,6 @@ addLayer('suc', {
             return lines.join('<br />');
         }
     },
-    /** @param {AchievementTypes} [type] */
     getSuccessesRows(type = 'normal') {
         let rows = [];
 
@@ -456,7 +454,6 @@ addLayer('suc', {
 
         return rows;
     },
-    /** @param {AchievementTypes} [type] */
     getSuccesses(type = 'normal') {
         let rows = layers.suc.getSuccessesRows(type);
 
@@ -470,9 +467,7 @@ addLayer('suc', {
             return rows.some(r => RegExp(`^${r}\\d$`).test(id));
         });
     },
-    /** @param {AchievementTypes} [type] */
     totalSuccesses(type = 'normal') { return D(this.getSuccesses(type).length); },
-    /** @param {AchievementTypes} [type] */
     ownedSuccesses(type = 'normal') { return D(this.getSuccesses(type).filter(id => hasAchievement('suc', id)).length); },
     achievementPopups: false,
 });

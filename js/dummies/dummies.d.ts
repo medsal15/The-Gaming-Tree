@@ -5,6 +5,28 @@ type Computed<T> = T extends (...args: any) => any ? ReturnType<T> : T;
 type RComputed<T> = { [k in keyof T]: T[k] extends (...args: any) => any ? ReturnType<T[k]> : RComputed<T[k]> };
 type CSSStyles = { [k in keyof CSSStyleDeclaration]?: CSSStyleDeclaration[k] };
 type AchievementTypes = 'normal' | 'bonus' | 'secret';
+type TabFormatEntries<L extends keyof Layers> = ['display-text', Computable<string>] | ['display-image', Computable<string>] | ['raw-html', Computable<string>] |
+    'h-line' | 'v-line' |
+    'blank' | ['blank', height: number] | ['blank', width: number, height: number] |
+['row', TabFormatEntries[]] | ['column', TabFormatEntries[]] |
+    'main-display' | ['main-display', precision: number] |
+    'resource-display' | 'prestige-button' |
+['text-input', keyof Player[L]] |
+['slider', [name: keyof Player[L], min: number, max: number]] |
+['drop-down', [name: keyof Player[L], options: string[]]] |
+['drop-down-double', [name: keyof Player[L], options: [value: string, display: string][]]] |
+    'upgrades' | 'milestones' | 'challenges' | 'achievements' | 'buyables' | 'clickables' |
+['upgrades' | 'milestones' | 'challenges' | 'achievments' | 'buyables' | 'clickables', rows: number[]] |
+['upgrade' | 'milestone' | 'challenge' | 'achievment' | 'buyable' | 'clickable', id: number] |
+['microtabs', microtabs: string[]] |
+['bar', id: string] |
+['infobox', id: string] |
+['tree', (keyof Layers)[][]] |
+['upgrade-tree' | 'buyable-tree' | 'clickable-tree', number[][]] |
+['toggle', [layer: keyof Layers, id: string]] |
+['layer-proxy', [layer: keyof Layers, data: TabFormatEntries[]]] |
+    'respec-button' | 'master-button' |
+['sell-one', id: number] | ['sell-all', id: number];
 
 declare class Decimal {
     //#region Constants
@@ -375,7 +397,7 @@ declare class Layer<L extends string> {
             /**
              * The tab layout code for the subtab, in the tab layout format.
              */
-            content: (string | [string, any])[],
+            content: TabFormatEntries<L>[]
             /**
              * Applies CSS to the whole subtab when switched to, in the form of an "CSS Object", where the keys are CSS attributes,
              * and the values are the values for those attributes (both as strings).
@@ -1713,8 +1735,8 @@ declare class LayerData {
     resetTime?: number
     upgrades?: number[]
     activeChallenge?: number | null
-    buyables: { [id: number]: Decimal }
-    challenges: { [id: number]: number }
+    buyables?: { [id: number]: Decimal }
+    challenges?: { [id: number]: number }
 }
 
 type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building' | 'plant';
@@ -2222,10 +2244,10 @@ type Layers = {
     }
     // Alt Side
     suc: Layer<'suc'> & {
-        getFailuresRows(type?: AchievementTypes): number[]
-        getFailures(type?: AchievementTypes): string[]
-        totalFailures(type?: AchievementTypes): Decimal
-        ownedFailures(type?: AchievementTypes): Decimal
+        getSuccessesRows(type?: AchievementTypes): number[]
+        getSuccesses(type?: AchievementTypes): string[]
+        totalSuccesses(type?: AchievementTypes): Decimal
+        ownedSuccesses(type?: AchievementTypes): Decimal
     }
     tic: Layer<'tic'> & {
         time_speed(layer?: string): Decimal

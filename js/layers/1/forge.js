@@ -3,7 +3,6 @@
 addLayer('f', {
     name: 'Forge',
     symbol: 'F',
-    /** @returns {typeof player.f} */
     startData() {
         return {
             points: D.dZero,
@@ -507,7 +506,6 @@ addLayer('f', {
             unlocked() { return player.f.alloys; },
         },
     },
-    /** @type {typeof layers.f.fuels} */
     fuels: {
         '*': {
             regex: /^fuel_(display|toggle)_([a-z_]+)$/,
@@ -655,7 +653,6 @@ addLayer('f', {
             },
         },
     },
-    /** @type {typeof layers.f.recipes} */
     recipes: {
         '*': {
             regexes: {
@@ -1306,7 +1303,6 @@ addLayer('f', {
             unlocked() { return tmp.lo.items['holy_water'].unlocked ?? true; },
         },
     },
-    /** @type {typeof layers.f.heat} */
     heat: {
         speed() {
             return D.dTwo.pow(D.log10(player.f.points.max(0).add(1)).div(50));

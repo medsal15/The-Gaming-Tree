@@ -4,7 +4,6 @@
 addLayer('p', {
     name: 'Plants',
     symbol: 'P',
-    /** @returns {typeof player.p} */
     startData() {
         return {
             unlocked: false,
@@ -267,7 +266,6 @@ addLayer('p', {
             },
         },
     },
-    /** @type {Layer<'p'>['grid']} */
     grid: {
         cols() {
             let cols = 5;
@@ -370,7 +368,6 @@ addLayer('p', {
             return 'Empty';
         },
     },
-    /** @type {Layers['p']['plants']} */
     plants: {
         '*': {
             list() {

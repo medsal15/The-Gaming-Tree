@@ -3,7 +3,6 @@
 addLayer('to', {
     name: 'Tower',
     symbol: 'T',
-    /** @returns {typeof player.to} */
     startData() {
         return {
             unlocked: false,
@@ -87,7 +86,6 @@ addLayer('to', {
         //todo 6: well
         //todo 7: more building materials & arc furnace
     },
-    /** @type {Layers['to']['buyables']} */
     buyables: {
         // Random
         11: {
@@ -409,7 +407,6 @@ addLayer('to', {
         // Great Materials
         //todo iron ingot, bronze ingot, steel ingot
     },
-    /** @type {Layers['to']['materials']} */
     materials: {
         low: {
             'slime_goo': {
@@ -472,7 +469,6 @@ addLayer('to', {
     exponent: Decimal.dTwo,
     roundUpCost: true,
     branches: ['xp_alt'],
-    /** @this {Layers['to']} */
     doReset(layer) {
         if (layer == 'to') {
             Object.keys(tmp.to.buyables)

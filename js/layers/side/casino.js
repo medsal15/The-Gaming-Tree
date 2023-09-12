@@ -3,7 +3,6 @@
 addLayer('cas', {
     name: 'Casino',
     symbol: '🎲',
-    /** @returns {typeof player.cas} */
     startData() {
         return {
             unlocked: true,
@@ -51,7 +50,6 @@ addLayer('cas', {
             ],
         },
     },
-    /** @type {typeof layers.cas.items} */
     items: {
         sources(item_id) {
             if (!item_id) return {};
@@ -216,7 +214,6 @@ addLayer('cas', {
             ]];
         },
     },
-    /** @type {typeof layers.cas.token} */
     token: {
         chance() {
             return D(.05);
