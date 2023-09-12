@@ -4,7 +4,6 @@
 addLayer('c', {
     name: 'City',
     symbol: 'C',
-    /** @returns {typeof player.c} */
     startData() {
         return {
             points: D.dZero,
@@ -153,7 +152,6 @@ addLayer('c', {
             },
         },
     },
-    /** @type {Layer<'c'>['grid']} */
     grid: {
         cols() {
             let cols = 5;
@@ -240,7 +238,6 @@ addLayer('c', {
             if (data?.building in tmp.c.buildings) return data.enabled ? 'ON' : 'OFF';
         },
     },
-    /** @type {typeof layers.c.upgrades} */
     upgrades: {
         11: {
             title: 'Improved Making',
@@ -1682,7 +1679,6 @@ addLayer('c', {
             ];
         },
     }),
-    /** @type {Layers['c']['buildings']} */
     buildings: {
         '*': {
             regex: /^(select)_([a-z_]+)$/,
@@ -2582,7 +2578,6 @@ addLayer('c', {
          * Launch Pad -> fuel => research + stardust
          */
     },
-    /** @type {Layers['c']['resources']} */
     resources: {
         '*': {
             gain_resource(resource, amount) {
@@ -2630,7 +2625,6 @@ addLayer('c', {
             },
         },
     },
-    /** @type {Layers['c']['floors']} */
     floors: {
         max() {
             let max = D.dZero;
@@ -2692,7 +2686,6 @@ addLayer('c', {
         if (player.c.floor < 0) player.c.floor = 0;
     },
     type: 'none',
-    /** @this {Layers['c']} */
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 

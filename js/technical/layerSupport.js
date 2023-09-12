@@ -220,8 +220,9 @@ function setupLayer(layer) {
 
 
 /**
- * @param {String} layerName
- * @param {Layer} layerData
+ * @template {keyof Layers} L
+ * @param {L} layerName
+ * @param {Layers[L]} layerData
  * @param {Layer['tabFormat']|null} [tabLayers]
  */
 function addLayer(layerName, layerData, tabLayers = null) { // Call this to add layers from a different file!

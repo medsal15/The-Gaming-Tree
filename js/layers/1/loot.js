@@ -9,7 +9,6 @@ addLayer('lo', {
         'background-position': 'center',
         'background-size': 'contain',
     },
-    /** @returns {typeof player.lo} */
     startData() {
         return {
             // Required for a fake none layer
@@ -130,7 +129,6 @@ addLayer('lo', {
             },
         },
     },
-    /** @type {typeof layers.lo.buyables} */
     buyables: {
         // slime
         11: {
@@ -2510,7 +2508,6 @@ addLayer('lo', {
             return lines.join('<hr>');
         },
     },
-    /** @type {typeof layers.lo.items} */
     items: {
         '*': {
             global_chance_multiplier() {

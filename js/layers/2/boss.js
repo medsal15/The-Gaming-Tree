@@ -3,7 +3,6 @@
 addLayer('b', {
     name: 'boss',
     symbol: 'B',
-    /** @returns {typeof player.b} */
     startData() {
         return {
             unlocked: false,

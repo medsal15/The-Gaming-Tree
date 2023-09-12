@@ -3,7 +3,6 @@
 addLayer('xp', {
     name: 'Experience Points',
     symbol: 'XP',
-    /** @returns {typeof player.xp} */
     startData() {
         return {
             unlocked: true,
@@ -707,7 +706,6 @@ addLayer('xp', {
         }
     },
     type: 'none',
-    /** @type {typeof layers.xp.enemies} */
     enemies: {
         '*': {
             color_level(level = 0) {
@@ -1550,7 +1548,6 @@ addLayer('xp', {
             get_drops(kills) { return [['stardust', D.dOne]]; },
         },
     },
-    /** @type {typeof layers.xp.total} */
     total: {
         kills() {
             return Object.values(player.xp.enemies).reduce((sum, data) => D.add(sum, data.kills), D.dZero);

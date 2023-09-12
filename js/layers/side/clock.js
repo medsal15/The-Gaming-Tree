@@ -4,7 +4,6 @@
 addLayer('clo', {
     name: 'Clock',
     symbol: '⏲',
-    /** @returns {typeof player.clo} */
     startData() {
         return {
             unlocked: true,
@@ -45,7 +44,6 @@ addLayer('clo', {
             unlocked() { return hasChallenge('b', 51); },
         },
     },
-    /** @type {typeof layers.clo.upgrades} */
     upgrades: {
         11: {
             title: 'Experience connector',
@@ -1049,7 +1047,6 @@ addLayer('clo', {
         },
     },
     tooltip() { return `Time speed: *${format(tmp.clo.time_speed)}`; },
-    /** @type {typeof layers.clo.time_speed} */
     time_speed(layer, visual = false) {
         if (!inChallenge('b', 51) && !hasChallenge('b', 51)) return D.dOne;
 

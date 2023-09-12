@@ -4,7 +4,6 @@
 addLayer('t', {
     name: 'Tree',
     symbol: 'T',
-    /** @returns {typeof player.t} */
     startData() {
         return {
             unlocked: false,
@@ -287,7 +286,6 @@ addLayer('t', {
             unlocked() { return tmp.t.trees.baobab.unlocked ?? true; },
         },
     },
-    /** @type {typeof layers.t.upgrades} */
     upgrades: {
         11: {
             title: 'Soaked Axe',
@@ -525,7 +523,6 @@ addLayer('t', {
             textStyle: { 'color': 'black' },
         },
     },
-    /** @type {typeof layers.t.trees} */
     trees: {
         '*': {
             health_mult() {
@@ -887,7 +884,6 @@ addLayer('t', {
             regen: D.dZero,
         },
     },
-    /** @type {typeof layers.t.convertion} */
     convertion: {
         from: ['soaked_log', 'normal_log'],
         rate(item) {
@@ -933,7 +929,6 @@ addLayer('t', {
             return layers.t.convertion.rate(item).neg();
         },
     },
-    /** @this {typeof layers.t} */
     update(diff) {
         if (!player.t.unlocked || !tmp.t.layerShown) return;
 

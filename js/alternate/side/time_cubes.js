@@ -8,7 +8,6 @@ addLayer('tic', {
         'background-position': 'center',
         'background-size': 'contain',
     },
-    /** @returns {typeof player.tic} */
     startData() {
         return {
             unlocked: false,
@@ -55,14 +54,12 @@ addLayer('tic', {
             canClick: true,
         },
     },
-    /** @type {typeof layers.tic.cubes} */
     cubes: {
         gain() {
             if (player.tic.invert) return D.dOne;
             return D.dZero;
         },
     },
-    /** @type {typeof layers.tic.time_speed} */
     time_speed(layer) {
         let speed = player.tic.points.max(0).add(10).log10();
 

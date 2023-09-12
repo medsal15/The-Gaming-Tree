@@ -3,7 +3,6 @@
 addLayer('mag', {
     name: 'Magic',
     symbol: '✨',
-    /** @returns {typeof player.mag} */
     startData() {
         return {
             points: D.dZero,
@@ -137,7 +136,6 @@ addLayer('mag', {
             ],
         },
     },
-    /** @type {typeof layers.mag.elements} */
     elements: {
         '*': {
             weak_multiplier: D(1 / 3),
@@ -272,7 +270,6 @@ addLayer('mag', {
             get weak() { return this._weak ??= Object.keys(layers.mag.elements).filter(element => layers.mag.elements[element].strong?.includes(this.id)); },
         },
     },
-    /** @type {typeof layers.mag.mana} */
     mana: {
         gain() {
             let gain = D(.5),
