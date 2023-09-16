@@ -3533,6 +3533,40 @@ addLayer('lo', {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
             },
             name: 'stone brick',
             style: {
@@ -3549,6 +3583,40 @@ addLayer('lo', {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
             },
             name: 'copper ingot',
             style: {
@@ -3565,6 +3633,40 @@ addLayer('lo', {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
             },
             name: 'tin ingot',
             style: {
@@ -3581,6 +3683,40 @@ addLayer('lo', {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
             },
             name: 'iron ingot',
             style: {
@@ -3597,6 +3733,40 @@ addLayer('lo', {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.unlocked) return ['forge:smelt']; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
             },
             name: 'gold ingot',
             style: {
@@ -3614,13 +3784,47 @@ addLayer('lo', {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.alloys) return ['forge:smelt']; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
             },
             name: 'bronze ingot',
             style: {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
                 'background-color': '#BB8844',
             },
-            unlocked() { return player.f.alloys; },
+            unlocked() { return player.f.alloys || hasMilestone('to', 7); },
         },
         steel_ingot: {
             _id: null,
@@ -3630,13 +3834,47 @@ addLayer('lo', {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
                 other() { if (player.f.alloys) return ['forge:smelt']; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
             },
             name: 'steel ingot',
             style: {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
                 'background-color': '#777777',
             },
-            unlocked() { return player.f.alloys; },
+            unlocked() { return player.f.alloys || hasMilestone('to', 7); },
         },
         // Trees
         soaked_log: {
