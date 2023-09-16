@@ -3121,23 +3121,6 @@ addLayer('lo', {
             },
             unlocked() { return hasChallenge('b', 21); },
         },
-        // Star drops
-        stardust: {
-            _id: null,
-            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1102,
-            sources: {
-                _id: null,
-                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (hasChallenge('b', 22)) return ['enemy:star']; },
-            },
-            name: 'stardust',
-            style: {
-                'background-image': `url('./resources/images/powder.svg')`,
-                'background-color'() { return tmp.xp.enemies.star.color; },
-            },
-            unlocked() { return hasChallenge('b', 22); },
-        },
         // Mining
         stone: {
             _id: null,
@@ -3968,6 +3951,56 @@ addLayer('lo', {
             },
             unlocked() { return tmp.p.layerShown ?? true; },
         },
+        // Freezer
+        water: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1001,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
+            },
+            name: 'water',
+            style: {
+                'background-image': `url('./resources/images/drop.svg')`,
+                'background-color': '#4444FF',
+            },
+            unlocked() { return hasMilestone('to', 6) || false; },
+        },
         // Special
         holy_water: {
             _id: null,
@@ -3983,6 +4016,23 @@ addLayer('lo', {
                 'background': `url('./resources/images/round-bottom-flask.svg'), radial-gradient(#88CCFF, #EEDD88)`,
             },
             unlocked() { return inChallenge('b', 21) || hasChallenge('b', 21); },
+        },
+        // Star drops
+        stardust: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1102,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                other() { if (hasChallenge('b', 22)) return ['enemy:star']; },
+            },
+            name: 'stardust',
+            style: {
+                'background-image': `url('./resources/images/powder.svg')`,
+                'background-color'() { return tmp.xp.enemies.star.color; },
+            },
+            unlocked() { return hasChallenge('b', 22); },
         },
     },
     // type none does not allow layerReset

@@ -591,7 +591,7 @@ function loadVue() {
 		props: ['layer', 'data'],
 		template: `
 			<select v-model="player[layer][data[0]]">
-				<option v-for="[item, name] in data[1]" v-bind:value="item">{{name}}</option>
+				<option v-for="item in data[1]" v-bind:value="item[0]">{{item[1]}}</option>
 			</select>
 		`
 	});

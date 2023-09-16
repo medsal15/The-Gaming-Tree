@@ -11,11 +11,19 @@ addLayer('to', {
         };
     },
     layerShown() { return player.to.unlocked; },
+    effect() {
+        if (tmp.to.deactivated) return D.dOne;
+        return D.add(player.to.points, 2).log2();
+    },
+    effectDescription() { return `multiplying XP cap by ${shiftDown ? '[log2(floors + 2)]' : format(tmp.to.effect)}`; },
+    tooltip() {
+        return `${formatWhole(player.to.points)} floors<br>\
+        ${formatWhole(layerBuyableAmount('to'))} materials`;
+    },
     color: '#996644',
     row: 1,
     position: 0.5,
     resource: 'floors',
-    //todo Are these good hotkeys?
     hotkeys: [
         {
             key: 'f',
@@ -48,7 +56,6 @@ addLayer('to', {
             ],
         },
     },
-    /** @type {Layers['to']['milestones']} */
     milestones: {
         1: {
             requirementDescription: 'Layering: Build a floor',
@@ -64,13 +71,20 @@ addLayer('to', {
             effect() { return D.pow(1.1, player.to.points); },
             effectDescription() {
                 const effect = shiftDown ? '[1.1 ^ floors]' : format(tmp[this.layer].milestones[this.id].effect);
-                return `Multiply taming progress gain by ${effect} and unlock zombies`;
+                return `Multiply taming progress gain by ${effect}<br>\
+                    Unlock zombies`;
             },
             done() { return player.to.points.gte(2); },
         },
         3: {
             requirementDescription: 'Engineering: Build 3 floors',
-            effectDescription: 'Unlock more tower materials and unlock the ability to build small smelter',
+            effectDescription() {
+                const effect = shiftDown ? '[log10(science + 10)]' : format(tmp[this.layer].milestones[this.id].effect);
+                return `Unlock more tower materials<br>\
+                    Unlock the ability to build smelters<br>\
+                    Science divides materials costs by ${effect}`;
+            },
+            effect() { return player.c.resources.science.amount.add(10).log10(); },
             done() { return player.to.points.gte(3); },
         },
         4: {
@@ -82,9 +96,27 @@ addLayer('to', {
             },
             done() { return player.to.points.gte(4); },
         },
-        //todo 5: more coins
-        //todo 6: well
-        //todo 7: more building materials & arc furnace
+        5: {
+            requirementDescription: 'Planetarium: Build 5 floors',
+            effect() { return D.add(player.to.points, 2).log2(); },
+            effectDescription() {
+                const effect = shiftDown ? '[log2(floors + 2)]' : format(tmp[this.layer].milestones[this.id].effect);
+                return `Multiply star time by ${effect}`;
+            },
+            done() { return player.to.points.gte(5); },
+        },
+        6: {
+            requirementDescription: 'Dowsing Rod: Build 6 floors',
+            effectDescription: 'Unlock the ability to build wells',
+            done() { return player.to.points.gte(6); },
+        },
+        7: {
+            requirementDescription: 'Advanced Engineering: Build 7 floors',
+            effectDescription: `Unlock more tower materials<br>\
+                Smelters can smelt iron and gold<br>\
+                Unlock the ability to build arc furnaces`,
+            done() { return player.to.points.gte(7); },
+        },
     },
     buyables: {
         // Random
@@ -96,7 +128,7 @@ addLayer('to', {
                 let cost = '';
                 if (shiftDown) {
                     const entry = tmp.to.materials.low[item];
-                    cost = `[${format(entry.req)} * ${format(entry.base)} ^ (${format(entry.exp)} ^ amount)]`;
+                    cost = `[${format(entry.base)} * ${format(entry.exp)} ^ amount]`;
                 } else {
                     cost = `${format(player.lo.items[item].amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items[item].name}`;
                 }
@@ -106,8 +138,13 @@ addLayer('to', {
             cost() {
                 const item = player.to.random[0],
                     entry = tmp.to.materials.low[item];
+                if (!entry) return;
 
-                return D.pow(entry.exp, getBuyableAmount(this.layer, this.id)).pow_base(entry.base).times(entry.req);
+                let cost = D.pow(entry.exp, getBuyableAmount(this.layer, this.id)).times(entry.base);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
             },
             canAfford() {
                 const item = player.to.random[0];
@@ -137,7 +174,7 @@ addLayer('to', {
                 let cost = '';
                 if (shiftDown) {
                     const entry = tmp.to.materials.medium[item];
-                    cost = `[${format(entry.req)} * ${format(entry.base)} ^ (${format(entry.exp)} ^ amount)]`;
+                    cost = `[${format(entry.base)} * ${format(entry.exp)} ^ amount]`;
                 } else {
                     cost = `${format(player.lo.items[item].amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items[item].name}`;
                 }
@@ -147,8 +184,13 @@ addLayer('to', {
             cost() {
                 const item = player.to.random[1],
                     entry = tmp.to.materials.medium[item];
+                if (!entry) return;
 
-                return D.pow(entry.exp, getBuyableAmount(this.layer, this.id)).pow_base(entry.base).times(entry.req);
+                let cost = D.pow(entry.exp, getBuyableAmount(this.layer, this.id)).times(entry.base);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
             },
             canAfford() {
                 const item = player.to.random[1];
@@ -179,7 +221,7 @@ addLayer('to', {
                 let cost = '';
                 if (shiftDown) {
                     const entry = tmp.to.materials.high[item];
-                    cost = `[${format(entry.req)} * ${format(entry.base)} ^ (${format(entry.exp)} ^ amount)]`;
+                    cost = `[${format(entry.base)} * ${format(entry.exp)} ^ amount]`;
                 } else {
                     cost = `${format(player.lo.items[item].amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items[item].name}`;
                 }
@@ -189,8 +231,13 @@ addLayer('to', {
             cost() {
                 const item = player.to.random[2],
                     entry = tmp.to.materials.high[item];
+                if (!entry) return;
 
-                return D.pow(entry.exp, getBuyableAmount(this.layer, this.id)).pow_base(entry.base).times(entry.req);
+                let cost = D.pow(entry.exp, getBuyableAmount(this.layer, this.id)).times(entry.base);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
             },
             canAfford() {
                 const item = player.to.random[2];
@@ -211,7 +258,7 @@ addLayer('to', {
 
                 return style;
             },
-            unlocked: false,
+            unlocked() { return hasMilestone('to', 7); },
         },
         // Basic Materials
         21: {
@@ -220,7 +267,7 @@ addLayer('to', {
                 let cost = '';
 
                 if (shiftDown) {
-                    cost = '[75 * 2 ^ (1.5 ^ amount)]';
+                    cost = '[75 * 1.5 ^ amount]';
                 } else {
                     cost = `${format(player.lo.items.stone.amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items.stone.name}`;
                 }
@@ -228,11 +275,13 @@ addLayer('to', {
                 return `Cost: ${cost}`;
             },
             cost() {
-                return D.pow(1.5, getBuyableAmount(this.layer, this.id)).pow_base(2).times(75);
+                let cost = D.pow(1.5, getBuyableAmount(this.layer, this.id)).times(75);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
             },
-            canAfford() {
-                return D.gte(player.lo.items.stone.amount, tmp[this.layer].buyables[this.id].cost);
-            },
+            canAfford() { return D.gte(player.lo.items.stone.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
                 layers.lo.items['*'].gain_items('stone', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
@@ -251,7 +300,7 @@ addLayer('to', {
                 let cost = '';
 
                 if (shiftDown) {
-                    cost = '[75 * 2 ^ (1.5 ^ amount)]';
+                    cost = '[75 * 1.5 ^ amount]';
                 } else {
                     cost = `${format(player.lo.items.plank.amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items.plank.name}`;
                 }
@@ -259,11 +308,13 @@ addLayer('to', {
                 return `Cost: ${cost}`;
             },
             cost() {
-                return D.pow(1.5, getBuyableAmount(this.layer, this.id)).pow_base(2).times(75);
+                let cost = D.pow(1.5, getBuyableAmount(this.layer, this.id)).times(75);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
             },
-            canAfford() {
-                return D.gte(player.lo.items.plank.amount, tmp[this.layer].buyables[this.id].cost);
-            },
+            canAfford() { return D.gte(player.lo.items.plank.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
                 layers.lo.items['*'].gain_items('plank', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
@@ -282,7 +333,7 @@ addLayer('to', {
                 let cost = '';
 
                 if (shiftDown) {
-                    cost = '[25 * 2 ^ (1.5 ^ amount)]';
+                    cost = '[25 * 1.5 ^ amount]';
                 } else {
                     cost = `${format(player.lo.items.copper_ore.amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items.copper_ore.name}`;
                 }
@@ -290,11 +341,13 @@ addLayer('to', {
                 return `Cost: ${cost}`;
             },
             cost() {
-                return D.pow(1.5, getBuyableAmount(this.layer, this.id)).pow_base(2).times(25);
+                let cost = D.pow(1.5, getBuyableAmount(this.layer, this.id)).times(25);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
             },
-            canAfford() {
-                return D.gte(player.lo.items.copper_ore.amount, tmp[this.layer].buyables[this.id].cost);
-            },
+            canAfford() { return D.gte(player.lo.items.copper_ore.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
                 layers.lo.items['*'].gain_items('copper_ore', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
@@ -314,7 +367,7 @@ addLayer('to', {
                 let cost = '';
 
                 if (shiftDown) {
-                    cost = '[75 * 2 ^ (1.5 ^ amount)]';
+                    cost = '[75 * 1.5 ^ amount]';
                 } else {
                     cost = `${format(player.lo.items.stone_brick.amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items.stone_brick.name}`;
                 }
@@ -322,11 +375,13 @@ addLayer('to', {
                 return `Cost: ${cost}`;
             },
             cost() {
-                return D.pow(1.5, getBuyableAmount(this.layer, this.id)).pow_base(2).times(75);
+                let cost = D.pow(1.5, getBuyableAmount(this.layer, this.id)).times(75);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
             },
-            canAfford() {
-                return D.gte(player.lo.items.stone_brick.amount, tmp[this.layer].buyables[this.id].cost);
-            },
+            canAfford() { return D.gte(player.lo.items.stone_brick.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
                 layers.lo.items['*'].gain_items('stone_brick', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
@@ -346,7 +401,7 @@ addLayer('to', {
                 let cost = '';
 
                 if (shiftDown) {
-                    cost = '[75 * 2 ^ (1.5 ^ amount)]';
+                    cost = '[75 * 1.5 ^ amount]';
                 } else {
                     cost = `${format(player.lo.items.copper_ingot.amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items.copper_ingot.name}`;
                 }
@@ -354,11 +409,13 @@ addLayer('to', {
                 return `Cost: ${cost}`;
             },
             cost() {
-                return D.pow(1.5, getBuyableAmount(this.layer, this.id)).pow_base(2).times(75);
+                let cost = D.pow(1.5, getBuyableAmount(this.layer, this.id)).times(75);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
             },
-            canAfford() {
-                return D.gte(player.lo.items.copper_ingot.amount, tmp[this.layer].buyables[this.id].cost);
-            },
+            canAfford() { return D.gte(player.lo.items.copper_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
                 layers.lo.items['*'].gain_items('copper_ingot', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
@@ -378,7 +435,7 @@ addLayer('to', {
                 let cost = '';
 
                 if (shiftDown) {
-                    cost = '[50 * 2 ^ (1.25 ^ amount)]';
+                    cost = '[50 * 1.25 ^ amount]';
                 } else {
                     cost = `${format(player.lo.items.iron_ore.amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items.iron_ore.name}`;
                 }
@@ -386,11 +443,13 @@ addLayer('to', {
                 return `Cost: ${cost}`;
             },
             cost() {
-                return D.pow(1.25, getBuyableAmount(this.layer, this.id)).pow_base(2).times(50);
+                let cost = D.pow(1.25, getBuyableAmount(this.layer, this.id)).times(50);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
             },
-            canAfford() {
-                return D.gte(player.lo.items.iron_ore.amount, tmp[this.layer].buyables[this.id].cost);
-            },
+            canAfford() { return D.gte(player.lo.items.iron_ore.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
                 layers.lo.items['*'].gain_items('iron_ore', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
@@ -405,49 +464,165 @@ addLayer('to', {
             unlocked() { return hasMilestone('to', 3); },
         },
         // Great Materials
-        //todo iron ingot, bronze ingot, steel ingot
+        41: {
+            title() { return `${formatWhole(getBuyableAmount(this.layer, this.id))} Iron Ingot Block`; },
+            display() {
+                let cost = '';
+
+                if (shiftDown) {
+                    cost = '[50 * 1.25 ^ amount]';
+                } else {
+                    cost = `${format(player.lo.items.iron_ingot.amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items.iron_ingot.name}`;
+                }
+
+                return `Cost: ${cost}`;
+            },
+            cost() {
+                let cost = D.pow(1.25, getBuyableAmount(this.layer, this.id)).pow_base(2).times(50);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
+            },
+            canAfford() { return D.gte(player.lo.items.iron_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
+            buy() {
+                layers.lo.items['*'].gain_items('iron_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.iron_ingot.style['background-color'];
+
+                return style;
+            },
+            unlocked() { return hasMilestone('to', 7); },
+        },
+        42: {
+            title() { return `${formatWhole(getBuyableAmount(this.layer, this.id))} Bronze Ingot Block`; },
+            display() {
+                let cost = '';
+
+                if (shiftDown) {
+                    cost = '[5 * 1.25 ^ amount]';
+                } else {
+                    cost = `${format(player.lo.items.bronze_ingot.amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items.bronze_ingot.name}`;
+                }
+
+                return `Cost: ${cost}`;
+            },
+            cost() {
+                let cost = D.pow(1.25, getBuyableAmount(this.layer, this.id)).times(5);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
+            },
+            canAfford() { return D.gte(player.lo.items.bronze_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
+            buy() {
+                layers.lo.items['*'].gain_items('bronze_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.bronze_ingot.style['background-color'];
+
+                return style;
+            },
+            unlocked() { return hasMilestone('to', 7); },
+        },
+        43: {
+            title() { return `${formatWhole(getBuyableAmount(this.layer, this.id))} Steel Ingot Block`; },
+            display() {
+                let cost = '';
+
+                if (shiftDown) {
+                    cost = '[25 * 1.25 ^ amount]';
+                } else {
+                    cost = `${format(player.lo.items.steel_ingot.amount)}/${format(tmp[this.layer].buyables[this.id].cost)} ${tmp.lo.items.steel_ingot.name}`;
+                }
+
+                return `Cost: ${cost}`;
+            },
+            cost() {
+                let cost = D.pow(1.25, getBuyableAmount(this.layer, this.id)).times(25);
+
+                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+
+                return cost;
+            },
+            canAfford() { return D.gte(player.lo.items.steel_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
+            buy() {
+                layers.lo.items['*'].gain_items('steel_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                addBuyables(this.layer, this.id, 1);
+            },
+            style() {
+                const style = {};
+
+                if (canBuyBuyable(this.layer, this.id)) style['background-color'] = tmp.lo.items.steel_ingot.style['background-color'];
+
+                return style;
+            },
+            unlocked() { return hasMilestone('to', 7); },
+        },
     },
     materials: {
-        low: {
-            'slime_goo': {
-                req: 100,
-                base: 2.5,
-                exp: 2,
-            },
-            'slime_core_shard': {
-                req: 50,
-                base: 2,
-                exp: 2,
-            },
+        low() {
+            const low = {
+                'slime_goo': {
+                    base: 100,
+                    exp: 2,
+                },
+                'red_fabric': {
+                    base: 100,
+                    exp: 1.75,
+                },
+                'normal_log': {
+                    base: 100,
+                    exp: 2,
+                },
+            };
+
+            if (tmp.xp_alt?.monsters.zombie.unlocked) low['rotten_flesh'] = {
+                base: 100,
+                exp: 1.5,
+            }
+
+            return low;
         },
         medium: {
-            'slime_core': {
-                req: 25,
-                base: 1.5,
+            'slime_core_shard': {
+                base: 50,
                 exp: 2,
             },
-            'red_fabric': {
-                req: 100,
-                base: 2.5,
-                exp: 2.5,
-            },
             'pyrite_coin': {
-                req: 50,
-                base: 2,
-                exp: 2.5,
+                base: 50,
+                exp: 1.75,
             },
         },
-        high: {
-            'rusty_gear': {
-                req: 25,
-                base: 1.5,
-                exp: 2.5,
-            },
-            'coal': {
-                req: 50,
-                base: 3,
-                exp: 3,
-            },
+        high() {
+            const high = {
+                'slime_core': {
+                    base: 5,
+                    exp: 2,
+                },
+                'rusty_gear': {
+                    base: 5,
+                    exp: 1.75,
+                },
+                'coal': {
+                    base: 50,
+                    exp: 2,
+                },
+            };
+
+            if (tmp.xp_alt?.monsters.zombie.unlocked) high['brain'] = {
+                base: 5,
+                exp: 1.5,
+            }
+
+            return high;
         },
         randomize() {
             const low = Object.keys(run(layers.to.materials.low, layers.to.materials)),
@@ -461,19 +636,35 @@ addLayer('to', {
             ];
         },
     },
-    type: 'static',
     baseResource: 'building materials',
     baseAmount() { return layerBuyableAmount('to'); },
-    requires: new Decimal(12.5),
-    base: Decimal.dTwo,
-    exponent: Decimal.dTwo,
+    type: 'custom',
+    getResetGain() {
+        let max_gain = D.affordGeometricSeries(tmp.to.baseAmount, 12.5, 2, player.to.points);
+
+        if (!tmp.to.canBuyMax) max_gain = max_gain.min(1);
+
+        return max_gain;
+    },
+    getNextAt(canMax) {
+        if (!canMax) {
+            return player.to.points.pow_base(2).times(12.5);
+        } else {
+            return tmp.to.baseAmount.div(12.5).log2().floor().add(1).pow(2).times(12.5);
+        }
+    },
+    canReset() { return getResetGain('to').gte(1); },
+    prestigeButtonText() {
+        return `Reset for +<b>${formatWhole(getResetGain('to'))}</b> floors<br><br>\
+        Next: ${formatWhole(tmp.to.baseAmount)} / ${formatWhole(getNextAt('to'))} ${tmp.to.baseResource}`;
+    },
     roundUpCost: true,
     branches: ['xp_alt'],
     doReset(layer) {
         if (layer == 'to') {
             Object.keys(tmp.to.buyables)
                 .filter(id => !['layer', 'rows', 'cols'].includes(id))
-                .forEach(id => setBuyableAmount('to', id));
+                .forEach(id => setBuyableAmount('to', id, D.dZero));
             player.to.random = layers.to.materials.randomize();
         } else if (tmp[layer].row > this.row) {
             layerDataReset(this.layer);
