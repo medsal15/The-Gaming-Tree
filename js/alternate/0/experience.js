@@ -90,7 +90,7 @@ addLayer('xp_alt', {
                     'display-text',
                     () => {
                         const tame_style = (text, ...style) => `<span style="color:${tmp.xp_alt.color_tame};text-shadow:${tmp.xp_alt.color_tame} 0 0 10px;${style.join(';')}">${text}</span>`,
-                            capped = !tmp.l.canBuyMax && D.gte(player.xp_alt.points, tmp.xp.enemies['*'].exp_cap),
+                            capped = D.gte(player.xp_alt.points, tmp.xp.enemies['*'].exp_cap),
                             xp_text = capped ? 'hardcapped' : layerColor('xp_alt', `+${format(tmp.xp_alt.monsters['*'].experience)} /s`),
                             tame_pieces = [];
                         if (tmp.xp_alt.total.tamed.neq(player.xp_alt.monsters[player.xp_alt.type].tamed)) {

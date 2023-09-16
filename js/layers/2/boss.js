@@ -158,7 +158,8 @@ addLayer('b', {
                                 color = tmp.tic.color;
                                 break;
                             case 82:
-                            //todo color = alt casino
+                                //todo color = tmp.bin.color;
+                                break;
                             case 91:
                             //todo color = alt magic
                             case 92:
@@ -464,7 +465,7 @@ addLayer('b', {
         },
         // Seals
         81: {
-            name: 'Unseal the Time Cubes',
+            name: 'Time Cubes Seal',
             challengeDescription: `\
                 Time is multiplied by a random number between -1 and 2 every second<br><br>\
                 <span style="color:#AA5555;">This works like a Boss challenge</span>`,
@@ -485,14 +486,31 @@ addLayer('b', {
             rewardDescription: 'Unlock Time Cubes',
             buttonStyle() {
                 const active = activeChallenge('b'),
-                    style = { 'background-color': '#FF00FF', };
+                    style = { 'background-color': tmp.tic.color, };
                 if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
             unlocked() { return hasUpgrade('a', 24); },
             onComplete() { player.subtabs.tic.mainTabs = 'Generation'; },
         },
-        //todo 82
+        82: {
+            name: 'Bingo Seal',
+            challengeDescription: `\
+                All lower rows resources gain are multiplied by their bingo progress<br><br>\
+                <span style="color:#AA5555;">This works like a Boss challenge</span>`,
+            goalDescription: 'Get 3 bingos',
+            canComplete: false,
+            rewardDescription: 'Unlock Bingo',
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    //todo
+                    style = { /*'background-color': tmp.bin.color,*/ };
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
+            unlocked() { return hasUpgrade('a', 34); },
+            //onComplete() { player.subtabs.tic.mainTabs = '???'; }, //todo set to main tab
+        },
         //todo 91
         //todo 92
     },

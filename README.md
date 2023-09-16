@@ -27,6 +27,7 @@ By [Lorc](https://lorcblog.blogspot.com/):
 - [stone block](https://game-icons.net/1x1/lorc/stone-block.html)
 - [swap bag](https://game-icons.net/1x1/lorc/swap-bag.html)
 - [wheat](https://game-icons.net/1x1/lorc/wheat.html)
+- [well](https://game-icons.net/1x1/lorc/well.html)
 - [wood axe](https://game-icons.net/1x1/lorc/wood-axe.html)
 
 By [Delapouite](https://delapouite.com/):
@@ -36,6 +37,7 @@ By [Delapouite](https://delapouite.com/):
 - [corn](https://game-icons.net/1x1/delapouite/corn.html)
 - [cube](https://game-icons.net/1x1/delapouite/cube.html)
 - [exit door](https://game-icons.net/1x1/delapouite/exit-door.html)
+- [furnace](https://game-icons.net/1x1/delapouite/furnace.html)
 - [log](https://game-icons.net/1x1/delapouite/log.html)
 - [next button](https://game-icons.net/1x1/delapouite/next-button.html)
 - [observatory](https://game-icons.net/1x1/delapouite/observatory.html)

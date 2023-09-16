@@ -447,16 +447,16 @@ declare class Layer<L extends string> {
     /**
      * A set of one-time purchases which can have unique upgrade conditions, currency costs, and bonuses.
      */
-    upgrades: { [id: number]: Upgrade<L> }
+    upgrades: { [id: string]: Upgrade<L> }
     /**
      * A list of bonuses gained upon reaching certain thresholds of a resource. Often used for automation/QOL.
      */
-    milestones: { [id: number]: Milestone<L> }
+    milestones: { [id: string]: Milestone<L> }
     /**
      * The player can enter challenges, which make the game harder.
      * If they reach a goal and beat the challenge, they recieve a bonus.
      */
-    challenges?: { [id: number]: Challenge<L> }
+    challenges?: { [id: string]: Challenge<L> }
     /**
      * Effectively upgrades that can be bought multiple times, and are optionally respeccable. Many uses.
      */
@@ -483,7 +483,8 @@ declare class Layer<L extends string> {
          * A custom confirmation message on respec, in place of the default one.
          */
         respecMessage?: Computable<string>
-        [id: number]: Buyable<L>,
+    } & {
+        [id: string]: Buyable<L>,
     }
     /**
      * Extremely versatile and generalized buttons which can only be clicked sometimes.
@@ -559,7 +560,7 @@ declare class Layer<L extends string> {
     /**
      * Kind of like milestones, but with a different display style and some other differences. Extra features are on the way at a later date!
      */
-    achievements?: { [id: number]: Achievement<L> }
+    achievements?: { [id: string]: Achievement<L> }
     /**
      * If false, disables popup message when you get the achievement. True by default.
      */
@@ -1745,12 +1746,13 @@ type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
     'red_fabric' | 'pyrite_coin' | 'rusty_gear' |
     'rotten_flesh' | 'brain' |
     'leaf' | 'seed' |
-    'stardust' | 'holy_water' |
     'stone' | 'copper_ore' | 'tin_ore' | 'coal' | 'iron_ore' | 'gold_ore' |
     'stone_brick' | 'copper_ingot' | 'tin_ingot' | 'iron_ingot' | 'gold_ingot' |
     'bronze_ingot' | 'steel_ingot' |
     'soaked_log' | 'normal_log' | 'plank' |
-    'wheat' | 'corn' | 'strawberry' | 'potato' | 'eggplant' | 'egg';
+    'wheat' | 'corn' | 'strawberry' | 'potato' | 'eggplant' | 'egg' |
+    'water' |
+    'stardust' | 'holy_water';
 
 type Layers = {
     // Side
@@ -2444,7 +2446,6 @@ type Layers = {
         materials: {
             [type in 'low' | 'medium' | 'high']: Computable<{
                 [item in items]: {
-                    req: DecimalSource
                     base: DecimalSource
                     exp: DecimalSource
                 }

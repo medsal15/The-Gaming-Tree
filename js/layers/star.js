@@ -4,7 +4,6 @@
 addLayer('star', {
     row: 0,
     position: 999,
-    /** @returns {Player['star']} */
     startData() {
         return {
             unlocked: true,
@@ -106,7 +105,6 @@ addLayer('star', {
             tooltip: 'Escape the star and return to XP',
         },
     },
-    /** @type {Layers['star']['star']} */
     star: {
         time() {
             let base_time = D(5);
@@ -116,6 +114,8 @@ addLayer('star', {
             let time = D.div(base_time, D.add(tmp.xp.enemies.star.level, 1).pow(2));
 
             time = time.times(tmp.p.plants.starflower.effect);
+
+            if (hasMilestone('to', 5)) time = time.times(tmp.to.milestones[5].effect);
 
             return time;
         },
