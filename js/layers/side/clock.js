@@ -21,7 +21,7 @@ addLayer('clo', {
         'Time Speed': {
             content: [
                 ['display-text', () => `Base time speed: ${format(tmp.clo.time_speed)} seconds/s`],
-                ['display-text', () => inChallenge('b', 51) ? '' : `<span style="color:#AA5555;">Time speed is lower for higher rows</span>`],
+                ['display-text', () => inChallenge('b', 51) ? '' : `<span class="warning">Time speed is lower for higher rows</span>`],
                 'blank',
                 () => {
                     if (inChallenge('b', 51)) {

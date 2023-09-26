@@ -13,6 +13,7 @@ By [Lorc](https://lorcblog.blogspot.com/):
 - [eggplant](https://game-icons.net/1x1/lorc/aubergine.html)
 - [brain](https://game-icons.net/1x1/lorc/brain.html)
 - [cog](https://game-icons.net/1x1/lorc/cog.html)
+- [conway game of life glider](https://game-icons.net/1x1/delapouite/conway-life-glider.html)
 - [cracked disk](https://game-icons.net/1x1/lorc/cracked-disc.html)
 - [drop](https://game-icons.net/1x1/lorc/drop.html)
 - [erlenmeyer](https://game-icons.net/1x1/lorc/erlenmeyer.html)

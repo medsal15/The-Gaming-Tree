@@ -115,7 +115,7 @@ addLayer('star', {
 
             time = time.times(tmp.p.plants.starflower.effect);
 
-            if (hasMilestone('to', 5)) time = time.times(tmp.to.milestones[5].effect);
+            if (hasMilestone('to', 4)) time = time.times(tmp.to.milestones[4].effect);
 
             return time;
         },

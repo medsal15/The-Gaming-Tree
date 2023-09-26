@@ -82,26 +82,27 @@ addLayer('to', {
                 const effect = shiftDown ? '[log10(science + 10)]' : format(tmp[this.layer].milestones[this.id].effect);
                 return `Unlock more tower materials<br>\
                     Unlock the ability to build smelters<br>\
-                    Science divides materials costs by ${effect}`;
+                    Science divides materials costs by ${effect}<br>\
+                    Keep this milestone`;
             },
             effect() { return player.c.resources.science.amount.add(10).log10(); },
             done() { return player.to.points.gte(3); },
         },
         4: {
-            requirementDescription: 'Greenhouse: Build 4 floors',
-            effect() { return D.pow(1.25, player.to.points); },
-            effectDescription() {
-                const effect = shiftDown ? '[1.25 ^ floors]' : format(tmp[this.layer].milestones[this.id].effect);
-                return `Multiply harvest yield by ${effect}`;
-            },
-            done() { return player.to.points.gte(4); },
-        },
-        5: {
-            requirementDescription: 'Planetarium: Build 5 floors',
+            requirementDescription: 'Planetarium: Build 4 floors',
             effect() { return D.add(player.to.points, 2).log2(); },
             effectDescription() {
                 const effect = shiftDown ? '[log2(floors + 2)]' : format(tmp[this.layer].milestones[this.id].effect);
                 return `Multiply star time by ${effect}`;
+            },
+            done() { return player.to.points.gte(4); },
+        },
+        5: {
+            requirementDescription: 'Greenhouse: Build 5 floors',
+            effect() { return D.pow(1.25, player.to.points); },
+            effectDescription() {
+                const effect = shiftDown ? '[1.25 ^ floors]' : format(tmp[this.layer].milestones[this.id].effect);
+                return `Multiply harvest yield by ${effect}`;
             },
             done() { return player.to.points.gte(5); },
         },
@@ -114,7 +115,8 @@ addLayer('to', {
             requirementDescription: 'Advanced Engineering: Build 7 floors',
             effectDescription: `Unlock more tower materials<br>\
                 Smelters can smelt iron and gold<br>\
-                Unlock the ability to build arc furnaces`,
+                Unlock the ability to build arc furnaces<br>\
+                Keep this milestone`,
             done() { return player.to.points.gte(7); },
         },
     },
@@ -582,6 +584,10 @@ addLayer('to', {
                     base: 100,
                     exp: 2,
                 },
+                'wheat': {
+                    base: 100,
+                    exp: 1.5,
+                },
             };
 
             if (tmp.xp_alt?.monsters.zombie.unlocked) low['rotten_flesh'] = {
@@ -600,6 +606,10 @@ addLayer('to', {
                 base: 50,
                 exp: 1.75,
             },
+            'corn': {
+                base: 50,
+                exp: 1.5,
+            },
         },
         high() {
             const high = {
@@ -614,6 +624,10 @@ addLayer('to', {
                 'coal': {
                     base: 50,
                     exp: 2,
+                },
+                'eggplant': {
+                    base: 25,
+                    exp: 1.5,
                 },
             };
 
@@ -667,7 +681,13 @@ addLayer('to', {
                 .forEach(id => setBuyableAmount('to', id, D.dZero));
             player.to.random = layers.to.materials.randomize();
         } else if (tmp[layer].row > this.row) {
+            const milestones = [];
+            if (hasMilestone('to', 3)) milestones.push(3);
+            if (hasMilestone('to', 7)) milestones.push(7);
+
             layerDataReset(this.layer);
+
+            player.to.milestones.push(...milestones);
         }
     },
     prestigeNotify() { return canReset('to') || canAffordLayerBuyable('to'); },

@@ -32,8 +32,10 @@ let modInfo = {
 		'layers/1/level.js', 'layers/1/loot.js', 'layers/1/forge.js',
 		'layers/2/boss.js', 'layers/2/shop.js', 'layers/2/alternator.js',
 
-		'alternate/side/successes.js', 'alternate/side/time_cubes.js',
+		//todo condiments
+		'alternate/side/successes.js', 'alternate/side/time_cubes.js', 'alternate/side/bingo.js',
 		'alternate/0/experience.js', 'alternate/0/city.js', 'alternate/0/plants.js',
+		//todo kitchen, freezer
 		'alternate/1/tower.js',
 	],
 	/**
@@ -131,6 +133,7 @@ var doNotCallTheseFunctionsEveryTick = [
 	'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop', 'gain_items',
 	'show_fuel', 'show_smelt',
 	'randomize',
+	'create_card', 'roll_ball', 'roll_new_ball',
 ];
 
 /**
@@ -153,7 +156,7 @@ function addedPlayerData() { }
  * @type {Computable<string>[]}
  */
 var displayThings = [
-	() => VERSION.beta ? '<span style="color:#AA5555;">Beta version, things might be a bit unstable</span>' : '',
+	() => VERSION.beta ? '<span class="warning">Beta version, things might be a bit unstable</span>' : '',
 	() => isEndgame() ? '<span style="color:#60C0F0">You are past endgame. Content may not be balanced.</span>' : '',
 	() => {
 		const id = activeChallenge('b');

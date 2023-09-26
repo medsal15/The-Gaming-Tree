@@ -87,7 +87,7 @@ addLayer('f', {
 
                     return text;
                 }],
-                ['display-text', '<span style="color:#AA5555;">You lose 1% of your heat every second</span>'],
+                ['display-text', '<span class="warning">You lose 1% of your heat every second</span>'],
                 () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '(technically 2% because of your challenges)']; },
                 'blank',
                 ['upgrades', [1, 2, 3]],
@@ -116,10 +116,10 @@ addLayer('f', {
 
                     return text;
                 }],
-                ['display-text', '<span style="color:#AA5555;">You lose 1% of your heat every second</span>'],
+                ['display-text', '<span class="warning">You lose 1% of your heat every second</span>'],
                 () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '(technically 2% because of your challenges)']; },
                 'blank',
-                ['display-text', `<span style="color:#AA5555;">You consume 1% of your fuels to produce heat every second</span>`],
+                ['display-text', `<span class="warning">You consume 1% of your fuels to produce heat every second</span>`],
                 ['display-text', () => `Your forge's size prevents consuming more than ${format(tmp.f.fuels['*'].size)} of each fuel per second`],
                 'blank',
                 [
@@ -153,7 +153,7 @@ addLayer('f', {
 
                     return text;
                 }],
-                ['display-text', '<span style="color:#AA5555;">You lose 1% of your heat every second</span>'],
+                ['display-text', '<span class="warning">You lose 1% of your heat every second</span>'],
                 () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '(technically 2% because of your challenges)']; },
                 ['display-text', () => `Your heat divides time requirements by ${shiftDown ? `[${tmp.f.heat.speed_formula}]` : format(tmp.f.heat.speed)}`],
                 'blank',
@@ -164,7 +164,7 @@ addLayer('f', {
                     <span style="${!ctrlDown && shiftDown ? 'text-decoration:underline;' : ''}">shift for *25</span>,\
                     and <span style="${ctrlDown && shiftDown ? 'text-decoration:underline;' : ''}">both for *250</span>`
                 ],
-                ['display-text', '<span style="color:#AA5555;">Smelting will only progress as long as there is enough heat</span>'],
+                ['display-text', '<span class="warning">Smelting will only progress as long as there is enough heat</span>'],
                 'blank',
                 [
                     'column',
@@ -232,7 +232,7 @@ addLayer('f', {
                 if (!shiftDown) {
                     return `Reduces smeltable crafting costs depending on its depth found<br>\
                         Use their smelted variant for crafting<br>\
-                        <span style="color:#AA5555;">Reset ALL affected buyables</span>`;
+                        <span class="warning">Reset ALL affected buyables</span>`;
                 }
 
                 let formula = '/(depth ^ 2) * 100';

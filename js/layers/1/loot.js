@@ -1,5 +1,6 @@
 'use strict';
 
+//todo add total per second to items
 //todo add buyMax to buyables
 addLayer('lo', {
     name: 'Loot',

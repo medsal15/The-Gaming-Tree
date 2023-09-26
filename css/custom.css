@@ -5,3 +5,7 @@ table.layer-table,
     border-collapse: collapse;
     padding: 5px;
 }
+
+.warning {
+    color: #AA5555;
+}

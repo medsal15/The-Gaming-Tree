@@ -47,7 +47,7 @@ addLayer('b', {
                         ],
                     ];
                 },
-                ['display-text', () => `<span style="color:#AA5555;">Boss challenges ${player.b.auto_start ? 'are automatically entered and ' : ''}cannot be exited.</span>`],
+                ['display-text', () => `<span class="warning">Boss challenges ${player.b.auto_start ? 'are automatically entered and ' : ''}cannot be exited.</span>`],
                 'blank',
                 ['challenges', [1, 2]],
             ],
@@ -72,7 +72,7 @@ addLayer('b', {
                         ],
                     ];
                 },
-                ['display-text', '<span style="color:#AA5555;">Mini-boss challenges cannot be exited.</span>'],
+                ['display-text', '<span class="warning">Mini-boss challenges cannot be exited.</span>'],
                 ['display-text', '<span style="color:#00CCCC;">Mini-boss challenges are optional.</span>'],
                 'blank',
                 ['challenges', [3, 4]],
@@ -127,7 +127,7 @@ addLayer('b', {
                         ],
                     ];
                 },
-                ['display-text', () => `<span style="color:#AA5555;font-size:1.5em;">This challenge cannot be exited.</span>`],
+                ['display-text', () => `<span class="warning" style="font-size:1.5em;">This challenge cannot be exited.</span>`],
                 'blank',
                 ['challenges', [7]],
                 'blank',
@@ -158,10 +158,11 @@ addLayer('b', {
                                 color = tmp.tic.color;
                                 break;
                             case 82:
-                                //todo color = tmp.bin.color;
+                                color = tmp.bin.color;
                                 break;
                             case 91:
-                            //todo color = alt magic
+                                //todo color = tmp.con.color;
+                                break;
                             case 92:
                             //todo color = alt stats
                         }
@@ -420,7 +421,7 @@ addLayer('b', {
             challengeDescription() {
                 let text = 'Enter all your beaten challenges at once. They are automatically completed and affect both sides.';
                 if (!false) {
-                    text = `<b style="color:#AA5555;">Your world is too small for this challenge.</b><br>\
+                    text = `<b class="warning">Your world is too small for this challenge.</b><br>\
                     ${text}`;
                 }
 
@@ -461,6 +462,12 @@ addLayer('b', {
                     player.mag.points = D(50);
                     layers.mag.elements['*'].randomize();
                 }
+                // Seal challenges
+                if (challenges.includes(82)) {
+                    player.bin.cards = {};
+                    player.bin.rolled = [];
+                    tmp.bin.cards.possibles.forEach(layer => player.bin.cards[layer] = { spots: layers.bin.cards.create_card() });
+                }
             },
         },
         // Seals
@@ -468,7 +475,7 @@ addLayer('b', {
             name: 'Time Cubes Seal',
             challengeDescription: `\
                 Time is multiplied by a random number between -1 and 2 every second<br><br>\
-                <span style="color:#AA5555;">This works like a Boss challenge</span>`,
+                <span class="warning">This works like a Boss challenge</span>`,
             goalDescription() {
                 if (tmp.xp_alt.layerShown) {
                     return `Tame ${formatWhole(tmp.xp_alt.total.tamed.min(100))}/${formatWhole(100)} monsters`;
@@ -483,7 +490,7 @@ addLayer('b', {
                     return tmp.xp.total.kills.gte(250);
                 }
             },
-            rewardDescription: 'Unlock Time Cubes',
+            rewardDescription: 'Unlock the true potential of Time Cubes',
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = { 'background-color': tmp.tic.color, };
@@ -496,22 +503,52 @@ addLayer('b', {
         82: {
             name: 'Bingo Seal',
             challengeDescription: `\
-                All lower rows resources gain are multiplied by their bingo progress<br><br>\
-                <span style="color:#AA5555;">This works like a Boss challenge</span>`,
-            goalDescription: 'Get 3 bingos',
-            canComplete: false,
-            rewardDescription: 'Unlock Bingo',
+                All lower resources gain are multiplied by their layer's bingo progress<br><br>\
+                <span class="warning">This works like a Boss challenge</span>`,
+            goalDescription: 'Get a bingo',
+            canComplete() { return Object.values(player.bin.cards).some(({ wins }) => D.gt(wins, 0)); },
+            rewardDescription: 'Unlock the true potential of Bingo',
             buttonStyle() {
                 const active = activeChallenge('b'),
-                    //todo
-                    style = { /*'background-color': tmp.bin.color,*/ };
+                    style = { 'background-color': tmp.bin.color, };
                 if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
             unlocked() { return hasUpgrade('a', 34); },
-            //onComplete() { player.subtabs.tic.mainTabs = '???'; }, //todo set to main tab
+            onEnter() {
+                player.bin.cards = {};
+                player.bin.rolled = [];
+                tmp.bin.cards.possibles.forEach(layer => player.bin.cards[layer] = { spots: layers.bin.cards.create_card() });
+            },
+            onExit() {
+                player.bin.cards = {};
+                player.bin.rolled = [];
+            },
+            onComplete() {
+                player.bin.points = D(5);
+                player.subtabs.tic.mainTabs = 'Bingo';
+                player.bin.cards = {};
+                player.bin.rolled = [];
+                player.bin.respecs = D.dZero;
+                player.bin.time = D.dZero;
+            },
         },
-        //todo 91
+        91: {
+            name: 'Condiment Seal',
+            challengeDescription: '???',
+            goalDescription: '???',
+            canComplete: false,
+            rewardDescription: 'Unlock the true potential of Condiments',
+            buttonStyle() {
+                const active = activeChallenge('b'),
+                    //todo
+                    style = { /*'background-color': tmp.con.color,*/ };
+                if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
+                return style;
+            },
+            unlocked() { return hasUpgrade('a', 44); },
+            //onComplete() { player.subtabs.tic.mainTabs = '???'; }, //todo? set to main tab
+        },
         //todo 92
     },
     automate() {
