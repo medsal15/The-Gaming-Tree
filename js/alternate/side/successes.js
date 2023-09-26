@@ -261,7 +261,6 @@ addLayer('suc', {
             },
             unlocked() { return tmp.p.layerShown; },
         },
-        /*
         51: {
             name: 'Onion',
             tooltip: 'Get another layer of city building',
@@ -304,18 +303,6 @@ addLayer('suc', {
         54: {
             name: 'What is it build of?',
             tooltip: 'Get a greenhouse',
-            done() { return hasMilestone('to', 4); },
-            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.to.color); },
-            style() {
-                let s = {};
-                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.to.color;
-                return s;
-            },
-            unlocked() { return tmp.to.layerShown; },
-        },
-        55: {
-            name: 'Art of the deal',
-            tooltip: 'Get a ???',
             done() { return hasMilestone('to', 5); },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.to.color); },
             style() {
@@ -325,7 +312,21 @@ addLayer('suc', {
             },
             unlocked() { return tmp.to.layerShown; },
         },
-        */
+        55: {
+            name: 'Shocking',
+            tooltip: 'Build an arc furnace',
+            done() {
+                const placed = tmp.c.buildings['*'].placed;
+                return D.gt(placed.arc_furnace, 0);
+            },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.to.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.to.color;
+                return s;
+            },
+            unlocked() { return tmp.to.layerShown; },
+        },
         //#endregion Normal Successes
         //#region Bonus Successes
         11: {
@@ -362,7 +363,7 @@ addLayer('suc', {
 
                 return 'Unseal Bingo';
             },
-            done() { return false; },
+            done() { return hasChallenge('b', 82); },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
             style() {
                 let s = {};

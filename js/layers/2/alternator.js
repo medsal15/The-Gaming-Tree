@@ -46,9 +46,9 @@ addLayer('a', {
                         </span>`
                 ],
                 'blank',
-                ['display-text', `<span style="color:#AA5555;">Alternating a layer will radically change its function and effects</span>`],
-                ['display-text', `<span style="color:#AA5555;">Alternating a layer will increase the cost to alternate other layers</span>`],
-                ['display-text', () => `<span style="color:#AA5555;">Layer effects are ^${format(tmp.a.change_efficiency)} as efficient between alternate and normal layers</span>`],
+                ['display-text', `<span class="warning">Alternating a layer will radically change its function and effects</span>`],
+                ['display-text', `<span class="warning">Alternating a layer will increase the cost to alternate other layers</span>`],
+                ['display-text', () => `<span class="warning">Layer effects are ^${format(tmp.a.change_efficiency)} as efficient between alternate and normal layers</span>`],
                 'blank',
                 ['upgrade-tree', [
                     [11, 12, 13],
@@ -115,6 +115,7 @@ addLayer('a', {
                 player.xp_alt.unlocked = true;
                 doReset('s', true);
             },
+            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
         },
         12: {
             title: 'Alternate Mining',
@@ -146,6 +147,7 @@ addLayer('a', {
                 player.c.unlocked = true;
                 doReset('s', true);
             },
+            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
         },
         13: {
             title: 'Alternate Tree',
@@ -177,6 +179,7 @@ addLayer('a', {
                 player.p.unlocked = true;
                 doReset('s', true);
             },
+            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
         },
         14: {
             title: 'Alternate Achievements',
@@ -236,6 +239,7 @@ addLayer('a', {
                 player.to.unlocked = true;
                 doReset('s', true);
             },
+            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
         },
         22: {
             title: 'Alternate Loot',
@@ -318,8 +322,9 @@ addLayer('a', {
                 return style;
             },
             unlocked() { return tmp.clo.layerShown || tmp.tic.layerShown; },
-            canAfford() { return hasChallenge('b', 51); },
+            canAfford() { return hasChallenge('b', 51) && player.lo.items.stardust.amount.gte(this.cost); },
             onPurchase() { player.tic.unlocked = true; },
+            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
         },
         31: {
             title: 'Alternate Bosses',
@@ -393,9 +398,10 @@ addLayer('a', {
         },
         34: {
             title: 'Alternate Casino',
-            description: 'Not Yet Implemented<br>More gambling',
+            description: 'More gambling',
             cost: D(4),
             item: 'stardust',
+            currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
@@ -406,23 +412,27 @@ addLayer('a', {
                 };
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.bin.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.cas.color}, ${tmp.bin.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.cas.color;
                 }
 
                 return style;
             },
-            unlocked() { return tmp.cas.layerShown; },
-            canAfford: false,
+            unlocked() { return tmp.cas.layerShown || tmp.bin.layerShown; },
+            canAfford() { return hasChallenge('b', 52) && player.lo.items.stardust.amount.gte(this.cost); },
+            onPurchase() { player.bin.unlocked = true; },
+            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
         },
         44: {
             title: 'Alternate Magic',
             description: 'Not Yet Implemented<br>???',
             cost: D(6),
             item: 'stardust',
+            currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {
@@ -450,6 +460,7 @@ addLayer('a', {
             description: 'Not Yet Implemented<br>Social Butterfly',
             cost: D(8),
             item: 'stardust',
+            currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
             currencyLocation() { return player.lo.items[this.item]; },
             style() {

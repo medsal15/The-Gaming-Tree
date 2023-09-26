@@ -68,7 +68,7 @@ addLayer('mag', {
                             </td>\
                         </tr>\
                         <tr>\
-                            <td style="color:#AA5555;">${cons.length ? cons.join('<br>') : 'No negatives'}</td>\
+                            <td class="warning">${cons.length ? cons.join('<br>') : 'No negatives'}</td>\
                         </tr>`;
                     },
                         /** @param {string} element */

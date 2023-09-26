@@ -65,9 +65,23 @@ addLayer('s', {
                 ['display-text', () => `You have ${tmp.s.coins.format}`],
                 'prestige-button',
                 'blank',
-                ['display-text', () => `You have ${formatWhole(tmp.s.investloans.amount)} effective ${tmp.s.investloans.use_loans ? 'repaid loans' : 'investments'}`],
-                ['display-text', () => `<span style="color:#AA5555;">Buying a${tmp.s.investloans.use_loans ? ' loan' : 'n investment'} increases the price of all the others</span>`],
-                () => tmp.s.investloans.use_loans ? '' : ['display-text', '<span style="color:#AA5555;">Investments are reset on boss reset</span>'],
+                ['display-text', () => {
+                    const type = {
+                        'loan': 'repaid loans',
+                        'debt': 'repaid debts',
+                        'investment': 'investments',
+                    }[tmp.s.investloans.type];
+                    return `You have ${formatWhole(tmp.s.investloans.amount)} effective ${type}`;
+                }],
+                ['display-text', () => {
+                    const type = {
+                        'loan': 'a loan',
+                        'debt': 'a debt',
+                        'investment': 'an investment',
+                    }[tmp.s.investloans.type];
+                    return `<span class="warning">Buying ${type} increases the price of all the others</span>`;
+                }],
+                () => tmp.s.investloans.use_loans ? undefined : ['display-text', '<span class="warning">Investments are reset on boss reset</span>'],
                 'blank',
                 ['clickable', 11],
                 ['upgrades', [4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 8]],

@@ -116,6 +116,7 @@ function formatCoins(decimal, coin_types) {
  */
 const D = new Proxy(val => new Decimal(val), {
     get(_, prop) { return Decimal[prop]; },
+    ownKeys() { return Object.keys(Decimal); },
 });
 /**
  * Same as `player.<layer>.activeChallenge ?? false`

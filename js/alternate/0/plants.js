@@ -380,7 +380,7 @@ addLayer('p', {
 
                 mult = mult.times(tmp.p.plants.sunflower.effect);
 
-                if (hasMilestone('to', 4)) mult = mult.times(tmp.to.milestones[4].effect);
+                if (hasMilestone('to', 5)) mult = mult.times(tmp.to.milestones[5].effect);
 
                 return mult;
             },
@@ -1071,7 +1071,7 @@ addLayer('p', {
 
                 return D.times(1.25, mult);
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify: false,
             unlocked() { return player.p.plants.corn.infusions.includes(this.id); },
             infusions: {
                 'stardust': 'starflower',

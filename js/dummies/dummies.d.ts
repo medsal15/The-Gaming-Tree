@@ -397,7 +397,7 @@ declare class Layer<L extends string> {
             /**
              * The tab layout code for the subtab, in the tab layout format.
              */
-            content: TabFormatEntries<L>[]
+            content: Computable<TabFormatEntries<L>[]>
             /**
              * Applies CSS to the whole subtab when switched to, in the form of an "CSS Object", where the keys are CSS attributes,
              * and the values are the values for those attributes (both as strings).
@@ -1735,6 +1735,7 @@ declare class LayerData {
     //unlockOrder?: string[]
     resetTime?: number
     upgrades?: number[]
+    milestones?: number[]
     activeChallenge?: number | null
     buyables?: { [id: number]: Decimal }
     challenges?: { [id: number]: number }
@@ -2257,6 +2258,41 @@ type Layers = {
             gain(): Decimal
         }
     }
+    bin: Layer<'bin'> & {
+        cards: {
+            /** List of existing cards */
+            list(): (keyof Layers)[]
+            /** List of potential cards */
+            possibles(): (keyof Layers)[]
+            /** List of cards available */
+            availables(): (keyof Layers)[]
+            /** Cost of a new card in bingo bucks */
+            cost(): Decimal
+            cost_formula: Computable<string>
+            /** Creates a new bingo card */
+            create_card(): number[]
+            show_card(card?: Player['bin']['show']): string
+            /** Checks if any card has a bingo */
+            bingo(): false | (keyof Layers)[]
+            multipliers(layer: keyof Layers): Decimal
+            multipliers(): { [layer in keyof Layers]?: Decimal }
+            multipliers(layer?: keyof Layers): Decimal | { [layer in keyof Layers]?: Decimal }
+        }
+        balls: {
+            /** Roll a random ball */
+            roll_ball(): number
+            /** Roll an unrolled ball */
+            roll_new_ball(): number | undefined
+            /** Time between rolls */
+            time: Computable<Decimal>
+            /** Lowest number for a bingo ball */
+            min: Computable<number>
+            /** Highest number for a bingo ball */
+            max: Computable<number>
+            /** Full grid of all potential balls */
+            grid(): string
+        }
+    }
     // Alt Row 0
     xp_alt: Layer<'xp_alt'> & {
         color_tame: string
@@ -2489,9 +2525,9 @@ type Player = {
     }
     points: Decimal
     subtabs: {
-        [key: string]: {
+        [key in keyof Layers]: {
             mainTabs: string,
-        },
+        }
     }
     tab: string
     time: number
@@ -2683,6 +2719,23 @@ type Player = {
             speed: Decimal
             time: Decimal
         }
+    }
+    bin: LayerData & {
+        cards: {
+            [layer in keyof Layers]?: {
+                spots: number[]
+                /** Consecutive wins */
+                wins: Decimal
+            }
+        }
+        /** Rolled numbers */
+        rolled: number[]
+        respecs: Decimal
+        /** Time until next bingo ball */
+        time: Decimal
+        /** Currently selected bingo card */
+        show: keyof Layers | ''
+        bingo_notify: boolean
     }
     // Alt Row 0
     xp_alt: LayerData & {

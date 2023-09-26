@@ -21,7 +21,7 @@ addLayer('cas', {
             },
         };
     },
-    layerShown() { return inChallenge('b', 52) || hasChallenge('b', 52); },
+    layerShown() { return (inChallenge('b', 52) || hasChallenge('b', 52)) && !hasUpgrade('a', 34); },
     color: '#BBAA66',
     row: 'side',
     position: 2,
@@ -34,7 +34,7 @@ addLayer('cas', {
                 ['display-text', () => `Your next swap will cost ${shiftDown ? `[${tmp.cas.items.swap_cost_formula}]` : format(tmp.cas.items.swap_cost)} tokens`],
                 ['display-text', () => `You have swapped ${format(player.cas.count)} times`],
                 ['display-text', () => `You have ${format(tmp.cas.token.chance.times(100))}% to get a token every item drop roll`],
-                ['display-text', () => `<span style="color:#AA5555;">You need to swap ${format(player.cas.respecs)} times to respec</span>`],
+                ['display-text', () => `<span class="warning">You need to swap ${format(player.cas.respecs)} times to respec</span>`],
                 'blank',
                 ['display-text', 'Click an item on the left column to select it.'],
                 ['display-text', 'Click an item on the right column to swap with the selected item.'],
