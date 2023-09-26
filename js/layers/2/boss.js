@@ -466,7 +466,7 @@ addLayer('b', {
                 if (challenges.includes(82)) {
                     player.bin.cards = {};
                     player.bin.rolled = [];
-                    tmp.bin.cards.possibles.forEach(layer => player.bin.cards[layer] = { spots: layers.bin.cards.create_card() });
+                    tmp.bin.cards.possibles.forEach(layer => player.bin.cards[layer] = { spots: layers.bin.cards.create_card(), wins: D.dZero, });
                 }
             },
         },
@@ -516,6 +516,8 @@ addLayer('b', {
             },
             unlocked() { return hasUpgrade('a', 34); },
             onEnter() {
+                player.bin.points = D(0);
+                player.bin.time = D.dZero;
                 player.bin.cards = {};
                 player.bin.rolled = [];
                 tmp.bin.cards.possibles.forEach(layer => player.bin.cards[layer] = { spots: layers.bin.cards.create_card() });
@@ -523,6 +525,7 @@ addLayer('b', {
             onExit() {
                 player.bin.cards = {};
                 player.bin.rolled = [];
+                player.bin.show = '';
             },
             onComplete() {
                 player.bin.points = D(5);
@@ -531,6 +534,7 @@ addLayer('b', {
                 player.bin.rolled = [];
                 player.bin.respecs = D.dZero;
                 player.bin.time = D.dZero;
+                player.bin.show = '';
             },
         },
         91: {

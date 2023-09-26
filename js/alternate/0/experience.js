@@ -580,6 +580,8 @@ addLayer('xp_alt', {
 
                 if (hasUpgrade('c', 33)) mult = mult.times(upgradeEffect('c', 33));
 
+                if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['xp_alt'] ?? 1);
+
                 // Main
                 if (hasUpgrade('xp', 12)) mult = mult.times(upgradeEffect('xp', 12).experience.pow(tmp.a.change_efficiency));
                 if (hasUpgrade('xp', 13)) mult = mult.times(upgradeEffect('xp', 13).pow(tmp.a.change_efficiency));
@@ -633,6 +635,8 @@ addLayer('xp_alt', {
 
                 if (hasUpgrade('xp_alt', 12)) mult = mult.times(upgradeEffect('xp_alt', 12).produce);
                 if (hasUpgrade('xp_alt', 32)) mult = mult.times(upgradeEffect('xp_alt', 32));
+
+                if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['xp_alt'] ?? 1);
 
                 return mult;
             },

@@ -1791,6 +1791,8 @@ addLayer('c', {
                 if (hasUpgrade('c', 51)) mult = mult.times(upgradeEffect('c', 51));
                 if (hasUpgrade('c', 91)) mult = mult.times(upgradeEffect('c', 91));
 
+                if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['c'] ?? 1);
+
                 return mult;
             },
             item_produce_mult() {
@@ -1807,6 +1809,8 @@ addLayer('c', {
                 if (hasUpgrade('c', 83)) mult = mult.times(upgradeEffect('c', 83));
                 if (hasUpgrade('c', 91)) mult = mult.div(upgradeEffect('c', 91));
 
+                if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['c'] ?? 1);
+
                 return mult;
             },
             item_consume_mult() {
@@ -1816,9 +1820,7 @@ addLayer('c', {
 
                 return mult;
             },
-            cost_mult() {
-                return D.dOne;
-            },
+            cost_mult() { return D.dOne; },
         },
         // T0
         quarry: {
@@ -2757,6 +2759,13 @@ addLayer('c', {
 
                 player.c.resources[resource].amount = D.add(player.c.resources[resource].amount, amount).max(0);
             },
+            gain_mult() {
+                let mult = D.dOne;
+
+                if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['c'] ?? 1);
+
+                return mult;
+            },
         },
         science: {
             _id: null,
@@ -2764,7 +2773,7 @@ addLayer('c', {
             name: 'science',
             color: '#AA99FF',
             gain_mult() {
-                let mult = D.dOne;
+                let mult = tmp.c.resources['*'].gain_mult;
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
@@ -2782,7 +2791,7 @@ addLayer('c', {
             name: 'energy',
             color: '#FFEE00',
             gain_mult() {
-                let mult = D.dOne;
+                let mult = tmp.c.resources['*'].gain_mult;
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {

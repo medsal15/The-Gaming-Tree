@@ -1,7 +1,7 @@
 // ************ Big Feature related ************
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  */
 function respecBuyables(layer) {
 	if (!layers[layer].buyables) return
@@ -13,7 +13,7 @@ function respecBuyables(layer) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String|Number} id
  * @returns {Boolean}
  */
@@ -29,7 +29,7 @@ function canAffordUpgrade(layer, id) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String|Number} id
  * @returns {Boolean}
  */
@@ -41,7 +41,7 @@ function canBuyBuyable(layer, id) {
 
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {{currencyLocation: String, currencyInternalName: String, currencyLayer: String}} thing
  * @param {String|Number|Decimal} cost
  */
@@ -65,7 +65,7 @@ function canAffordPurchase(layer, thing, cost) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String|Number} id
  */
 function buyUpgrade(layer, id) {
@@ -73,7 +73,7 @@ function buyUpgrade(layer, id) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String|Number} id
  */
 function buyUpg(layer, id) {
@@ -117,7 +117,7 @@ function buyUpg(layer, id) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String|Number} id
  */
 function buyMaxBuyable(layer, id) {
@@ -131,7 +131,7 @@ function buyMaxBuyable(layer, id) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String|Number} id
  */
 function buyBuyable(layer, id) {
@@ -144,7 +144,7 @@ function buyBuyable(layer, id) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String|Number} id
  */
 function clickClickable(layer, id) {
@@ -157,7 +157,7 @@ function clickClickable(layer, id) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String|Number} id
  */
 function clickGrid(layer, id) {
@@ -170,7 +170,7 @@ function clickGrid(layer, id) {
 
 // Function to determine if the player is in a challenge
 /**
- * @param {string} layer
+ * @param {keyof Layers} layer
  * @param {string|number} id
  * @returns {boolean}
  */
@@ -226,7 +226,7 @@ function showNavTab(name, prev) {
 
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  */
 function goBack(layer) {
 	let nextTab = "none"
@@ -254,7 +254,7 @@ function layOver(obj1, obj2) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @returns {Boolean}
  */
 function prestigeNotify(layer) {
@@ -287,7 +287,7 @@ function notifyLayer(name) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String} family
  * @param {String} id
  * @returns {Boolean}
@@ -302,7 +302,7 @@ function subtabShouldNotify(layer, family, id) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String} family
  * @param {String} id
  * @returns {Boolean}
@@ -316,7 +316,7 @@ function subtabResetNotify(layer, family, id) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @returns {Boolean}
  */
 function nodeShown(layer) {
@@ -324,7 +324,7 @@ function nodeShown(layer) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @returns {Boolean}
  */
 function layerunlocked(layer) {
@@ -348,7 +348,7 @@ function toNumber(x) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  */
 function updateMilestones(layer) {
 	if (tmp[layer].deactivated) return
@@ -363,7 +363,7 @@ function updateMilestones(layer) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  */
 function updateAchievements(layer) {
 	if (tmp[layer].deactivated) return
@@ -378,7 +378,7 @@ function updateAchievements(layer) {
 
 /**
  * @param {Number} diff
- * @param {String} layer
+ * @param {keyof Layers} layer
  */
 function addTime(diff, layer) {
 	let data = player
@@ -538,7 +538,7 @@ function run(func, target, args = null) {
 }
 
 /**
- * @param {String} layer
+ * @param {keyof Layers} layer
  * @param {String|Number} func id of a function in a grid
  * @param {any} data
  * @param {any}

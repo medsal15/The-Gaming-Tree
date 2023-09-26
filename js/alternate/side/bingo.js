@@ -1,5 +1,6 @@
 'use strict';
 
+//todo norng: swap highest win streak with focused layer
 addLayer('bin', {
     name: 'Bingo',
     image: './resources/images/conway-life-glider.svg',
@@ -18,6 +19,10 @@ addLayer('bin', {
             show: '',
             bingo_notify: true,
             time: D.dZero,
+            warn: {
+                respec: true,
+                create: true,
+            },
         };
     },
     layerShown() { return player.bin.unlocked; },
@@ -37,10 +42,22 @@ addLayer('bin', {
             content: [
                 ['display-text', () => `You have ${layerColor('bin', format(player.bin.points), 'font-size:1.5em;')} ${tmp.bin.resource}`],
                 ['display-text', `You gain 1 bingo bucks when you roll a number on a bingo card`],
+                ['display-text', () => {
+                    if (inChallenge('b', 82)) return;
+                    return `<span class="warning">You have respecced ${formatWhole(player.bin.respecs)} times</span>`;
+                }],
                 'blank',
                 ['display-text', () => `Last ball rolled: ${player.bin.rolled.length ? formatWhole(player.bin.rolled.at(-1)) : 'none'}`],
                 ['bar', 'roll'],
                 ['clickables', [1]],
+                ['row', [
+                    ['display-text', 'Warnings: '],
+                    'blank',
+                    ['clickable', 'warn_respec'],
+                    'blank',
+                    ['clickable', 'warn_create'],
+                ]],
+                'blank',
                 ['drop-down-double', ['show', () => [
                     ['', 'none'],
                     ...tmp.bin.cards.list.map(layer => [layer, tmp[layer].name]),
@@ -49,7 +66,18 @@ addLayer('bin', {
                     if (player.bin.show == '') return tmp.bin.balls.grid;
                     return tmp.bin.cards.show_card;
                 }],
+                [
+                    'display-text',
+                    () => {
+                        if (player.bin.show == '') return `Rolled ${formatWhole(player.bin.rolled.length)} balls`;
+
+                        let text = `Current layer multiplier: ${format(tmp.bin.cards.multiplier)} `
+                        if (!inChallenge('b', 82)) text += `(${formatWhole(player.bin.cards[player.bin.show].wins)} victories)`;
+                        return text;
+                    }
+                ],
             ],
+            unlocked() { return inChallenge('b', 82) || hasChallenge('b', 82); },
         },
     },
     cards: {
@@ -66,11 +94,11 @@ addLayer('bin', {
         },
         availables() { return tmp.bin.cards.possibles.filter(layer => !(layer in player.bin.cards)); },
         cost() {
-            const base = D.div(player.bin.respecs, 100).add(2);
+            const base = D.div(player.bin.respecs, 100).add(3);
 
             return base.pow(tmp.bin.cards.list.length).times(5);
         },
-        cost_formula: '5 * (2 + respecs / 100) ^ bingo cards',
+        cost_formula: '5 * (3 + respecs / 100) ^ bingo cards',
         create_card() {
             /** @type {number[]} */
             const card = [];
@@ -81,8 +109,8 @@ addLayer('bin', {
             }
             return card;
         },
-        bingo() {
-            if (player.bin.rolled.length < 5) return false;
+        has_bingo(spots) {
+            if (!spots || player.bin.rolled.length < 5) return;
 
             /** @param {number[]} spots */
             const check_rows = spots => {
@@ -104,9 +132,15 @@ addLayer('bin', {
                         [0, 6, 18, 24].every(i => player.bin.rolled.includes(spots[i])) ||
                         [4, 8, 16, 20].every(i => player.bin.rolled.includes(spots[i]))
                     );
-                },
-                bingos = Object.entries(player.bin.cards)
-                    .filter(([, { spots }]) => check_rows(spots) || check_cols(spots) || check_diags(spots));
+                };
+
+            return check_rows(spots) || check_cols(spots) || check_diags(spots);
+        },
+        bingo() {
+            if (player.bin.rolled.length < 5) return false;
+
+            const bingos = Object.entries(player.bin.cards)
+                .filter(([, { spots }]) => this.has_bingo(spots));
 
             if (!bingos.length) return false;
 
@@ -122,7 +156,7 @@ addLayer('bin', {
                 { length: 5 },
                 (_, i) => `<tr>${bingo.slice(i * 5, (i + 1) * 5)
                     .map(i => {
-                        let style = [];
+                        let style = ['font-size: 1.25em'];
 
                         if (player.bin.rolled.includes(i)) style.push('color: #77BB77');
 
@@ -134,19 +168,31 @@ addLayer('bin', {
                     ${rows}\
                 </table>`;
         },
-        multipliers(layer) {
-            //todo apply to other layers
-            if (!layer) {
-                return Object.fromEntries(
-                    tmp.bin.cards.possibles
-                        .map(layer => [layer, layers.bin.cards.multipliers(layer)])
-                );
-            }
-            if (!tmp.bin.cards.possibles.includes(layer)) return D.dOne;
+        multiplier(layer = player.bin.show) {
+            if (!layer || !(layer in player.bin.cards)) return D.dOne;
 
-            //todo compute bingo progress
-            return D.dOne;
+            const card = player.bin.cards[layer];
+
+            if (inChallenge('b', 82)) {
+                if (this.has_bingo(card.spots)) return D.dOne;
+
+                const rows = Math.min(
+                    ...Array.from({ length: 5 })
+                        .map((_, i) => card.spots.slice(i * 5, (i + 1) * 5)
+                            .filter(num => player.bin.rolled.includes(num)).length)
+                ) * 2,
+                    cols = Math.min(
+                        ...Array.from({ length: 5 })
+                            .map((_, i) => card.spots.filter((num, j) => j % 5 == i && player.bin.rolled.includes(num)).length)
+                    ) * 2,
+                    spots = card.spots.filter(n => player.bin.rolled.includes(n)).length;
+
+                return D.add(rows, cols).add(spots).div(50);
+            } else {
+                return D.div(card.wins, 2).add(1);
+            }
         },
+        multipliers() { return Object.fromEntries(tmp.bin.cards.possibles.map(layer => [layer, this.multiplier(layer)])); },
     },
     balls: {
         roll_ball() { return Math.floor(Math.random() * (tmp.bin.balls.max - tmp.bin.balls.min) + tmp.bin.balls.min); },
@@ -170,12 +216,12 @@ addLayer('bin', {
                     const n = x * side + y + tmp.bin.balls.min;
                     if (n > tmp.bin.balls.max) return '';
                     const rolled = player.bin.rolled.includes(n);
-                    return (rolled ? '<span style="color:#77BB77">' : '') + formatWhole(n) + (rolled ? '</span>' : '');
+                    return (rolled ? '<span style="color: #77BB77;">' : '') + formatWhole(n) + (rolled ? '</span>' : '');
                 },
                 rows = Array.from(
                     { length: side },
                     (_, i) => `<tr>` +
-                        Array.from({ length: side }, (_, j) => `<td>${num(i, j)}</td>`).join('') +
+                        Array.from({ length: side }, (_, j) => `<td style="font-size: 1.25em;">${num(i, j)}</td>`).join('') +
                         `</tr>`
                 ).join('');
             return `<table class="layer-table" style="--color:${tmp.bin.color};">\
@@ -188,9 +234,12 @@ addLayer('bin', {
             title: 'Respec Bingo Cards',
             canClick() { return tmp.bin.cards.list.length > 0; },
             onClick() {
+                if (player.bin.warn.respec && !confirm('This will reset your entire Bingo layer\nProceed?')) return;
                 player.bin.cards = {};
                 player.bin.respecs = D.add(player.bin.respecs, 1);
                 player.bin.points = layers.bin.cards.cost();
+                player.bin.rolled.length = 0;
+                player.bin.time = D.dZero;
             },
             unlocked() { return !inChallenge('b', 82); },
         },
@@ -198,15 +247,53 @@ addLayer('bin', {
             title: 'New Bingo Card',
             canClick() { return tmp.bin.cards.availables.length > 0 && D.gte(player.bin.points, tmp.bin.cards.cost); },
             onClick() {
-                const availables = tmp.bin.cards.availables;
+                if (player.bin.warn.create && !confirm('This will reset your bingo cards and rolled balls\nProceed?')) return;
+                const availables = tmp.bin.cards.availables,
+                    cost = tmp.bin.cards.cost;
 
-                if (D.lt(player.bin.points, tmp.bin.cards.cost) || availables.length <= 0) return;
+                if (D.lt(player.bin.points, cost) || availables.length <= 0) return;
+
+                tmp.bin.cards.list.forEach(layer => player.bin.cards[layer].spots = layers.bin.cards.create_card());
 
                 const layer = availables[Math.floor(Math.random() * availables.length)];
 
-                player.bin.cards[layer] = layers.bin.cards.create_card();
+                player.bin.cards[layer] = {
+                    spots: layers.bin.cards.create_card(),
+                    wins: D.dZero,
+                };
+                player.bin.rolled.length = 0;
+                player.bin.time = D.dZero;
+                player.bin.points = D.dZero;
             },
             unlocked() { return !inChallenge('b', 82); },
+            display() {
+                const cost = shiftDown ? `[${tmp.bin.cards.cost_formula}]` : format(tmp.bin.cards.cost);
+                return `Cost: ${cost} ${tmp.bin.resource}`;
+            },
+        },
+        'warn_respec': {
+            unlocked() { return !inChallenge('b', 82); },
+            canClick() { return !inChallenge('b', 82); },
+            onClick() { player.bin.warn.respec = !player.bin.warn.respec; },
+            display() { return player.bin.warn.respec ? 'ON' : 'OFF'; },
+            style: {
+                'height': '40px',
+                'width': '40px',
+                'min-height': 'unset',
+                'font-size': '.8em',
+            },
+        },
+        'warn_create': {
+            unlocked() { return !inChallenge('b', 82); },
+            canClick() { return !inChallenge('b', 82); },
+            onClick() { player.bin.warn.create = !player.bin.warn.create; },
+            display() { return player.bin.warn.create ? 'ON' : 'OFF'; },
+            style: {
+                'height': '40px',
+                'width': '40px',
+                'min-height': 'unset',
+                'font-size': '.8em',
+            },
         },
     },
     bars: {
@@ -226,11 +313,12 @@ addLayer('bin', {
             textStyle: { 'color': 'gray', },
         },
     },
-    prestigeNotify() { return tmp.bin.cards.availables.length > 0 && D.gte(player.bin.points, tmp.bin.cards.cost); },
     update(diff) {
         if (!tmp.bin.layerShown) return;
 
-        //player.bin.time = D.add(player.bin.time, diff);
+        if (!inChallenge('b', 82) || !canCompleteChallenge('b', 82)) {
+            player.bin.time = D.add(player.bin.time, diff);
+        }
 
         if (player.bin.time.gte(tmp.bin.balls.time)) {
             // Roll a new ball
@@ -261,4 +349,5 @@ addLayer('bin', {
         }
     },
     shouldNotify() { return inChallenge('b', 82) && canCompleteChallenge('b', 82); },
+    prestigeNotify() { return hasChallenge('b', 82) && tmp.bin.cards.availables.length > 0 && D.gte(player.bin.points, tmp.bin.cards.cost); },
 });
