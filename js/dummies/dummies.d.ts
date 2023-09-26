@@ -503,7 +503,7 @@ declare class Layer<L extends string> {
          */
         showMasterButton?(): boolean,
     } & {
-        [id: number]: Clickable<L>,
+        [id: string]: Clickable<L>,
     }
     /**
      * An area that functions like a set of subtabs,
@@ -2272,11 +2272,12 @@ type Layers = {
             /** Creates a new bingo card */
             create_card(): number[]
             show_card(card?: Player['bin']['show']): string
+            /** Checks if a specific card has a bingo */
+            has_bingo(card: number[]): boolean
             /** Checks if any card has a bingo */
             bingo(): false | (keyof Layers)[]
-            multipliers(layer: keyof Layers): Decimal
+            multiplier(layer: keyof Layers): Decimal
             multipliers(): { [layer in keyof Layers]?: Decimal }
-            multipliers(layer?: keyof Layers): Decimal | { [layer in keyof Layers]?: Decimal }
         }
         balls: {
             /** Roll a random ball */
@@ -2406,6 +2407,7 @@ type Layers = {
         resources: {
             '*': {
                 gain_resource(resource: resources, amount: DecimalSource)
+                gain_mult(): Decimal
             }
         } & {
             [resource in resources]: {
@@ -2736,6 +2738,10 @@ type Player = {
         /** Currently selected bingo card */
         show: keyof Layers | ''
         bingo_notify: boolean
+        warn: {
+            respec: boolean
+            create: boolean
+        }
     }
     // Alt Row 0
     xp_alt: LayerData & {

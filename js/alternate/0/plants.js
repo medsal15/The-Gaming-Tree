@@ -382,6 +382,8 @@ addLayer('p', {
 
                 if (hasMilestone('to', 5)) mult = mult.times(tmp.to.milestones[5].effect);
 
+                if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['p'] ?? 1);
+
                 return mult;
             },
             grow_mult() {

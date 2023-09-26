@@ -654,17 +654,27 @@ addLayer('to', {
     baseAmount() { return layerBuyableAmount('to'); },
     type: 'custom',
     getResetGain() {
-        let max_gain = D.affordGeometricSeries(tmp.to.baseAmount, 12.5, 2, player.to.points);
+        if (D.eq(0, tmp.to.gainMult)) return D.dZero;
+
+        let start = D.div(12.5, tmp.to.gainMult),
+            ratio = D(2);
+
+        let max_gain = D.affordGeometricSeries(tmp.to.baseAmount, start, ratio, player.to.points);
 
         if (!tmp.to.canBuyMax) max_gain = max_gain.min(1);
 
         return max_gain;
     },
     getNextAt(canMax) {
+        if (D.eq(0, tmp.to.gainMult)) return D.dInf;
+
+        let start = D.div(12.5, tmp.to.gainMult),
+            ratio = D(2);
+
         if (!canMax) {
-            return player.to.points.pow_base(2).times(12.5);
+            return player.to.points.pow_base(ratio).times(start);
         } else {
-            return tmp.to.baseAmount.div(12.5).log2().floor().add(1).pow(2).times(12.5);
+            return tmp.to.baseAmount.div(start).log(ratio).floor().add(1).pow(ratio).times(start);
         }
     },
     canReset() { return getResetGain('to').gte(1); },
@@ -672,7 +682,6 @@ addLayer('to', {
         return `Reset for +<b>${formatWhole(getResetGain('to'))}</b> floors<br><br>\
         Next: ${formatWhole(tmp.to.baseAmount)} / ${formatWhole(getNextAt('to'))} ${tmp.to.baseResource}`;
     },
-    roundUpCost: true,
     branches: ['xp_alt'],
     doReset(layer) {
         if (layer == 'to') {
@@ -691,4 +700,11 @@ addLayer('to', {
         }
     },
     prestigeNotify() { return canReset('to') || canAffordLayerBuyable('to'); },
+    gainMult() {
+        let mult = D.dOne;
+
+        if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['to'] ?? 1);
+
+        return mult;
+    },
 });
