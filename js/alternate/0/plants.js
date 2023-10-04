@@ -1,6 +1,5 @@
 'use strict';
 
-//todo remove mode (if plant selected -> click plants, if plant planted, click -> harvest/destroy)
 //todo recycle plant seeds into seeds (item)
 addLayer('p', {
     name: 'Plants',
@@ -8,7 +7,6 @@ addLayer('p', {
     startData() {
         return {
             unlocked: false,
-            mode: 'place',
             plant: '',
             plants: Object.fromEntries(
                 Object.keys(layers.p.plants).map(plant => [plant, {
@@ -54,7 +52,6 @@ addLayer('p', {
                         ],
                     ];
                 },
-                ['clickables', [1]],
                 'blank',
                 'grid',
                 'blank',
@@ -157,7 +154,7 @@ addLayer('p', {
                         ]
                     ]],
                     'blank',
-                    ['clickable', 21],
+                    ['clickable', 11],
                 ]],
                 ['display-text', () => {
                     const target = player.p.infuse_target,
@@ -210,16 +207,6 @@ addLayer('p', {
     },
     clickables: {
         11: {
-            display: 'Set current mode to planting',
-            canClick() { return player.p.mode != 'place'; },
-            onClick() { player.p.mode = 'place'; },
-        },
-        12: {
-            display: 'Set current mode to harvesting or destroying',
-            canClick() { return player.p.mode != 'harvest'; },
-            onClick() { player.p.mode = 'harvest'; },
-        },
-        21: {
             style: { 'background-image': `url('./resources/images/crafting.svg')`, },
             canClick() {
                 const target = player.p.infuse_target,
@@ -265,57 +252,49 @@ addLayer('p', {
             };
         },
         getCanClick(data, _) {
-            switch (player.p.mode) {
-                case 'place':
-                    return data.plant == '' && player.p.plant != '' &&
-                        (tmp.p.plants[player.p.plant].unlocked ?? true) &&
-                        D.gte(player.p.plants[player.p.plant].seeds, 1);
-                case 'harvest':
-                    return data.plant != '';
-            }
+            return data.plant != '' || (
+                player.p.plant != '' &&
+                (tmp.p.plants[player.p.plant].unlocked ?? true) &&
+                D.gte(player.p.plants[player.p.plant].seeds, 1)
+            );
         },
         onClick(data, _) {
-            switch (player.p.mode) {
-                case 'place':
-                    if (
-                        data.plant == '' && player.p.plant != '' &&
-                        (tmp.p.plants[player.p.plant].unlocked ?? true) &&
-                        D.gte(player.p.plants[player.p.plant].seeds, 1)
-                    ) {
-                        data.plant = player.p.plant;
-                        data.age = D.dZero;
-                        player.p.plants[data.plant].seeds = D.minus(player.p.plants[data.plant].seeds, 1);
-                    }
-                    return;
-                case 'harvest':
-                    if (data.plant != '') {
-                        // Get items
-                        const drops = layers.p.plants[data.plant].produce(data.age),
-                            seeds = layers.p.plants[data.plant].seeds(data.age),
-                            player_data = player.p.plants[data.plant],
-                            equal = drops.length == player_data.last_harvest.length &&
-                                seeds.eq(player_data.last_harvest_seeds) &&
-                                drops.every(([item, amount]) => player_data.last_harvest.some(([litem, lamount]) => litem == item && D.eq(lamount, amount)));
+            if (data.plant != '') {
+                // prevent accidental double clicking
+                if (D.lt(data.age, 1)) return;
+                // Get items
+                const drops = layers.p.plants[data.plant].produce(data.age),
+                    seeds = layers.p.plants[data.plant].seeds(data.age),
+                    player_data = player.p.plants[data.plant],
+                    equal = drops.length == player_data.last_harvest.length &&
+                        seeds.eq(player_data.last_harvest_seeds) &&
+                        drops.every(([item, amount]) => player_data.last_harvest.some(([litem, lamount]) => litem == item && D.eq(lamount, amount)));
 
-                        layers.lo.items['*'].gain_items(drops);
-                        player_data.seeds = D.add(player_data.seeds, seeds);
+                layers.lo.items['*'].gain_items(drops);
+                player_data.seeds = D.add(player_data.seeds, seeds);
 
-                        if (equal) {
-                            player_data.last_harvest_count = D.add(player_data.last_harvest_count, 1);
-                        } else {
-                            player_data.last_harvest_count = D.dOne;
-                            player_data.last_harvest = drops;
-                            player_data.last_harvest_seeds = seeds;
-                        }
-                        player.p.last_harvest = data.plant;
+                if (equal) {
+                    player_data.last_harvest_count = D.add(player_data.last_harvest_count, 1);
+                } else {
+                    player_data.last_harvest_count = D.dOne;
+                    player_data.last_harvest = drops;
+                    player_data.last_harvest_seeds = seeds;
+                }
+                player.p.last_harvest = data.plant;
 
-                        if (drops.length) player_data.harvested = D.add(player_data.harvested, 1);
+                if (drops.length) player_data.harvested = D.add(player_data.harvested, 1);
 
-                        // Wipe
-                        data.plant = '';
-                        data.age = D.dZero;
-                    }
-                    return;
+                // Wipe
+                data.plant = '';
+                data.age = D.dZero;
+            } else if (
+                player.p.plant != '' &&
+                (tmp.p.plants[player.p.plant].unlocked ?? true) &&
+                D.gte(player.p.plants[player.p.plant].seeds, 1)
+            ) {
+                data.plant = player.p.plant;
+                data.age = D.dZero;
+                player.p.plants[data.plant].seeds = D.minus(player.p.plants[data.plant].seeds, 1);
             }
         },
         getStyle(data, _) {

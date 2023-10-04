@@ -1,6 +1,5 @@
 'use strict';
 
-//todo norng: swap highest win streak with focused layer
 addLayer('bin', {
     name: 'Bingo',
     image: './resources/images/conway-life-glider.svg',
@@ -42,6 +41,16 @@ addLayer('bin', {
             content: [
                 ['display-text', () => `You have ${layerColor('bin', format(player.bin.points), 'font-size:1.5em;')} ${tmp.bin.resource}`],
                 ['display-text', `You gain 1 bingo bucks when you roll a number on a bingo card`],
+                ['row', () => {
+                    if (options.noRNG) return [
+                        ['display-text', 'Swap best win streak with '],
+                        'blank',
+                        ['drop-down-double', ['swap', () => [
+                            ['', 'none'],
+                            ...tmp.bin.cards.list.map(layer => [layer, tmp[layer].name]),
+                        ]]]
+                    ];
+                }],
                 ['display-text', () => {
                     if (inChallenge('b', 82)) return;
                     return `<span class="warning">You have respecced ${formatWhole(player.bin.respecs)} times</span>`;
@@ -170,7 +179,7 @@ addLayer('bin', {
         multiplier(layer = player.bin.show) {
             if (!layer || !(layer in player.bin.cards)) return D.dOne;
 
-            const card = player.bin.cards[layer];
+            let card = player.bin.cards[layer];
 
             if (inChallenge('b', 82)) {
                 if (this.has_bingo(card.spots)) return D.dOne;
@@ -188,6 +197,17 @@ addLayer('bin', {
 
                 return D.add(rows, cols).add(spots).div(50);
             } else {
+                if (options.noRNG && player.bin.swap) {
+                    const best = Object.entries(player.bin.cards).reduce(([, best], [, current]) => D.gt(best.wins, current.wins), [, { wins: D.dZero }]);
+                    if (layer == player.bin.swap) {
+                        // Find highest win streak and use it
+                        card = best;
+                    } else if (card == best) {
+                        // If this is the highest, use swap target
+                        card = player.bin.cards[player.bin.swap];
+                    }
+                }
+
                 return D.div(card.wins, 2).add(1);
             }
         },

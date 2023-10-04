@@ -68,6 +68,7 @@ addLayer('k', {
                     <span style="${!ctrlDown && shiftDown ? 'text-decoration:underline;' : ''}">shift for *25</span>,\
                     and <span style="${ctrlDown && shiftDown ? 'text-decoration:underline;' : ''}">both for *250</span>`
                 ],
+                ['display-text', () => `Due to your oven's size, you can only cook up to ${formatWhole(tmp.k.recipes['*'].size)} of the same food at a time`],
                 'blank',
                 [
                     'column',
@@ -143,7 +144,7 @@ addLayer('k', {
                         { length: player.k.active.length },
                         (_, i) => [
                             ['display-text', layers.k.dishes['*'].description_active(i)],
-                            'blank',
+                            'h-line',
                         ]
                     ).flat(),
                 ],
@@ -238,7 +239,7 @@ addLayer('k', {
             speed() {
                 let mult = D.dOne;
 
-                mult = mult.times(tmp.k.dishes.slime_juice.effect.prod);
+                mult = mult.times(tmp.k.dishes.slime_juice.effect);
 
                 return mult;
             },
@@ -449,7 +450,7 @@ addLayer('k', {
                 return [
                     ['copper_ore', D.pow(1.75, amount).times(50)],
                     ['tin_ore', D.pow(1.75, amount).times(25)],
-                    ['gold_ore', D.pow(1.75, amount).times(12.5)],
+                    ['gold_ore', D.pow(1.75, amount).times(7.5)],
                     ['stardust', amount],
                 ];
             },
@@ -462,7 +463,7 @@ addLayer('k', {
             formulas: {
                 'copper_ore': '1.75 ^ amount * 50',
                 'tin_ore': '1.75 ^ amount * 25',
-                'gold_ore': '1.75 ^ amount * 12.5',
+                'gold_ore': '1.75 ^ amount * 7.5',
                 'stardust': 'amount',
                 'time': '1.25 ^ amount * 60',
             },
@@ -1342,5 +1343,8 @@ addLayer('k', {
         }
         addPoints('f', gain);
     },
-    prestigeNotify() { return Object.keys(layers.k.recipes).some(recipe_id => layers.k.recipes['*'].can_cook(recipe_id)); },
+    prestigeNotify() {
+        return Object.keys(layers.k.recipes)
+            .some(recipe_id => layers.k.recipes['*'].can_cook(recipe_id) && D.lte(player.k.recipes[recipe_id].amount_cooking, 0));
+    },
 });

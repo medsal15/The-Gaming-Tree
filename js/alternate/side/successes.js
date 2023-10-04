@@ -377,7 +377,10 @@ addLayer('suc', {
         },
         65: {
             name: 'Tastes better than it smells',
-            tooltip: 'Cook a monster meal',
+            tooltip() {
+                if (tmp.k.dishes.monster_meal.unlocked) return 'Cook a monster meal';
+                return 'Cook ???';
+            },
             done() { return D.gt(player.k.dishes.monster_meal.amount, 0); },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.k.color); },
             style() {

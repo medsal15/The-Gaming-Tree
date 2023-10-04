@@ -2853,6 +2853,12 @@ type Player = {
             respec: boolean
             create: boolean
         }
+        /**
+         * noRNG only
+         *
+         * Swaps highest win streak with the selected layer
+         */
+        swap: keyof Layers | ''
     }
     // Alt Row 0
     xp_alt: LayerData & {
@@ -2909,7 +2915,6 @@ type Player = {
                 age: Decimal
             }
         }
-        mode: 'place' | 'harvest'
         /** Currently selected plant for placement */
         plant: string
         infuse_target: string

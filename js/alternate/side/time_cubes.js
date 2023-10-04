@@ -73,16 +73,22 @@ addLayer('tic', {
 
         if (player.tic.invert) speed = speed.neg();
 
-        //todo set mult to sin/cos/tan wave
-        if (inChallenge('b', 81)) speed = speed.times(player.tic.chal.speed);
+        if (inChallenge('b', 81)) {
+            if (options.noRNG) {
+                speed = speed.times(player.tic.chal.time.minus(1));
+            } else {
+                speed = speed.times(player.tic.chal.speed);
+            }
+        }
 
         return speed;
     },
     update(diff) {
-        //todo disable in norng
         if (inChallenge('b', 81)) {
             player.tic.chal.time = D.add(player.tic.chal.time, diff);
-            if (player.tic.chal.time.gte(1)) {
+            /** Time limit until a new change */
+            const cap = options.noRNG ? 3 : 1;
+            if (player.tic.chal.time.gte(cap)) {
                 player.tic.chal.speed = D.add(player.tic.chal.speed, Math.random() - .5).max(-1).min(2);
                 player.tic.chal.time = D.dZero;
             }
