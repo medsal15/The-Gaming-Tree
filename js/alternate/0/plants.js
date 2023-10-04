@@ -1,5 +1,6 @@
 'use strict';
 
+//todo remove mode (if plant selected -> click plants, if plant planted, click -> harvest/destroy)
 //todo recycle plant seeds into seeds (item)
 addLayer('p', {
     name: 'Plants',
@@ -106,36 +107,25 @@ addLayer('p', {
                     ['drop-down-double', ['plant', () => [['', 'nothing'], ...tmp.p.plants['*'].list.map(plant => [plant, tmp.p.plants[plant].name])]]],
                 ]],
                 'blank',
-                ['display-text', () => {
-                    /** @param {string} plant */
-                    const row = plant_id => {
-                        const plant = tmp.p.plants[plant_id],
-                            produces = plant.produces.map(item => `${format(player.lo.items[item].amount)} ${tmp.lo.items[item].name}`);
+                [
+                    'layer-table',
+                    () => {
+                        return [
+                            ['Name', 'Life', 'Effect', 'Amount'],
+                            ...tmp.p.plants['*'].list.map(plant_id => {
+                                const plant = tmp.p.plants[plant_id],
+                                    produces = plant.produces.map(item => ['display-text', `${format(player.lo.items[item].amount)} ${tmp.lo.items[item].name}`]);
 
-                        return `<tr>\
-                                <td rowspan="2">${capitalize(plant.name)}</td>\
-                                <td rowspan="2">\
-                                    Maturation: ${formatTime(plant.maturation)}<br><br>\
-                                    Lifespan: ${formatTime(plant.ages.at(-1)[1])}\
-                                </td>\
-                                <td rowspan="2">${tmp.p.plants[plant_id].effect_text ?? 'None'}</td>\
-                                <td>${format(player.p.plants[plant_id].seeds)} seeds</td>\
-                            </tr>\
-                            <tr>\
-                                <td>${produces.join('<br>')}</td>\
-                            </tr>`;
-                    };
-
-                    return `<table class="layer-table" style="--color:${tmp.p.color};">\
-                            <tr>\
-                                <th>Name</th>\
-                                <th>Life</th>\
-                                <th>Effect</th>\
-                                <th>Amount</th>\
-                            </tr>\
-                            ${tmp.p.plants['*'].list.map(row).join('')}\
-                        </table>`;
-                }],
+                                return [
+                                    [['display-text', capitalize(plant.name)]],
+                                    [['display-text', `Maturation: ${formatTime(plant.maturation)}`], ['display-text', `Lifespan: ${formatTime(plant.ages.at(-1)[1])}`]],
+                                    [['display-text', plant.effect_text ?? 'None']],
+                                    [['display-text', `${format(player.p.plants[plant_id].seeds)} seeds`], 'h-line', ...produces],
+                                ];
+                            })
+                        ];
+                    },
+                ],
             ],
         },
         'Infusion': {
@@ -182,34 +172,26 @@ addLayer('p', {
                 }],
                 'blank',
                 ['display-text', 'Discovered infusions'],
-                ['display-text', () => {
-                    /**
-                     * @param {string} plant
-                     * @param {string} item
-                     */
-                    const row = (plant, item) => {
-                        return `<tr>\
-                                <td>${capitalize(tmp.p.plants[plant].name)}</td>\
-                                <td>${capitalize(tmp.lo.items[item].name)}</td>\
-                                <td>${capitalize(tmp.p.plants[tmp.p.plants[plant].infusions[item]].name)}</td>\
-                            </tr>`;
-                    },
-                        /** @type {[string, string][]} */
-                        infusions = tmp.p.plants['*'].list.map(
+                [
+                    'layer-table',
+                    () => {
+                        /** @type {[string, items][]} */
+                        const infusions = tmp.p.plants['*'].list.map(
                             plant => Object.entries(tmp.p.plants[plant].infusions)
                                 .filter(([, result]) => tmp.p.plants[result].unlocked && player.p.plants[plant].infusions.includes(result))
                                 .map(([item]) => [plant, item])
                         ).flat();
 
-                    return `<table class="layer-table" style="--color:${tmp.p.color};">\
-                            <tr>\
-                                <th>Base</th>\
-                                <th>Item</th>\
-                                <th>Result</th>\
-                            </tr>\
-                            ${infusions.map(([plant, item]) => row(plant, item)).join('')}\
-                        </table>`;
-                }],
+                        return [
+                            ['Base', 'Item', 'Result'],
+                            ...infusions.map(([plant, item]) => [
+                                [['display-text', capitalize(tmp.p.plants[plant].name)]],
+                                [['display-text', capitalize(tmp.lo.items[item].name)]],
+                                [['display-text', capitalize(tmp.p.plants[tmp.p.plants[plant].infusions[item]].name)]],
+                            ])
+                        ];
+                    },
+                ],
                 'blank',
                 ['display-text', 'Infusion hints'],
                 ['display-text', () => {
@@ -384,6 +366,10 @@ addLayer('p', {
 
                 if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['p'] ?? 1);
 
+                mult = mult.times(tmp.k.dishes.failure.effect);
+
+                mult = mult.times(tmp.k.dishes.grilled_corn.effect);
+
                 return mult;
             },
             grow_mult() {
@@ -392,6 +378,8 @@ addLayer('p', {
                 if (hasUpgrade('c', 74)) mult = mult.times(upgradeEffect('c', 74));
 
                 mult = mult.times(tmp.p.plants.clockberry.effect);
+
+                mult = mult.times(tmp.k.dishes.roasted_eggplant.effect);
 
                 return mult;
             },

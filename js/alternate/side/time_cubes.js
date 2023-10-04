@@ -73,11 +73,13 @@ addLayer('tic', {
 
         if (player.tic.invert) speed = speed.neg();
 
+        //todo set mult to sin/cos/tan wave
         if (inChallenge('b', 81)) speed = speed.times(player.tic.chal.speed);
 
         return speed;
     },
     update(diff) {
+        //todo disable in norng
         if (inChallenge('b', 81)) {
             player.tic.chal.time = D.add(player.tic.chal.time, diff);
             if (player.tic.chal.time.gte(1)) {

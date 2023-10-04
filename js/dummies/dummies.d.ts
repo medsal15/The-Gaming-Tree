@@ -8,7 +8,7 @@ type AchievementTypes = 'normal' | 'bonus' | 'secret';
 type TabFormatEntries<L extends keyof Layers> = ['display-text', Computable<string>] | ['display-image', Computable<string>] | ['raw-html', Computable<string>] |
     'h-line' | 'v-line' |
     'blank' | ['blank', height: number] | ['blank', width: number, height: number] |
-['row', TabFormatEntries[]] | ['column', TabFormatEntries[]] |
+['row', TabFormatEntries<L>[]] | ['column', TabFormatEntries<L>[]] |
     'main-display' | ['main-display', precision: number] |
     'resource-display' | 'prestige-button' |
 ['text-input', keyof Player[L]] |
@@ -24,9 +24,17 @@ type TabFormatEntries<L extends keyof Layers> = ['display-text', Computable<stri
 ['tree', (keyof Layers)[][]] |
 ['upgrade-tree' | 'buyable-tree' | 'clickable-tree', number[][]] |
 ['toggle', [layer: keyof Layers, id: string]] |
-['layer-proxy', [layer: keyof Layers, data: TabFormatEntries[]]] |
+['layer-proxy', [layer: keyof Layers, data: TabFormatEntries<keyof Layers>[]]] |
     'respec-button' | 'master-button' |
-['sell-one', id: number] | ['sell-all', id: number];
+['sell-one', id: number] | ['sell-all', id: number] |
+[
+    'layer-table',
+    [
+        layer?: keyof Layers,
+        headers: string[],
+        ...string[][]
+    ]
+];
 
 declare class Decimal {
     //#region Constants
@@ -769,7 +777,7 @@ declare class Layer<L extends string> {
      * The color value can either be a string with a hex color code, or a number from 1-3 (theme-affected colors).
      * A third element in the array optionally specifies line width.
      */
-    branches?: Computable<string[] | [string, string | 1 | 2 | 3, number?][]>
+    branches?: Computable<(keyof Layers)[] | [keyof Layers, string | 1 | 2 | 3, number?][]>
     /**
      * A CSS object, where the keys are CSS attributes, which styles this layer's node on the tree.
      */
@@ -1754,6 +1762,13 @@ type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
     'wheat' | 'corn' | 'strawberry' | 'potato' | 'eggplant' | 'egg' |
     'water' |
     'stardust' | 'holy_water';
+type temperatures = 'none' | 'low' | 'medium' | 'high' | 'burning';
+type dishes = 'failure' |
+    'grilled_corn' | 'roasted_eggplant' |
+    'bread' | 'berries_bowl' | 'french_fries' |
+    'fried_eggs' | 'cake' |
+    'slime_juice' | 'monster_meal' | 'star_crunch';
+type time_units = 'seconds' | 'tames' | 'kills';
 
 type Layers = {
     // Side
@@ -2046,7 +2061,7 @@ type Layers = {
             '*': {
                 /** Converts a grid id to an item id (or false if there is none) */
                 grid_to_item: ((id: number) => items | false) & {
-                    cache: { [k: number]: string | false }
+                    cache: { [k: number]: items | false }
                 }
                 global_chance_multiplier(): Decimal
                 /** Computes the drops from a type */
@@ -2186,17 +2201,7 @@ type Layers = {
                  */
                 time(amount?: Decimal): Decimal
                 /** Formulas that determine amounts consumed **and** time */
-                formulas: Computable<{ [key: string | 'time']: string }>
-                /**
-                 * **Not implemented**
-                 *
-                 * If true, the recipe will run passively
-                 * consuming ??? of the materials required
-                 * divided by the time it would takes for the same amount
-                 *
-                 * @default false
-                 */
-                passive?: Computable<boolean>
+                formulas: Computable<{ [key in items | 'time']: string }>
             }
         }
         heat: {
@@ -2271,7 +2276,11 @@ type Layers = {
             cost_formula: Computable<string>
             /** Creates a new bingo card */
             create_card(): number[]
-            show_card(card?: Player['bin']['show']): string
+            show_card(card?: Player['bin']['show']): [
+                layer: keyof Layers,
+                never[],
+                ...string[][]
+            ] | never[]
             /** Checks if a specific card has a bingo */
             has_bingo(card: number[]): boolean
             /** Checks if any card has a bingo */
@@ -2291,7 +2300,10 @@ type Layers = {
             /** Highest number for a bingo ball */
             max: Computable<number>
             /** Full grid of all potential balls */
-            grid(): string
+            grid(): [
+                never[],
+                ...string[][]
+            ]
         }
     }
     // Alt Row 0
@@ -2309,6 +2321,7 @@ type Layers = {
                 difficulty_mult(): Decimal
                 produce_mult(): Decimal
                 tames_mult(): Decimal
+                tames_passive_mult(): Decimal
             }
         } & {
             [type: string]: {
@@ -2493,6 +2506,110 @@ type Layers = {
             randomize(): items[]
         }
     }
+    k: Layer<'k'> & {
+        temperatures: {
+            current(): temperatures
+            info: { [temp in temperatures]: {
+                color: string
+                name: string
+                min?: DecimalSource
+                max?: DecimalSource
+            } }
+            regex: RegExp
+        }
+        recipes: {
+            '*': {
+                regexes: {
+                    display: RegExp
+                    amount: RegExp
+                    bar: RegExp
+                }
+                show_recipe(recipe: string): TabFormatEntries<'k'>[] | undefined
+                /** Maximum amount of items produced at once */
+                size(): Decimal
+                /** Computes a recipe's default amount (for tmp display) */
+                default_amount(recipe: string, amount?: Decimal): Decimal
+                speed(): Decimal
+                can_cook(recipe_id: string): boolean
+            }
+            [recipe: string]: {
+                readonly id: string
+                /**
+                 * Required heats to cook the dish
+                 * Other heats will cancel the dish
+                 */
+                heats: Computable<temperatures[]>
+                /** @default true */
+                unlocked?: Computable<boolean>
+                /**
+                 * A recipe will not run if it can't consume everything
+                 * @param amount Target amount to produce
+                 *
+                 * Defaults to currently being produced, or wanted produced
+                 */
+                consumes(amount?: Decimal): [item: items, amount: Decimal][]
+                /** Produced food */
+                produces: dishes
+                /**
+                 * Time it takes to produce the item in seconds
+                 * @param amount Target amount to produce
+                 *
+                 * Defaults to currently being produced, or wanted produced
+                 */
+                time(amount?: Decimal): Decimal
+                /** Formulas that determine amounts consumed **and** time */
+                formulas: Computable<{ [key in items | 'time']: string }>
+            }
+        }
+        dishes: {
+            '*': {
+                /** Converts a grid id to an item id (or false if there is none) */
+                grid_to_dish: ((id: number) => dishes | false) & {
+                    cache: { [k: number]: dishes | false }
+                }
+                /** Total amount of dishes */
+                amount(): Decimal
+                /** Total value of all dishes */
+                value: Computable<Decimal>
+                /**
+                 * Maximum amount of active dishes
+                 *
+                 * Newly eaten dishes will overwrite the **oldest** one
+                 */
+                size(): number
+                /**
+                 * Computes a dish's default duration (for tmp display)
+                 *
+                 * Returns, in order, given duration, time left from active effect, 0
+                 */
+                default_duration(dish: dishes, duration?: Decimal): Decimal
+                description_active(effect: number): string
+                description_dish(dish: dishes): string
+                units: { [unit in time_units]: {
+                    format(amount: Decimal): string
+                    /** Name to display */
+                    name: string
+                } }
+                duration_mult(): Decimal
+            }
+        } & {
+            [dish in dishes]: {
+                readonly id: dish
+                readonly grid: number
+                /** Dish style */
+                style?: Computable<CSSStyles>
+                name: Computable<string>
+                type: 'food' | 'drink'
+                /** @default true */
+                unlocked?: Computable<boolean>
+                duration: Computable<{ unit: time_units, time: DecimalSource }>
+                effect(duration: Decimal): any
+                effect_description(duration: Decimal): string
+                /** Total value of the dish */
+                value: Computable<Decimal>
+            }
+        }
+    }
     // Special
     star: Layer<'star'> & {
         star: {
@@ -2671,12 +2788,6 @@ type Player = {
         recipes: {
             [recipe: string]: {
                 /**
-                 * **Not implemented**
-                 *
-                 * Whether the recipe is running passively
-                 */
-                enabled: boolean
-                /**
                  * Current amount being smelted
                  *
                  * 0 if not being smelted
@@ -2822,6 +2933,42 @@ type Player = {
     // Alt Row 1
     to: LayerData & {
         random: items[]
+    }
+    k: LayerData & {
+        recipes: {
+            [recipe: string]: {
+                /**
+                 * Current amount being smelted
+                 *
+                 * 0 if not being smelted
+                 */
+                amount_cooking: Decimal
+                /** Current input value */
+                amount_target: Decimal
+                /**
+                 * Progress in seconds since the recipe was started
+                 *
+                 * If amount_cooking > 0, increase this one until >= tmp.f.recipes.time(amount_cooking)
+                 */
+                progress: Decimal
+                /**
+                 * If true, the recipe is rerun on completion
+                 */
+                auto: boolean
+            }
+        }
+        /** Active dishes */
+        active: {
+            id: dishes
+            units: time_units
+            time: Decimal
+        }[]
+        dishes: { [dish in dishes]: {
+            amount: Decimal
+        } }
+        /** Current target temperature set in the kitchen */
+        mode: temperatures
+        selected: dishes | ''
     }
     // Special
     star: LayerData & {

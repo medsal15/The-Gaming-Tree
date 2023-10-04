@@ -25,7 +25,7 @@ addLayer('lo', {
     },
     tooltip() { return `${formatWhole(tmp.lo.items["*"].amount)} items`; },
     layerShown() { return (player.lo.shown || hasUpgrade('xp', 33)) && !tmp[this.layer].deactivated; },
-    deactivated() { return inChallenge('b', 31); },
+    deactivated() { return inChallenge('b', 31) || hasUpgrade('a', 22); },
     color: '#AA7755',
     row: 1,
     position: 1,
@@ -2454,16 +2454,15 @@ addLayer('lo', {
             const item_id = layers.lo.items["*"].grid_to_item(id);
             if (!item_id) return;
 
-            /** @type {typeof tmp.lo.items[string]} */
             const item = tmp.lo.items[item_id];
 
-            return item.name.replaceAll(/^.| ./g, s => s.toUpperCase());
+            return capitalize_words(item.name);
         },
         getDisplay(_, id) {
             const item_id = layers.lo.items["*"].grid_to_item(id);
             if (!item_id) return;
 
-            return `${format(player.lo.items[item_id].amount)}`;
+            return format(player.lo.items[item_id].amount);
         },
         getTooltip(_, id) {
             const star = layers.lo.items['*'],
@@ -2529,7 +2528,9 @@ addLayer('lo', {
 
                 const cache = layers.lo.items["*"].grid_to_item.cache ??= {};
                 if (!(id in cache)) {
-                    const item = Object.keys(tmp.lo.items).filter(item => item != '*').find(item => tmp.lo.items[item].grid == id) ?? false;
+                    const item = Object.keys(tmp.lo.items)
+                        .filter(item => item != '*')
+                        .find(item => tmp.lo.items[item].grid == id) ?? false;
                     cache[id] = item;
                 }
                 return cache[id];
@@ -2672,7 +2673,6 @@ addLayer('lo', {
                 }
             },
             can_drop(type) {
-                if (tmp.lo.deactivated) return false;
                 /** @type {[drop_sources, string]} */
                 const [from, sub] = type.split(':');
 

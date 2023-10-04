@@ -77,6 +77,22 @@ These are the existing components, but you can create more in [components.js](/j
 - layer-proxy: Lets you use components from another layer. The argument is a pair, `[layer, data]`, consisting of the id of the layer to proxy from, and the tabFormat for the components to show.
     (Note: you cannot use a microtab within a layer proxy)
 
+- layer-table: Lets you create a table with the color of the layer. The first argument may be a layer id to use a different color. The next one is the headers (in plain text). Following arguments are further tab layouts per row, per cell. Meaning:
+
+    ```js
+    content: [
+        ['layer-table', [
+            // Optional
+            other_layer_id,
+            // Required
+            [['header 1', 'header 2', '...etc']],
+            [['display-text', 'foo'], ['display-text', 'bar'], ['display-text', 'baz']], // row 1
+            [['clickable', 11], ['clickables', 2],], // other components also work!
+            etc...
+        ]]
+    ],
+    ```
+
 The rest of the components are sub-components. They can be used just like other components, but are typically part of another component.
 
 - upgrade, milestone, challenge, buyable, clickable, achievement, gridable: An individual upgrade, challenge, etc. The argument is the id. This can be used if you want to have upgrades split up across multiple subtabs, for example.

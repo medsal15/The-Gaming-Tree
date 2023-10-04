@@ -1067,6 +1067,7 @@ addLayer('clo', {
                 'b': 31, 's': 32, 'a': 33,
 
                 'xp_alt': 11, 'c': 12, 'p': 13,
+                'to': 21, 'k': 22,
             };
             if (layer in links && hasUpgrade(this.layer, links[layer])) {
                 speed = speed.add(buyableEffect('clo', 11));
@@ -1090,6 +1091,8 @@ addLayer('clo', {
 
         const alt = [
             'xp_alt', 'c', 'p',
+            'to', 'k', //'fr',
+            //'bl', 'v', 'sp', 'yy',
         ];
 
         if (alt.includes(layer)) speed = speed.pow(tmp.a.change_efficiency);

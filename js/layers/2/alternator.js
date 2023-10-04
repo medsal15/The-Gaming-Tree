@@ -116,6 +116,7 @@ addLayer('a', {
                 doReset('s', true);
             },
             pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            canAfford() { return D.gte(player.lo.items.stardust.amount, this.cost()); },
         },
         12: {
             title: 'Alternate Mining',
@@ -148,6 +149,7 @@ addLayer('a', {
                 doReset('s', true);
             },
             pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            canAfford() { return D.gte(player.lo.items.stardust.amount, this.cost()); },
         },
         13: {
             title: 'Alternate Tree',
@@ -180,6 +182,7 @@ addLayer('a', {
                 doReset('s', true);
             },
             pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            canAfford() { return D.gte(player.lo.items.stardust.amount, this.cost()); },
         },
         14: {
             title: 'Alternate Achievements',
@@ -230,7 +233,10 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)); },
+            canAfford() {
+                return [11, 12, 13].every(id => hasUpgrade('a', id)) &&
+                    D.gte(player.lo.items.stardust.amount, this.cost());
+            },
             branches() {
                 const color = [21, 22, 23].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[31, color]];
@@ -243,7 +249,7 @@ addLayer('a', {
         },
         22: {
             title: 'Alternate Loot',
-            description: 'Not Yet Implemented<br>Items are great, but you can\'t eat them<br><br>Requires all 1st row layer alternates',
+            description: 'Items are great, but you can\'t eat them<br><br>Requires all 1st row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -253,20 +259,29 @@ addLayer('a', {
                 const style = {};
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.k.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.lo.color}, ${tmp.k.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.lo.color;
                 }
 
                 return style;
             },
-            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)) && false; },
+            canAfford() {
+                return [11, 12, 13].every(id => hasUpgrade('a', id)) &&
+                    D.gte(player.lo.items.stardust.amount, this.cost());
+            },
             branches() {
                 const color = [21, 22, 23].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[32, color], 23];
             },
+            onPurchase() {
+                player.k.unlocked = true;
+                doReset('s', true);
+            },
+            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
         },
         23: {
             title: 'Alternate Forge',
@@ -289,7 +304,10 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [11, 12, 13].every(id => hasUpgrade('a', id)) && false; },
+            canAfford() {
+                return [11, 12, 13].every(id => hasUpgrade('a', id)) && false &&
+                    D.gte(player.lo.items.stardust.amount, this.cost());
+            },
             branches() {
                 const color = [31, 32].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[33, color]];
@@ -347,7 +365,10 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [21, 22, 23].every(id => hasUpgrade('a', id)) && false; },
+            canAfford() {
+                return [21, 22, 23].every(id => hasUpgrade('a', id)) && false &&
+                    D.gte(player.lo.items.stardust.amount, this.cost());
+            },
         },
         32: {
             title: 'Alternate Shop',
@@ -370,7 +391,10 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [21, 22, 23].every(id => hasUpgrade('a', id)) && false; },
+            canAfford() {
+                return [21, 22, 23].every(id => hasUpgrade('a', id)) && false &&
+                    D.gte(player.lo.items.stardust.amount, this.cost());
+            },
         },
         33: {
             title: 'Alternate Alternator',
@@ -394,7 +418,10 @@ addLayer('a', {
 
                 return style;
             },
-            canAfford() { return [31, 32].every(id => hasUpgrade('a', id)) && false; },
+            canAfford() {
+                return [31, 32].every(id => hasUpgrade('a', id)) && false &&
+                    D.gte(player.lo.items.stardust.amount, this.cost());
+            },
         },
         34: {
             title: 'Alternate Casino',

@@ -186,19 +186,21 @@ addLayer('xp_alt', {
                     },
                 ],
                 'blank',
-                ['display-text', () => {
+                ['layer-table', () => {
                     const tame_style = (text, ...style) => `<span style="color:${tmp.xp_alt.color_tame};text-shadow:${tmp.xp_alt.color_tame} 0 0 10px;${style.join(';')}">${text}</span>`,
                         monster_style = (type, text, ...style) => {
                             const color = tmp.xp_alt.monsters[type].color;
                             return `<span style="color:${color};text-shadow:${color} 0 0 10px;${style.join(';')}">${text}</span>`;
-                        },
-                        row = type => {
+                        };
+
+                    return [
+                        ['Monster', 'Progress', 'Tamed', 'Experience', 'Production'],
+                        ...tmp.xp_alt.monsters['*'].list.map(type => {
                             const monster = tmp.xp_alt.monsters[type],
                                 tames = monster.tames,
-                                height = Math.max(1, monster.produces.length),
                                 items = Array.from(
-                                    { length: height },
-                                    (_, i) => `+${format(monster.produces[i][1])} ${tmp.lo.items[monster.produces[i][0]].name} /s`
+                                    { length: monster.produces.length },
+                                    (_, i) => ['display-text', `+${format(monster.produces[i][1])} ${tmp.lo.items[monster.produces[i][0]].name} /s`]
                                 );
 
                             /** @type {string[]} */
@@ -212,27 +214,15 @@ addLayer('xp_alt', {
 
                             const tames_text = tame_pieces.length > 0 ? ` (${tame_pieces.join(', ')})` : '';
 
-                            if (!items.length) items.push('Nothing');
-
-                            return `<tr>\
-                                    <td>${capitalize(monster.name)}</td>\
-                                    <td>${format(player.xp_alt.monsters[type].progress)} / ${format(monster.difficulty)}</td>\
-                                    <td>${tame_style(format(player.xp_alt.monsters[type].tamed))} ${tames_text}</td>\
-                                    <td>${monster_style(type, `+${format(monster.experience)}`)} /s</td>\
-                                    <td>${items.join('<br>')}</td>\
-                                <tr>`;
-                        };
-
-                    return `<table class="layer-table" style="--color:${tmp.xp_alt.color}">\
-                            <tr>\
-                                <th>Monster</th>\
-                                <th>Progress</th>\
-                                <th>Tamed</th>\
-                                <th>Experience</th>\
-                                <th>Production</th>\
-                            </tr>\
-                            ${tmp.xp_alt.monsters['*'].list.map(row).join('')}\
-                        </table>`;
+                            return [
+                                [['display-text', capitalize(monster.name)]],
+                                [['display-text', `${format(player.xp_alt.monsters[type].progress)} / ${format(monster.difficulty)}`]],
+                                [['display-text', `${tame_style(format(player.xp_alt.monsters[type].tamed))} ${tames_text}`]],
+                                [['display-text', `${monster_style(type, `+${format(monster.experience)}`)} /s`]],
+                                items,
+                            ];
+                        })
+                    ];
                 }],
             ],
         },
@@ -297,6 +287,8 @@ addLayer('xp_alt', {
                 }
 
                 player.xp_alt.monsters[type].tamed = D.minus(player.xp_alt.monsters[type].tamed, 1);
+                player.k.active.filter(data => data.units == 'kills')
+                    .forEach(data => data.time = D.minus(data.time, 1));
             },
             onHold() {
                 const type = player.xp_alt.type,
@@ -328,6 +320,8 @@ addLayer('xp_alt', {
                 }
 
                 player.xp_alt.monsters[type].tamed = D.minus(player.xp_alt.monsters[type].tamed, 1);
+                player.k.active.filter(data => data.units == 'kills')
+                    .forEach(data => data.time = D.minus(data.time, 1));
             },
             tooltip: 'Kill one of this monster, gain its normal drops, but stop gaining XP',
         },
@@ -582,6 +576,8 @@ addLayer('xp_alt', {
 
                 if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['xp_alt'] ?? 1);
 
+                mult = mult.times(tmp.k.dishes.failure.effect);
+
                 // Main
                 if (hasUpgrade('xp', 12)) mult = mult.times(upgradeEffect('xp', 12).experience.pow(tmp.a.change_efficiency));
                 if (hasUpgrade('xp', 13)) mult = mult.times(upgradeEffect('xp', 13).pow(tmp.a.change_efficiency));
@@ -613,6 +609,8 @@ addLayer('xp_alt', {
 
                 mult = mult.times(tmp.p.plants.candy_corn.effect);
 
+                mult = mult.times(tmp.k.dishes.cake.effect);
+
                 return mult;
             },
             difficulty_add() {
@@ -638,6 +636,8 @@ addLayer('xp_alt', {
 
                 if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['xp_alt'] ?? 1);
 
+                mult = mult.times(tmp.k.dishes.fried_eggs.effect.prod);
+
                 return mult;
             },
             tames_mult() {
@@ -648,6 +648,15 @@ addLayer('xp_alt', {
                 }
 
                 if (hasUpgrade('xp_alt', 43)) mult = mult.times(upgradeEffect('xp_alt', 43));
+
+                mult = mult.times(tmp.k.dishes.fried_eggs.effect.tames);
+
+                return mult;
+            },
+            tames_passive_mult() {
+                let mult = D.dOne;
+
+                mult = mult.times(tmp.k.dishes.berries_bowl.effect);
 
                 return mult;
             },
@@ -726,7 +735,9 @@ addLayer('xp_alt', {
 
                 const monster = tmp.xp_alt.monsters[this.type];
 
-                return D.div(monster.progress_gain, monster.difficulty).times(monster.tames);
+                let gain = D.div(monster.progress_gain, monster.difficulty).times(monster.tames).times(tmp.xp_alt.monsters['*'].tames_passive_mult);
+
+                return gain;
             },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
         },
@@ -801,7 +812,9 @@ addLayer('xp_alt', {
 
                 if (!hasUpgrade('xp_alt', 22) || !hasUpgrade('c', 43) || !monster.unlocked) return D.dZero;
 
-                return D.div(monster.progress_gain, monster.difficulty).times(monster.tames);
+                let gain = D.div(monster.progress_gain, monster.difficulty).times(monster.tames).times(tmp.xp_alt.monsters['*'].tames_passive_mult);
+
+                return gain;
             },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
             unlocked() { return hasUpgrade('xp_alt', 33) },
@@ -873,7 +886,20 @@ addLayer('xp_alt', {
                 return base;
             },
             passive_tame() {
-                return D.dZero;
+                let mult = D.dZero;
+
+                mult = mult.add(tmp.k.dishes.monster_meal.effect);
+
+                if (mult.lte(0)) return D.dZero;
+
+                const monster = tmp.xp_alt.monsters[this.type];
+
+                let gain = D.div(monster.progress_gain, monster.difficulty)
+                    .times(monster.tames)
+                    .times(tmp.xp_alt.monsters['*'].tames_passive_mult)
+                    .times(mult);
+
+                return gain;
             },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
             unlocked() { return hasMilestone('to', 2); },
@@ -944,9 +970,7 @@ addLayer('xp_alt', {
 
                 return base;
             },
-            passive_tame() {
-                return D.dZero;
-            },
+            passive_tame() { return D.dZero; },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
             unlocked: false,
         },
@@ -1042,7 +1066,10 @@ addLayer('xp_alt', {
                 layers.lo.items['*'].gain_items(production);
             }
             if (D.gt(tmp.xp_alt.monsters[type].passive_tame, 0)) {
-                player.xp_alt.monsters[type].tamed = D.add(player.xp_alt.monsters[type].tamed, D.times(tmp.xp_alt.monsters[type].passive_tame, diff));
+                const tames = D.times(tmp.xp_alt.monsters[type].passive_tame, diff);
+                player.xp_alt.monsters[type].tamed = D.add(player.xp_alt.monsters[type].tamed, tames);
+                player.k.active.filter(data => data.units == 'tames')
+                    .forEach(data => data.time = D.minus(data.time, tames));
             }
         }
     },
@@ -1055,6 +1082,8 @@ addLayer('xp_alt', {
                     // Workaround for starting at undefined
                     player_data.progress = D.minus(player_data.progress, tmp.xp_alt.monsters[type].difficulty);
                     player_data.tamed = D.add(player_data.tamed, tmp.xp_alt.monsters[type].tames);
+                    player.k.active.filter(data => data.units == 'tames')
+                        .forEach(data => data.time = D.minus(data.time, 1));
                 }
             }
         }

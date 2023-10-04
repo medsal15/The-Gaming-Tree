@@ -10,7 +10,8 @@ addLayer('to', {
             random: layers.to.materials.randomize(),
         };
     },
-    layerShown() { return player.to.unlocked; },
+    layerShown() { return player.to.unlocked && !tmp[this.layer].deactivated; },
+    deactivated() { return inChallenge('b', 31); },
     effect() {
         if (tmp.to.deactivated) return D.dOne;
         return D.add(player.to.points, 2).log2();
