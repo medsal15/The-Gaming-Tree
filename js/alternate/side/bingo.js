@@ -62,7 +62,7 @@ addLayer('bin', {
                     ['', 'none'],
                     ...tmp.bin.cards.list.map(layer => [layer, tmp[layer].name]),
                 ]]],
-                ['display-text', () => {
+                ['layer-table', () => {
                     if (player.bin.show == '') return tmp.bin.balls.grid;
                     return tmp.bin.cards.show_card;
                 }],
@@ -86,7 +86,7 @@ addLayer('bin', {
             /** @type {(keyof Layers)[]} */
             const layers = [
                 'xp_alt', 'c', 'p',
-                'to', //'k', //'fr', //todo
+                'to', 'k', //'fr', //todo
                 //'bl', //'v', //'sp', //todo
             ];
 
@@ -147,26 +147,25 @@ addLayer('bin', {
             return bingos.map(([layer]) => layer);
         },
         show_card(card = player.bin.show) {
-            if (!card) return;
+            if (!card) return [];
 
             const bingo = player.bin.cards[card]?.spots;
-            if (!bingo) return;
+            if (!bingo) return [];
 
-            const rows = Array.from(
-                { length: 5 },
-                (_, i) => `<tr>${bingo.slice(i * 5, (i + 1) * 5)
-                    .map(i => {
-                        let style = ['font-size: 1.25em'];
+            return [
+                card,
+                [],
+                ...Array.from(
+                    { length: 5 },
+                    (_, i) => bingo.slice(i * 5, (i + 1) * 5).map(i => {
+                        const style = ['font-size: 1.25em'];
 
                         if (player.bin.rolled.includes(i)) style.push('color: #77BB77');
 
-                        return `<td style="${style.join(';')}">${formatWhole(i)}</td>`;
+                        return [['display-text', `<span style="${style.join(';')}">${formatWhole(i)}</span>`]];
                     })
-                    .join('')}<tr>`
-            ).join('');
-            return `<table class="layer-table" style="--color:${tmp[card].color};">\
-                    ${rows}\
-                </table>`;
+                ),
+            ];
         },
         multiplier(layer = player.bin.show) {
             if (!layer || !(layer in player.bin.cards)) return D.dOne;
@@ -215,18 +214,20 @@ addLayer('bin', {
                 num = (x, y) => {
                     const n = x * side + y + tmp.bin.balls.min;
                     if (n > tmp.bin.balls.max) return '';
-                    const rolled = player.bin.rolled.includes(n);
-                    return (rolled ? '<span style="color: #77BB77;">' : '') + formatWhole(n) + (rolled ? '</span>' : '');
-                },
-                rows = Array.from(
+                    const style = ['font-size: 1.25em'];
+
+                    if (player.bin.rolled.includes(n)) style.push('color: #77BB77');
+
+                    return `<span style="${style.join(';')}">${formatWhole(n)}</span>`;
+                };
+
+            return [
+                [],
+                ...Array.from(
                     { length: side },
-                    (_, i) => `<tr>` +
-                        Array.from({ length: side }, (_, j) => `<td style="font-size: 1.25em;">${num(i, j)}</td>`).join('') +
-                        `</tr>`
-                ).join('');
-            return `<table class="layer-table" style="--color:${tmp.bin.color};">\
-                    ${rows}\
-                </table>`;
+                    (_, i) => Array.from({ length: side }, (_, j) => [['display-text', num(i, j)]])
+                )
+            ];
         },
     },
     clickables: {

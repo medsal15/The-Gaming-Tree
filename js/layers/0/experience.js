@@ -222,44 +222,52 @@ addLayer('xp', {
                     },
                 ],
                 'blank',
-                ['display-text', () => {
-                    const kill_style = (text, ...style) => `<span style="color:${tmp.xp.color_kill};text-shadow:${tmp.xp.color_kill} 0 0 10px;${style.join(';')}">${text}</span>`,
-                        enemy_style = (type, text, ...style) => {
-                            const color = tmp.xp.enemies[type].color;
-                            return `<span style="color:${color};text-shadow:${color} 0 0 10px;${style.join(';')}">${text}</span>`
-                        },
-                        show_dps = hasChallenge('b', 12),
-                        show_element = hasChallenge('b', 61) || inChallenge('b', 61),
-                        row = type => {
-                            const enemy = tmp.xp.enemies[type],
-                                kills = enemy.kills,
-                                kill_text = kills.neq(1) ? ` (+${kill_style(format(kills))})` : '',
-                                dps = show_dps ? `<td>${type == player.xp.type ? '<u>' : ''}${format(enemy.dps)}${type == player.xp.type ? '</u>' : ''}</td>` : '',
-                                element = show_element ? `<td style="color:${tmp.mag.elements[player.xp.enemies[type].element].color};">${tmp.mag.elements[player.xp.enemies[type].element].name}</td>` : '';
-                            return `<tr>\
-                                <td>${capitalize(enemy.name)}</td>\
-                                <td>${format(player.xp.enemies[type].health)} / ${format(enemy.health)}</td>\
-                                <td>${enemy_style(type, `+${format(enemy.experience)}`)}</td>\
-                                <td>${kill_style(format(player.xp.enemies[type].kills))}${kill_text}</td>\
-                                <td>${options.colorLevels ? capitalize(enemy.color_level) : formatWhole(enemy.level)}</td>\
-                                ${dps}\
-                                ${element}\
-                            </tr>`;
-                        };
+                [
+                    'layer-table',
+                    () => {
+                        const headers = ['Enemy', 'Health', 'Experience', 'Kills', options.colorLevels ? 'Color' : 'Level'],
+                            show_dps = hasChallenge('b', 12),
+                            show_element = hasChallenge('b', 61) || inChallenge('b', 61),
+                            enemy_style = (type, text, ...style) => {
+                                const color = tmp.xp.enemies[type].color;
+                                return `<span style="color:${color};text-shadow:${color} 0 0 10px;${style.join(';')}">${text}</span>`
+                            },
+                            kill_style = (text, ...style) => `<span style="color:${tmp.xp.color_kill};text-shadow:${tmp.xp.color_kill} 0 0 10px;${style.join(';')}">${text}</span>`;
 
-                    return `<table class="layer-table" style="--color:${tmp.xp.color};">
-                        <tr>
-                            <th>Enemy</th>
-                            <th>Health</th>
-                            <th>Experience</th>
-                            <th>Kills</th>
-                            <th>${options.colorLevels ? 'Color' : 'Level'}</th>
-                            ${show_dps ? '<th>DPS</th>' : ''}
-                            ${show_element ? '<th>Element</th>' : ''}
-                        </tr>
-                        ${tmp.xp.enemies['*'].list.map(row).join('')}
-                    </table>`;
-                }],
+                        if (show_dps) headers.push('DPS');
+                        if (show_element) headers.push('Element');
+
+                        return [
+                            headers,
+                            ...tmp.xp.enemies['*'].list.map(type => {
+                                const enemy = tmp.xp.enemies[type],
+                                    kill_text = enemy.kills.neq(1) ? ` (+${kill_style(format(enemy.kills))})` : '',
+                                    lines = [
+                                        [['display-text', capitalize(enemy.name)]],
+                                        [['display-text', `${format(player.xp.enemies[type].health)} / ${format(enemy.health)}`]],
+                                        [['display-text', enemy_style(type, `+${format(enemy.experience)}`)]],
+                                        [['display-text', kill_style(format(player.xp.enemies[type].kills)) + kill_text]],
+                                        [['display-text', options.colorLevels ? capitalize(enemy.color_level) : formatWhole(enemy.level)]],
+                                    ];
+
+                                if (show_dps) {
+                                    let line = format(enemy.dps);
+
+                                    if (type == player.xp.type) line = `<u>${line}</u>`
+
+                                    lines.push([['display-text', line]]);
+                                }
+                                if (show_element) {
+                                    const element = tmp.mag.elements[player.xp.enemies[type].element];
+
+                                    lines.push([['display-text', `<span style="color:${element.color};">${element.name}</span>`]]);
+                                }
+
+                                return lines;
+                            }),
+                        ];
+                    },
+                ],
             ],
             unlocked() { return tmp.xp.enemies['*'].list.length > 1 || inChallenge('b', 41); }, // Otherwise it'd show what you can see in the main view
         },
@@ -689,6 +697,8 @@ addLayer('xp', {
                     if (type == 'star') {
                         player_data.name = random_string_alpha(Math.floor(Math.random() * 12) + 4).toLowerCase();
                     }
+                    player.k.active.filter(data => data.units == 'kills')
+                        .forEach(data => data.time = D.minus(data.time, 1));
                 }
 
                 player_data.health = D.add(player_data.health, layers.xp.enemies[type].health(layers.xp.enemies[type].level(player_data.kills)));
@@ -866,6 +876,8 @@ addLayer('xp', {
                 if (hasUpgrade('xp_alt', 42)) mult = mult.times(upgradeEffect('xp_alt', 42).pow(tmp.a.change_efficiency));
 
                 if (hasUpgrade('c', 33)) mult = mult.times(upgradeEffect('c', 33).pow(tmp.a.change_efficiency));
+
+                mult = mult.times(D.pow(tmp.k.dishes.failure.effect, tmp.a.change_efficiency));
 
                 return mult;
             },

@@ -327,6 +327,66 @@ addLayer('suc', {
             },
             unlocked() { return tmp.to.layerShown; },
         },
+        61: {
+            name: 'Oops',
+            tooltip: 'Badly cook some food',
+            done() { return D.gt(player.k.dishes.failure.amount, 0); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.k.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.k.color;
+                return s;
+            },
+            unlocked() { return tmp.k.layerShown; },
+        },
+        62: {
+            name: 'Needs a little butter',
+            tooltip: 'Grill some corn',
+            done() { return D.gt(player.k.dishes.grilled_corn.amount, 0); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.k.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.k.color;
+                return s;
+            },
+            unlocked() { return tmp.k.layerShown; },
+        },
+        63: {
+            name: 'Belgian*',
+            tooltip: 'Fry some potatoes',
+            done() { return D.gt(player.k.dishes.french_fries.amount, 0); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.k.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.k.color;
+                return s;
+            },
+            unlocked() { return tmp.k.layerShown; },
+        },
+        64: {
+            name: 'Still Alive',
+            tooltip: 'Bake a cake',
+            done() { return D.gt(player.k.dishes.cake.amount, 0); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.k.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.k.color;
+                return s;
+            },
+            unlocked() { return tmp.k.layerShown; },
+        },
+        65: {
+            name: 'Tastes better than it smells',
+            tooltip: 'Cook a monster meal',
+            done() { return D.gt(player.k.dishes.monster_meal.amount, 0); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.k.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.k.color;
+                return s;
+            },
+            unlocked() { return tmp.k.layerShown; },
+        },
         //#endregion Normal Successes
         //#region Bonus Successes
         11: {
@@ -443,7 +503,7 @@ addLayer('suc', {
         switch (type) {
             case 'normal':
             default:
-                rows = [2, 3, 4, 5];
+                rows = [2, 3, 4, 5, 6];
                 break;
             case 'bonus':
                 rows = [1];

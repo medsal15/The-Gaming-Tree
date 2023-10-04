@@ -16,7 +16,7 @@ addLayer('f', {
                 Object.keys(layers.f.recipes)
                     .filter(recipe => recipe != '*')
                     .map(recipe => [recipe, {
-                        enabled: false,
+                        auto: false,
                         amount_smelting: D.dZero,
                         amount_target: D.dZero,
                         progress: D.dZero,
@@ -666,7 +666,7 @@ addLayer('f', {
                 const recipe = tmp.f.recipes[recipe_id];
 
                 return ['row', [
-                    ...Array.from({ length: recipe.consumes.length }, (_, i) => ['clickable', `recipe_display_${recipe_id}_${i}`]),
+                    ...recipe.consumes.map((_, i) => ['clickable', `recipe_display_${recipe_id}_${i}`]),
                     ['bar', `recipe_heat_${recipe_id}`],
                     ['bar', `recipe_time_${recipe_id}`],
                     // I can't put a text-input on a subitem so I'll have to do with what I can
@@ -1315,6 +1315,19 @@ addLayer('f', {
                 .map(fuel => tmp.f.fuels[fuel].producing)
                 .reduce(D.add, D.dZero);
 
+            if (tmp.k.layerShown) {
+                const info = tmp.k.temperatures.info[player.k.mode];
+                if (!['none', 'burning'].includes(player.k.mode)) {
+                    if (D.lt(player.f.points, info.min)) {
+                        // Warm by 10% of minimum
+                        gain = D.add(gain, D.div(info.min, 10));
+                    } else if (D.lt(player.f.points, info.max)) {
+                        // Regulate to middle temperature
+                        gain = D.add(gain, D.add(info.min, info.max).div(200));
+                    }
+                }
+            }
+
             let loss = player.f.points.div(100);
 
             return gain.minus(loss);
@@ -1345,7 +1358,7 @@ addLayer('f', {
             player.f.recipes[id].auto = data.auto;
         });
     },
-    branches: ['lo'],
+    branches: [() => tmp.lo.layerShown ? 'lo' : ['k', 3]],
     /*
     If you've looked at level.js, you know what you're about to see.
 
@@ -1410,7 +1423,7 @@ addLayer('f', {
                 const [, , recipe_id, index] = recipe_display_matches,
                     recipe = () => tmp.f?.recipes[recipe_id],
                     precipe = () => player.f.recipes[recipe_id],
-                    /** @type {() => [string, Decimal]} */
+                    /** @type {() => [items, Decimal]} */
                     entry = () => {
                         if (+index < recipe().consumes.length) {
                             let e = [...recipe().consumes[+index]];
@@ -1570,7 +1583,7 @@ addLayer('f', {
                     .map(recipe => {
                         /**
                          * OK so
-                         * When tmp sets up, it sometimes converts arrays into Decimals (for a reason I don't wanna search)
+                         * When tmp sets up, it sometimes converts arrays into Decimals
                          * This causes problems during the array creation because `Decimal + 1` is NaN
                          */
                         /** @type {number} */
@@ -1602,27 +1615,27 @@ addLayer('f', {
             if (recipe_matches) {
                 /** @type {[string, 'heat'|'time', string]} */
                 const [, mode, recipe_id] = recipe_matches,
-                    recipe = tmp.f?.recipes[recipe_id];
+                    recipe = () => tmp.f?.recipes[recipe_id];
 
-                return {
+                return obj[prop] ??= {
                     direction: { 'heat': UP, 'time': RIGHT, }[mode],
                     width: { 'heat': 80, 'time': 160, }[mode],
                     height: 80,
-                    unlocked() { return recipe.unlocked ?? true; },
+                    unlocked() { return recipe().unlocked ?? true; },
                     progress() {
                         switch (mode) {
                             case 'heat':
-                                return D.div(player.f.points, recipe.heat);
+                                return D.div(player.f.points, recipe().heat);
                             case 'time':
-                                return D.div(player.f.recipes[recipe_id].progress, recipe.time);
+                                return D.div(player.f.recipes[recipe_id].progress, recipe().time);
                         }
                     },
                     display() {
-                        if (mode == 'heat') return `${format(player.f.points)} / ${format(recipe.heat)}`;
+                        if (mode == 'heat') return `${format(player.f.points)} / ${format(recipe().heat)}`;
                         if (!shiftDown) {
-                            return `${formatTime(player.f.recipes[recipe_id].progress)} / ${formatTime(recipe.time)}`;
+                            return `${formatTime(player.f.recipes[recipe_id].progress)} / ${formatTime(recipe().time)}`;
                         } else {
-                            return `Formula: ${recipe.formulas.time}s`;
+                            return `Formula: ${recipe().formulas.time}s`;
                         }
                     },
                     fillStyle() { if (mode == 'heat') return { 'background-color': '#FFAA00', }; },

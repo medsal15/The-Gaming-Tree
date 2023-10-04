@@ -87,6 +87,31 @@ function loadVue() {
 		</div>
 		`
 	})
+
+	Vue.component('layer-table', {
+		props: ['layer', 'data'],
+		computed: {
+			key() { return this.$vnode.key },
+			lay() { return Array.isArray(this.data[0]) ? this.layer : this.data[0]; },
+			headers() { return Array.isArray(this.data[0]) ? this.data[0] : this.data[1]; },
+			rows() { return Array.isArray(this.data[0]) ? this.data.slice(1) : this.data.slice(2); },
+		},
+		template: `
+		<div>
+			<table class="layer-table" v-bind:style="{'--color': tmp[lay]?.color}">
+				<tr>
+					<th v-for="head in headers" v-html="head"></th>
+				</tr>
+				<tr v-for="row in rows">
+					<td v-for="cell in row">
+						<column :layer="layer" :data="cell" :key="key + 'col'"></column>
+					</td>
+				</tr>
+			</table>
+		</div>
+		`,
+	});
+
 	Vue.component('infobox', {
 		props: ['layer', 'data'],
 		template: `

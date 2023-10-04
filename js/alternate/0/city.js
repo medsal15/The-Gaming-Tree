@@ -1793,6 +1793,9 @@ addLayer('c', {
 
                 if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['c'] ?? 1);
 
+                mult = mult.times(tmp.k.dishes.failure.effect);
+                mult = mult.times(tmp.k.dishes.bread.effect);
+
                 return mult;
             },
             item_produce_mult() {
@@ -1810,6 +1813,10 @@ addLayer('c', {
                 if (hasUpgrade('c', 91)) mult = mult.div(upgradeEffect('c', 91));
 
                 if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['c'] ?? 1);
+
+                mult = mult.times(tmp.k.dishes.failure.effect);
+                mult = mult.times(tmp.k.dishes.bread.effect);
+                mult = mult.div(tmp.k.dishes.french_fries.effect);
 
                 return mult;
             },
@@ -2881,6 +2888,6 @@ addLayer('c', {
         Object.keys(player.c.resources).forEach(res => player.c.resources[res] = { amount: D.dZero, });
         player.c.floors = [{}];
     },
-    branches: [['lo', 3]],
+    branches: [() => tmp.k.layerShown ? 'k' : ['lo', 3]],
     autoUpgrade() { return hasChallenge('b', 21) && player.c.auto_research && player.c.unlocked; },
 });

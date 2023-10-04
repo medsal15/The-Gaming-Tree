@@ -1107,7 +1107,7 @@ addLayer('s', {
         //#endregion Normal upgrades
     },
     type: 'normal',
-    baseAmount() { return tmp.lo.items["*"].value; },
+    baseAmount() { return D.add(tmp.lo.items["*"].value, tmp.k.dishes['*'].value); },
     baseResource: 'crafts total value',
     requires: D(100),
     exponent: D(.5),
@@ -1160,7 +1160,7 @@ addLayer('s', {
             return id >= 41;
         },
     },
-    branches: ['lo'],
+    branches: [() => tmp.lo.layerShown ? 'lo' : ['k', 3]],
     gainMult() {
         let mult = D.dOne;
 

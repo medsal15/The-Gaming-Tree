@@ -1106,6 +1106,14 @@ addLayer('clo', {
             }
         }
 
+        const alt = [
+            'xp_alt', 'c', 'p',
+            'to', 'k', //'fr',
+            //'bl', 'v', 'sp', 'yy',
+        ];
+
+        if (alt.includes(layer)) speed = speed.pow(tmp.a.change_efficiency);
+
         return speed;
     },
     componentStyles: {
