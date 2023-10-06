@@ -1172,6 +1172,8 @@ addLayer('s', {
 
         mult = mult.times(tmp.l.skills.bartering.effect);
 
+        mult = mult.times(buyableEffect('fr', 23));
+
         return mult;
     },
     doReset(layer) {

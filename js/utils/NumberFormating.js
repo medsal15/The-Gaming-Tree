@@ -39,9 +39,8 @@ function fixValue(x, y = 0) {
  * @returns {Decimal}
  */
 function sumValues(x) {
-    x = Object.values(x)
-    if (!x[0]) return decimalZero
-    return x.reduce((a, b) => Decimal.add(a, b))
+    x = Object.values(x);
+    return x.reduce((a, b) => Decimal.add(a, b), decimalZero);
 }
 
 /**

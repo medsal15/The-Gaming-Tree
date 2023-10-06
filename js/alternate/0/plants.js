@@ -362,6 +362,13 @@ addLayer('p', {
 
                 return mult;
             },
+            seeds_mult() {
+                let mult = D.dOne;
+
+                mult = mult.times(buyableEffect('fr', 31).seed);
+
+                return mult;
+            },
         },
         wheat: {
             _id: null,
@@ -444,6 +451,8 @@ addLayer('p', {
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
 
                 return D.times(1.5, mult);
             },
@@ -536,6 +545,8 @@ addLayer('p', {
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
 
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+
                 return D.times(1.1, mult);
             },
             notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
@@ -624,6 +635,8 @@ addLayer('p', {
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
 
                 return D.times(1.25, mult);
             },
@@ -717,6 +730,8 @@ addLayer('p', {
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
 
                 return D.times(1.1, mult);
             },
@@ -844,6 +859,8 @@ addLayer('p', {
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
 
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+
                 return D.times(1.25, mult);
             },
             notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
@@ -934,6 +951,8 @@ addLayer('p', {
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
 
                 return D.times(1.1, mult);
             },
@@ -1037,6 +1056,8 @@ addLayer('p', {
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
 
                 return D.times(1.25, mult);
             },
@@ -1143,6 +1164,8 @@ addLayer('p', {
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
 
                 return D.times(1.1, mult);
             },
@@ -1270,6 +1293,8 @@ addLayer('p', {
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
 
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+
                 return D.times(1.25, mult);
             },
             notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
@@ -1360,6 +1385,8 @@ addLayer('p', {
                 if (D.lte(age, tmp.p.plants[this.id].maturation) ||
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
 
                 return D.times(1.1, mult);
             },
@@ -1487,6 +1514,8 @@ addLayer('p', {
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
 
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+
                 return D.times(1.25, mult);
             },
             notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
@@ -1578,6 +1607,8 @@ addLayer('p', {
                     D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
                     D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
 
+                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+
                 return D.times(1.1, mult);
             },
             notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
@@ -1638,20 +1669,27 @@ addLayer('p', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
-        const keep = ['mode', 'plant', 'infuse_target', 'infuse_item'];
+        const keep = ['mode', 'plant', 'infuse_target', 'infuse_item'],
+            max_seeds = D.add(buyableEffect('lo', 62).t_hold.pow(tmp.a.change_efficiency), buyableEffect('fr', 31).p_hold),
+            hold = Object.entries(player.p.plants).map(([plant, data]) => [plant, {
+                seeds: D.min(max_seeds, data.seeds),
+            }]);
 
         layerDataReset(this.layer, keep);
-        Object.keys(player.p.plants).forEach(plant => Object.assign(player.p.plants[plant], {
+        hold.forEach(([plant, data]) => Object.assign(player.p.plants[plant], {
             dead: D.dZero,
             harvested: D.dZero,
-            // Since there are no upgrades, keep an amount of seeds
-            seeds: player.p.plants[plant].seeds.min(buyableEffect('lo', 62).t_hold.pow(tmp.a.change_efficiency)),
+            seeds: data.seeds,
             last_harvest: [],
             last_harvest_seeds: D.dZero,
             last_harvest_count: D.dZero,
-        }))
+        }));
     },
-    branches: [[() => player.f.unlocked ? 'f' : 'lo', 3]],
+    branches: [() => {
+        if (player.fr.unlocked) return 'fr';
+        if (player.f.unlocked) return ['f', 3];
+        return ['lo', 3];
+    }],
     prestigeNotify() {
         return Object.values(player.p.plants).some(data => D.gte(data.seeds, 1)) &&
             Object.entries(player.p.grid)

@@ -285,7 +285,7 @@ addLayer('a', {
         },
         23: {
             title: 'Alternate Forge',
-            description: 'Not Yet Implemented<br>Don\'t touch the thermostat<br><br>Requires all 1st row layer alternates',
+            description: `Don't touch the thermostat<br><br>Requires all 1st row layer alternates`,
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -295,9 +295,10 @@ addLayer('a', {
                 const style = {};
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.fr.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.f.color}, ${tmp.fr.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.f.color;
                 }
@@ -305,13 +306,18 @@ addLayer('a', {
                 return style;
             },
             canAfford() {
-                return [11, 12, 13].every(id => hasUpgrade('a', id)) && false &&
+                return [11, 12, 13].every(id => hasUpgrade('a', id)) &&
                     D.gte(player.lo.items.stardust.amount, this.cost());
             },
             branches() {
                 const color = [31, 32].every(id => hasUpgrade(this.layer, id)) ? 1 : 2;
                 return [[33, color]];
             },
+            onPurchase() {
+                player.fr.unlocked = true;
+                doReset('s', true);
+            },
+            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
         },
         24: {
             title: 'Alternate Clock',
@@ -519,7 +525,7 @@ addLayer('a', {
 
         layerDataReset(this.layer, keep);
     },
-    branches: ['f'],
+    branches: [() => tmp.f.layerShown ? 'f' : ['fr', 3]],
     change_efficiency() {
         return D(.5);
     },

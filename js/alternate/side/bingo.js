@@ -95,8 +95,8 @@ addLayer('bin', {
             /** @type {(keyof Layers)[]} */
             const layers = [
                 'xp_alt', 'c', 'p',
-                'to', 'k', //'fr', //todo
-                //'bl', //'v', //'sp', //todo
+                'to', 'k', 'fr',
+                //'bl', //'v', //'sp', //'yy', //todo
             ];
 
             return layers.filter(layer => player[layer].unlocked && tmp[layer].layerShown);

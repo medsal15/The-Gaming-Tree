@@ -1676,7 +1676,10 @@ addLayer('c', {
                     configurable: true,
                 };
         },
-        has(_, prop) { return layers.c.buildings['*'].regex.exec(prop) || ['place', 'destroy', 'toggle', 'up', 'down'].includes(prop); },
+        has(_, prop) {
+            return layers.c.buildings['*'].regex.exec(prop) ||
+                ['place', 'destroy', 'toggle', 'up', 'down'].includes(prop);
+        },
         ownKeys(_) {
             return [
                 'place',
@@ -1933,6 +1936,8 @@ addLayer('c', {
                     } else if (inChallenge('b', 12)) {
                         mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
+
+                    mult = mult.times(buyableEffect('fr', 13));
 
                     items[i][1] = D.times(amount, mult);
                 });
@@ -2219,6 +2224,8 @@ addLayer('c', {
                         mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
+                    mult = mult.times(buyableEffect('fr', 13));
+
                     items[i][1] = D.times(amount, mult);
                 });
 
@@ -2287,13 +2294,15 @@ addLayer('c', {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
                     .add(tmp.c.buildings.duplicator.effect[this.id]);
 
-                /** @type {[string, Decimal][]} */
+                /** @type {[items, Decimal][]} */
                 const items = [['coal', D(1 / 20)]];
 
-                items.forEach(([, amount], i) => {
+                items.forEach(([item, amount], i) => {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult).times(tmp.c.buildings['*'].item_consume_mult);
 
                     if (hasUpgrade('c', 63)) mult = mult.times(upgradeEffect('c', 63));
+
+                    if (item == 'coal') mult = mult.div(buyableEffect('fr', 22));
 
                     items[i][1] = D.times(amount, mult);
                 });
@@ -2551,8 +2560,10 @@ addLayer('c', {
                     ['gold_ore', D(25 / 441)],
                 );
 
-                items.forEach(([, amount], i) => {
+                items.forEach(([item, amount], i) => {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult).times(tmp.c.buildings['*'].item_consume_mult);
+
+                    if (item == 'coal') mult = mult.div(buyableEffect('fr', 22));
 
                     items[i][1] = D.times(amount, mult);
                 });
@@ -2789,6 +2800,8 @@ addLayer('c', {
                     mult = mult.div(D.add(player.c.resources[this.id].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
+                mult = mult.times(buyableEffect('fr', 32).science);
+
                 return mult;
             },
         },
@@ -2879,9 +2892,10 @@ addLayer('c', {
 
         /** @type {(keyof player['c'])[]} */
         const keep = [],
+            max_ups = D.add(buyableEffect('lo', 23).m_hold.pow(tmp.a.change_efficiency), buyableEffect('fr', 33).c_hold).floor(),
             kept_ups = [...player[this.layer].upgrades];
 
-        kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 23).m_hold.pow(tmp.a.change_efficiency).floor()).toNumber();
+        kept_ups.length = D.min(kept_ups.length, max_ups).toNumber();
 
         layerDataReset(this.layer, keep);
         player[this.layer].upgrades.push(...kept_ups);

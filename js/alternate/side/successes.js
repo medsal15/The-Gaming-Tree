@@ -390,6 +390,66 @@ addLayer('suc', {
             },
             unlocked() { return tmp.k.layerShown; },
         },
+        71: {
+            name: 'R-R-Freezerator',
+            tooltip: 'Get some ice',
+            done() { return player.lo.items.ice.amount.gte(1); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.fr.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.fr.color;
+                return s;
+            },
+            unlocked() { return tmp.fr.layerShown; },
+        },
+        72: {
+            name: `It's melting!`,
+            tooltip: 'Make a glacier',
+            done() { return getBuyableAmount('fr', 11).gte(1); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.fr.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.fr.color;
+                return s;
+            },
+            unlocked() { return tmp.fr.layerShown; },
+        },
+        73: {
+            name: `Even molten, it holds information`,
+            tooltip: 'Carve some icestone',
+            done() { return getBuyableAmount('fr', 32).gte(1); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.fr.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.fr.color;
+                return s;
+            },
+            unlocked() { return tmp.fr.layerShown; },
+        },
+        74: {
+            name: `Cold cash`,
+            tooltip: 'Make some fake money',
+            done() { return getBuyableAmount('fr', 23).gte(1); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.fr.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.fr.color;
+                return s;
+            },
+            unlocked() { return tmp.fr.layerShown; },
+        },
+        75: {
+            name: `Chill`,
+            tooltip: 'Make the star colder',
+            done() { return getBuyableAmount('fr', 41).gte(1); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.fr.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.fr.color;
+                return s;
+            },
+            unlocked() { return tmp.fr.layerShown; },
+        },
         //#endregion Normal Successes
         //#region Bonus Successes
         11: {
@@ -469,6 +529,14 @@ addLayer('suc', {
         },
         //#endregion Bonus Successes
         //#region Secret Successes
+        81: {
+            name: `Sub-zero`,
+            tooltip: 'Make the star level go below 0',
+            done() { return D.lt(tmp.xp.enemies.star.level, 0); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Secret Success Completed!", 3, 'rgb(127,255,0)'); },
+            style: { 'background-color': 'rgb(127,255,0)' },
+            unlocked() { return hasAchievement(this.layer, this.id); },
+        },
         //#endregion Secret Successes
     },
     tooltip() {
@@ -506,13 +574,13 @@ addLayer('suc', {
         switch (type) {
             case 'normal':
             default:
-                rows = [2, 3, 4, 5, 6];
+                rows = [2, 3, 4, 5, 6, 7];
                 break;
             case 'bonus':
                 rows = [1];
                 break;
             case 'secret':
-                rows = [];
+                rows = [8];
                 break;
         }
 

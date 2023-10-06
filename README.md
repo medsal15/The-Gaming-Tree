@@ -22,6 +22,7 @@ By [Lorc](https://lorcblog.blogspot.com/):
 - [falling leaf](https://game-icons.net/1x1/lorc/falling-leaf.html)
 - [fleshy mass](https://game-icons.net/1x1/lorc/fleshy-mass.html)
 - [glass shot](https://game-icons.net/1x1/lorc/glass-shot.html)
+- [ice cube](https://game-icons.net/1x1/lorc/ice-cube.html)
 - [metal bar](https://game-icons.net/1x1/lorc/metal-bar.html)
 - [mirror mirror](https://game-icons.net/1x1/lorc/mirror-mirror.html)
 - [powder](https://game-icons.net/1x1/lorc/powder.html)

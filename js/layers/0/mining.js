@@ -850,9 +850,10 @@ addLayer('m', {
         if (layers[layer].row <= this.row) return;
 
         const keep = ['show_deep', 'mode', 'short_mode'],
+            max_ups = D.add(buyableEffect('lo', 23).m_hold, buyableEffect('fr', 33).c_hold.pow(tmp.a.change_efficiency)).floor(),
             kept_ups = [...player.m.upgrades];
 
-        kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 23).m_hold).toNumber();
+        kept_ups.length = D.min(kept_ups.length, max_ups).toNumber();
 
         layerDataReset(this.layer, keep);
         layers.m.ore.items.forEach(item => player.lo.items[item].amount = D.dZero);

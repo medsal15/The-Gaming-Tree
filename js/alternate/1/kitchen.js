@@ -154,6 +154,7 @@ addLayer('k', {
     type: 'none',
     branches: ['xp_alt'],
     temperatures: {
+        //todo add cold temps
         current() {
             const heat = player.f.points;
             if (heat.lte(1)) return 'none';
@@ -166,6 +167,7 @@ addLayer('k', {
             none: {
                 color: '#CCCCCC',
                 name: 'room temperature',
+                min: -1,
                 max: 1,
             },
             low: {
@@ -194,6 +196,19 @@ addLayer('k', {
         },
         regex: /^heat_(none|low|medium|high)$/,
     },
+    /**
+     * TODO
+     *
+     * ice cream: boost freezer, boost row 1
+     *  https://game-icons.net/1x1/delapouite/ice-cream-cone.html
+     *  slime goo, strawberry, ice
+     * popsicle: boost freezer, ???
+     *  https://game-icons.net/1x1/delapouite/ice-pop.html
+     *  ???, ice
+     * tea?: ???
+     *  https://game-icons.net/1x1/delapouite/ice-cubes.html
+     *  ???, water, ice
+     */
     recipes: {
         '*': {
             regexes: {
@@ -1273,9 +1288,7 @@ addLayer('k', {
                     configurable: true,
                 };
         },
-        has(_, prop) {
-            return layers.k.recipes['*'].regexes.bar.exec(prop);
-        },
+        has(_, prop) { return layers.k.recipes['*'].regexes.bar.exec(prop); },
         ownKeys() {
             return [
                 ...Object.keys(layers.k.recipes)
@@ -1331,7 +1344,7 @@ addLayer('k', {
         const info = tmp.k.temperatures.info[player.k.mode];
         let gain = D.dZero;
         // Do not do anything for room temp or burning
-        if (!['none', 'burning'].includes(player.k.mode)) {
+        if (!['burning'].includes(player.k.mode) || info.min.lte(0)) {
             if (D.lt(player.f.points, info.min)) {
                 // Warm by 10% of minimum
                 gain = D.div(info.min, 10).times(diff);
@@ -1342,6 +1355,14 @@ addLayer('k', {
             // else Let it cool naturally
         }
         addPoints('f', gain);
+    },
+    automate() {
+        Object.entries(player.f.recipes)
+            .forEach(([_, recipe]) => {
+                // Prevent overflow in some cases
+                if (recipe.amount_target.gt(tmp.k.recipes['*'].size)) recipe.amount_target = tmp.k.recipes['*'].size;
+                //todo auto
+            });
     },
     prestigeNotify() {
         return Object.keys(layers.k.recipes)

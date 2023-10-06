@@ -335,9 +335,7 @@ addLayer('cas', {
                 configurable: true,
             };
         },
-        has(_, prop) {
-            return layers.cas.regex.exec(prop) || prop == 'respec_swaps';
-        },
+        has(_, prop) { return layers.cas.regex.exec(prop) || prop == 'respec_swaps'; },
         ownKeys(_) {
             return [
                 ...Object.keys(layers.lo.items)

@@ -610,6 +610,9 @@ addLayer('b', {
             if (!hasUpgrade('s', 121)) {
                 player.f.points = player.f.points.minus(get_loss(player.f.points)).max(0);
             }
+            if (!false) {
+                player.fr.points = player.fr.points.minus(get_loss(player.fr.points, true)).max(0);
+            }
             // Items
             Object.entries(player.lo.items).forEach(([item, data]) => {
                 if (item == 'stardust') return;

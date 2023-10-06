@@ -1072,6 +1072,8 @@ addLayer('clo', {
                     'b': 31, 's': 32, 'a': 33,
 
                     'xp_alt': 11, 'c': 12, 'p': 13,
+                    'to': 21, 'k': 22, 'fr': 23,
+                    //'bl': 31, 'v': 32, 'sp': 33, 'yy': 33,
                 };
 
                 allow = layer in links && hasUpgrade(this.layer, links[layer]);
@@ -1100,6 +1102,8 @@ addLayer('clo', {
 
                 const alt = [
                     'xp_alt', 'c', 'p',
+                    'to', 'k', 'fr',
+                    //'bl', 'v', 'sp', 'yy',
                 ];
 
                 if (alt.includes(layer)) speed = speed.pow(tmp.a.change_efficiency);
@@ -1108,7 +1112,7 @@ addLayer('clo', {
 
         const alt = [
             'xp_alt', 'c', 'p',
-            'to', 'k', //'fr',
+            'to', 'k', 'fr',
             //'bl', 'v', 'sp', 'yy',
         ];
 

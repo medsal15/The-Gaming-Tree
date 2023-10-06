@@ -45,7 +45,7 @@ addLayer('t', {
         {
             key: 'T',
             description: 'Shift + T: Display tree layer',
-            unlocked() { return player.t.unlocked; },
+            unlocked() { return tmp.t.layerShown; },
             onPress() { showTab('t'); },
         },
     ],
@@ -1027,9 +1027,10 @@ addLayer('t', {
         if (layers[layer].row <= this.row) return;
 
         const keep = ['convert', 'short_mode', 'focus'],
+            max_ups = D.add(buyableEffect('lo', 62).t_hold, buyableEffect('fr', 31).p_hold.pow(tmp.a.change_efficiency)).floor(),
             kept_ups = [...player.t.upgrades];
 
-        kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 62).t_hold).toNumber();
+        kept_ups.length = D.min(kept_ups.length, max_ups).toNumber();
 
         layerDataReset(this.layer, keep);
         layers.t.trees['*'].items.forEach(item => player.lo.items[item].amount = D.dZero);

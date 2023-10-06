@@ -121,8 +121,12 @@ addLayer('star', {
 
             return time;
         },
-        size() { return D(3).add(tmp.xp.enemies.star.level).min(10); },
-        targets() { return D.add(tmp.xp.enemies.star.level, 1); },
+        size() { return D(3).add(tmp.xp.enemies.star.level).min(10).max(1).floor(); },
+        targets() {
+            let targets = D.add(tmp.xp.enemies.star.level, 1);
+
+            return targets.max(1);
+        },
     },
     grid: {
         maxCols: 10,

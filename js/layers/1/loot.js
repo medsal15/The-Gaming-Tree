@@ -1,6 +1,6 @@
 'use strict';
 
-//todo add total per second to items
+//todo display total per second to items
 //todo add buyMax to buyables
 addLayer('lo', {
     name: 'Loot',
@@ -1531,7 +1531,7 @@ addLayer('lo', {
 
                 return style;
             },
-            unlocked() { return tmp.t.layerShown || getBuyableAmount(this.layer, this.id).gte(1); },
+            unlocked() { return tmp.t.layerShown || tmp.fr.layerShown || getBuyableAmount(this.layer, this.id).gte(1); },
             value() {
                 let value = D(4);
 
@@ -2425,7 +2425,7 @@ addLayer('lo', {
         },
     },
     grid: {
-        rows: 11,
+        rows: 12,
         cols: 6,
         getStartData(_) { return {}; },
         getStyle(_, id) {
@@ -2659,11 +2659,19 @@ addLayer('lo', {
                     case 'tree':
                         if (sub == 'convertion') return 'Convertion';
                         return `Chopping ${tmp.t.trees[sub].name}`;
-                    case 'forge':
+                    case 'forge': {
                         let text = 'Forge: ';
                         if (sub == 'fuel') text += 'fueling';
                         if (sub == 'smelt') text += 'smelting';
                         return text;
+                    }
+                    case 'freezer': {
+                        let text = 'Freezer: ';
+                        if (sub == 'condensation') text += 'condensation';
+                        if (sub == 'cooling') text += 'cooling';
+                        if (sub == 'freezing') text += 'freezing';
+                        return text;
+                    }
                     case 'tamed': case 'tamed_kill':
                         return `tamed ${tmp.xp_alt.monsters[sub].name}`;
                     case 'building':
@@ -2685,6 +2693,8 @@ addLayer('lo', {
                         return tmp.t.layerShown;
                     case 'forge':
                         return tmp.f.layerShown;
+                    case 'freezer':
+                        return tmp.fr.layerShown;
                     case 'tamed_kill':
                     case 'tamed':
                         return tmp.xp_alt.layerShown && (tmp.xp_alt.monsters[sub].unlocked ?? true);
@@ -2802,6 +2812,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'slime goo',
             style: {
@@ -2840,6 +2851,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'slime core shard',
             style: {
@@ -2864,6 +2876,7 @@ addLayer('lo', {
                     chances['tamed_kill:slime'] = chances['enemy:slime'];
                     return chances;
                 },
+                other() { if (player.fr.unlocked) return ['freezer:freezing']; },
             },
             name: 'slime core',
             style: {
@@ -2904,6 +2917,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'red fabric',
             style: {
@@ -2941,6 +2955,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'pyrite coin',
             style: {
@@ -2964,6 +2979,7 @@ addLayer('lo', {
                     chances['tamed_kill:goblin'] = chances['enemy:goblin'];
                     return chances;
                 },
+                other() { if (player.fr.unlocked) return ['freezer:freezing']; },
             },
             name: 'rusty gear',
             style: {
@@ -3002,6 +3018,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'rotten flesh',
             style: {
@@ -3039,6 +3056,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'brain',
             style: {
@@ -3077,6 +3095,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'leaf',
             style: {
@@ -3114,6 +3133,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'seed',
             style: {
@@ -3179,6 +3199,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
                 other() {
                     const sources = [];
 
@@ -3253,6 +3274,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'copper ore',
             style: {
@@ -3319,6 +3341,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'tin ore',
             style: {
@@ -3387,7 +3410,8 @@ addLayer('lo', {
 
                     return per_second;
                 },
-                other() { if (player.f.unlocked) return ['forge:smelt']; },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
             },
             name: 'coal',
             style: {
@@ -3457,6 +3481,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'iron ore',
             style: {
@@ -3517,6 +3542,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'gold ore',
             style: {
@@ -3533,7 +3559,7 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (player.f.unlocked) return ['forge:smelt']; },
+                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
                 per_second() {
                     const per_second = {};
 
@@ -3568,6 +3594,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'stone brick',
             style: {
@@ -3583,7 +3610,7 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (player.f.unlocked) return ['forge:smelt']; },
+                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
                 per_second() {
                     const per_second = {};
 
@@ -3618,6 +3645,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'copper ingot',
             style: {
@@ -3633,7 +3661,7 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (player.f.unlocked) return ['forge:smelt']; },
+                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
                 per_second() {
                     const per_second = {};
 
@@ -3668,6 +3696,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'tin ingot',
             style: {
@@ -3683,7 +3712,7 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (player.f.unlocked) return ['forge:smelt']; },
+                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
                 per_second() {
                     const per_second = {};
 
@@ -3718,6 +3747,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'iron ingot',
             style: {
@@ -3733,7 +3763,7 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (player.f.unlocked) return ['forge:smelt']; },
+                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
                 per_second() {
                     const per_second = {};
 
@@ -3768,6 +3798,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'gold ingot',
             style: {
@@ -3819,6 +3850,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'bronze ingot',
             style: {
@@ -3869,6 +3901,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'steel ingot',
             style: {
@@ -3907,13 +3940,15 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() { if (player.fr.unlocked) return ['freezer:freezing']; },
             },
             name: 'soaked log',
             style: {
                 'background-image': `url('./resources/images/log.svg')`,
                 'background-color': '#AA2222',
             },
-            unlocked() { return tmp.t.layerShown ?? true; },
+            unlocked() { return tmp.t.layerShown || tmp.fr.layerShown; },
         },
         normal_log: {
             _id: null,
@@ -3987,7 +4022,8 @@ addLayer('lo', {
 
                     return per_second;
                 },
-                other() { if (player.f.unlocked) return ['forge:smelt']; },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
             },
             name: 'normal log',
             style: {
@@ -4049,6 +4085,7 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'plank',
             style: {
@@ -4230,25 +4267,103 @@ addLayer('lo', {
                         });
                     }
 
+                    if (tmp.fr.layerShown) {
+                        const gain = tmp.fr.water.gain,
+                            loss_cool = tmp.fr.cold.consumes,
+                            loss_ice = tmp.fr.ice.consumes;
+
+                        if (D.gt(gain, 0)) per_second['freezer:condensation'] = gain;
+                        if (D.lt(loss_cool, 0)) per_second['freezer:cooling'] = loss_cool;
+                        if (D.lt(loss_ice, 0)) per_second['freezer:freezing'] = loss_ice;
+                    }
+
                     return per_second;
                 },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'water',
             style: {
                 'background-image': `url('./resources/images/drop.svg')`,
                 'background-color': '#4444FF',
             },
-            unlocked() { return hasMilestone('to', 6) || false; },
+            unlocked() { return hasMilestone('to', 6) || tmp.fr.layerShown; },
         },
-        // Special
-        holy_water: {
+        ice: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1002,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.fr.layerShown) {
+                        const gain = tmp.fr.ice.gain;
+
+                        if (D.gt(gain, 0)) per_second['freezer:freezing'] = gain;
+                    }
+
+                    return per_second;
+                },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+            },
+            name: 'ice',
+            style: {
+                'background-image': `url('./resources/images/ice-cube.svg')`,
+                'background-color': '#8888FF',
+            },
+            unlocked() { return tmp.fr.layerShown; },
+        },
+        // Freezer Materials
+        icestone: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
             grid: 1101,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (player.f.unlocked) return ['forge:smelt']; },
+                other() { if (tmp.fr.layerShown) return ['freezer:freezing']; },
+            },
+            name: 'icestone',
+            style: {
+                'background-image': `url('./resources/images/stone-block.svg')`,
+                'background-color': '#AAAAFF',
+            },
+            unlocked() { return tmp.fr.layerShown; },
+        },
+        rust_ingot: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1102,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                other() { if (tmp.fr.layerShown) return ['freezer:freezing']; },
+            },
+            name: 'rust ingot',
+            style: {
+                'background-image': `url('./resources/images/metal-bar.svg')`,
+                'background-color': '#BB4400',
+            },
+            unlocked() { return tmp.fr.layerShown; },
+        },
+        // Special
+        holy_water: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1201,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                other() {
+                    const other = [];
+
+                    if (tmp.f.layerShown) other.push('forge:smelt');
+                    if (player.fr.unlocked) other.push('freezer:freezing');
+
+                    return other;
+                },
             },
             name: 'holy water',
             style: {
@@ -4260,7 +4375,7 @@ addLayer('lo', {
         stardust: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1102,
+            grid: 1202,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },

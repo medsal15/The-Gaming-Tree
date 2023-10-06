@@ -721,7 +721,7 @@ addLayer('xp', {
             color_level(level = 0) {
                 const l = D(level);
                 if (format(l) == 'NaN') return 'unknown';
-                /** @type {{[k in number|'e'|'F'|'.']: (len: number) => string}} */
+                /** @type {{[k in number|'e'|'F'|'.'|'-']: (len: number) => string}} */
                 const map = {
                     0: len => [
                         'black',
@@ -825,6 +825,7 @@ addLayer('xp', {
                     'e': len => 'shifted through',
                     'F': len => 'tainted by',
                     '.': len => 'covered by',
+                    '-': len => 'negative',
                 };
 
                 return formatWhole(l).replaceAll(/(.)\1*/g, s => `${map[s[0]](s.length)} `);
@@ -1530,9 +1531,11 @@ addLayer('xp', {
             _type: null,
             get type() { return this._type ??= Object.keys(layers.xp.enemies).find(item => layers.xp.enemies[item] == this); },
             level() {
-                const kills = player.lo.items.stardust.amount;
+                let kills = player.lo.items.stardust.amount;
 
-                return kills.floor();
+                kills = kills.minus(buyableEffect('fr', 41));
+
+                return kills;
             },
             color_level() { return layers.xp.enemies['*'].color_level(tmp.xp.enemies[this.type].level); },
             color() {
@@ -1550,7 +1553,7 @@ addLayer('xp', {
 
                 health = health.times(tmp.c.buildings.observatory.effect).max(1);
 
-                return health;
+                return health.ceil();
             },
             experience: D.dZero,
             kills: D.dOne,
@@ -1572,10 +1575,11 @@ addLayer('xp', {
 
         /** @type {(keyof player['xp'])[]} */
         const keep = ['type'],
+            max_ups = D.add(buyableEffect('lo', 12).xp_hold, buyableEffect('fr', 32).xp_hold.pow(tmp.a.change_efficiency)).floor(),
             kept_ups = [...player.xp.upgrades],
             auto = { ...player.xp.auto };
 
-        kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 12).xp_hold).toNumber();
+        kept_ups.length = D.min(kept_ups.length, max_ups).toNumber();
 
         layerDataReset(this.layer, keep);
         player.xp.upgrades.push(...kept_ups);

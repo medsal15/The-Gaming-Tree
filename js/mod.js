@@ -35,8 +35,7 @@ let modInfo = {
 		//todo condiments
 		'alternate/side/successes.js', 'alternate/side/time_cubes.js', 'alternate/side/bingo.js',
 		'alternate/0/experience.js', 'alternate/0/city.js', 'alternate/0/plants.js',
-		//todo freezer
-		'alternate/1/tower.js', 'alternate/1/kitchen.js',
+		'alternate/1/tower.js', 'alternate/1/kitchen.js', 'alternate/1/freezer.js',
 	],
 	/**
 	 * If you have a Discord server or other discussion place, you can add a link to it.

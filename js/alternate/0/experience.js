@@ -638,6 +638,8 @@ addLayer('xp_alt', {
 
                 mult = mult.times(tmp.k.dishes.fried_eggs.effect.prod);
 
+                mult = mult.times(buyableEffect('fr', 33).monster);
+
                 return mult;
             },
             tames_mult() {
@@ -1039,9 +1041,10 @@ addLayer('xp_alt', {
 
         /** @type {(keyof player['xp_alt'])[]} */
         const keep = ['type'],
+            max_ups = D.add(buyableEffect('lo', 12).xp_hold.pow(tmp.a.change_efficiency), buyableEffect('fr', 32).xp_hold).floor(),
             kept_ups = [...player.xp_alt.upgrades];
 
-        kept_ups.length = D.min(kept_ups.length, buyableEffect('lo', 12).xp_hold.pow(tmp.a.change_efficiency).floor()).toNumber();
+        kept_ups.length = D.min(kept_ups.length, max_ups).toNumber();
 
         layerDataReset(this.layer, keep);
         player.xp_alt.upgrades.push(...kept_ups);

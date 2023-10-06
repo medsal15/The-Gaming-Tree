@@ -94,7 +94,7 @@ function loadVue() {
 			key() { return this.$vnode.key },
 			lay() { return Array.isArray(this.data[0]) ? this.layer : this.data[0]; },
 			headers() { return Array.isArray(this.data[0]) ? this.data[0] : this.data[1]; },
-			rows() { return Array.isArray(this.data[0]) ? this.data.slice(1) : this.data.slice(2); },
+			rows() { return Array.isArray(this.data) ? Array.isArray(this.data[0]) ? this.data.slice(1) : this.data.slice(2) : []; },
 		},
 		template: `
 		<div>

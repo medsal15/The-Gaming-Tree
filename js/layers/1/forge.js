@@ -1,5 +1,6 @@
 'use strict';
 
+//todo use heat.gain for heat gain
 addLayer('f', {
     name: 'Forge',
     symbol: 'F',
@@ -54,12 +55,12 @@ addLayer('f', {
     position: 2,
     resource: 'heat',
     layerShown() { return player[this.layer].unlocked && !tmp[this.layer].deactivated; },
-    deactivated() { return inChallenge('b', 31); },
+    deactivated() { return inChallenge('b', 31) || hasUpgrade('a', 23); },
     hotkeys: [
         {
             key: 'F',
             description: 'Shift + F: Display forge layer',
-            unlocked() { return player.f.unlocked; },
+            unlocked() { return tmp.f.layerShown; },
             onPress() { showTab('f'); },
         },
     ],
@@ -80,7 +81,7 @@ addLayer('f', {
                     let text = `You have ${layerColor('f', format(player.f.points), 'font-size:1.5em;')}`;
 
                     if (tmp.f.heat.gain.abs().gt(1e-4)) {
-                        text += ` (${tmp.f.heat.gain.gt(0) ? '+' : ''}${layerColor('f', format(tmp.f.heat.gain))} /s)`;
+                        text += ` (${layerColor('f', (tmp.f.heat.gain.gt(0) ? '+' : '') + format(tmp.f.heat.gain))} /s)`;
                     }
 
                     text += ' heat.';
@@ -154,23 +155,29 @@ addLayer('f', {
                     return text;
                 }],
                 ['display-text', '<span class="warning">You lose 1% of your heat every second</span>'],
-                () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '(technically 2% because of your challenges)']; },
+                () => { if (inChallenge('b', 32) && !hasUpgrade('s', 121)) return ['display-text', '<span class="warning">(technically 2% because of your challenges)</span>']; },
                 ['display-text', () => `Your heat divides time requirements by ${shiftDown ? `[${tmp.f.heat.speed_formula}]` : format(tmp.f.heat.speed)}`],
+                () => {
+                    if (tmp.fr.layerShown) return [
+                        'display-text',
+                        `Your cold multiplies time requirements by ${shiftDown ? `[${tmp.fr.cold.slow_formula}]` : format(tmp.fr.cold.slow)}`,
+                    ];
+                },
                 'blank',
                 ['display-text', () => `Your forge's size prevents producing more than ${format(tmp.f.recipes['*'].size)} of each recipes per second`],
                 [
                     'display-text',
                     () => `Hold <span style="${ctrlDown && !shiftDown ? 'text-decoration:underline;' : ''}">control for *10</span>,\
-                    <span style="${!ctrlDown && shiftDown ? 'text-decoration:underline;' : ''}">shift for *25</span>,\
-                    and <span style="${ctrlDown && shiftDown ? 'text-decoration:underline;' : ''}">both for *250</span>`
+                        <span style="${!ctrlDown && shiftDown ? 'text-decoration:underline;' : ''}">shift for *25</span>,\
+                        and <span style="${ctrlDown && shiftDown ? 'text-decoration:underline;' : ''}">both for *250</span>`
                 ],
                 ['display-text', '<span class="warning">Smelting will only progress as long as there is enough heat</span>'],
                 'blank',
                 [
                     'column',
                     () => Object.keys(layers.f.recipes)
-                        .filter(fuel => fuel != '*')
-                        .map(fuel => layers.f.recipes['*'].show_recipe(fuel))
+                        .filter(recipe => recipe != '*')
+                        .map(recipe => layers.f.recipes['*'].show_recipe(recipe))
                 ],
             ],
         },
@@ -217,9 +224,9 @@ addLayer('f', {
             });
     },
     automate() {
-        // Prevent overflow in some cases
         Object.entries(player.f.recipes)
             .forEach(([id, recipe]) => {
+                // Prevent overflow in some cases
                 if (recipe.amount_target.gt(tmp.f.recipes['*'].size)) recipe.amount_target = tmp.f.recipes['*'].size;
                 if (recipe.auto) clickClickable('f', `recipe_display_${id}_${tmp.f.recipes[id].consumes.length}`);
             });
@@ -681,9 +688,8 @@ addLayer('f', {
 
                 if (hasUpgrade('f', 13)) size = size.add(upgradeEffect('f', 13).recipe);
 
-                return size;
+                return size.floor();
             },
-            producing(item) { return D.dZero; },
             default_amount(recipe, amount) {
                 if (D.gt(amount, 0)) return D(amount);
                 if (!recipe) return D.dOne;
@@ -699,6 +705,8 @@ addLayer('f', {
                 speed = speed.times(tmp.f.heat.speed);
 
                 speed = speed.times(buyableEffect('lo', 73));
+
+                speed = speed.div(tmp.fr.cold.slow);
 
                 return speed;
             },
@@ -1235,7 +1243,7 @@ addLayer('f', {
             time(amount) {
                 amount = layers.f.recipes['*'].default_amount(this.id, amount);
 
-                let time = D.times(amount, 40).add(120);
+                let time = D.times(amount, 30).add(100);
 
                 time = time.div(tmp.f.recipes['*'].speed);
 
@@ -1304,10 +1312,10 @@ addLayer('f', {
         },
     },
     heat: {
-        speed() {
-            return D.dTwo.pow(D.log10(player.f.points.max(0).add(1)).div(50));
-        },
+        speed() { return D.dTwo.pow(D.log10(player.f.points.max(0).add(1)).div(50)); },
         speed_formula: '2 ^ (log10(heat + 1) / 50)',
+        slow() { return D.dTwo.pow(D.log10(player.f.points.max(0).add(1)).div(100)).pow(tmp.a.change_efficiency); },
+        slow_formula: '2 ^ (log10(heat + 1) / 100)',
         gain() {
             /** @type {Decimal} */
             let gain = Object.keys(layers.f.fuels)
@@ -1447,13 +1455,13 @@ addLayer('f', {
                     display() {
                         if (!shiftDown) {
                             return `<h3>${capitalize(tmp.lo?.items[entry()[0]].name)}</h3><br>\
-                            ${format(player.lo.items[entry()[0]].amount)}<br>\
-                            ${D.gt(entry()[1], 0) ? '+' : ''}${format(entry()[1])}\
-                            ${is_output() && precipe().amount_smelting.gt(0) ? '<br><i>In progress</i>' : ''}`;
+                                ${format(player.lo.items[entry()[0]].amount)}<br>\
+                                ${D.gt(entry()[1], 0) ? '+' : ''}${format(entry()[1])}\
+                                ${is_output() && precipe().amount_smelting.gt(0) ? '<br><i>In progress</i>' : ''}`;
                         } else {
                             return `<h3>${capitalize(tmp.lo?.items[entry()[0]].name)}</h3><br>\
-                            Formula: ${recipe().formulas[entry()[0]] ?? 'amount'}\
-                            ${is_output() && precipe().amount_smelting.gt(0) ? '<br><i>In progress</i>' : ''}`;
+                                Formula: ${recipe().formulas[entry()[0]] ?? 'amount'}\
+                                ${is_output() && precipe().amount_smelting.gt(0) ? '<br><i>In progress</i>' : ''}`;
                         }
                     },
                     unlocked() { return recipe().unlocked ?? true; },
@@ -1569,8 +1577,9 @@ addLayer('f', {
                 };
         },
         has(_, prop) {
-            return !!layers.f.fuels['*'].regex.exec(prop) &&
-                !!layers.f.recipes['*'].regexes.display.exec(prop);
+            return !!layers.f.fuels['*'].regex.exec(prop) ||
+                !!layers.f.recipes['*'].regexes.display.exec(prop) ||
+                !!layers.f.recipes['*'].regexes.amount.exec(prop);
         },
         ownKeys(_) {
             return [
@@ -1659,4 +1668,11 @@ addLayer('f', {
             ];
         },
     }),
+    componentStyles: {
+        'clickable': {
+            'background-repeat': 'no-repeat',
+            'background-position': 'center',
+            'background-size': 'contain',
+        },
+    },
 });

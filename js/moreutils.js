@@ -82,6 +82,18 @@ function layerColor(layer, text, style = "") {
     return `<span style="color:${tmp[layer].color};text-shadow:${tmp[layer].color} 0 0 10px;${style}">${text}</span>`;
 }
 /**
+ * Colors text with an item's color
+ *
+ * @param {items} item
+ * @param {string} text
+ * @param {string} [style]
+ * @returns {string}
+ */
+function itemColor(item, text, style = "") {
+    const color = tmp.lo.items[item].style['background-color'];
+    return `<span style="color:${color};text-shadow:${color} 0 0 10px;${style}">${text}</span>`;
+}
+/**
  * Like format, but returns an array of each coin types, limited to 100.
  *
  * If the highest coin type is above 1e9, it will be the only one returned.
