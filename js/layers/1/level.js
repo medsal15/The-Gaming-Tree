@@ -456,8 +456,11 @@ addLayer('l', {
     type: 'static',
     baseResource: 'experience points',
     baseAmount() {
-        if (tmp.xp.layerShown) return player.xp.points;
-        return player.xp_alt.points;
+        const max = tmp.xp.enemies['*'].exp_cap;
+        let amount;
+        if (tmp.xp.layerShown) amount = player.xp.points;
+        else amount = player.xp_alt.points;
+        return amount.min(max);
     },
     requires: D(12_500),
     base: D.dTwo,
