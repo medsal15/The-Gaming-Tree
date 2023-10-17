@@ -175,10 +175,11 @@ var systemComponents = {
             </tr>
             <tr>
 				<td><button class="opt" onclick="toggleOpt('forceTooltips'); needsCanvasUpdate = true">Shift-Click to Toggle Tooltips: {{ options.forceTooltips?"ON":"OFF" }}</button></td>
+				<td><button class="opt" onclick="shiftDown = !shiftDown">Force Shift on: {{ shiftDown?"ON":"OFF" }}</button></td>
                 <td><button class="opt" onclick="toggleOpt('noRNG'); needsCanvasUpdate = true">Disable Luck: {{ options.noRNG?"ON":"OFF" }}</button></td>
-                <td><button class="opt" onclick="toggleOpt('colorLevels'); needsCanvasUpdate = true">Color Levels: {{ options.colorLevels?"ON":"OFF" }}</button></td>
 			</tr>
-            <tr>
+			<tr>
+                <td><button class="opt" onclick="toggleOpt('colorLevels'); needsCanvasUpdate = true">Color Levels: {{ options.colorLevels?"ON":"OFF" }}</button></td>
                 <td><button v-if="tmp.lo.layerShown" class="opt" onclick="changeLootChance(); needsCanvasUpdate = true">Fractional Chance Mode: {{ CHANCE_MODE[options.chanceMode] }}</button></td>
 			</tr>
         </table>`

@@ -9,6 +9,10 @@ addLayer('_hotkeys', {
     startData() { return { unlocked: true, points: D.dZero, }; },
     hotkeys: [
         {
+            key: '',
+            description: 'Shift (hold): Display formulas',
+        },
+        {
             key: 'ArrowLeft',
             description: '←: Move to previous tab',
             onPress() {
