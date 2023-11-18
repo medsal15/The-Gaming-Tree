@@ -2615,7 +2615,8 @@ addLayer('c', {
             formulas: {
                 cost: [['stone', '(1.4 ^ built) * 100'], ['iron_ore', '(1.25 ^ built) * 25']],
             },
-            unlocked() { return hasMilestone('to', 3); },
+            // Prevent softlock for those without Tower!
+            unlocked() { return hasMilestone('to', 3) || inChallenge('b', 21) || inChallenge('b', 41); },
         },
         well: {
             _id: null,
