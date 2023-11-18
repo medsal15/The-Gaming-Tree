@@ -82,6 +82,7 @@ let VERSION = {
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.B</h3><br>
 		- Added 5 new layers.<br>
+		- QoL: Add quick select buttons for city and plant.<br>
 		- Update endgame: Get all 3 new row 1 layers.<br>
 	<h3>v0.A</h3><br>
 		- Added 4 new layers.<br>
