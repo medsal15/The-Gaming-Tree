@@ -188,10 +188,10 @@ addLayer('fr', {
     },
     automate() {
         Object.entries(player.f.recipes)
-            .forEach(([_, recipe]) => {
+            .forEach(([id, recipe]) => {
                 // Prevent overflow in some cases
                 if (recipe.amount_target.gt(tmp.fr.recipes['*'].size)) recipe.amount_target = tmp.fr.recipes['*'].size;
-                //todo auto
+                if (recipe.auto && id in tmp.fr.recipes) clickClickable('fr', `recipe_display_${id}_${tmp.fr.recipes[id].consumes.length}`);
             });
     },
     type: 'none',
@@ -1088,6 +1088,10 @@ addLayer('fr', {
 
             gain = gain.times(tmp.bin.cards.multipliers['fr'] ?? 1);
 
+            gain = gain.times(tmp.k.dishes.ice_cream.effect);
+
+            gain = gain.times(tmp.k.dishes.popsicle.effect);
+
             return gain;
         },
         total_gain() { return D.add(tmp.fr.water.gain, tmp.fr.cold.consumes).add(tmp.fr.ice.consumes); },
@@ -1101,6 +1105,10 @@ addLayer('fr', {
             gain = gain.times(tmp.fr.ice.mult);
 
             gain = gain.times(buyableEffect('fr', 12));
+
+            gain = gain.times(tmp.k.dishes.ice_cream.effect);
+
+            gain = gain.times(tmp.k.dishes.popsicle.effect);
 
             const loss = player.fr.points.div(100);
 
@@ -1121,6 +1129,10 @@ addLayer('fr', {
             let gain = D.min(player.fr.points, player.lo.items.water.amount).div(500);
 
             gain = gain.times(buyableEffect('fr', 21));
+
+            gain = gain.times(tmp.k.dishes.ice_cream.effect);
+
+            gain = gain.times(tmp.k.dishes.popsicle.effect);
 
             return gain;
         },

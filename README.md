@@ -49,6 +49,8 @@ By [Delapouite](https://delapouite.com/):
 - [fried eggs](https://game-icons.net/1x1/delapouite/fried-eggs.html)
 - [furnace](https://game-icons.net/1x1/delapouite/furnace.html)
 - [hot meal](https://game-icons.net/1x1/delapouite/hot-meal.html)
+- [ice cream cone](https://game-icons.net/1x1/delapouite/ice-cream-cone.html)
+- [ice pop](https://game-icons.net/1x1/delapouite/ice-pop.html)
 - [log](https://game-icons.net/1x1/delapouite/log.html)
 - [next button](https://game-icons.net/1x1/delapouite/next-button.html)
 - [observatory](https://game-icons.net/1x1/delapouite/observatory.html)

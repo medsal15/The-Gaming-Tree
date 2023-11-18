@@ -706,6 +706,8 @@ addLayer('to', {
 
         if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['to'] ?? 1);
 
+        mult = mult.times(tmp.k.dishes.popsicle.effect);
+
         return mult;
     },
 });

@@ -52,6 +52,12 @@ addLayer('p', {
                         ],
                     ];
                 },
+                [
+                    'row',
+                    () => Object.keys(layers.p.plants)
+                        .filter(id => tmp.p.plants[id].unlocked ?? true)
+                        .map(id => ['clickable', `quick_${id}`])
+                ],
                 'blank',
                 'grid',
                 'blank',
@@ -154,7 +160,7 @@ addLayer('p', {
                         ]
                     ]],
                     'blank',
-                    ['clickable', 11],
+                    ['clickable', 'infuse'],
                 ]],
                 ['display-text', () => {
                     const target = player.p.infuse_target,
@@ -205,36 +211,102 @@ addLayer('p', {
             ],
         },
     },
-    clickables: {
-        11: {
-            style: { 'background-image': `url('./resources/images/crafting.svg')`, },
-            canClick() {
-                const target = player.p.infuse_target,
-                    item = player.p.infuse_item;
+    clickables: new Proxy({}, {
+        /** @returns {Clickable<'p'>} */
+        get(obj, prop) {
+            // Required to not break the auto stuff
+            if (prop == 'constructor') return obj.constructor;
+            if (prop == 'layer') return 'p';
 
-                return target != '' && player.p.plants[target].seeds.gte(1) &&
-                    item != '' && player.lo.items[item].amount.gte(1) &&
-                    (tmp.p.plants[target].unlocked ?? true) && (tmp.lo.items[item].unlocked ?? true) &&
-                    item in tmp.p.plants[target].infusions;
-            },
-            onClick() {
-                const target = player.p.infuse_target,
-                    item = player.p.infuse_item;
+            if (prop in obj) return obj[prop];
 
-                if (target != '' && player.p.plants[target].seeds.gte(1) &&
-                    item != '' && player.lo.items[item].amount.gte(1) &&
-                    (tmp.p.plants[target].unlocked ?? true) && (tmp.lo.items[item].unlocked ?? true) &&
-                    item in tmp.p.plants[target].infusions
-                ) {
-                    player.p.plants[target].seeds = D.minus(player.p.plants[target].seeds, 1);
-                    const result = tmp.p.plants[target].infusions[item];
-                    if (!player.p.plants[target].infusions.includes(result)) player.p.plants[target].infusions.push(result);
-                    layers.lo.items['*'].gain_items(item, -1);
-                    player.p.plants[result].seeds = D.add(player.p.plants[result].seeds, 1);
-                }
-            },
+            if (prop == 'infuse') {
+                return obj[prop] ??= {
+                    style: { 'background-image': `url('./resources/images/crafting.svg')`, },
+                    canClick() {
+                        const target = player.p.infuse_target,
+                            item = player.p.infuse_item;
+
+                        return target != '' && player.p.plants[target].seeds.gte(1) &&
+                            item != '' && player.lo.items[item].amount.gte(1) &&
+                            (tmp.p.plants[target].unlocked ?? true) && (tmp.lo.items[item].unlocked ?? true) &&
+                            item in tmp.p.plants[target].infusions;
+                    },
+                    onClick() {
+                        const target = player.p.infuse_target,
+                            item = player.p.infuse_item;
+
+                        if (target != '' && player.p.plants[target].seeds.gte(1) &&
+                            item != '' && player.lo.items[item].amount.gte(1) &&
+                            (tmp.p.plants[target].unlocked ?? true) && (tmp.lo.items[item].unlocked ?? true) &&
+                            item in tmp.p.plants[target].infusions
+                        ) {
+                            player.p.plants[target].seeds = D.minus(player.p.plants[target].seeds, 1);
+                            const result = tmp.p.plants[target].infusions[item];
+                            if (!player.p.plants[target].infusions.includes(result)) player.p.plants[target].infusions.push(result);
+                            layers.lo.items['*'].gain_items(item, -1);
+                            player.p.plants[result].seeds = D.add(player.p.plants[result].seeds, 1);
+                        }
+                    },
+                };
+            }
+
+            const matches = layers.p.plants['*'].regex.exec(prop);
+            if (matches) {
+                /** @type {[string, 'quick', string]} */
+                const [, , plant] = matches;
+
+                return obj[prop] ??= {
+                    canClick() { return player.p.plant == plant || D.gte(player.p.plants[plant].seeds, 1); },
+                    onClick() {
+                        if (player.p.plant == plant) player.p.plant = '';
+                        else player.p.plant = plant;
+                    },
+                    display() { return `${capitalize(tmp.p.plants[plant].name)}<br>${format(player.p.plants[plant].seeds)}`; },
+                    style() {
+                        let base = {},
+                            plant_style = {};
+                        const cant = {};
+
+                        if (player.p.plant == plant) base['box-shadow'] = `${tmp.p.color} 0 0 20px`;
+                        if (!tmp[this.layer].clickables[this.id].canClick) {
+                            cant['background'] = '#bf8f8f';
+                            cant['cursor'] = 'not-allowed';
+                        } else {
+                            plant_style = tmp.p.plants[plant].style.general;
+                        }
+
+                        return Object.assign(
+                            base,
+                            {
+                                'height': '80px',
+                                'width': '80px',
+                                'min-height': 'unset',
+                            },
+                            plant_style,
+                            cant,
+                        );
+                    },
+                    unlocked: true,
+                };
+            }
         },
-    },
+        getOwnPropertyDescriptor(_, prop) {
+            if (prop == 'layer' ||
+                layers.p.plants['*'].regex.exec(prop) ||
+                prop == 'infuse') return {
+                    enumerable: true,
+                    configurable: true,
+                };
+        },
+        has(_, prop) { return layers.p.plants['*'].regex.exec(prop) || prop == 'layer'; },
+        ownKeys() {
+            return [
+                'infuse',
+                ...Object.keys(layers.p.plants).map(plant => `quick_${plant}`),
+            ];
+        },
+    }),
     grid: {
         cols() {
             let cols = 5;
@@ -369,6 +441,7 @@ addLayer('p', {
 
                 return mult;
             },
+            regex: /^(quick)_([a-z_]+)$/,
         },
         wheat: {
             _id: null,

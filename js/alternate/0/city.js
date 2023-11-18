@@ -77,6 +77,12 @@ addLayer('c', {
                     'blank',
                     ['clickable', 'toggle'],
                 ]],
+                [
+                    'row',
+                    () => Object.keys(layers.c.buildings)
+                        .filter(id => tmp.c.buildings[id].unlocked ?? true)
+                        .map(id => ['clickable', `quick_${id}`])
+                ],
                 'blank',
                 'grid',
                 'blank',
@@ -1634,8 +1640,8 @@ addLayer('c', {
 
             const matches = layers.c.buildings['*'].regex.exec(prop);
             if (matches) {
-                /** @type {[string, 'select', string]} */
-                const [, , building] = matches;
+                /** @type {[string, 'select'|'quick', string]} */
+                const [, type, building] = matches;
 
                 return obj[prop] ??= {
                     canClick() { return D.gte(getBuyableAmount('c', building), D.add(tmp.c.buildings['*'].placed[building], 1)); },
@@ -1644,23 +1650,40 @@ addLayer('c', {
                         else player.c.building = building;
                     },
                     display() {
-                        const select = player.c.building == building ? 'Selected' : 'Select';
-                        return `${select} ${tmp.c.buildings[building].name}`;
+                        switch (type) {
+                            case 'select':
+                                const select = player.c.building == building ? 'Selected' : 'Select';
+                                return `${select} ${tmp.c.buildings[building].name}`;
+                            case 'quick':
+                                const placed = tmp.c.buildings['*'].placed[building] ?? D.dZero,
+                                    total = getBuyableAmount('c', building);
+                                return `${capitalize(tmp.c.buildings[building].name)}<br>${formatWhole(placed)} / ${formatWhole(total)}`;
+                        }
                     },
                     style() {
-                        const base = {},
-                            cant = {};
+                        let base = {},
+                            add = {};
+                        const cant = {};
 
                         if (player.c.building == building) base['box-shadow'] = `${tmp.c.color} 0 0 20px`;
                         if (!tmp[this.layer].clickables[this.id].canClick) {
                             cant['background'] = '#bf8f8f';
                             cant['cursor'] = 'not-allowed';
                         }
+                        if (type == 'quick') {
+                            base = {
+                                'height': '80px',
+                                'width': '80px',
+                                'min-height': 'unset',
+                            };
+                            add = tmp.c.buildings[building].style.grid;
+                        }
 
                         return Object.assign(
                             base,
                             tmp.c.buildings[building].style.general,
                             tmp.c.buildings[building].style.select,
+                            add,
                             cant,
                         );
                     },
@@ -1687,13 +1710,13 @@ addLayer('c', {
                 'toggle',
                 'up',
                 'down',
-                ...Object.keys(layers.c.buildings).map(id => `select_${id}`),
+                ...Object.keys(layers.c.buildings).map(id => [`select_${id}`, `quick_${id}`]).flat(),
             ];
         },
     }),
     buildings: {
         '*': {
-            regex: /^(select)_([a-z_]+)$/,
+            regex: /^(select|quick)_([a-z_]+)$/,
             placed() {
                 return player.c.floors.reduce(
                     /** @param {{[building: string]: Decimal}} full */

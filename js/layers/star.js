@@ -113,7 +113,7 @@ addLayer('star', {
 
             base_time = base_time.add(tmp.k.dishes.star_crunch.effect.time);
 
-            let time = D.div(base_time, D.add(tmp.xp.enemies.star.level, 1).pow(2));
+            let time = D.div(base_time, D.add(tmp.xp.enemies.star.level, 1).pow(2).max(1));
 
             time = time.times(tmp.p.plants.starflower.effect);
 

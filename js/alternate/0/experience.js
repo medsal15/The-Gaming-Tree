@@ -91,7 +91,8 @@ addLayer('xp_alt', {
                     () => {
                         const tame_style = (text, ...style) => `<span style="color:${tmp.xp_alt.color_tame};text-shadow:${tmp.xp_alt.color_tame} 0 0 10px;${style.join(';')}">${text}</span>`,
                             capped = D.gte(player.xp_alt.points, tmp.xp.enemies['*'].exp_cap),
-                            xp_text = capped ? 'hardcapped' : layerColor('xp_alt', `+${format(tmp.xp_alt.monsters['*'].experience)} /s`),
+                            xp_text = capped ? '' : `(${layerColor('xp_alt', `+${format(tmp.xp_alt.monsters['*'].experience)} /s`)}) `,
+                            xp_cap = tmp.xp.enemies['*'].exp_cap,
                             tame_pieces = [];
                         if (tmp.xp_alt.total.tamed.neq(player.xp_alt.monsters[player.xp_alt.type].tamed)) {
                             tame_pieces.push(tame_style(`<span title="Amount of current monster tamed">${format(player.xp_alt.monsters[player.xp_alt.type].tamed)}</span>`));
@@ -102,7 +103,8 @@ addLayer('xp_alt', {
 
                         const tame_text = tame_pieces.length ? ` (${tame_pieces.join(', ')})` : '';
 
-                        return `You have ${layerColor('xp_alt', format(player.xp_alt.points), 'font-size:1.5em;')} (${xp_text}) experience
+                        return `You have ${layerColor('xp_alt', format(player.xp_alt.points), 'font-size:1.5em;')}\
+                            ${xp_text}/ ${layerColor('xp_alt', format(xp_cap))} experience\
                             and ${tame_style(formatWhole(tmp.xp_alt.total.tamed), 'font-size:1.5em')}${tame_text} tamed monsters`;
                     },
                 ],
@@ -720,6 +722,8 @@ addLayer('xp_alt', {
                 base.forEach(([item, amount], i) => {
                     let mult = monst.times(tmp.xp_alt.monsters['*'].produce_mult);
                     const upg = tmp.s.investloans.item_upgrade[item] ?? false;
+
+                    mult = mult.times(tmp.k.dishes.ice_cream.effect);
 
                     if (upg && hasUpgrade('s', upg)) {
                         mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));

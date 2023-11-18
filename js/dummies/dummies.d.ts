@@ -1768,6 +1768,7 @@ type dishes = 'failure' |
     'grilled_corn' | 'roasted_eggplant' |
     'bread' | 'berries_bowl' | 'french_fries' |
     'fried_eggs' | 'cake' |
+    'ice_cream' | 'popsicle' |
     'slime_juice' | 'monster_meal' | 'star_crunch';
 type time_units = 'seconds' | 'tames' | 'kills';
 
@@ -2440,6 +2441,7 @@ type Layers = {
                 harvest_mult(): Decimal
                 grow_mult(): Decimal
                 seeds_mult(): Decimal
+                regex: RegExp
             }
         } & {
             [plant: string]: {

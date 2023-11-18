@@ -78,39 +78,6 @@ addLayer('k', {
                 ],
             ],
         },
-        'Items': {
-            content: [
-                () => {
-                    const mult = tmp.lo.items["*"].gain_multiplier;
-
-                    if (mult.neq(1)) return [
-                        'column', [
-                            ['display-text', `Global gain multiplier (does not apply to chances): *${format(mult)}`],
-                            'blank',
-                        ],
-                    ];
-                },
-                () => {
-                    const mult = tmp.lo.items["*"].global_chance_multiplier;
-
-                    if (mult.neq(1)) return [
-                        'column', [
-                            ['display-text', `Global chance multiplier: *${format(mult)}`],
-                            'blank',
-                        ],
-                    ];
-                },
-                () => {
-                    if (
-                        Object.keys(tmp.lo.items).some(item => item != '*' &&
-                            (tmp.lo.items[item].unlocked ?? true) &&
-                            'per_second' in tmp.lo.items[item].sources)
-                    ) return ['display-text', 'Production per second depends on the layer doing it'];
-                },
-                'blank',
-                ['layer-proxy', ['lo', ['grid']]],
-            ],
-        },
         'Foods': {
             content: [
                 ['clickable', 'consume'],
@@ -150,11 +117,43 @@ addLayer('k', {
                 ],
             ],
         },
+        'Items': {
+            content: [
+                () => {
+                    const mult = tmp.lo.items["*"].gain_multiplier;
+
+                    if (mult.neq(1)) return [
+                        'column', [
+                            ['display-text', `Global gain multiplier (does not apply to chances): *${format(mult)}`],
+                            'blank',
+                        ],
+                    ];
+                },
+                () => {
+                    const mult = tmp.lo.items["*"].global_chance_multiplier;
+
+                    if (mult.neq(1)) return [
+                        'column', [
+                            ['display-text', `Global chance multiplier: *${format(mult)}`],
+                            'blank',
+                        ],
+                    ];
+                },
+                () => {
+                    if (
+                        Object.keys(tmp.lo.items).some(item => item != '*' &&
+                            (tmp.lo.items[item].unlocked ?? true) &&
+                            'per_second' in tmp.lo.items[item].sources)
+                    ) return ['display-text', 'Production per second depends on the layer doing it'];
+                },
+                'blank',
+                ['layer-proxy', ['lo', ['grid']]],
+            ],
+        },
     },
     type: 'none',
     branches: ['xp_alt'],
     temperatures: {
-        //todo add cold temps
         current() {
             const heat = player.f.points;
             if (heat.lte(1)) return 'none';
@@ -167,7 +166,6 @@ addLayer('k', {
             none: {
                 color: '#CCCCCC',
                 name: 'room temperature',
-                min: -1,
                 max: 1,
             },
             low: {
@@ -198,16 +196,9 @@ addLayer('k', {
     },
     /**
      * TODO
-     *
-     * ice cream: boost freezer, boost row 1
-     *  https://game-icons.net/1x1/delapouite/ice-cream-cone.html
-     *  slime goo, strawberry, ice
-     * popsicle: boost freezer, ???
-     *  https://game-icons.net/1x1/delapouite/ice-pop.html
-     *  ???, ice
-     * tea?: ???
+     * tea: boost ent, tree, wood
      *  https://game-icons.net/1x1/delapouite/ice-cubes.html
-     *  ???, water, ice
+     *  leaf, water, ice
      */
     recipes: {
         '*': {
@@ -405,6 +396,56 @@ addLayer('k', {
                 'egg': '1.25 ^ amount * 4',
                 'wheat': '1.5 ^ amount * 8',
                 'time': 'amount * 30 + 60',
+            },
+        },
+        ice_cream: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.recipes).find(recipe => layers.k.recipes[recipe] == this); },
+            heats: ['none',],
+            consumes(amount) {
+                amount = layers.k.recipes['*'].default_amount(this.id, amount);
+
+                return [
+                    ['strawberry', D.pow(1.5, amount).times(5)],
+                    ['slime_goo', D.pow(2, amount).times(25)],
+                    ['ice', D.pow(1.25, amount)]
+                ];
+            },
+            produces: 'ice_cream',
+            time(amount) {
+                amount = layers.k.recipes['*'].default_amount(this.id, amount);
+
+                return D.times(amount, 10).add(50);
+            },
+            formulas: {
+                'strawberry': '1.5 ^ amount * 5',
+                'slime_goo': '2 ^ amount * 25',
+                'ice': '1.25 ^ amount',
+                'time': 'amount * 10 + 50',
+            },
+        },
+        popsicle: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.recipes).find(recipe => layers.k.recipes[recipe] == this); },
+            heats: ['none',],
+            consumes(amount) {
+                amount = layers.k.recipes['*'].default_amount(this.id, amount);
+
+                return [
+                    ['plank', D.pow(1.1, amount)],
+                    ['ice', D.pow(1.25, amount).times(10)]
+                ];
+            },
+            produces: 'popsicle',
+            time(amount) {
+                amount = layers.k.recipes['*'].default_amount(this.id, amount);
+
+                return D.times(amount, 10).add(30);
+            },
+            formulas: {
+                'plank': '1.1 ^ amount',
+                'ice': '1.25 ^ amount * 10',
+                'time': 'amount * 10 + 30',
             },
         },
         slime_juice: {
@@ -828,10 +869,79 @@ addLayer('k', {
             },
             value() { return D.times(4, player.k.dishes[this.id].amount); },
         },
-        slime_juice: {
+        ice_cream: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
             grid: 501,
+            style: {
+                'background-image': `url('./resources/images/ice-cream-cone.svg')`,
+                'background-color': '#FFAAAA',
+            },
+            name: 'ice cream',
+            type: 'food',
+            duration: {
+                unit: 'seconds',
+                time() {
+                    let time = D(60);
+
+                    time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    return time;
+                },
+            },
+            effect(duration) {
+                duration = layers.k.dishes['*'].default_duration(this.id, duration);
+                if (tmp.k.deactivated) duration = D.dZero;
+                if (D.gt(duration, 0)) return D.pow(1.1, D.div(duration, 15));
+                return D.dOne;
+            },
+            effect_description(duration) {
+                if (D.lte(duration, 0)) duration = D(tmp.k.dishes[this.id].duration.time);
+                let effect = shiftDown ? '[1.1 ^ (time left / 15)]' : format(this.effect(duration));
+                return `Multiplies slime and freezer production by ${effect}`;
+            },
+            value() { return D.times(3, player.k.dishes[this.id].amount); },
+            unlocked() { return tmp.fr.layerShown; },
+        },
+        popsicle: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            grid: 502,
+            style: {
+                'background-image': `url('./resources/images/ice-pop.svg')`,
+                'background-color': '#BBBBFF',
+            },
+            name: 'popsicle',
+            type: 'food',
+            duration: {
+                unit: 'seconds',
+                time() {
+                    let time = D(30);
+
+                    time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    return time;
+                },
+            },
+            effect(duration) {
+                duration = layers.k.dishes['*'].default_duration(this.id, duration);
+                if (tmp.k.deactivated) duration = D.dZero;
+                if (D.gt(duration, 0)) return D.pow(1.2, D.div(duration, 10));
+                return D.dOne;
+            },
+            effect_description(duration) {
+                if (D.lte(duration, 0)) duration = D(tmp.k.dishes[this.id].duration.time);
+                let effect = shiftDown ? '[1.2 ^ (time left / 10)]' : format(this.effect(duration));
+                const tower_effect = tmp.to.layerShown ? ' and divides tower cost' : '';
+                return `Multiplies freezer production${tower_effect} by ${effect}`;
+            },
+            value() { return D.times(3, player.k.dishes[this.id].amount); },
+            unlocked() { return tmp.fr.layerShown; },
+        },
+        slime_juice: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            grid: 601,
             style: {
                 'background-image': `url('./resources/images/glass-shot.svg')`,
                 'background-color': '#77BBBB',
@@ -860,7 +970,7 @@ addLayer('k', {
         monster_meal: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
-            grid: 502,
+            grid: 602,
             style: {
                 'background-image': `url('./resources/images/hot-meal.svg')`,
                 'background-color': '#779977',
@@ -894,7 +1004,7 @@ addLayer('k', {
         star_crunch: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
-            grid: 503,
+            grid: 603,
             style: {
                 'background-image': `url('./resources/images/staryu.svg')`,
                 'background-color'() { return tmp.xp.enemies.star.color; },
@@ -914,7 +1024,7 @@ addLayer('k', {
                 duration = layers.k.dishes['*'].default_duration(this.id, duration);
                 if (tmp.k.deactivated) duration = D.dZero;
                 if (D.gt(duration, 0)) return { time: D.div(duration, 10), size: D.dTwo };
-                return { time: D.dOne, size: D.dZero };
+                return { time: D.dZero, size: D.dZero };
             },
             effect_description(duration) {
                 if (D.lte(duration, 0)) duration = D(tmp.k.dishes[this.id].duration.time);
@@ -925,7 +1035,7 @@ addLayer('k', {
         },
     },
     grid: {
-        rows: 5,
+        rows: 6,
         cols: 3,
         getStartData(_) { return {}; },
         getStyle(_, id) {
@@ -1344,7 +1454,7 @@ addLayer('k', {
         const info = tmp.k.temperatures.info[player.k.mode];
         let gain = D.dZero;
         // Do not do anything for room temp or burning
-        if (!['burning'].includes(player.k.mode) || info.min.lte(0)) {
+        if (!['burning', 'none'].includes(player.k.mode) && D.gt(info.min, 0)) {
             if (D.lt(player.f.points, info.min)) {
                 // Warm by 10% of minimum
                 gain = D.div(info.min, 10).times(diff);
@@ -1358,10 +1468,10 @@ addLayer('k', {
     },
     automate() {
         Object.entries(player.f.recipes)
-            .forEach(([_, recipe]) => {
+            .forEach(([id, recipe]) => {
                 // Prevent overflow in some cases
                 if (recipe.amount_target.gt(tmp.k.recipes['*'].size)) recipe.amount_target = tmp.k.recipes['*'].size;
-                //todo auto
+                if (recipe.auto && id in tmp.k.recipes) clickClickable('k', `recipe_display_${id}_${tmp.k.recipes[id].consumes.length}`);
             });
     },
     prestigeNotify() {

@@ -551,7 +551,7 @@ addLayer('b', {
                 return style;
             },
             unlocked() { return hasUpgrade('a', 44); },
-            //onComplete() { player.subtabs.tic.mainTabs = '???'; }, //todo? set to main tab
+            //onComplete() { player.subtabs.tic.mainTabs = '???'; }, //todo set to main tab
         },
         //todo 92
     },

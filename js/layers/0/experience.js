@@ -85,7 +85,8 @@ addLayer('xp', {
                     () => {
                         const kill_style = (text, ...style) => `<span style="color:${tmp.xp.color_kill};text-shadow:${tmp.xp.color_kill} 0 0 10px;${style.join(';')}">${text}</span>`,
                             capped = D.gte(player.xp.points, tmp.xp.enemies['*'].exp_cap),
-                            xp_text = capped ? 'hardcapped' : layerColor('xp', `+${format(tmp.xp.enemies[player.xp.type].experience)}`),
+                            xp_text = capped ? '' : `(${layerColor('xp', `+${format(tmp.xp.enemies[player.xp.type].experience)}`)}) `,
+                            xp_cap = tmp.xp.enemies['*'].exp_cap,
                             kill_pieces = [];
                         if (tmp.xp.total.kills.neq(player.xp.enemies[player.xp.type].kills)) {
                             kill_pieces.push(kill_style(`<span title="Kills from the current enemy">${format(player.xp.enemies[player.xp.type].kills)}</span>`));
@@ -96,7 +97,8 @@ addLayer('xp', {
 
                         const kill_text = kill_pieces.length ? ` (${kill_pieces.join(', ')})` : '';
 
-                        return `You have ${layerColor('xp', formatWhole(player.xp.points), 'font-size:1.5em;')} (${xp_text}) experience
+                        return `You have ${layerColor('xp', formatWhole(player.xp.points), 'font-size:1.5em;')}\
+                            ${xp_text}/ ${layerColor('xp', format(xp_cap))} experience\
                             and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')}${kill_text} kills`;
                     },
                 ],
