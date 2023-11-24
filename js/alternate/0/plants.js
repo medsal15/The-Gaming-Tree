@@ -258,7 +258,11 @@ addLayer('p', {
                 const [, , plant] = matches;
 
                 return obj[prop] ??= {
-                    canClick() { return player.p.plant == plant || D.gte(player.p.plants[plant].seeds, 1); },
+                    canClick() {
+                        return player.p.plant == plant ||
+                            D.gte(player.p.plants[plant].seeds, 1) ||
+                            Object.values(player.p.grid).some(data => data.plant == plant);
+                    },
                     onClick() {
                         if (player.p.plant == plant) player.p.plant = '';
                         else player.p.plant = plant;

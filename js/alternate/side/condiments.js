@@ -19,7 +19,7 @@ addLayer('con', {
     nodeStyle() {
         const style = {};
 
-        if (tmp.con.condiments['*'].highest) style['border-color'] = tmp.con.condiments[tmp.con.condiments['*'].highest].color;
+        if (tmp.con.condiments['*']?.highest) style['border-color'] = tmp.con.condiments[tmp.con.condiments['*'].highest]?.color;
 
         return style;
     },

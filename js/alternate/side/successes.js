@@ -301,7 +301,7 @@ addLayer('suc', {
             unlocked() { return tmp.to.layerShown; },
         },
         54: {
-            name: 'What is it build of?',
+            name: 'What is it built of?',
             tooltip: 'Get a greenhouse',
             done() { return hasMilestone('to', 5); },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.to.color); },
