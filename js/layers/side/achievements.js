@@ -962,6 +962,7 @@ addLayer('ach', {
             },
             unlocked() { return [31, 32, 41, 42].some(id => hasChallenge('b', id)); },
         },
+        //todo bonus achievements for bonus challenges in final challenge
         //#endregion Bonus achievements
         //#region Secret achievements
         21: {

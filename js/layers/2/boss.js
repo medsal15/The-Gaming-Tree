@@ -161,7 +161,7 @@ addLayer('b', {
                                 color = tmp.bin.color;
                                 break;
                             case 91:
-                                //todo color = tmp.con.color;
+                                color = tmp.con.color;
                                 break;
                             case 92:
                             //todo color = alt stats
@@ -468,6 +468,10 @@ addLayer('b', {
                     player.bin.rolled = [];
                     tmp.bin.cards.possibles.forEach(layer => player.bin.cards[layer] = { spots: layers.bin.cards.create_card(), wins: D.dZero, });
                 }
+                if (challenges.includes(91)) {
+                    player.con.points = D.dZero;
+                    Object.values(player.con.condiments).forEach(data => data.amount = D.dZero);
+                }
             },
         },
         // Seals
@@ -539,19 +543,27 @@ addLayer('b', {
         },
         91: {
             name: 'Condiment Seal',
-            challengeDescription: '???',
+            challengeDescription: 'Unlock food condiments. Not using a condiment heavily nerfs row 2 layers.',
+            //? reach ??? spice
             goalDescription: '???',
             canComplete: false,
             rewardDescription: 'Unlock the true potential of Condiments',
             buttonStyle() {
                 const active = activeChallenge('b'),
-                    //todo
-                    style = { /*'background-color': tmp.con.color,*/ };
+                    style = { 'background-color': tmp.con.color, };
                 if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
             unlocked() { return hasUpgrade('a', 44); },
-            //onComplete() { player.subtabs.tic.mainTabs = '???'; }, //todo set to main tab
+            onEnter() {
+                player.con.points = D.dZero;
+                Object.values(player.con.condiments).forEach(data => data.amount = D.dZero);
+            },
+            onComplete() {
+                player.subtabs.con.mainTabs = 'Condiments';
+                player.con.points = D.dZero;
+                Object.values(player.con.condiments).forEach(data => data.amount = D.dZero);
+            },
         },
         //todo 92
     },

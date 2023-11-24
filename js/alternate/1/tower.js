@@ -145,7 +145,7 @@ addLayer('to', {
 
                 let cost = D.pow(entry.exp, getBuyableAmount(this.layer, this.id)).times(entry.base);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -191,7 +191,7 @@ addLayer('to', {
 
                 let cost = D.pow(entry.exp, getBuyableAmount(this.layer, this.id)).times(entry.base);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -238,7 +238,7 @@ addLayer('to', {
 
                 let cost = D.pow(entry.exp, getBuyableAmount(this.layer, this.id)).times(entry.base);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -280,7 +280,7 @@ addLayer('to', {
             cost() {
                 let cost = D.pow(1.5, getBuyableAmount(this.layer, this.id)).times(75);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -313,7 +313,7 @@ addLayer('to', {
             cost() {
                 let cost = D.pow(1.5, getBuyableAmount(this.layer, this.id)).times(75);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -346,7 +346,7 @@ addLayer('to', {
             cost() {
                 let cost = D.pow(1.5, getBuyableAmount(this.layer, this.id)).times(25);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -380,7 +380,7 @@ addLayer('to', {
             cost() {
                 let cost = D.pow(1.5, getBuyableAmount(this.layer, this.id)).times(75);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -414,7 +414,7 @@ addLayer('to', {
             cost() {
                 let cost = D.pow(1.5, getBuyableAmount(this.layer, this.id)).times(75);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -448,7 +448,7 @@ addLayer('to', {
             cost() {
                 let cost = D.pow(1.25, getBuyableAmount(this.layer, this.id)).times(50);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -483,7 +483,7 @@ addLayer('to', {
             cost() {
                 let cost = D.pow(1.25, getBuyableAmount(this.layer, this.id)).pow_base(2).times(50);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -517,7 +517,7 @@ addLayer('to', {
             cost() {
                 let cost = D.pow(1.25, getBuyableAmount(this.layer, this.id)).times(5);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -551,7 +551,7 @@ addLayer('to', {
             cost() {
                 let cost = D.pow(1.25, getBuyableAmount(this.layer, this.id)).times(25);
 
-                if (hasMilestone('to', 3)) cost = cost.div(tmp.to.milestones[3].effect);
+                cost = cost.times(tmp.to.materials.cost_mult);
 
                 return cost;
             },
@@ -571,6 +571,16 @@ addLayer('to', {
         },
     },
     materials: {
+        cost_mult() {
+            let mult = D.dOne;
+
+            if (hasMilestone('to', 3)) mult = mult.div(tmp.to.milestones[3].effect);
+
+            mult = mult.times(tmp.con.condiments['*'].total.to.material_cost ?? D.dOne);
+
+            return mult;
+        },
+        //todo add ice
         low() {
             const low = {
                 'slime_goo': {
@@ -598,6 +608,7 @@ addLayer('to', {
 
             return low;
         },
+        //todo add icestone/rust
         medium: {
             'slime_core_shard': {
                 base: 50,
@@ -707,6 +718,8 @@ addLayer('to', {
         if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['to'] ?? 1);
 
         mult = mult.times(tmp.k.dishes.popsicle.effect);
+
+        mult = mult.times(tmp.con.condiments['*'].total.to.floor_cost ?? D.dOne);
 
         return mult;
     },

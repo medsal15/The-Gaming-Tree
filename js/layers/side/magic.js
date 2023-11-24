@@ -43,6 +43,7 @@ addLayer('mag', {
                         and weaker elements deal *${format(tmp.mag.elements['*'].weak_multiplier)} damage`
                 ],
                 'blank',
+                //todo convert to layer-table
                 ['display-text', () => {
                     /** @param {string} element */
                     const row = element => {

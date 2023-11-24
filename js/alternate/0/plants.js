@@ -1,5 +1,6 @@
 'use strict';
 
+//todo add infusion shortcuts
 //todo recycle plant seeds into seeds (item)
 addLayer('p', {
     name: 'Plants',

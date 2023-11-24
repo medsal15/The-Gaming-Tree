@@ -1665,11 +1665,6 @@ addLayer('c', {
                             add = {};
                         const cant = {};
 
-                        if (player.c.building == building) base['box-shadow'] = `${tmp.c.color} 0 0 20px`;
-                        if (!tmp[this.layer].clickables[this.id].canClick) {
-                            cant['background'] = '#bf8f8f';
-                            cant['cursor'] = 'not-allowed';
-                        }
                         if (type == 'quick') {
                             base = {
                                 'height': '80px',
@@ -1677,6 +1672,11 @@ addLayer('c', {
                                 'min-height': 'unset',
                             };
                             add = tmp.c.buildings[building].style.grid;
+                        }
+                        if (player.c.building == building) base['box-shadow'] = `${tmp.c.color} 0 0 20px`;
+                        if (!tmp[this.layer].clickables[this.id].canClick) {
+                            cant['background'] = '#bf8f8f';
+                            cant['cursor'] = 'not-allowed';
                         }
 
                         return Object.assign(

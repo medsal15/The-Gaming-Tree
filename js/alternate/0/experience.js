@@ -91,7 +91,7 @@ addLayer('xp_alt', {
                     () => {
                         const tame_style = (text, ...style) => `<span style="color:${tmp.xp_alt.color_tame};text-shadow:${tmp.xp_alt.color_tame} 0 0 10px;${style.join(';')}">${text}</span>`,
                             capped = D.gte(player.xp_alt.points, tmp.xp.enemies['*'].exp_cap),
-                            xp_text = capped ? '' : `(${layerColor('xp_alt', `+${format(tmp.xp_alt.monsters['*'].experience)} /s`)}) `,
+                            xp_text = capped ? '' : `(${layerColor('xp_alt', `+${format(tmp.xp_alt.monsters['*'].experience)}`)} /s) `,
                             xp_cap = tmp.xp.enemies['*'].exp_cap,
                             tame_pieces = [];
                         if (tmp.xp_alt.total.tamed.neq(player.xp_alt.monsters[player.xp_alt.type].tamed)) {
@@ -693,7 +693,7 @@ addLayer('xp_alt', {
                 return gain;
             },
             experience(tamed) {
-                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+                const monst = D(tamed ?? player.xp_alt.monsters[this.type].tamed);
 
                 let exp = D(.01);
 
@@ -711,7 +711,7 @@ addLayer('xp_alt', {
                 return tames;
             },
             produces(tamed) {
-                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+                const monst = D(tamed ?? player.xp_alt.monsters[this.type].tamed);
 
                 /** @type {[string, Decimal][]} */
                 const base = [
@@ -774,7 +774,7 @@ addLayer('xp_alt', {
                 return gain;
             },
             experience(tamed) {
-                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+                const monst = D(tamed ?? player.xp_alt.monsters[this.type].tamed);
 
                 let exp = D(.04);
 
@@ -790,7 +790,7 @@ addLayer('xp_alt', {
                 return tames;
             },
             produces(tamed) {
-                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+                const monst = D(tamed ?? player.xp_alt.monsters[this.type].tamed);
 
                 /** @type {[string, Decimal][]} */
                 const base = [
@@ -852,7 +852,7 @@ addLayer('xp_alt', {
                 return gain;
             },
             experience(tamed) {
-                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+                const monst = D(tamed ?? player.xp_alt.monsters[this.type].tamed);
 
                 let exp = D(.08);
 
@@ -868,7 +868,7 @@ addLayer('xp_alt', {
                 return tames;
             },
             produces(tamed) {
-                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+                const monst = D(tamed ?? player.xp_alt.monsters[this.type].tamed);
 
                 /** @type {[string, Decimal][]} */
                 const base = [
@@ -937,7 +937,7 @@ addLayer('xp_alt', {
                 return gain;
             },
             experience(tamed) {
-                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+                const monst = D(tamed ?? player.xp_alt.monsters[this.type].tamed);
 
                 let exp = D(.16);
 
@@ -953,7 +953,7 @@ addLayer('xp_alt', {
                 return tames;
             },
             produces(tamed) {
-                const monst = D(tamed ?? player.xp_alt.monsters[player.xp_alt.type].tamed);
+                const monst = D(tamed ?? player.xp_alt.monsters[this.type].tamed);
 
                 /** @type {[string, Decimal][]} */
                 const base = [

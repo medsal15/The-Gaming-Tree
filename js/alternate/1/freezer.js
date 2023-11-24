@@ -187,7 +187,7 @@ addLayer('fr', {
             });
     },
     automate() {
-        Object.entries(player.f.recipes)
+        Object.entries(player.fr.recipes)
             .forEach(([id, recipe]) => {
                 // Prevent overflow in some cases
                 if (recipe.amount_target.gt(tmp.fr.recipes['*'].size)) recipe.amount_target = tmp.fr.recipes['*'].size;
@@ -1092,6 +1092,8 @@ addLayer('fr', {
 
             gain = gain.times(tmp.k.dishes.popsicle.effect);
 
+            gain = gain.times(tmp.con.condiments['*'].total.f.water ?? D.dOne);
+
             return gain;
         },
         total_gain() { return D.add(tmp.fr.water.gain, tmp.fr.cold.consumes).add(tmp.fr.ice.consumes); },
@@ -1109,6 +1111,8 @@ addLayer('fr', {
             gain = gain.times(tmp.k.dishes.ice_cream.effect);
 
             gain = gain.times(tmp.k.dishes.popsicle.effect);
+
+            gain = gain.times(tmp.con.condiments['*'].total.f.cold ?? D.dOne);
 
             const loss = player.fr.points.div(100);
 

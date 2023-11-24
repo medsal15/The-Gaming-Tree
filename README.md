@@ -28,6 +28,7 @@ By [Lorc](https://lorcblog.blogspot.com/):
 - [powder](https://game-icons.net/1x1/lorc/powder.html)
 - [rock](https://game-icons.net/1x1/lorc/rock.html)
 - [round bottom flask](https://game-icons.net/1x1/lorc/round-bottom-flask.html)
+- [salt shaker](https://game-icons.net/1x1/lorc/salt-shaker.html)
 - [sliced bread](https://game-icons.net/1x1/lorc/sliced-bread.html)
 - [spill](https://game-icons.net/1x1/lorc/spill.html)
 - [staryu](https://game-icons.net/1x1/lorc/staryu.html)

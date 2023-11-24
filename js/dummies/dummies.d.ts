@@ -2300,6 +2300,84 @@ type Layers = {
             ]
         }
     }
+    con: Layer<'con'> & {
+        spice: {
+            gain(): Decimal
+            formula: Computable<string>
+        }
+        condiments: {
+            '*': {
+                /** Gain of the current condiment */
+                gain(): Decimal
+                /** Loss of all condiments */
+                loss(): Decimal
+                total: {
+                    to: {
+                        /** cost multiplier */
+                        material_cost(): Decimal
+                        /** gain multiplier */
+                        floor_cost(): Decimal
+                    }
+                    k: {
+                        /** addition */
+                        oven_size(): Decimal
+                        /** addition */
+                        stomach_size(): Decimal
+                    }
+                    /** gain multipliers */
+                    f: {
+                        water(): Decimal
+                        cold(): Decimal
+                    }
+                }
+                /** Multiplier to correct food duration with the highest condiment */
+                bonus: Computable<Decimal>
+                /** Multiplier to incorrect food duration with the highest condiment */
+                malus: Computable<Decimal>
+                /** Condiment with highest amount */
+                highest(): string
+            }
+            [condiment: string]: {
+                readonly id: string
+                effect(): {
+                    to?: {
+                        /** cost multiplier */
+                        material_cost?: Decimal
+                        /** gain multiplier */
+                        floor_cost?: Decimal
+                    }
+                    k?: {
+                        /** addition */
+                        oven_size?: Decimal
+                        /** addition */
+                        stomach_size?: Decimal
+                    }
+                    /** gain multipliers */
+                    f?: {
+                        water?: Decimal
+                        cold?: Decimal
+                    }
+                }
+                formulas: Computable<{
+                    to?: {
+                        material_cost?: string
+                        floor_cost?: string
+                    }
+                    k?: {
+                        oven_size?: string
+                        stomach_size?: string
+                    }
+                    f?: {
+                        water?: string
+                        cold?: string
+                    }
+                }>
+                name: string
+                color: string
+            }
+        }
+        clickables: Layer<'con'>['clickables'] & { [id: string]: Clickable<'con'> & { condiment: string } }
+    }
     // Alt Row 0
     xp_alt: Layer<'xp_alt'> & {
         color_tame: string
@@ -2491,6 +2569,7 @@ type Layers = {
          * Cost is `req * base ^ (exp ^ amount)`
          */
         materials: {
+            cost_mult(): Decimal
             [type in 'low' | 'medium' | 'high']: Computable<{
                 [item in items]: {
                     base: DecimalSource
@@ -2598,11 +2677,20 @@ type Layers = {
                 type: 'food' | 'drink'
                 /** @default true */
                 unlocked?: Computable<boolean>
-                duration: Computable<{ unit: time_units, time: DecimalSource }>
+                //duration: Computable<{ unit: time_units, time: DecimalSource }>
+                duration: {
+                    readonly id: dish
+                    unit: time_units
+                    time: Computable<DecimalSource>
+                }
                 effect(duration: Decimal): any
                 effect_description(duration: Decimal): string
                 /** Total value of the dish */
                 value: Computable<Decimal>
+                condiment: {
+                    good: string[]
+                    bad: string[]
+                }
             }
         }
     }
@@ -2931,6 +3019,14 @@ type Player = {
          * Swaps highest win streak with the selected layer
          */
         swap: keyof Layers | ''
+    }
+    con: LayerData & {
+        condiment: string
+        condiments: {
+            [condiment: string]: {
+                amount: Decimal
+            }
+        }
     }
     // Alt Row 0
     xp_alt: LayerData & {

@@ -231,7 +231,13 @@ addLayer('k', {
                     ['clickable', `recipe_auto_${recipe_id}`],
                 ]];
             },
-            size() { return D.dOne; },
+            size() {
+                let size = D.dOne;
+
+                size = size.add(tmp.con.condiments['*'].total.k.oven_size ?? D.dZero);
+
+                return size.floor().max(0);
+            },
             default_amount(recipe, amount) {
                 if (D.gt(amount, 0)) return D(amount);
                 if (!recipe) return D.dOne;
@@ -539,7 +545,9 @@ addLayer('k', {
 
                 size = size.add(tmp.k.dishes.star_crunch.effect.size);
 
-                return size.toNumber();
+                size = size.add(tmp.con.condiments['*'].total.k.stomach_size ?? D.dZero);
+
+                return size.floor().max(0).toNumber();
             },
             grid_to_dish(id) {
                 if (!id) return false;
@@ -568,11 +576,11 @@ addLayer('k', {
                     dish = tmp.k.dishes[active.id],
                     /** @type {time_units} */
                     unit = dish.duration.unit,
-                    f = layers.k.dishes['*'].units[unit].format,
+                    duration_format = layers.k.dishes['*'].units[unit].format,
                     name = layers.k.dishes['*'].units[unit].name;
 
                 return `<h3>${capitalize(dish.name)}</h3><br>\
-                    ${f(active.time)} / ${f(dish.duration.time)} ${name}<br>\
+                    ${duration_format(active.time)} / ${duration_format(dish.duration.time)} ${name}<br>\
                     ${layers.k.dishes[active.id].effect_description(active.time)}`;
             },
             description_dish(dish_id) {
@@ -582,11 +590,16 @@ addLayer('k', {
                     /** @type {time_units} */
                     unit = dish.duration.unit,
                     duration_format = layers.k.dishes['*'].units[unit].format,
-                    name = layers.k.dishes['*'].units[unit].name;
+                    name = layers.k.dishes['*'].units[unit].name,
+                    /** @type {(condiment: string) => string} */
+                    condiment_text = condiment => `<span style="color:${tmp.con.condiments[condiment].color};">${tmp.con.condiments[condiment].name}</span>`,
+                    good = (tmp.con.layerShown && dish.condiment.good.length) ? `Tastes better with ${listFormat(dish.condiment.good.map(condiment_text))}<br>` : '',
+                    bad = (tmp.con.layerShown && dish.condiment.bad.length) ? `Tastes worse with ${listFormat(dish.condiment.bad.map(condiment_text))}<br>` : '';
 
                 return `${capitalize(dish.name)}<br>\
                         Duration: ${duration_format(dish.duration.time)} ${name}<br>\
                         ${layers.k.dishes[dish_id].effect_description(dish.duration.time)}<br>\
+                        ${good}${bad}\
                         Value: ${format(dish.value)}`;
             },
             units: {
@@ -614,7 +627,7 @@ addLayer('k', {
         },
         failure: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 101,
             style: {
                 'background-image': `url('./resources/images/carrion.svg')`,
@@ -623,11 +636,20 @@ addLayer('k', {
             name: 'failed food',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'seconds',
                 time() {
                     let time = D(10);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -640,10 +662,14 @@ addLayer('k', {
             },
             effect_description(duration) { return `Multiplies XP gain, building production/consumption, and harvest yield by 0.5`; },
             value: D.dZero,
+            condiment: {
+                good: [],
+                bad: [],
+            },
         },
         grilled_corn: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 201,
             style: {
                 'background-image': `url('./resources/images/corn.svg')`,
@@ -652,11 +678,20 @@ addLayer('k', {
             name: 'grilled corn',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'seconds',
                 time() {
                     let time = D(150);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -673,10 +708,14 @@ addLayer('k', {
                 return `Multiplies plant harvest yield by ${effect}`;
             },
             value() { return D.times(1, player.k.dishes[this.id].amount); },
+            condiment: {
+                good: ['pepper'],
+                bad: ['mint'],
+            },
         },
         roasted_eggplant: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 202,
             style: {
                 'background-image': `url('./resources/images/aubergine.svg')`,
@@ -686,11 +725,20 @@ addLayer('k', {
             name: 'roasted eggplant',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'seconds',
                 time() {
                     let time = D(60);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -707,10 +755,14 @@ addLayer('k', {
                 return `Multiplies plant growth speed by ${effect}`;
             },
             value() { return D.times(1, player.k.dishes[this.id].amount); },
+            condiment: {
+                good: ['pepper'],
+                bad: ['ginger'],
+            },
         },
         bread: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 301,
             style: {
                 'background-image': `url('./resources/images/sliced-bread.svg')`,
@@ -719,11 +771,20 @@ addLayer('k', {
             name: 'bread',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'seconds',
                 time() {
                     let time = D(120);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -740,10 +801,14 @@ addLayer('k', {
                 return `Multiplies city production/consumption by ${effect}`;
             },
             value() { return D.times(2, player.k.dishes[this.id].amount); },
+            condiment: {
+                good: ['vinegar'],
+                bad: ['mint'],
+            },
         },
         berries_bowl: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 302,
             style: {
                 'background-image': `url('./resources/images/berries-bowl.svg')`,
@@ -752,11 +817,20 @@ addLayer('k', {
             name: 'berries bowl',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'seconds',
                 time() {
                     let time = D(20);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -773,10 +847,14 @@ addLayer('k', {
                 return `Multiplies passive monster gain by ${effect}`;
             },
             value() { return D.times(2, player.k.dishes[this.id].amount); },
+            condiment: {
+                good: ['mint'],
+                bad: ['pepper'],
+            },
         },
         french_fries: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 303,
             style: {
                 'background-image': `url('./resources/images/french-fries.svg')`,
@@ -785,11 +863,20 @@ addLayer('k', {
             name: 'french fries',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'seconds',
                 time() {
                     let time = D(30);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -806,10 +893,14 @@ addLayer('k', {
                 return `Divides city consumption by ${effect}`;
             },
             value() { return D.times(2, player.k.dishes[this.id].amount); },
+            condiment: {
+                good: ['vinegar'],
+                bad: ['ginger'],
+            },
         },
         fried_eggs: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 401,
             style: {
                 'background-image': `url('./resources/images/fried-eggs.svg')`,
@@ -818,11 +909,20 @@ addLayer('k', {
             name: 'fried eggs',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'tames',
                 time() {
                     let time = D(10);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -835,10 +935,14 @@ addLayer('k', {
             },
             effect_description(duration) { return `Multiplies monster tames by 2, but divides monster production by 2`; },
             value() { return D.times(3, player.k.dishes[this.id].amount); },
+            condiment: {
+                good: ['pepper'],
+                bad: ['mint'],
+            },
         },
         cake: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 402,
             style: {
                 'background-image': `url('./resources/images/cake-slice.svg')`,
@@ -847,11 +951,20 @@ addLayer('k', {
             name: 'cake',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'tames',
                 time() {
                     let time = D(20);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -868,10 +981,14 @@ addLayer('k', {
                 return `Multiplies taming progress by ${effect}`;
             },
             value() { return D.times(4, player.k.dishes[this.id].amount); },
+            condiment: {
+                good: ['mint'],
+                bad: ['vinegar'],
+            },
         },
         ice_cream: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 501,
             style: {
                 'background-image': `url('./resources/images/ice-cream-cone.svg')`,
@@ -880,11 +997,20 @@ addLayer('k', {
             name: 'ice cream',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'seconds',
                 time() {
                     let time = D(60);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -902,10 +1028,14 @@ addLayer('k', {
             },
             value() { return D.times(3, player.k.dishes[this.id].amount); },
             unlocked() { return tmp.fr.layerShown; },
+            condiment: {
+                good: ['mint'],
+                bad: ['ginger'],
+            },
         },
         popsicle: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 502,
             style: {
                 'background-image': `url('./resources/images/ice-pop.svg')`,
@@ -914,11 +1044,20 @@ addLayer('k', {
             name: 'popsicle',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'seconds',
                 time() {
                     let time = D(30);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -937,10 +1076,14 @@ addLayer('k', {
             },
             value() { return D.times(3, player.k.dishes[this.id].amount); },
             unlocked() { return tmp.fr.layerShown; },
+            condiment: {
+                good: ['mint'],
+                bad: ['pepper'],
+            },
         },
         slime_juice: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 601,
             style: {
                 'background-image': `url('./resources/images/glass-shot.svg')`,
@@ -949,11 +1092,20 @@ addLayer('k', {
             name: 'slime juice',
             type: 'drink',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'seconds',
                 time() {
                     let time = D(60);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -966,10 +1118,14 @@ addLayer('k', {
             },
             effect_description(duration) { return `Multiplies cooking speed by 2`; },
             value() { return D.times(3, player.k.dishes[this.id].amount); },
+            condiment: {
+                good: ['pepper'],
+                bad: ['vinegar'],
+            },
         },
         monster_meal: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 602,
             style: {
                 'background-image': `url('./resources/images/hot-meal.svg')`,
@@ -978,11 +1134,20 @@ addLayer('k', {
             name: 'monster meal',
             type: 'food',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'tames',
                 time() {
                     let time = D(45);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -1000,10 +1165,14 @@ addLayer('k', {
             },
             value() { return D.times(3, player.k.dishes[this.id].amount); },
             unlocked() { return tmp.xp_alt.monsters.zombie.unlocked; },
+            condiment: {
+                good: ['mint'],
+                bad: ['ginger'],
+            },
         },
         star_crunch: {
             _id: null,
-            get id() { return this._id ??= Object.keys(layers.k.dishes).find(dish => layers.k.dishes[dish] == this); },
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 603,
             style: {
                 'background-image': `url('./resources/images/staryu.svg')`,
@@ -1011,11 +1180,20 @@ addLayer('k', {
             },
             name: 'star crunch',
             duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
                 unit: 'seconds',
                 time() {
                     let time = D(300);
 
                     time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
 
                     return time;
                 },
@@ -1032,6 +1210,10 @@ addLayer('k', {
                 return `Increases base star time by ${effect}, and stomach size by 2`;
             },
             value() { return D.times(10, player.k.dishes[this.id].amount); },
+            condiment: {
+                good: ['mint', 'pepper'],
+                bad: ['vinegar', 'ginger'],
+            },
         },
     },
     grid: {

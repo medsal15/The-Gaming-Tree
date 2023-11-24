@@ -527,6 +527,7 @@ addLayer('suc', {
             },
             unlocked() { return hasChallenge('b', 42); },
         },
+        //todo bonus successes for bonus challenges in final challenge
         //#endregion Bonus Successes
         //#region Secret Successes
         81: {
