@@ -671,8 +671,8 @@ addLayer('xp_alt', {
             get type() { return this._type ??= Object.keys(layers.xp_alt.monsters).find(item => layers.xp_alt.monsters[item] == this); },
             color: '#884488',
             name() { return tmp.xp.enemies[this.type].name; },
-            difficulty() {
-                const tamed = player.xp_alt.monsters[this.type].tamed ?? D.dZero;
+            difficulty(tamed) {
+                tamed ??= player.xp_alt.monsters[this.type].tamed ?? D.dZero;
 
                 let exp = D(1.1),
                     base = D(10);
@@ -746,14 +746,15 @@ addLayer('xp_alt', {
                 return gain;
             },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
+            unlocked() { return !inChallenge('b', 41) },
         },
         goblin: {
             _type: null,
             get type() { return this._type ??= Object.keys(layers.xp_alt.monsters).find(item => layers.xp_alt.monsters[item] == this); },
             color: '#44FF44',
             name() { return tmp.xp.enemies[this.type].name; },
-            difficulty() {
-                const tamed = player.xp_alt.monsters[this.type].tamed ?? D.dZero;
+            difficulty(tamed) {
+                tamed ??= player.xp_alt.monsters[this.type].tamed ?? D.dZero;
 
                 let exp = D(1.15),
                     base = D(20);
@@ -823,15 +824,15 @@ addLayer('xp_alt', {
                 return gain;
             },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
-            unlocked() { return hasUpgrade('xp_alt', 33) },
+            unlocked() { return hasUpgrade('xp_alt', 33) && !inChallenge('b', 41) },
         },
         zombie: {
             _type: null,
             get type() { return this._type ??= Object.keys(layers.xp_alt.monsters).find(item => layers.xp_alt.monsters[item] == this); },
             color: '#557700',
             name() { return tmp.xp.enemies[this.type].name; },
-            difficulty() {
-                const tamed = player.xp_alt.monsters[this.type].tamed ?? D.dZero;
+            difficulty(tamed) {
+                tamed ??= player.xp_alt.monsters[this.type].tamed ?? D.dZero;
 
                 let exp = D(1.2),
                     base = D(40);
@@ -908,15 +909,15 @@ addLayer('xp_alt', {
                 return gain;
             },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
-            unlocked() { return hasMilestone('to', 2); },
+            unlocked() { return hasMilestone('to', 2) && !inChallenge('b', 41); },
         },
         ent: {
             _type: null,
             get type() { return this._type ??= Object.keys(layers.xp_alt.monsters).find(item => layers.xp_alt.monsters[item] == this); },
             color: '#448811',
             name() { return tmp.xp.enemies[this.type].name; },
-            difficulty() {
-                const tamed = player.xp_alt.monsters[this.type].tamed ?? D.dZero;
+            difficulty(tamed) {
+                tamed ??= player.xp_alt.monsters[this.type].tamed ?? D.dZero;
 
                 let exp = D(1.25),
                     base = D(80);
@@ -1005,8 +1006,8 @@ addLayer('xp_alt', {
                 return `#${Array.from({ length: 3 }, (_, i) => Math.floor(color_max[i] * fraction + color_min[i] * (1 - fraction)).toString(16).padStart(2, '0')).join('')}`;
             },
             name() { return tmp.xp.enemies[this.type].name; },
-            difficulty() {
-                const tamed = tmp.xp_alt.total.tamed;
+            difficulty(tamed) {
+                tamed ??= tmp.xp_alt.total.tamed;
 
                 let exp = D(1.75),
                     base = D(250);
@@ -1032,6 +1033,65 @@ addLayer('xp_alt', {
             passive_tame() { return D.dZero; },
             get_drops(kills) { return []; },
             unlocked() { return !inChallenge('b', 31) && inChallenge('b', 42); },
+        },
+        amalgam: {
+            _type: null,
+            get type() { return this._type ??= Object.keys(layers.xp_alt.monsters).find(item => layers.xp_alt.monsters[item] == this); },
+            color() {
+                const types = ['slime', 'goblin', 'zombie'];
+
+                if (false) types.push('ent'); //todo unlock ent
+
+                return colors_average(...types.map(type => tmp.xp_alt.monsters[type].color));
+            },
+            name() { return tmp.xp.enemies[this.type].name; },
+            difficulty(tamed) {
+                tamed ??= player.xp_alt.monsters[this.type].tamed;
+                const types = ['slime', 'goblin', 'zombie'];
+
+                if (false) types.push('ent'); //todo unlock ent
+
+                return types.reduce((sum, type) => D.add(sum, layers.xp_alt.monsters[type].difficulty(tamed)), 0);
+            },
+            progress_gain() {
+                let gain = D.dOne;
+
+                gain = gain.times(tmp.xp_alt.monsters['*'].progress_mult);
+
+                return gain;
+            },
+            experience(tamed) {
+                tamed ??= player.xp_alt.monsters[this.type].tamed;
+                const types = ['slime', 'goblin', 'zombie'];
+
+                if (false) types.push('ent'); //todo unlock ent
+
+                return types.reduce((sum, type) => D.add(sum, layers.xp_alt.monsters[type].experience(tamed)), 0);
+            },
+            tames() { return D.dOne; },
+            produces(tamed) {
+                tamed ??= player.xp_alt.monsters[this.type].tamed;
+                const types = ['slime', 'goblin', 'zombie'];
+
+                if (false) types.push('ent'); //todo unlock ent
+
+                return types.reduce((sum, type) => [...sum, ...layers.xp_alt.monsters[type].produces(tamed)], []);
+            },
+            passive_tame() {
+                const types = ['slime', 'goblin', 'zombie'];
+
+                if (false) types.push('ent'); //todo unlock ent
+
+                return D.div(types.reduce((sum, type) => D.add(sum, tmp.xp_alt.monsters[type].passive_tame), 0), types.length);
+            },
+            get_drops(kills) {
+                const types = ['slime', 'goblin', 'zombie'];
+
+                if (false) types.push('ent'); //todo unlock ent
+
+                return types.reduce((sum, type) => [...sum, ...layers.xp_alt.monsters[type].produces(kills)], []);
+            },
+            unlocked() { return inChallenge('b', 41); },
         },
     },
     total: {

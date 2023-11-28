@@ -217,6 +217,7 @@ addLayer('con', {
         },
     },
     //? Might need to nerf/change these
+    //if so, use a merge minigame
     buyables: {
         11: {
             title: 'Condiment Producer',
@@ -466,6 +467,7 @@ addLayer('con', {
                 return condiments.sort(([, data_a], [, data_b]) => D.cmp(data_a.amount, data_b.amount))[0][0];
             },
         },
+        //todo condimentless nerf for challenge
         pepper: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.con.condiments).find(condiment => layers.con.condiments[condiment] == this); },

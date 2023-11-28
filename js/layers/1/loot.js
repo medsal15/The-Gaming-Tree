@@ -3601,7 +3601,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/clay-brick.svg')`,
                 'background-color': '#BBBBBB',
             },
-            unlocked() { return tmp.f.layerShown; },
+            unlocked() { return tmp.f.layerShown || tmp.c.buildings.smelter.unlocked; },
         },
         copper_ingot: {
             _id: null,
@@ -3652,7 +3652,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
                 'background-color': '#BB7733',
             },
-            unlocked() { return tmp.f.layerShown; },
+            unlocked() { return tmp.f.layerShown || tmp.c.buildings.smelter.unlocked; },
         },
         tin_ingot: {
             _id: null,
@@ -3703,7 +3703,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
                 'background-color': '#CCBB88',
             },
-            unlocked() { return tmp.f.layerShown; },
+            unlocked() { return tmp.f.layerShown || tmp.c.buildings.smelter.unlocked; },
         },
         iron_ingot: {
             _id: null,
@@ -3754,7 +3754,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
                 'background-color': '#888888',
             },
-            unlocked() { return tmp.f.layerShown; },
+            unlocked() { return tmp.f.layerShown || tmp.c.buildings.smelter.unlocked; },
         },
         gold_ingot: {
             _id: null,
@@ -3805,7 +3805,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
                 'background-color': 'gold',
             },
-            unlocked() { return tmp.f.layerShown; },
+            unlocked() { return tmp.f.layerShown || tmp.c.buildings.smelter.unlocked; },
         },
         // Forge alloys
         bronze_ingot: {

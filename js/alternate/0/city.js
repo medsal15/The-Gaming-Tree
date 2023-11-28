@@ -2544,7 +2544,8 @@ addLayer('c', {
                     ['tin_ingot', D(1 / 56)],
                 ];
 
-                if (hasMilestone('to', 7)) items.push(
+                // Prevent softlock for those without enough Tower milestones
+                if (hasMilestone('to', 7) || inChallenge('b', 21) || inChallenge('b', 41)) items.push(
                     ['iron_ingot', D(1 / 220)],
                     ['gold_ingot', D(1 / 441)],
                 );
@@ -2578,7 +2579,8 @@ addLayer('c', {
                     ['tin_ore', D(50 / 56)],
                 ];
 
-                if (hasMilestone('to', 7)) items.push(
+                // Prevent softlock for those without enough Tower milestones
+                if (hasMilestone('to', 7) || inChallenge('b', 21) || inChallenge('b', 41)) items.push(
                     ['iron_ore', D(100 / 220)],
                     ['gold_ore', D(25 / 441)],
                 );
@@ -2615,7 +2617,7 @@ addLayer('c', {
             formulas: {
                 cost: [['stone', '(1.4 ^ built) * 100'], ['iron_ore', '(1.25 ^ built) * 25']],
             },
-            // Prevent softlock for those without Tower!
+            // Prevent softlock for those without enough Tower milestones
             unlocked() { return hasMilestone('to', 3) || inChallenge('b', 21) || inChallenge('b', 41); },
         },
         well: {

@@ -1,6 +1,5 @@
 'use strict';
 
-//todo add infusion shortcuts
 //todo recycle plant seeds into seeds (item)
 addLayer('p', {
     name: 'Plants',
@@ -187,27 +186,29 @@ addLayer('p', {
                         ).flat();
 
                         return [
-                            ['Base', 'Item', 'Result'],
+                            ['Base', 'Item', 'Result', 'Infuse'],
                             ...infusions.map(([plant, item]) => [
                                 [['display-text', capitalize(tmp.p.plants[plant].name)]],
                                 [['display-text', capitalize(tmp.lo.items[item].name)]],
                                 [['display-text', capitalize(tmp.p.plants[tmp.p.plants[plant].infusions[item]].name)]],
+                                [['clickable', `infuse_${plant}-${item}`]],
                             ])
                         ];
                     },
                 ],
-                'blank',
-                ['display-text', 'Infusion hints'],
-                ['display-text', () => {
+                ['column', () => {
+                    const locked = Object.keys(tmp.p.plants).filter(plant => plant != '*' && !tmp.p.plants[plant].unlocked && tmp.p.plants[plant].hint);
+                    if (!locked.length) return;
                     /**
                      * @param {string} plant
                      */
                     const row = plant => `${(tmp.p.plants[plant].unlocked ?? true) ? capitalize(tmp.p.plants[plant].name) : '???'}: ${tmp.p.plants[plant].hint}`;
 
-                    return Object.keys(tmp.p.plants)
-                        .filter(plant => plant != '*' && !tmp.p.plants[plant].unlocked && tmp.p.plants[plant].hint)
-                        .map(row)
-                        .join('<br>')
+                    return [
+                        'blank',
+                        ['display-text', 'Infusion hints'],
+                        ...locked.map(plant => ['display-text', row(plant)]),
+                    ]
                 }],
             ],
         },
@@ -252,10 +253,10 @@ addLayer('p', {
                 };
             }
 
-            const matches = layers.p.plants['*'].regex.exec(prop);
-            if (matches) {
+            const matches_select = layers.p.plants['*'].regexes.select.exec(prop);
+            if (matches_select) {
                 /** @type {[string, 'quick', string]} */
-                const [, , plant] = matches;
+                const [, , plant] = matches_select;
 
                 return obj[prop] ??= {
                     canClick() {
@@ -295,20 +296,78 @@ addLayer('p', {
                     unlocked: true,
                 };
             }
+
+            const matches_infusion = layers.p.plants['*'].regexes.infuse.exec(prop);
+            if (matches_infusion) {
+                /** @type {[string, 'infuse', string, items]} */
+                const [, , plant, item] = matches_infusion;
+                return obj[prop] ??= {
+                    canClick() {
+                        return D.gte(player.p.plants[plant].seeds, 1) &&
+                            D.gte(player.lo.items[item].amount, 1) &&
+                            player.p.plants[plant].infusions.includes(tmp.p.plants[plant].infusions[item]);
+                    },
+                    onClick() {
+                        player.p.plants[plant].seeds = D.minus(player.p.plants[plant].seeds, 1);
+                        const result = tmp.p.plants[plant].infusions[item];
+                        layers.lo.items['*'].gain_items(item, -1);
+                        player.p.plants[result].seeds = D.add(player.p.plants[result].seeds, 1);
+                    },
+                    style() {
+                        let base = {
+                            'background-image': `url('./resources/images/crafting.svg')`,
+                            'background-repeat': 'no-repeat',
+                            'background-position': 'center',
+                        },
+                            plant_style = {};
+                        const cant = {};
+
+                        if (!tmp[this.layer].clickables[this.id].canClick) {
+                            cant['background'] = `url('./resources/images/crafting.svg') #bf8f8f no-repeat center`;
+                            cant['cursor'] = 'not-allowed';
+                        } else {
+                            plant_style = tmp.p.plants[tmp.p.plants[plant].infusions[item]].style.general;
+                        }
+
+                        return Object.assign(
+                            base,
+                            {
+                                'height': '60px',
+                                'min-height': 'unset',
+                            },
+                            plant_style,
+                            cant,
+                        );
+                    },
+                    unlocked() { return player.p.plants[plant].infusions.includes(tmp.p.plants[plant].infusions[item]); },
+                    display() {
+                        return `${format(player.p.plants[plant].seeds)} ${tmp.p.plants[plant].name} seeds<br>\
+                            ${format(player.lo.items[item].amount)} ${tmp.lo.items[item].name}`;
+                    },
+                };
+            }
         },
         getOwnPropertyDescriptor(_, prop) {
             if (prop == 'layer' ||
-                layers.p.plants['*'].regex.exec(prop) ||
+                layers.p.plants['*'].regexes.select.exec(prop) ||
+                layers.p.plants['*'].regexes.infuse.exec(prop) ||
                 prop == 'infuse') return {
                     enumerable: true,
                     configurable: true,
                 };
         },
-        has(_, prop) { return layers.p.plants['*'].regex.exec(prop) || prop == 'layer'; },
+        has(_, prop) {
+            return layers.p.plants['*'].regexes.select.exec(prop) ||
+                layers.p.plants['*'].regexes.infuse.exec(prop) ||
+                prop == 'layer';
+        },
         ownKeys() {
             return [
                 'infuse',
                 ...Object.keys(layers.p.plants).map(plant => `quick_${plant}`),
+                ...Object.values(layers.p.plants)
+                    .filter(plant => 'infusions' in plant)
+                    .map(plant => Object.keys(plant.infusions).map(item => `infuse_${plant.id}-${item}`)).flat(),
             ];
         },
     }),
@@ -446,7 +505,10 @@ addLayer('p', {
 
                 return mult;
             },
-            regex: /^(quick)_([a-z_]+)$/,
+            regexes: {
+                select: /^(quick)_([a-z_]+)$/,
+                infuse: /^(infuse)_([a-z_]+)-([a-z_]+)$/,
+            },
         },
         wheat: {
             _id: null,

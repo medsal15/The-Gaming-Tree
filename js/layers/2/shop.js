@@ -8,6 +8,7 @@ addLayer('s', {
             unlocked: false,
             points: D.dZero,
             short_mode: false,
+            respecced: false,
         };
     },
     tooltip() {
@@ -95,6 +96,7 @@ addLayer('s', {
             onClick() {
                 if (!confirm(`Doing this will not refund your ${tmp.s.investloans.type}s and will force a Shop reset.\nAre you sure?`)) return;
 
+                player.s.respecced = true;
                 player.s.upgrades = player.s.upgrades.filter(id => !layers.s.investloans.is_upg_loan(id));
                 doReset('s', true);
             },

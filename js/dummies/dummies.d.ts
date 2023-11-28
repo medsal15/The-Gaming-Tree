@@ -2402,7 +2402,7 @@ type Layers = {
                 color: Computable<string>
                 name: Computable<string>
                 /** Amount of progress needed to tame */
-                difficulty(): Decimal
+                difficulty(tamed?: DecimalSource): Decimal
                 progress_gain(): Decimal
                 /** Total amount of experience produced every second */
                 experience(tamed?: DecimalSource): Decimal
@@ -2519,7 +2519,10 @@ type Layers = {
                 harvest_mult(): Decimal
                 grow_mult(): Decimal
                 seeds_mult(): Decimal
-                regex: RegExp
+                regexes: {
+                    select: RegExp
+                    infuse: RegExp
+                }
             }
         } & {
             [plant: string]: {
@@ -2977,7 +2980,8 @@ type Player = {
         final_challenges: number[]
     }
     s: LayerData & {
-        short_mode: boolean,
+        short_mode: boolean
+        respecced: boolean
     }
     a: LayerData & {}
     // Alt Side

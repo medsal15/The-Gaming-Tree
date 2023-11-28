@@ -307,9 +307,18 @@ addLayer('b', {
                 if (active && (active < 50 || active == 71) && !canCompleteChallenge(this.layer, this.id)) style.display = 'none';
                 return style;
             },
-            onEnter() { player.xp.type = 'amalgam'; },
-            onExit() { if (player.xp.type == 'amalgam') player.xp.type = 'slime'; },
-            onComplete() { if (player.xp.type == 'amalgam') player.xp.type = 'slime'; },
+            onEnter() {
+                player.xp.type = 'amalgam';
+                player.xp_alt.type = 'amalgam';
+            },
+            onExit() {
+                if (player.xp.type == 'amalgam') player.xp.type = 'slime';
+                if (player.xp_alt.type == 'amalgam') player.xp_alt.type = 'slime';
+            },
+            onComplete() {
+                if (player.xp.type == 'amalgam') player.xp.type = 'slime';
+                if (player.xp_alt.type == 'amalgam') player.xp_alt.type = 'slime';
+            },
         },
         42: {
             name: 'The World Tree',
