@@ -500,7 +500,7 @@ addLayer('k', {
                 'brain': '2 ^ amount',
                 'time': '20 * amount + 20',
             },
-            unlocked() { return tmp.xp_alt.monsters.zombie.unlocked; },
+            unlocked() { return tmp.xp_alt.monsters.zombie.unlocked || tmp.xp_alt.monsters.amalgam.unlocked; },
         },
         star_crunch: {
             _id: null,
@@ -1164,7 +1164,7 @@ addLayer('k', {
                 return `Passively tames zombies with ${effect}% efficiency`;
             },
             value() { return D.times(3, player.k.dishes[this.id].amount); },
-            unlocked() { return tmp.xp_alt.monsters.zombie.unlocked; },
+            unlocked() { return tmp.xp_alt.monsters.zombie.unlocked || tmp.xp_alt.monsters.amalgam.unlocked; },
             condiment: {
                 good: ['mint'],
                 bad: ['ginger'],

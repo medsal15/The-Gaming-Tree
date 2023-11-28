@@ -2416,7 +2416,7 @@ type Layers = {
                 /** Total items produced per second */
                 produces(tamed?: DecimalSource): [items, Decimal][]
                 /** Amount of the monster gained every second */
-                passive_tame(): Decimal
+                passive_tame(tamed?: DecimalSource): Decimal
                 /**
                  * Get drops as if the enemy were killed
                  *

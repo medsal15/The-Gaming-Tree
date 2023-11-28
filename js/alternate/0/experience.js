@@ -736,12 +736,16 @@ addLayer('xp_alt', {
 
                 return base;
             },
-            passive_tame() {
+            passive_tame(tamed) {
                 if (!hasUpgrade('xp_alt', 22)) return D.dZero;
 
+                tamed ??= player.xp_alt.monsters[this.type].tamed ?? D.dZero;
+
+                /** @type {typeof tmp.xp_alt.monsters[string]} */
                 const monster = tmp.xp_alt.monsters[this.type];
 
-                let gain = D.div(monster.progress_gain, monster.difficulty).times(monster.tames).times(tmp.xp_alt.monsters['*'].tames_passive_mult);
+                let gain = D.div(monster.progress_gain, layers.xp_alt.monsters[this.type].difficulty(tamed))
+                    .times(monster.tames).times(tmp.xp_alt.monsters['*'].tames_passive_mult);
 
                 return gain;
             },
@@ -815,11 +819,13 @@ addLayer('xp_alt', {
                 return base;
             },
             passive_tame() {
+                /** @type {typeof tmp.xp_alt.monsters[string]} */
                 const monster = tmp.xp_alt.monsters[this.type];
 
                 if (!hasUpgrade('xp_alt', 22) || !hasUpgrade('c', 43) || !monster.unlocked) return D.dZero;
 
-                let gain = D.div(monster.progress_gain, monster.difficulty).times(monster.tames).times(tmp.xp_alt.monsters['*'].tames_passive_mult);
+                let gain = D.div(monster.progress_gain, layers.xp_alt.monsters[this.type].difficulty(tamed))
+                    .times(monster.tames).times(tmp.xp_alt.monsters['*'].tames_passive_mult);
 
                 return gain;
             },
@@ -892,16 +898,17 @@ addLayer('xp_alt', {
 
                 return base;
             },
-            passive_tame() {
+            passive_tame(tamed) {
                 let mult = D.dZero;
 
                 mult = mult.add(tmp.k.dishes.monster_meal.effect);
 
                 if (mult.lte(0)) return D.dZero;
 
+                /** @type {typeof tmp.xp_alt.monsters[string]} */
                 const monster = tmp.xp_alt.monsters[this.type];
 
-                let gain = D.div(monster.progress_gain, monster.difficulty)
+                let gain = D.div(monster.progress_gain, layers.xp_alt.monsters[this.type].difficulty(tamed))
                     .times(monster.tames)
                     .times(tmp.xp_alt.monsters['*'].tames_passive_mult)
                     .times(mult);
@@ -977,7 +984,7 @@ addLayer('xp_alt', {
 
                 return base;
             },
-            passive_tame() { return D.dZero; },
+            passive_tame(tamed) { return D.dZero; },
             get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
             unlocked: false,
         },
@@ -1030,7 +1037,7 @@ addLayer('xp_alt', {
             experience(tamed) { return D.dZero; },
             tames() { return D.dOne; },
             produces(tamed) { return []; },
-            passive_tame() { return D.dZero; },
+            passive_tame(tamed) { return D.dZero; },
             get_drops(kills) { return []; },
             unlocked() { return !inChallenge('b', 31) && inChallenge('b', 42); },
         },
@@ -1077,12 +1084,13 @@ addLayer('xp_alt', {
 
                 return types.reduce((sum, type) => [...sum, ...layers.xp_alt.monsters[type].produces(tamed)], []);
             },
-            passive_tame() {
+            passive_tame(tamed) {
+                tamed ??= player.xp_alt.monsters[this.type].tamed;
                 const types = ['slime', 'goblin', 'zombie'];
 
                 if (false) types.push('ent'); //todo unlock ent
 
-                return D.div(types.reduce((sum, type) => D.add(sum, tmp.xp_alt.monsters[type].passive_tame), 0), types.length);
+                return D.div(types.reduce((sum, type) => D.add(sum, layers.xp_alt.monsters[type].passive_tame(tamed)), 0), types.length);
             },
             get_drops(kills) {
                 const types = ['slime', 'goblin', 'zombie'];
