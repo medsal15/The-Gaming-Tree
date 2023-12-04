@@ -605,7 +605,7 @@ addLayer('to', {
                 exp: 1.5,
             }
 
-            if (player.fr.unlocked) low['ice'] = {
+            if (player?.fr?.unlocked) low['ice'] = {
                 base: 10,
                 exp: 2,
             };
@@ -628,7 +628,7 @@ addLayer('to', {
                 },
             };
 
-            if (player.fr.unlocked) {
+            if (player?.fr?.unlocked) {
                 medium['icestone'] = {
                     base: 10,
                     exp: 1.75,

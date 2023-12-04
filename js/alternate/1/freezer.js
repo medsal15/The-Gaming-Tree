@@ -50,8 +50,8 @@ addLayer('fr', {
     deactivated() { return inChallenge('b', 31); },
     hotkeys: [
         {
-            key: 'f',
-            description: 'F: Display freezer layer',
+            key: 'r',
+            description: 'R: Display freezer layer',
             unlocked() { return player.fr.unlocked; },
             onPress() { showTab('fr'); },
         },

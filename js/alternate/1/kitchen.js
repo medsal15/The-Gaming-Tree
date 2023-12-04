@@ -594,13 +594,14 @@ addLayer('k', {
                     /** @type {(condiment: string) => string} */
                     condiment_text = condiment => `<span style="color:${tmp.con.condiments[condiment].color};">${tmp.con.condiments[condiment].name}</span>`,
                     good = (tmp.con.layerShown && dish.condiment.good.length) ? `Tastes better with ${listFormat(dish.condiment.good.map(condiment_text))}<br>` : '',
-                    bad = (tmp.con.layerShown && dish.condiment.bad.length) ? `Tastes worse with ${listFormat(dish.condiment.bad.map(condiment_text))}<br>` : '';
+                    bad = (tmp.con.layerShown && dish.condiment.bad.length) ? `Tastes worse with ${listFormat(dish.condiment.bad.map(condiment_text))}<br>` : '',
+                    value = shiftDown ? `Value: ${format(dish.value)} each` : `Total value: ${format(D.times(dish.value, player.k.dishes[dish_id].amount))}`;
 
                 return `${capitalize(dish.name)}<br>\
                         Duration: ${duration_format(dish.duration.time)} ${name}<br>\
                         ${layers.k.dishes[dish_id].effect_description(dish.duration.time)}<br>\
                         ${good}${bad}\
-                        Value: ${format(D.times(dish.value, player.k.dishes[dish_id].amount))}`;
+                        ${value}`;
             },
             units: {
                 kills: {
