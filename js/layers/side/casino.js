@@ -22,6 +22,7 @@ addLayer('cas', {
         };
     },
     layerShown() { return (inChallenge('b', 52) || hasChallenge('b', 52)) && !hasUpgrade('a', 34); },
+    deactivated() { return hasUpgrade('a', 34); },
     color: '#BBAA66',
     row: 'side',
     position: 2,
@@ -52,7 +53,7 @@ addLayer('cas', {
     },
     items: {
         sources(item_id) {
-            if (!item_id) return {};
+            if (!item_id || tmp.cas.deactivated) return {};
 
             const swaps = player.cas.swaps;
             if (inChallenge('b', 52)) {
@@ -81,7 +82,7 @@ addLayer('cas', {
             }
         },
         base(item, type) {
-            if (!item) return '';
+            if (!item || tmp.cas.deactivated) return '';
             if (!type) {
                 if (inChallenge('b', 52)) type = 'challenge';
                 else return '';
@@ -92,7 +93,7 @@ addLayer('cas', {
             return (Object.entries(player.cas.swaps[type]).find(([, it]) => it == item) ?? [''])[0];
         },
         items(source) {
-            if (!source) return {};
+            if (!source || tmp.cas.deactivated) return {};
 
             const swaps = player.cas.swaps;
             if (inChallenge('b', 52)) {
