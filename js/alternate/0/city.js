@@ -114,7 +114,7 @@ addLayer('c', {
                         const gain = tmp.c.resources.energy.gain;
 
                         let gain_str = '';
-                        if (D.abs(gain).gt(1e-4)) gain_str = ` (<span style="color:${tmp.c.resources.energy.color};">${(gain.gt(0) ? '+' : '-') + format(gain)}</span> /s)`;
+                        if (D.abs(gain).gt(1e-4)) gain_str = ` (<span style="color:${tmp.c.resources.energy.color};">${(gain.gt(0) ? '+' : '') + format(gain)}</span> /s)`;
 
                         return ['column', [
                             [
@@ -140,7 +140,7 @@ addLayer('c', {
                         const gain = tmp.c.resources.science.gain;
 
                         let gain_str = '';
-                        if (D.abs(gain).gt(1e-4)) gain_str = ` (<span style="color:${tmp.c.resources.science.color};">${(gain.gt(0) ? '+' : '-') + format(gain)}</span> /s)`;
+                        if (D.abs(gain).gt(1e-4)) gain_str = ` (<span style="color:${tmp.c.resources.science.color};">${(gain.gt(0) ? '+' : '') + format(gain)}</span> /s)`;
 
                         return `You have <span style="color:${tmp.c.resources.science.color};font-size:1.5em;">${format(player.c.resources.science.amount)}</span>${gain_str} ${tmp.c.resources.science.name}`;
                     }
