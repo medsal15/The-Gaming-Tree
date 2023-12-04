@@ -246,7 +246,7 @@ addLayer('p', {
                             player.p.plants[target].seeds = D.minus(player.p.plants[target].seeds, 1);
                             const result = tmp.p.plants[target].infusions[item];
                             if (!player.p.plants[target].infusions.includes(result)) player.p.plants[target].infusions.push(result);
-                            layers.lo.items['*'].gain_items(item, -1);
+                            gain_items(item, -1);
                             player.p.plants[result].seeds = D.add(player.p.plants[result].seeds, 1);
                         }
                     },
@@ -310,7 +310,7 @@ addLayer('p', {
                     onClick() {
                         player.p.plants[plant].seeds = D.minus(player.p.plants[plant].seeds, 1);
                         const result = tmp.p.plants[plant].infusions[item];
-                        layers.lo.items['*'].gain_items(item, -1);
+                        gain_items(item, -1);
                         player.p.plants[result].seeds = D.add(player.p.plants[result].seeds, 1);
                     },
                     style() {
@@ -406,7 +406,7 @@ addLayer('p', {
                         seeds.eq(player_data.last_harvest_seeds) &&
                         drops.every(([item, amount]) => player_data.last_harvest.some(([litem, lamount]) => litem == item && D.eq(lamount, amount)));
 
-                layers.lo.items['*'].gain_items(drops);
+                gain_items(drops);
                 player_data.seeds = D.add(player_data.seeds, seeds);
 
                 if (equal) {
@@ -1783,7 +1783,7 @@ addLayer('p', {
                 }
                 player.p.last_harvest = data.plant;
 
-                layers.lo.items['*'].gain_items(drops);
+                gain_items(drops);
                 player_data.seeds = D.add(player_data.seeds, seeds);
 
                 player_data.dead = D.add(player_data.dead, 1);

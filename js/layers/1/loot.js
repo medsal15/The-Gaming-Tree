@@ -190,7 +190,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -270,7 +270,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -341,7 +341,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -445,7 +445,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -542,7 +542,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -652,7 +652,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -731,7 +731,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -813,7 +813,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -909,7 +909,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -988,7 +988,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1086,7 +1086,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1163,7 +1163,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1256,7 +1256,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1357,7 +1357,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1444,7 +1444,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1521,7 +1521,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1601,7 +1601,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1695,7 +1695,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1774,7 +1774,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1852,7 +1852,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1934,7 +1934,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -2011,7 +2011,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -2103,7 +2103,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -2179,7 +2179,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -2255,7 +2255,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -2330,7 +2330,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -2405,7 +2405,7 @@ addLayer('lo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -2430,7 +2430,7 @@ addLayer('lo', {
         cols: 6,
         getStartData(_) { return {}; },
         getStyle(_, id) {
-            const item_id = layers.lo.items["*"].grid_to_item(id);
+            const item_id = grid_to_item(id);
             if (!item_id) return { 'display': 'none', };
 
             const item = tmp.lo.items[item_id];
@@ -2446,13 +2446,13 @@ addLayer('lo', {
             );
         },
         getUnlocked(id) {
-            const item = layers.lo.items["*"].grid_to_item(id);
+            const item = grid_to_item(id);
             if (!item) return false;
 
             return tmp.lo.items[item].unlocked ?? true;
         },
         getTitle(_, id) {
-            const item_id = layers.lo.items["*"].grid_to_item(id);
+            const item_id = grid_to_item(id);
             if (!item_id) return;
 
             const item = tmp.lo.items[item_id];
@@ -2460,14 +2460,13 @@ addLayer('lo', {
             return capitalize_words(item.name);
         },
         getDisplay(_, id) {
-            const item_id = layers.lo.items["*"].grid_to_item(id);
+            const item_id = grid_to_item(id);
             if (!item_id) return;
 
             return format(player.lo.items[item_id].amount);
         },
         getTooltip(_, id) {
-            const star = layers.lo.items['*'],
-                item_id = star.grid_to_item(id);
+            const item_id = grid_to_item(id);
             if (!item_id) return;
 
             const item = tmp.lo.items[item_id],
@@ -2480,28 +2479,28 @@ addLayer('lo', {
             if ('chances' in sources && sources.chances) {
                 lines.push(
                     ...Object.entries(sources.chances)
-                        .filter(([type]) => star.can_drop(type))
-                        .map(([type, chance]) => `${capitalize(star.type_name(type))}: ${star.format_chance(chance.times(tmp.lo.items["*"].global_chance_multiplier))}`),
+                        .filter(([type]) => can_drop(type))
+                        .map(([type, chance]) => `${capitalize(type_name(type))}: ${format_chance(chance.times(tmp.lo.items["*"].global_chance_multiplier))}`),
                 );
             }
             if ('weights' in sources && sources.weights) {
                 lines.push(
                     ...Object.entries(sources.weights)
-                        .filter(([type]) => star.can_drop(type))
-                        .map(([type, weight]) => `${capitalize(star.type_name(type))}: ${star.format_chance(weight.div(tmp.lo.items["*"].weight[type]))} (in group)`),
+                        .filter(([type]) => can_drop(type))
+                        .map(([type, weight]) => `${capitalize(type_name(type))}: ${format_chance(weight.div(tmp.lo.items["*"].weight[type]))} (in group)`),
                 );
             }
             if ('per_second' in sources && sources.per_second) {
                 lines.push(
                     ...Object.entries(sources.per_second)
-                        .filter(([type]) => star.can_drop(type))
-                        .map(([type, amount]) => `${capitalize(star.type_name(type))}: ${format(amount)}/s`),
+                        .filter(([type]) => can_drop(type))
+                        .map(([type, amount]) => `${capitalize(type_name(type))}: ${format(amount)}/s`),
                 );
             }
             if ('other' in sources && sources.other) {
                 lines.push(
-                    ...sources.other.filter(type => star.can_drop(type))
-                        .map(type => capitalize(star.type_name(type))),
+                    ...sources.other.filter(type => can_drop(type))
+                        .map(type => capitalize(type_name(type))),
                 );
             }
 
@@ -2523,189 +2522,6 @@ addLayer('lo', {
                 if (hasUpgrade('m', 53)) mult = mult.times(upgradeEffect('m', 53));
 
                 return mult;
-            },
-            grid_to_item(id) {
-                if (!id) return false;
-
-                const cache = layers.lo.items["*"].grid_to_item.cache ??= {};
-                if (!(id in cache)) {
-                    const item = Object.keys(tmp.lo.items)
-                        .filter(item => item != '*')
-                        .find(item => tmp.lo.items[item].grid == id) ?? false;
-                    cache[id] = item;
-                }
-                return cache[id];
-            },
-            get_drops(type = player.xp.type, chance_multiplier = D.dOne) {
-                if (!this.can_drop(type) || D.lte(chance_multiplier, 0)) return [];
-
-                const items = (inChallenge('b', 52) || hasChallenge('b', 52)) ? layers.cas.items.items(type) : this.items(type),
-                    /** @type {{[item_id: string]: Decimal}} */
-                    results = {},
-                    /** @type {[string, Decimal][]} */
-                    to_roll = [],
-                    /** @type {(item_id: string, amount: DecimalSource) => Decimal} */
-                    add_to_results = (item_id, amount) => results[item_id] = D.add(results[item_id] ?? 0, amount);
-
-                Object.entries(items.chances ?? {}).forEach(([item_id, chance]) => {
-                    const rchance = chance.times(chance_multiplier).times(tmp.lo.items['*'].global_chance_multiplier);
-                    if (rchance.gte(1) || options.noRNG) {
-                        add_to_results(item_id, rchance);
-                    } else {
-                        to_roll.push([item_id, rchance]);
-                    }
-                });
-
-                if (to_roll.length > 7) {
-                    to_roll.forEach(([item_id, chance]) => add_to_results(item_id, chance));
-                } else {
-                    let rng = Math.random(),
-                        i = 0;
-                    for (; i < 2 ** to_roll.length && rng > 0; i++) {
-                        const bin = i.toString(2).padStart(to_roll.length, '0').split(''),
-                            chance = to_roll.map(([, chance], i) => {
-                                if (bin[i] == '1') return chance;
-                                else return D.dOne.minus(chance);
-                            }).reduce(D.times, D.dOne);
-                        rng -= chance.toNumber();
-                    }
-                    if (rng <= 0 && i > 0) i--;
-                    const bin = i.toString(2).padStart(to_roll.length, '0').split('');
-                    to_roll.forEach(([item], i) => {
-                        if (bin[i] == '1') add_to_results(item, 1);
-                    });
-                }
-
-                if (Object.keys(items.weights ?? {}).length > 0) {
-                    const entries = Object.entries(items.weights),
-                        total = entries.reduce((sum, [, weight]) => D.add(sum, weight), D.dZero);
-
-                    if (entries.length == 1) {
-                        add_to_results(entries[0][0], 1);
-                    } else if (D.gt(chance_multiplier, 10) || options.noRNG) {
-                        entries.forEach(([item_id, weight]) => {
-                            const amount = weight.div(total).times(chance_multiplier);
-
-                            add_to_results(item_id, amount);
-                        });
-                    } else {
-                        // There must be a better way to do this, but it looks like a pain to figure out
-                        for (let l = D.dZero; l.lt(chance_multiplier); l = l.add(1)) {
-                            let rng = D.times(Math.random(), total),
-                                i = 0;
-                            while (rng.gt(0)) {
-                                rng = rng.minus(entries[i][1]);
-                                i++;
-                            }
-                            if (rng.lte(0) && i > 0) i--;
-                            const item = entries[i][0];
-                            add_to_results(item, 1);
-                        }
-                    }
-                }
-
-                Object.entries(results).forEach(([item, gain]) => {
-                    const upg = layers.s.investloans.item_upgrade[item] ?? false;
-                    if (inChallenge('b', 12)) {
-                        if (upg && hasUpgrade('s', upg)) return;
-                        results[item] = gain.div(D.add(player.lo.items[item].amount.max(0), 10).log10());
-                    }
-                    let gain_mult = tmp.lo.items["*"].gain_multiplier;
-
-                    if (upg && hasUpgrade('s', upg)) gain_mult = gain_mult.times(upgradeEffect('s', upg));
-
-                    results[item] = results[item].times(gain_mult);
-                });
-
-                if (inChallenge('b', 52) || hasChallenge('b', 52)) {
-                    // Roll for tokens
-                    const chance = tmp.cas.token.chance.times(chance_multiplier);
-
-                    if (chance.gte(1) || options.noRNG) {
-                        addPoints('cas', chance);
-                    } else if (D.gt(chance, Math.random())) {
-                        addPoints('cas', 1);
-                    }
-                }
-
-                return Object.entries(results);
-            },
-            gain_items(item, amount) {
-                if (Array.isArray(item)) {
-                    item.forEach(([item, amount]) => player.lo.items[item].amount = D.add(player.lo.items[item].amount, amount).max(0));
-                } else {
-                    player.lo.items[item].amount = D.add(player.lo.items[item].amount, amount).max(0);
-                }
-            },
-            format_chance(chance) {
-                if (chance.gte(1) || options.noRNG) return `+${format(chance)}`;
-                if (chance.lte(0)) return format(0);
-
-                const fractional = options.chanceMode == 'NOT_GUARANTEED' || (options.chanceMode == 'LESS_HALF' && chance.lt(.5));
-
-                if (fractional) {
-                    return `1/${format(chance.pow(-1))}`;
-                } else {
-                    return `${format(chance.times(100))}%`;
-                }
-            },
-            type_name(type) {
-                /** @type {[drop_sources, string]} */
-                const [from, sub] = type.split(':');
-                switch (from) {
-                    case 'enemy':
-                        return tmp.xp.enemies[sub].name;
-                    case 'mining':
-                        return `${layers.m.ore.mode(sub)} ${tmp.m.name.toLowerCase()}`.trim();
-                    case 'tree':
-                        if (sub == 'convertion') return 'Convertion';
-                        return `Chopping ${tmp.t.trees[sub].name}`;
-                    case 'forge': {
-                        let text = 'Forge: ';
-                        if (sub == 'fuel') text += 'fueling';
-                        if (sub == 'smelt') text += 'smelting';
-                        return text;
-                    }
-                    case 'freezer': {
-                        let text = 'Freezer: ';
-                        if (sub == 'condensation') text += 'condensation';
-                        if (sub == 'cooling') text += 'cooling';
-                        if (sub == 'freezing') text += 'freezing';
-                        return text;
-                    }
-                    case 'tamed': case 'tamed_kill':
-                        return `tamed ${tmp.xp_alt.monsters[sub].name}`;
-                    case 'building':
-                        return `built ${tmp.c.buildings[sub].name}`;
-                    case 'plant':
-                        return `grown ${tmp.p.plants[sub].name}`;
-                }
-            },
-            can_drop(type) {
-                /** @type {[drop_sources, string]} */
-                const [from, sub] = type.split(':');
-
-                switch (from) {
-                    case 'enemy':
-                        return hasUpgrade('lo', 11) || hasUpgrade('s', 22) || sub == 'star';
-                    case 'mining':
-                        return tmp.m.layerShown;
-                    case 'tree':
-                        return tmp.t.layerShown;
-                    case 'forge':
-                        return tmp.f.layerShown;
-                    case 'freezer':
-                        return tmp.fr.layerShown;
-                    case 'tamed_kill':
-                    case 'tamed':
-                        return tmp.xp_alt.layerShown && (tmp.xp_alt.monsters[sub].unlocked ?? true);
-                    case 'building':
-                        return tmp.c.layerShown;
-                    case 'plant':
-                        return tmp.p.layerShown && (tmp.p.plants[sub].unlocked ?? true);
-                }
-
-                return false;
             },
             amount() { return Object.values(player.lo.items).reduce((sum, { amount }) => D.add(sum, amount), D.dZero); },
             weight(type) {

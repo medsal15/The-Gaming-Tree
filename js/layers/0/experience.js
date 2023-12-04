@@ -103,7 +103,7 @@ addLayer('xp', {
                     },
                 ],
                 () => {
-                    if (tmp.xp.enemies['*'].drops_mult.neq(1) && layers.lo.items['*'].can_drop('enemy:'))
+                    if (tmp.xp.enemies['*'].drops_mult.neq(1) && can_drop('enemy:'))
                         return ['display-text', `Drop chances multiplier: *${format(tmp.xp.enemies['*'].drops_mult)}`];
                 },
                 'blank',
@@ -147,7 +147,7 @@ addLayer('xp', {
                 'blank',
                 ['display-text', () => {
                     const type = player.xp.type;
-                    if (!layers.lo.items["*"].can_drop('enemy:') || player.xp.enemies[type].kills.lte(0)) return;
+                    if (!can_drop('enemy:') || player.xp.enemies[type].kills.lte(0)) return;
 
                     let drops = 'nothing',
                         count = '';
@@ -671,12 +671,12 @@ addLayer('xp', {
                     addPoints('xp', xp_gain);
                     player_data.kills = D.add(player_data.kills, kills_gain);
 
-                    if (layers.lo.items['*'].can_drop(`enemy:${type}`)) {
+                    if (can_drop(`enemy:${type}`)) {
                         let drops_mult = kills_gain;
 
                         drops_mult = drops_mult.times(tmp.xp.enemies['*'].drops_mult);
 
-                        const drops = layers.xp.enemies[type].get_drops(drops_mult),
+                        const drops = get_enemy_drops(type, drops_mult),
                             equal = drops.length == player_data.last_drops.length &&
                                 drops.every(([item, amount]) => player_data.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
                         if (equal) {
@@ -685,7 +685,7 @@ addLayer('xp', {
                             player_data.last_drops_times = D.dOne;
                             player_data.last_drops = drops;
                         }
-                        layers.lo.items['*'].gain_items(drops);
+                        gain_items(drops);
                     }
 
                     if (inChallenge('b', 61)) {
@@ -1057,7 +1057,6 @@ addLayer('xp', {
                 return regen_perc.times(this.health(level ?? tmp.xp.enemies[this.type].level));
             },
             unlocked() { return !inChallenge('b', 41); },
-            get_drops(kills) { return layers.lo.items['*'].get_drops(`enemy:${this.type}`, kills); },
         },
         goblin: {
             _type: null,
@@ -1135,7 +1134,6 @@ addLayer('xp', {
                 return regen_perc.times(this.health(level ?? tmp.xp.enemies[this.type].level));
             },
             unlocked() { return hasChallenge('b', 11) && !inChallenge('b', 31) && !inChallenge('b', 41); },
-            get_drops(kills) { return layers.lo.items['*'].get_drops(`enemy:${this.type}`, kills); },
         },
         zombie: {
             _type: null,
@@ -1213,7 +1211,6 @@ addLayer('xp', {
                 return regen_perc.times(this.health(level ?? tmp.xp.enemies[this.type].level));
             },
             unlocked() { return hasChallenge('b', 12) && !inChallenge('b', 31) && !inChallenge('b', 41); },
-            get_drops(kills) { return layers.lo.items['*'].get_drops(`enemy:${this.type}`, kills); },
         },
         ent: {
             _type: null,
@@ -1293,7 +1290,6 @@ addLayer('xp', {
                 return regen_perc.times(this.health(level ?? tmp.xp.enemies[this.type].level));
             },
             unlocked() { return hasChallenge('b', 21) && !inChallenge('b', 31) && !inChallenge('b', 41); },
-            get_drops(kills) { return layers.lo.items['*'].get_drops(`enemy:${this.type}`, kills); },
         },
         // Challenges enemies
         amalgam: {
@@ -1360,13 +1356,6 @@ addLayer('xp', {
                 return ['slime', 'goblin', 'zombie', 'ent'].reduce((sum, type) => D.add(sum, layers.xp.enemies[type].regen(level)), D.dZero);
             },
             unlocked() { return inChallenge('b', 41); },
-            get_drops(kills) {
-                return Object.entries(['slime', 'goblin', 'zombie', 'ent'].reduce((sum, type) => {
-                    layers.xp.enemies[type].get_drops(kills).forEach(([item, amount]) => sum[item] = D.add(sum[item], amount));
-
-                    return sum;
-                }, {}));
-            },
         },
         world_tree: {
             _type: null,
@@ -1472,7 +1461,6 @@ addLayer('xp', {
                 return regen_perc.times(this.health(level ?? tmp.xp.enemies[this.type].level));
             },
             unlocked() { return !inChallenge('b', 31) && inChallenge('b', 42); },
-            get_drops() { return []; },
         },
         player: {
             _type: null,
@@ -1526,7 +1514,6 @@ addLayer('xp', {
                 return regen;
             },
             unlocked: false,
-            get_drops(kills) { return []; },
         },
         // Final enemy
         star: {
@@ -1564,7 +1551,6 @@ addLayer('xp', {
             dps: D.dZero,
             regen: D.dZero,
             unlocked() { return hasChallenge('b', 22) && !inChallenge('b', 31) && !inChallenge('b', 41); },
-            get_drops(kills) { return [['stardust', D.dOne]]; },
         },
     },
     total: {

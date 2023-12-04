@@ -392,7 +392,7 @@ addLayer('b', {
             },
             onEnter() {
                 player.mag.points = D(50);
-                layers.mag.elements['*'].randomize();
+                randomize_enemy_element();
             },
             onComplete() {
                 player.mag.points = D.dZero;
@@ -469,13 +469,13 @@ addLayer('b', {
                 }
                 if (challenges.includes(61)) {
                     player.mag.points = D(50);
-                    layers.mag.elements['*'].randomize();
+                    randomize_enemy_element();
                 }
                 // Seal challenges
                 if (challenges.includes(82)) {
                     player.bin.cards = {};
                     player.bin.rolled = [];
-                    tmp.bin.cards.possibles.forEach(layer => player.bin.cards[layer] = { spots: layers.bin.cards.create_card(), wins: D.dZero, });
+                    tmp.bin.cards.possibles.forEach(layer => player.bin.cards[layer] = { spots: create_card(), wins: D.dZero, });
                 }
                 if (challenges.includes(91)) {
                     player.con.points = D.dZero;
@@ -533,7 +533,7 @@ addLayer('b', {
                 player.bin.time = D.dZero;
                 player.bin.cards = {};
                 player.bin.rolled = [];
-                tmp.bin.cards.possibles.forEach(layer => player.bin.cards[layer] = { spots: layers.bin.cards.create_card() });
+                tmp.bin.cards.possibles.forEach(layer => player.bin.cards[layer] = { spots: create_card() });
             },
             onExit() {
                 player.bin.cards = {};
@@ -552,8 +552,10 @@ addLayer('b', {
         },
         91: {
             name: 'Condiment Seal',
-            challengeDescription: 'Unlock food condiments. Not using a condiment heavily nerfs row 2 layers.',
-            //? reach ??? spice
+            challengeDescription: `\
+                Unlock food condiments. Not using a condiment heavily nerfs row 2 layers.\
+                <span class="warning">This works like a Boss challenge</span>`,
+            //todo reach ??? spice
             goalDescription: '???',
             canComplete: false,
             rewardDescription: 'Unlock the true potential of Condiments',
@@ -639,13 +641,13 @@ addLayer('b', {
                 if (item == 'stardust') return;
 
                 const upg = layers.s.investloans.item_upgrade[item] ?? false;
-                if (!upg || !hasUpgrade('s', upg)) layers.lo.items['*'].gain_items(item, get_loss(data.amount).neg());
+                if (!upg || !hasUpgrade('s', upg)) gain_items(item, get_loss(data.amount).neg());
             });
             // Resources
             Object.entries(player.c.resources).forEach(([resource, data]) => {
                 if (!false) return;
 
-                layers.c.resources['*'].gain_resource(resource, get_loss(data.amount).neg());
+                gain_resource(resource, get_loss(data.amount).neg());
             });
         }
     },

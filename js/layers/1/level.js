@@ -61,7 +61,7 @@ addLayer('l', {
                     'column',
                     () => Object.keys(layers.l.skills)
                         .filter(skill => skill != '*')
-                        .map(skill => layers.l.skills["*"].show_skill(skill))
+                        .map(skill => show_skill(skill))
                 ],
             ],
         },
@@ -195,14 +195,6 @@ addLayer('l', {
                 return max;
             },
             left() { return tmp.l.skills["*"].max.minus(Object.values(player.l.skills).reduce((u, { points }) => u.add(points), D.dZero)); },
-            show_skill(skill) {
-                if (!(skill in layers.l.skills)) return [];
-                return ['row', [
-                    ['bar', skill],
-                    ['clickable', `add_${skill}`],
-                    ['clickable', `remove_${skill}`],
-                ]];
-            },
             speed() {
                 let speed = D.dOne;
 

@@ -108,16 +108,6 @@ addLayer('bin', {
             return base.pow(tmp.bin.cards.list.length).times(5);
         },
         cost_formula: '5 * (3 + respecs / 100) ^ bingo cards',
-        create_card() {
-            /** @type {number[]} */
-            const card = [];
-            for (let i = 0; i < 25; i++) {
-                const n = layers.bin.balls.roll_ball();
-                if (card.includes(n)) i--;
-                else card.push(n);
-            }
-            return card;
-        },
         has_bingo(spots) {
             if (!spots || player.bin.rolled.length < 5) return;
 
@@ -214,17 +204,6 @@ addLayer('bin', {
         multipliers() { return Object.fromEntries(tmp.bin.cards.possibles.map(layer => [layer, this.multiplier(layer)])); },
     },
     balls: {
-        roll_ball() { return Math.floor(Math.random() * (tmp.bin.balls.max - tmp.bin.balls.min) + tmp.bin.balls.min); },
-        roll_new_ball() {
-            if (player.bin.rolled.length > (tmp.bin.balls.max - tmp.bin.balls.min)) return;
-
-            let n;
-            do {
-                n = layers.bin.balls.roll_ball();
-            } while (player.bin.rolled.includes(n));
-
-            return n;
-        },
         time: D.dTen,
         min: 1,
         max: 100,
@@ -274,12 +253,12 @@ addLayer('bin', {
 
                 if (D.lt(player.bin.points, cost) || availables.length <= 0) return;
 
-                tmp.bin.cards.list.forEach(layer => player.bin.cards[layer].spots = layers.bin.cards.create_card());
+                tmp.bin.cards.list.forEach(layer => player.bin.cards[layer].spots = create_card());
 
                 const layer = availables[Math.floor(Math.random() * availables.length)];
 
                 player.bin.cards[layer] = {
-                    spots: layers.bin.cards.create_card(),
+                    spots: create_card(),
                     wins: D.dZero,
                 };
                 player.bin.rolled.length = 0;
@@ -344,7 +323,7 @@ addLayer('bin', {
         if (player.bin.time.gte(tmp.bin.balls.time)) {
             // Roll a new ball
             player.bin.time = D.minus(player.bin.time, tmp.bin.balls.time);
-            const ball = layers.bin.balls.roll_new_ball();
+            const ball = roll_new_ball();
 
             if (typeof ball === 'undefined') return;
             player.bin.rolled.push(ball);
@@ -361,7 +340,7 @@ addLayer('bin', {
                     if (bingo.includes(layer)) data.wins = D.add(data.wins, 1);
                     else data.wins = D.dZero;
 
-                    data.spots = layers.bin.cards.create_card();
+                    data.spots = create_card();
                 });
                 player.bin.rolled = [];
 

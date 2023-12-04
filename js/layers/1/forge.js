@@ -127,7 +127,7 @@ addLayer('f', {
                     'column',
                     () => Object.keys(layers.f.fuels)
                         .filter(fuel => fuel != '*')
-                        .map(fuel => layers.f.fuels['*'].show_fuel(fuel))
+                        .map(fuel => show_fuel(fuel))
                 ],
             ],
         },
@@ -200,7 +200,7 @@ addLayer('f', {
                 const fuel = tmp.f.fuels[fuel_id],
                     item_id = fuel.item;
 
-                layers.lo.items['*'].gain_items(item_id, D.times(fuel.consuming, diff).neg());
+                gain_items(item_id, D.times(fuel.consuming, diff).neg());
                 addPoints('f', fuel.producing.times(diff));
             });
 
@@ -217,7 +217,7 @@ addLayer('f', {
                 precipe.progress = precipe.progress.add(diff);
 
                 if (precipe.progress.gte(recipe.time)) {
-                    layers.lo.items['*'].gain_items(recipe.produces, precipe.amount_smelting);
+                    gain_items(recipe.produces, precipe.amount_smelting);
                     precipe.progress = D.dZero;
                     precipe.amount_smelting = D.dZero;
                 }
@@ -516,19 +516,6 @@ addLayer('f', {
     fuels: {
         '*': {
             regex: /^fuel_(display|toggle)_([a-z_]+)$/,
-            show_fuel(fuel) {
-                if (!fuel || !(tmp.f.fuels[fuel].unlocked ?? true)) return;
-
-                const entry = tmp.f.fuels[fuel];
-
-                return ['row', [
-                    ['clickable', `fuel_display_${fuel}`],
-                    'blank',
-                    ['display-text', `${format(entry.producing)} heat /s (${format(entry.heat)} each)`],
-                    'blank',
-                    ['clickable', `fuel_toggle_${fuel}`],
-                ]];
-            },
             size() {
                 let size = D.dTen;
 
@@ -1489,7 +1476,7 @@ addLayer('f', {
                             const amount = precipe().amount_target;
 
                             recipe().consumes.forEach(([item, amount]) => {
-                                layers.lo.items['*'].gain_items(item, D.neg(amount));
+                                gain_items(item, D.neg(amount));
                             });
                             precipe().amount_smelting = amount;
                         }

@@ -986,7 +986,7 @@ addLayer('ach', {
             tooltip: 'Get all drops from an enemy at once without any chance boost',
             done() {
                 if (tmp.lo.items["*"].global_chance_multiplier.gt(1) ||
-                    !layers.lo.items['*'].can_drop('enemy:') ||
+                    !can_drop('enemy:') ||
                     tmp.xp.enemies['*'].drops_mult.gt(1) ||
                     options.noRNG) return false;
 
@@ -1044,7 +1044,7 @@ addLayer('ach', {
             tooltip: 'Get all drops from the amalgam',
             done() {
                 if (tmp.lo.items["*"].global_chance_multiplier.neq(1) ||
-                    !layers.lo.items['*'].can_drop('enemy:') ||
+                    !can_drop('enemy:') ||
                     tmp.xp.enemies['*'].drops_mult.gt(1) ||
                     options.noRNG ||
                     !inChallenge('b', 41)) return false;

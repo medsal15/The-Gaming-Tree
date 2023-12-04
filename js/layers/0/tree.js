@@ -89,7 +89,7 @@ addLayer('t', {
                 ['bar', 'health'],
                 ['clickables', [1]],
                 ['display-text', () => `Current damage: ${format(tmp.t.trees['*'].damage_base)}`],
-                ['display-text', () => `Chance to cut an additionnal piece of wood: ${layers.lo.items["*"].format_chance(tmp.t.trees['*'].chance)}`],
+                ['display-text', () => `Chance to cut an additionnal piece of wood: ${format_chance(tmp.t.trees['*'].chance)}`],
                 ['display-text', () => {
                     let drops = 'nothing',
                         count = '';
@@ -197,9 +197,9 @@ addLayer('t', {
                 let drops = [];
 
                 if (options.noRNG) {
-                    drops = layers.t.trees[type].get_drops(damage.times(tmp.t.trees['*'].chance));
+                    drops = get_tree_drops(type, damage.times(tmp.t.trees['*'].chance));
                 } else if (tmp.t.trees['*'].chance.gt(Math.random())) {
-                    drops = layers.t.trees[type].get_drops(damage);
+                    drops = get_tree_drops(type, damage);
                 } else {
                     drops = [];
                 }
@@ -214,7 +214,7 @@ addLayer('t', {
                     player.t.trees[type].last_drops = drops;
                 }
 
-                layers.lo.items["*"].gain_items(drops);
+                gain_items(drops);
             },
             onHold() {
                 player.t.clicked = true;
@@ -228,9 +228,9 @@ addLayer('t', {
                 let drops = [];
 
                 if (options.noRNG) {
-                    drops = layers.t.trees[type].get_drops(damage.times(tmp.t.trees['*'].chance));
+                    drops = get_tree_drops(type, damage.times(tmp.t.trees['*'].chance));
                 } else if (tmp.t.trees['*'].chance.gt(Math.random())) {
-                    drops = layers.t.trees[type].get_drops(damage);
+                    drops = get_tree_drops(type, damage);
                 } else {
                     drops = [];
                 }
@@ -245,7 +245,7 @@ addLayer('t', {
                     player.t.trees[type].last_drops = drops;
                 }
 
-                layers.lo.items["*"].gain_items(drops);
+                gain_items(drops);
             },
         },
         // Focus clickables
@@ -655,7 +655,6 @@ addLayer('t', {
 
                 return tmp.t.trees[this.id].damage.times(mult);
             },
-            get_drops(amount) { return layers.lo.items['*'].get_drops(`tree:${this.id}`, D(amount)); },
             size() {
                 let size = D(5);
 
@@ -715,7 +714,6 @@ addLayer('t', {
 
                 return tmp.t.trees[this.id].damage.times(mult);
             },
-            get_drops(amount) { return layers.lo.items['*'].get_drops(`tree:${this.id}`, D(amount)); },
             size() {
                 let size = D(20);
 
@@ -773,7 +771,6 @@ addLayer('t', {
 
                 return tmp.t.trees[this.id].damage.times(mult);
             },
-            get_drops(amount) { return layers.lo.items['*'].get_drops(`tree:${this.id}`, D(amount)); },
             size() {
                 let size = D(10);
 
@@ -831,7 +828,6 @@ addLayer('t', {
 
                 return tmp.t.trees[this.id].damage.times(mult);
             },
-            get_drops(amount) { return layers.lo.items['*'].get_drops(`tree:${this.id}`, D(amount)); },
             size() {
                 let size = D(40);
 
@@ -878,7 +874,6 @@ addLayer('t', {
 
                 return tmp.t.trees[this.id].damage.times(mult);
             },
-            get_drops(amount) { return []; },
             size: D.dZero,
             cap: D.dZero,
             regen: D.dZero,
@@ -941,7 +936,7 @@ addLayer('t', {
                 const gain = layers.t.convertion.per_second(item);
                 if (gain.eq(0)) return;
 
-                layers.lo.items['*'].gain_items(item, gain.times(diff));
+                gain_items(item, gain.times(diff));
             });
         }
 
@@ -963,10 +958,10 @@ addLayer('t', {
             if (tmp_tree.dps.gt(0)) {
                 player.t.clicked = true;
                 const damage = tmp_tree.dps.times(diff),
-                    drops = layers.t.trees[tree].get_drops(damage);
+                    drops = get_tree_drops(tree, damage);
 
                 if (drops.length) {
-                    layers.lo.items['*'].gain_items(drops);
+                    gain_items(drops);
 
                     const equal = drops.length == player_tree.last_drops.length &&
                         drops.every(([item, amount]) => player_tree.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
@@ -987,11 +982,11 @@ addLayer('t', {
             if (D.lte(player.t.trees[tree].health, 0)) {
                 // Tree is dead
                 if (player.t.clicked) {
-                    const drops = layers.t.trees[tree].get_drops(tmp.t.trees[tree].size);
+                    const drops = get_tree_drops(tree, tmp.t.trees[tree].size);
 
                     player.t.trees[tree].last_drops.push(...drops);
                     player.t.trees[tree].last_drops_times = D.dOne;
-                    layers.lo.items['*'].gain_items(drops);
+                    gain_items(drops);
                 }
 
                 player.t.trees[tree].health = tmp.t.trees[tree].health;

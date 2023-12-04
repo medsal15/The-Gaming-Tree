@@ -130,7 +130,7 @@ addLayer('c', {
                     };
                 },
                 //todo convert to layer-table
-                ['column', () => Object.keys(layers.c.buildings).map(id => layers.c.buildings['*'].show_building(id))],
+                ['column', () => Object.keys(layers.c.buildings).map(id => show_building(id))],
             ],
         },
         'Research': {
@@ -307,9 +307,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
         },
         21: {
@@ -356,9 +356,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [11],
         },
@@ -406,9 +406,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [11],
         },
@@ -456,9 +456,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [11],
             unlocked() { return player.xp_alt.unlocked; },
@@ -507,9 +507,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [21],
         },
@@ -557,9 +557,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [22],
         },
@@ -607,9 +607,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [23],
             unlocked() { return player.xp_alt.unlocked; },
@@ -659,9 +659,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [31],
         },
@@ -710,9 +710,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [32],
         },
@@ -759,9 +759,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [33],
             unlocked() { return player.xp_alt.unlocked; },
@@ -815,9 +815,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [41, 42, 43],
         },
@@ -865,9 +865,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [51],
             unlocked() { return hasUpgrade('c', 51); },
@@ -916,9 +916,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [51],
             unlocked() { return hasUpgrade('c', 51); },
@@ -967,9 +967,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [51],
             unlocked() { return hasUpgrade('c', 51); },
@@ -1018,9 +1018,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [51],
             unlocked() { return hasUpgrade('c', 51) && player.p.unlocked; },
@@ -1086,9 +1086,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [61],
             unlocked() { return hasUpgrade('c', 51); },
@@ -1154,9 +1154,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [62],
             unlocked() { return hasUpgrade('c', 51); },
@@ -1205,9 +1205,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [63],
             unlocked() { return hasUpgrade('c', 51); },
@@ -1256,9 +1256,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [64],
             unlocked() { return hasUpgrade('c', 51) && player.p.unlocked; },
@@ -1308,9 +1308,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [71],
             unlocked() { return hasUpgrade('c', 51); },
@@ -1360,9 +1360,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [72],
             unlocked() { return hasUpgrade('c', 51); },
@@ -1411,9 +1411,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [73],
             unlocked() { return hasUpgrade('c', 51); },
@@ -1462,9 +1462,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [74],
             unlocked() { return hasUpgrade('c', 51) && player.p.unlocked; },
@@ -1521,9 +1521,9 @@ addLayer('c', {
             },
             pay() {
                 (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
-                    .forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                 (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
-                    .forEach(([resource, cost]) => layers.c.resources['*'].gain_resource(resource, D.neg(cost)));
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [81, 82, 83, 84],
             unlocked() { return hasUpgrade('c', 51); },
@@ -1567,7 +1567,7 @@ addLayer('c', {
                     unlocked() { return tmpuilding().unlocked ?? true; },
                     canAfford() { return Array.isArray(tmpuilding().cost) && tmpuilding().cost.every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)); },
                     buy() {
-                        tmpuilding().cost.forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost)));
+                        tmpuilding().cost.forEach(([item, cost]) => gain_items(item, D.neg(cost)));
                         addBuyables(this.layer, this.id, 1);
                     },
                     style() {
@@ -1766,17 +1766,6 @@ addLayer('c', {
                                 return sum;
                             }, full);
                     }, {});
-            },
-            show_building(building) {
-                if (building == '*' || !(building in tmp.c.buildings) || !(tmp.c.buildings[building].unlocked ?? true)) return;
-
-                return ['row', [
-                    ['buyable', building],
-                    'blank',
-                    ['display-text', tmp.c.buildings[building].description],
-                    'blank',
-                    ['clickable', `select_${building}`],
-                ]];
             },
             description(building_id, effect = '') {
                 if (!building_id) return '';
@@ -2816,11 +2805,6 @@ addLayer('c', {
     },
     resources: {
         '*': {
-            gain_resource(resource, amount) {
-                if (!resource) return;
-
-                player.c.resources[resource].amount = D.add(player.c.resources[resource].amount, amount).max(0);
-            },
             gain_mult() {
                 let mult = D.dOne;
 
@@ -2955,12 +2939,12 @@ addLayer('c', {
                 if ('items' in build.consumes && Array.isArray(build.consumes.items)) {
                     const consumption = build.consumes.items.map(([item, amount]) => [item, D.times(amount, diff).neg()]);
 
-                    layers.lo.items['*'].gain_items(consumption);
+                    gain_items(consumption);
                 }
 
                 if ('resources' in build.consumes && Array.isArray(build.consumes.resources)) {
                     build.consumes.resources.forEach(([resource, amount]) => {
-                        layers.c.resources['*'].gain_resource(resource, D.times(amount, diff).neg());
+                        gain_resource(resource, D.times(amount, diff).neg());
                     });
                 }
             }
@@ -2968,11 +2952,11 @@ addLayer('c', {
                 if ('items' in build.produces && Array.isArray(build.produces.items)) {
                     const production = build.produces.items.map(([item, amount]) => [item, D.times(amount, diff)]);
 
-                    layers.lo.items['*'].gain_items(production);
+                    gain_items(production);
                 }
                 if ('resources' in build.produces && Array.isArray(build.produces.resources)) {
                     build.produces.resources.forEach(([resource, amount]) => {
-                        layers.c.resources['*'].gain_resource(resource, D.times(amount, diff));
+                        gain_resource(resource, D.times(amount, diff));
                     });
                 }
             }

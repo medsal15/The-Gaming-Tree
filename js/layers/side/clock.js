@@ -59,7 +59,7 @@ addLayer('clo', {
             price: [['slime_goo', D(32)], ['slime_core_shard', D(8)], ['slime_core', D.dOne]],
             costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
-            pay() { this.price.forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost))); },
+            pay() { this.price.forEach(([item, cost]) => gain_items(item, D.neg(cost))); },
             branches: [21, 22],
             style() {
                 const style = {};
@@ -81,7 +81,7 @@ addLayer('clo', {
             price: [['stone', D(32)], ['copper_ore', D(8)], ['tin_ore', D.dOne]],
             costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
-            pay() { this.price.forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost))); },
+            pay() { this.price.forEach(([item, cost]) => gain_items(item, D.neg(cost))); },
             branches: [22],
             style() {
                 const style = {};
@@ -110,7 +110,7 @@ addLayer('clo', {
             price: [['soaked_log', D(32)], ['normal_log', D(8)], ['plank', D.dOne]],
             costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
-            pay() { this.price.forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost))); },
+            pay() { this.price.forEach(([item, cost]) => gain_items(item, D.neg(cost))); },
             unlocked() { return hasChallenge('b', 51) && player.t.unlocked; },
             style() {
                 const style = {};
@@ -153,7 +153,7 @@ addLayer('clo', {
             price: [['slime_goo', D(32)], ['copper_ore', D(8)], ['rusty_gear', D.dOne]],
             costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
-            pay() { this.price.forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost))); },
+            pay() { this.price.forEach(([item, cost]) => gain_items(item, D.neg(cost))); },
             style() {
                 const style = {};
                 if (hasUpgrade(this.layer, this.id)) style['background-color'] = tmp.lo.color;
@@ -182,7 +182,7 @@ addLayer('clo', {
             price: [['bronze_ingot', D(32)], ['steel_ingot', D(8)]],
             costDisplay() { return `Cost: ${listFormat.format(this.price.map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`))}`; },
             canAfford() { return this.price.every(([item, cost]) => player.lo.items[item].amount.gte(cost)) && !inChallenge('b', 51); },
-            pay() { this.price.forEach(([item, cost]) => layers.lo.items['*'].gain_items(item, D.neg(cost))); },
+            pay() { this.price.forEach(([item, cost]) => gain_items(item, D.neg(cost))); },
             style() {
                 const style = {};
                 if (hasUpgrade(this.layer, this.id)) style['background-color'] = tmp.f.color;
@@ -372,7 +372,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -426,7 +426,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -495,7 +495,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -551,7 +551,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -618,7 +618,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -691,7 +691,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -798,7 +798,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -864,7 +864,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -919,7 +919,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -977,7 +977,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1034,7 +1034,7 @@ addLayer('clo', {
             },
             buy() {
                 Object.entries(this.cost(getBuyableAmount(this.layer, this.id)))
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.neg(amount)));
+                    .forEach(([item, amount]) => gain_items(item, D.neg(amount)));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {

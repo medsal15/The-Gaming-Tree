@@ -108,7 +108,7 @@ addLayer('m', {
                 ['clickables', [1]],
                 () => { if (player.m.show_deep) return ['display-text', `Mining ${tmp.m.ore.mode}`]; },
                 'blank',
-                ['display-text', () => `Chance to mine something: ${layers.lo.items["*"].format_chance(tmp.m.ore.chance)}`],
+                ['display-text', () => `Chance to mine something: ${format_chance(tmp.m.ore.chance)}`],
                 () => { if (tmp.m.ore.mine_mult.neq(1)) return ['display-text', `Mining *${format(tmp.m.ore.mine_mult)} ore`]; },
                 ['display-text', () => {
                     let drops = 'nothing',
@@ -181,9 +181,9 @@ addLayer('m', {
                 let drops = [];
 
                 if (options.noRNG) {
-                    drops = layers.m.ore.get_drops(tmp.m.ore.chance);
+                    drops = get_mining_drops(tmp.m.ore.chance);
                 } else if (tmp.m.ore.chance.gt(Math.random())) {
-                    drops = layers.m.ore.get_drops(1);
+                    drops = get_mining_drops(1);
                 } else {
                     drops = [];
                 }
@@ -198,7 +198,7 @@ addLayer('m', {
                     player.m.last_drops = drops;
                 }
 
-                layers.lo.items['*'].gain_items(drops);
+                gain_items(drops);
             },
             onHold() {
                 player.m.health = player.m.health.minus(1);
@@ -207,9 +207,9 @@ addLayer('m', {
                 let drops = [];
 
                 if (options.noRNG) {
-                    drops = layers.m.ore.get_drops(tmp.m.ore.chance);
+                    drops = get_mining_drops(tmp.m.ore.chance);
                 } else if (tmp.m.ore.chance.gt(Math.random())) {
-                    drops = layers.m.ore.get_drops(1);
+                    drops = get_mining_drops(1);
                 } else {
                     drops = [];
                 }
@@ -224,7 +224,7 @@ addLayer('m', {
                     player.m.last_drops = drops;
                 }
 
-                layers.lo.items['*'].gain_items(drops);
+                gain_items(drops);
             },
         },
         13: {
@@ -777,30 +777,6 @@ addLayer('m', {
                     return 'deep';
             };
         },
-        get_drops(amount) {
-            amount = D.times(amount, tmp.m.ore.mine_mult);
-
-            const drops = layers.lo.items["*"].get_drops(`mining:${player.m.mode}`, D(amount));
-
-            if (hasUpgrade('m', 32)) {
-                let stone = drops.reduce((sum, [, amount]) => D.add(sum, amount), D.dZero);
-
-                if (inChallenge('b', 12) && !hasUpgrade('s', 61)) stone = stone.div(D.add(player.lo.items.stone.amount.max(0), 10).log10());
-                if (hasUpgrade('s', 61)) stone = stone.times(upgradeEffect('s', 61));
-
-                const entry = drops.find(([item]) => item == 'stone') ?? false;
-                if (entry) entry[1] = stone;
-                else drops.push(['stone', stone]);
-            }
-            if (hasUpgrade('m', 52)) {
-                const stone = drops.find(([item]) => item == 'stone');
-                if (stone) {
-                    stone[1] = stone[1].times(upgradeEffect('m', 52));
-                }
-            }
-
-            return drops;
-        },
         items: [
             'stone', 'copper_ore', 'tin_ore', // T0
             'coal', 'iron_ore', 'gold_ore', // T1
@@ -830,7 +806,7 @@ addLayer('m', {
     automate() {
         if (hasUpgrade('m', 22) && player.m.health.gte(tmp.m.ore.health)) {
             const chance = player.m.health.times(tmp.m.ore.chance),
-                drops = layers.m.ore.get_drops(chance),
+                drops = get_mining_drops(chance),
                 equal = drops.length == player.m.last_drops.length &&
                     drops.every(([item, amount]) => player.m.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
             if (equal) {
@@ -839,7 +815,7 @@ addLayer('m', {
                 player.m.last_drops_times = D.dOne;
                 player.m.last_drops = drops;
             }
-            layers.lo.items["*"].gain_items(drops);
+            gain_items(drops);
             player.m.health = D.dZero;
         }
 

@@ -1844,7 +1844,6 @@ type Layers = {
                 element(enemy: string): string
                 /** Returns a random element */
                 random(): string
-                randomize(): void
             }
         } & {
             [element: string]: {
@@ -1950,12 +1949,6 @@ type Layers = {
                 regen(level?: DecimalSource): Decimal
                 /** Determines whether the enemy is visible */
                 unlocked(): boolean
-                /**
-                 * Get drops as if the enemy were killed
-                 *
-                 * **Does a loot roll (only important if casino is unlocked)**
-                 */
-                get_drops(kills: DecimalSource): [items, Decimal][]
             }
         }
         total: {
@@ -1972,7 +1965,6 @@ type Layers = {
             chance(mode?: Player['m']['mode']): Decimal
             /** Name of the mode */
             mode(mode?: Player['m']['mode']): string
-            get_drops(amount: DecimalSource): [items, Decimal][]
             /** List of items tracked by the layer */
             items: items[]
             mine_mult(): Decimal
@@ -2015,7 +2007,6 @@ type Layers = {
                 regen: Computable<Decimal>
                 damage: Computable<Decimal>
                 dps: Computable<Decimal>
-                get_drops(amount: DecimalSource): [items, Decimal][]
                 /** Amount of wood when felling a tree */
                 size: Computable<Decimal>
                 cap: Computable<Decimal>
@@ -2040,7 +2031,6 @@ type Layers = {
                 max(): Decimal
                 /** Skill points remaining for use */
                 left(): Decimal
-                show_skill(id: string): ['row', [['bar', string], ['clickable', `add_${string}`], ['clickable', `remove_${string}`]]]
                 speed(): Decimal
                 /** Bonus skill points for all skills (excluding locked ones) */
                 bonus(): Decimal
@@ -2065,21 +2055,7 @@ type Layers = {
         }
         items: {
             '*': {
-                /** Converts a grid id to an item id (or false if there is none) */
-                grid_to_item: ((id: number) => items | false) & {
-                    cache: { [k: number]: items | false }
-                }
                 global_chance_multiplier(): Decimal
-                /** Computes the drops from a type */
-                get_drops(type?: `${drop_sources}:${string}`, chance_multiplier?: DecimalSource): [items, Decimal][]
-                /** Adds the items in question to the player data */
-                gain_items(items: [items, DecimalSource][]): void
-                /** Adds the item in question to the player data */
-                gain_items(item: items, amount: DecimalSource): void
-                gain_items(item: items | [items, DecimalSource][], amount?: DecimalSource): void
-                format_chance(chance: Decimal): string
-                type_name(type: `${drop_sources}:${string}`): string
-                can_drop(type: `${drop_sources}:${string}`): boolean
                 /** Total amount of items */
                 amount(): Decimal
                 /** Total weight of a type (or all types) */
@@ -2135,8 +2111,6 @@ type Layers = {
         fuels: {
             '*': {
                 regex: RegExp
-                /** Returns a row that displays the fuel */
-                show_fuel(fuel: string): ['row', [['clickable', `fuel_display_${string}`], ['display-text', string], ['clickable', `fuel_toggle_${string}`]]]
                 /** Maximum amount of a fuel that can be consumed per second */
                 size(): Decimal
                 /** Amount of the item being consumed every second */
@@ -2269,8 +2243,6 @@ type Layers = {
             /** Cost of a new card in bingo bucks */
             cost(): Decimal
             cost_formula: Computable<string>
-            /** Creates a new bingo card */
-            create_card(): number[]
             show_card(card?: Player['bin']['show']): [
                 layer: keyof Layers,
                 never[],
@@ -2284,10 +2256,6 @@ type Layers = {
             multipliers(): { [layer in keyof Layers]?: Decimal }
         }
         balls: {
-            /** Roll a random ball */
-            roll_ball(): number
-            /** Roll an unrolled ball */
-            roll_new_ball(): number | undefined
             /** Time between rolls */
             time: Computable<Decimal>
             /** Lowest number for a bingo ball */
@@ -2418,12 +2386,6 @@ type Layers = {
                 produces(tamed?: DecimalSource): [items, Decimal][]
                 /** Amount of the monster gained every second */
                 passive_tame(tamed?: DecimalSource): Decimal
-                /**
-                 * Get drops as if the enemy were killed
-                 *
-                 * **Does a loot roll (only important if casino is unlocked)**
-                 */
-                get_drops(kills: DecimalSource): [items, Decimal][]
             }
         }
         total: {
@@ -2442,13 +2404,6 @@ type Layers = {
                 regex: RegExp
                 placed(): { [building: string]: Decimal }
                 enabled(): { [building: string]: Decimal }
-                show_building(building: string): ['row', [
-                    ['buyable', string],
-                    'blank',
-                    ['display-text', string],
-                    'blank',
-                    ['clickable', string],
-                ]] | undefined
                 description(building_id: string, effect?: string): string
                 produce_mult(): Decimal
                 item_produce_mult(): Decimal
@@ -2492,7 +2447,6 @@ type Layers = {
         }
         resources: {
             '*': {
-                gain_resource(resource: resources, amount: DecimalSource)
                 gain_mult(): Decimal
             }
         } & {
@@ -2580,8 +2534,6 @@ type Layers = {
          */
         materials: {
             cost_mult(): Decimal
-            /** Returns 3 random items, one per type */
-            randomize(): items[]
         } & {
             [type in 'low' | 'medium' | 'high']: Computable<{
                 [item in items]: {
@@ -3186,3 +3138,7 @@ type Player = {
         auto_leave: boolean
     }
 };
+/** Adds the items in question to the player data */
+function gain_items(items: [items, DecimalSource][]): void
+/** Adds the item in question to the player data */
+function gain_items(item: items, amount: DecimalSource): void

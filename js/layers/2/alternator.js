@@ -115,7 +115,7 @@ addLayer('a', {
                 player.xp_alt.unlocked = true;
                 doReset('s', true);
             },
-            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            pay() { gain_items('stardust', -1); },
             canAfford() { return D.gte(player.lo.items.stardust.amount, this.cost()); },
         },
         12: {
@@ -148,7 +148,7 @@ addLayer('a', {
                 player.c.unlocked = true;
                 doReset('s', true);
             },
-            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            pay() { gain_items('stardust', -1); },
             canAfford() { return D.gte(player.lo.items.stardust.amount, this.cost()); },
         },
         13: {
@@ -181,7 +181,7 @@ addLayer('a', {
                 player.p.unlocked = true;
                 doReset('s', true);
             },
-            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            pay() { gain_items('stardust', -1); },
             canAfford() { return D.gte(player.lo.items.stardust.amount, this.cost()); },
         },
         14: {
@@ -245,7 +245,7 @@ addLayer('a', {
                 player.to.unlocked = true;
                 doReset('s', true);
             },
-            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            pay() { gain_items('stardust', -1); },
         },
         22: {
             title: 'Alternate Loot',
@@ -281,7 +281,7 @@ addLayer('a', {
                 player.k.unlocked = true;
                 doReset('s', true);
             },
-            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            pay() { gain_items('stardust', -1); },
         },
         23: {
             title: 'Alternate Forge',
@@ -317,7 +317,7 @@ addLayer('a', {
                 player.fr.unlocked = true;
                 doReset('s', true);
             },
-            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            pay() { gain_items('stardust', -1); },
         },
         24: {
             title: 'Alternate Clock',
@@ -348,7 +348,7 @@ addLayer('a', {
             unlocked() { return tmp.clo.layerShown || tmp.tic.layerShown; },
             canAfford() { return hasChallenge('b', 51) && player.lo.items.stardust.amount.gte(this.cost); },
             onPurchase() { player.tic.unlocked = true; },
-            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            pay() { gain_items('stardust', -1); },
         },
         31: {
             title: 'Alternate Bosses',
@@ -458,7 +458,7 @@ addLayer('a', {
             unlocked() { return tmp.cas.layerShown || tmp.bin.layerShown; },
             canAfford() { return hasChallenge('b', 52) && player.lo.items.stardust.amount.gte(this.cost); },
             onPurchase() { player.bin.unlocked = true; },
-            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            pay() { gain_items('stardust', -1); },
         },
         44: {
             title: 'Alternate Magic',
@@ -489,7 +489,7 @@ addLayer('a', {
             unlocked() { return tmp.mag.layerShown; },
             canAfford() { return hasChallenge('b', 61) && player.lo.items.stardust.amount.gte(this.cost); },
             onPurchase() { player.con.unlocked = true; },
-            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
+            pay() { gain_items('stardust', -1); },
         },
         54: {
             title: 'Alternate Stats',

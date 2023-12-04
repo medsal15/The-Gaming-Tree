@@ -7,7 +7,7 @@ addLayer('to', {
         return {
             unlocked: false,
             points: D.dZero,
-            random: layers.to.materials.randomize(),
+            random: randomize_tower_materials(),
         };
     },
     layerShown() { return player.to.unlocked && !tmp[this.layer].deactivated; },
@@ -157,7 +157,7 @@ addLayer('to', {
             buy() {
                 const item = player.to.random[0];
 
-                layers.lo.items['*'].gain_items(item, tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items(item, tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -203,7 +203,7 @@ addLayer('to', {
             buy() {
                 const item = player.to.random[1];
 
-                layers.lo.items['*'].gain_items(item, tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items(item, tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -250,7 +250,7 @@ addLayer('to', {
             buy() {
                 const item = player.to.random[2];
 
-                layers.lo.items['*'].gain_items(item, tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items(item, tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -286,7 +286,7 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.stone.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                layers.lo.items['*'].gain_items('stone', tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items('stone', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -319,7 +319,7 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.plank.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                layers.lo.items['*'].gain_items('plank', tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items('plank', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -352,7 +352,7 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.copper_ore.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                layers.lo.items['*'].gain_items('copper_ore', tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items('copper_ore', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -386,7 +386,7 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.stone_brick.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                layers.lo.items['*'].gain_items('stone_brick', tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items('stone_brick', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -420,7 +420,7 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.copper_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                layers.lo.items['*'].gain_items('copper_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items('copper_ingot', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -454,7 +454,7 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.iron_ore.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                layers.lo.items['*'].gain_items('iron_ore', tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items('iron_ore', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -489,7 +489,7 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.iron_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                layers.lo.items['*'].gain_items('iron_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items('iron_ingot', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -523,7 +523,7 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.bronze_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                layers.lo.items['*'].gain_items('bronze_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items('bronze_ingot', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -557,7 +557,7 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.steel_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                layers.lo.items['*'].gain_items('steel_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                gain_items('steel_ingot', tmp[this.layer].buyables[this.id].cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -668,17 +668,6 @@ addLayer('to', {
 
             return high;
         },
-        randomize() {
-            const low = Object.keys(run(layers.to.materials.low, layers.to.materials)),
-                medium = Object.keys(run(layers.to.materials.medium, layers.to.materials)),
-                high = Object.keys(run(layers.to.materials.high, layers.to.materials));
-
-            return [
-                low[Math.floor(low.length * Math.random())],
-                medium[Math.floor(medium.length * Math.random())],
-                high[Math.floor(high.length * Math.random())],
-            ];
-        },
     },
     baseResource: 'building materials',
     baseAmount() { return layerBuyableAmount('to'); },
@@ -718,7 +707,7 @@ addLayer('to', {
             Object.keys(tmp.to.buyables)
                 .filter(id => !['layer', 'rows', 'cols'].includes(id))
                 .forEach(id => setBuyableAmount('to', id, D.dZero));
-            player.to.random = layers.to.materials.randomize();
+            player.to.random = randomize_tower_materials();
         } else if (tmp[layer].row > this.row) {
             const milestones = [];
             if (hasMilestone('to', 3)) milestones.push(3);

@@ -117,7 +117,7 @@ addLayer('xp_alt', {
                 ['display-text', () => `Progress gain: ${format(tmp.xp_alt.monsters[player.xp_alt.type].progress_gain)}`],
                 ['display-text', () => {
                     const type = player.xp_alt.type;
-                    if (!layers.lo.items["*"].can_drop(`tamed_kill:${type}`) || player.xp_alt.monsters[type].last_drops_times.lte(0)) return;
+                    if (!can_drop(`tamed_kill:${type}`) || player.xp_alt.monsters[type].last_drops_times.lte(0)) return;
 
                     let drops = 'nothing',
                         count = '';
@@ -268,9 +268,9 @@ addLayer('xp_alt', {
                     player.xp.enemies[type].kills = D.add(player.xp.enemies[type].kills, tmp.xp.enemies[type].kills);
                 }
 
-                if (layers.lo.items['*'].can_drop(`tamed_kill:${type}`)) {
+                if (can_drop(`tamed_kill:${type}`)) {
                     // However, you don't get the xp drop multipliers
-                    const drops = layers.xp_alt.monsters[type].get_drops(D.dOne),
+                    const drops = get_monster_drops(type, D.dOne),
                         equal = drops.length == player_data.last_drops.length &&
                             drops.every(([item, amount]) => player_data.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
 
@@ -281,7 +281,7 @@ addLayer('xp_alt', {
                         player_data.last_drops = drops;
                     }
 
-                    layers.lo.items['*'].gain_items(drops);
+                    gain_items(drops);
                 }
 
                 if (inChallenge('b', 62) || hasChallenge('b', 62)) {
@@ -301,9 +301,9 @@ addLayer('xp_alt', {
                     player.xp.enemies[type].kills = D.add(player.xp.enemies[type].kills, tmp.xp.enemies[type].kills);
                 }
 
-                if (layers.lo.items['*'].can_drop(`tamed_kill:${type}`)) {
+                if (can_drop(`tamed_kill:${type}`)) {
                     // However, you don't get the xp drop multipliers
-                    const drops = layers.xp_alt.monsters[type].get_drops(D.dOne),
+                    const drops = get_monster_drops(type, D.dOne),
                         equal = drops.length == player_data.last_drops.length &&
                             drops.every(([item, amount]) => player_data.last_drops.some(([litem, lamount]) => item == litem && D.eq(amount, lamount)));
 
@@ -314,7 +314,7 @@ addLayer('xp_alt', {
                         player_data.last_drops = drops;
                     }
 
-                    layers.lo.items['*'].gain_items(drops);
+                    gain_items(drops);
                 }
 
                 if (inChallenge('b', 62) || hasChallenge('b', 62)) {
@@ -749,7 +749,6 @@ addLayer('xp_alt', {
 
                 return gain;
             },
-            get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
             unlocked() { return !inChallenge('b', 41) },
         },
         goblin: {
@@ -818,18 +817,19 @@ addLayer('xp_alt', {
 
                 return base;
             },
-            passive_tame() {
+            passive_tame(tamed) {
                 /** @type {typeof tmp.xp_alt.monsters[string]} */
                 const monster = tmp.xp_alt.monsters[this.type];
 
                 if (!hasUpgrade('xp_alt', 22) || !hasUpgrade('c', 43) || !monster.unlocked) return D.dZero;
+
+                tamed ??= player.xp_alt.monsters[this.type].tamed ?? D.dZero;
 
                 let gain = D.div(monster.progress_gain, layers.xp_alt.monsters[this.type].difficulty(tamed))
                     .times(monster.tames).times(tmp.xp_alt.monsters['*'].tames_passive_mult);
 
                 return gain;
             },
-            get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
             unlocked() { return hasUpgrade('xp_alt', 33) && !inChallenge('b', 41) },
         },
         zombie: {
@@ -905,6 +905,8 @@ addLayer('xp_alt', {
 
                 if (mult.lte(0)) return D.dZero;
 
+                tamed ??= player.xp_alt.monsters[this.type].tamed ?? D.dZero;
+
                 /** @type {typeof tmp.xp_alt.monsters[string]} */
                 const monster = tmp.xp_alt.monsters[this.type];
 
@@ -915,7 +917,6 @@ addLayer('xp_alt', {
 
                 return gain;
             },
-            get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
             unlocked() { return hasMilestone('to', 2) && !inChallenge('b', 41); },
         },
         ent: {
@@ -985,7 +986,6 @@ addLayer('xp_alt', {
                 return base;
             },
             passive_tame(tamed) { return D.dZero; },
-            get_drops(kills) { return layers.lo.items['*'].get_drops(`tamed_kill:${this.type}`, kills); },
             unlocked: false,
         },
         // Challenge
@@ -1038,7 +1038,6 @@ addLayer('xp_alt', {
             tames() { return D.dOne; },
             produces(tamed) { return []; },
             passive_tame(tamed) { return D.dZero; },
-            get_drops(kills) { return []; },
             unlocked() { return !inChallenge('b', 31) && inChallenge('b', 42); },
         },
         amalgam: {
@@ -1092,13 +1091,6 @@ addLayer('xp_alt', {
 
                 return D.div(types.reduce((sum, type) => D.add(sum, layers.xp_alt.monsters[type].passive_tame(tamed)), 0), types.length);
             },
-            get_drops(kills) {
-                const types = ['slime', 'goblin', 'zombie'];
-
-                if (false) types.push('ent'); //todo unlock ent
-
-                return types.reduce((sum, type) => [...sum, ...layers.xp_alt.monsters[type].produces(kills)], []);
-            },
             unlocked() { return inChallenge('b', 41); },
         },
     },
@@ -1138,7 +1130,7 @@ addLayer('xp_alt', {
                 /** @type {[string, Decimal][]} */
                 const production = tmp.xp_alt.monsters[type].produces.map(([item, amount]) => [item, D.times(diff, amount)]);
 
-                layers.lo.items['*'].gain_items(production);
+                gain_items(production);
             }
             if (D.gt(tmp.xp_alt.monsters[type].passive_tame, 0)) {
                 const tames = D.times(tmp.xp_alt.monsters[type].passive_tame, diff);

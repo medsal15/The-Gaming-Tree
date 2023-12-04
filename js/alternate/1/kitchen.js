@@ -1501,7 +1501,7 @@ addLayer('k', {
                             const amount = precipe().amount_target;
 
                             recipe().consumes.forEach(([item, amount]) => {
-                                layers.lo.items['*'].gain_items(item, D.neg(amount));
+                                gain_items(item, D.neg(amount));
                             });
                             precipe().amount_cooking = amount;
                         }

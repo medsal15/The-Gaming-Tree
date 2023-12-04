@@ -11,7 +11,7 @@ addLayer('mag', {
         };
     },
     layerShown() { return (inChallenge('b', 61) || hasChallenge('b', 61)) && !hasUpgrade('a', 44); },
-    deactivated() { return !hasUpgrade('a', 44); },
+    deactivated() { return hasUpgrade('a', 44); },
     nodeStyle() {
         const style = {};
 
@@ -163,7 +163,6 @@ addLayer('mag', {
 
                 return elements[Math.floor(Math.random() * elements.length)];
             },
-            randomize() { Object.keys(layers.xp.enemies).forEach(type => player.xp.enemies[type].element = this.random()); },
         },
         none: {
             _id: null,

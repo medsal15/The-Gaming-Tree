@@ -17,7 +17,11 @@ addLayer('con', {
     },
     layerShown() { return player.con.unlocked; },
     nodeStyle() {
-        const style = {};
+        const style = {
+            'background-repeat': 'no-repeat',
+            'background-position': 'center',
+            'background-size': 'contain',
+        };
 
         if (tmp.con.condiments['*']?.highest) style['border-color'] = tmp.con.condiments[tmp.con.condiments['*'].highest]?.color;
 

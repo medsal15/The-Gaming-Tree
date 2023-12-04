@@ -159,13 +159,13 @@ addLayer('fr', {
         if (tmp.tic.layerShown) diff = D.times(diff, layers.tic.time_speed(this.layer));
 
         // Condensation
-        layers.lo.items['*'].gain_items('water', D.times(tmp.fr.water.total_gain, diff));
+        gain_items('water', D.times(tmp.fr.water.total_gain, diff));
 
         // Cooling
         addPoints(this.layer, D.times(tmp.fr.cold.gain, diff));
 
         // Freeze water
-        layers.lo.items['*'].gain_items('ice', D.times(tmp.fr.ice.gain, diff));
+        gain_items('ice', D.times(tmp.fr.ice.gain, diff));
 
         // Freezing recipes
         Object.keys(layers.fr.recipes)
@@ -180,7 +180,7 @@ addLayer('fr', {
                 precipe.progress = precipe.progress.add(diff);
 
                 if (precipe.progress.gte(recipe.time)) {
-                    layers.lo.items['*'].gain_items(recipe.produces, precipe.amount_freezing);
+                    gain_items(recipe.produces, precipe.amount_freezing);
                     precipe.progress = D.dZero;
                     precipe.amount_freezing = D.dZero;
                 }
@@ -240,7 +240,7 @@ addLayer('fr', {
             },
             buy() {
                 Object.entries(tmp[this.layer].buyables[this.id].cost)
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -295,7 +295,7 @@ addLayer('fr', {
             },
             buy() {
                 Object.entries(tmp[this.layer].buyables[this.id].cost)
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -350,7 +350,7 @@ addLayer('fr', {
             },
             buy() {
                 Object.entries(tmp[this.layer].buyables[this.id].cost)
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -405,7 +405,7 @@ addLayer('fr', {
             },
             buy() {
                 Object.entries(tmp[this.layer].buyables[this.id].cost)
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -461,7 +461,7 @@ addLayer('fr', {
             },
             buy() {
                 Object.entries(tmp[this.layer].buyables[this.id].cost)
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -517,7 +517,7 @@ addLayer('fr', {
             },
             buy() {
                 Object.entries(tmp[this.layer].buyables[this.id].cost)
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -579,7 +579,7 @@ addLayer('fr', {
             },
             buy() {
                 Object.entries(tmp[this.layer].buyables[this.id].cost)
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -641,7 +641,7 @@ addLayer('fr', {
             },
             buy() {
                 Object.entries(tmp[this.layer].buyables[this.id].cost)
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -703,7 +703,7 @@ addLayer('fr', {
             },
             buy() {
                 Object.entries(tmp[this.layer].buyables[this.id].cost)
-                    .forEach(([item, amount]) => layers.lo.items['*'].gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
+                    .forEach(([item, amount]) => gain_items(item, D.times(amount, tmp.lo.items['*'].craft_consumption).neg()));
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -1235,7 +1235,7 @@ addLayer('fr', {
                             const amount = precipe().amount_target;
 
                             recipe().consumes.forEach(([item, amount]) => {
-                                layers.lo.items['*'].gain_items(item, D.neg(amount));
+                                gain_items(item, D.neg(amount));
                             });
                             precipe().amount_freezing = amount;
                         }

@@ -126,14 +126,7 @@ let winText = `Congratulations! You have finished the current content in the gam
  * var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything"]
  * ```
  */
-var doNotCallTheseFunctionsEveryTick = [
-	'show_building', 'gain_resource',
-	'show_skill',
-	'grid_to_item', 'get_drops', 'format_chance', 'type_name', 'can_drop', 'gain_items',
-	'show_fuel', 'show_smelt',
-	'randomize',
-	'create_card', 'roll_ball', 'roll_new_ball',
-];
+var doNotCallTheseFunctionsEveryTick = [];
 
 /**
  * A function that returns any non-layer-related data that you want to be added to the save data and "player" object.
