@@ -462,7 +462,7 @@ addLayer('a', {
         },
         44: {
             title: 'Alternate Magic',
-            description: 'Not Yet Implemented<br>???',
+            description: 'Tastes even better',
             cost: D(6),
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -476,9 +476,10 @@ addLayer('a', {
                 };
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.con.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.mag.color}, ${tmp.con.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.mag.color;
                 }
@@ -486,7 +487,9 @@ addLayer('a', {
                 return style;
             },
             unlocked() { return tmp.mag.layerShown; },
-            canAfford: false,
+            canAfford() { return hasChallenge('b', 61) && player.lo.items.stardust.amount.gte(this.cost); },
+            onPurchase() { player.con.unlocked = true; },
+            pay() { layers.lo.items['*'].gain_items('stardust', -1); },
         },
         54: {
             title: 'Alternate Stats',

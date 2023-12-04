@@ -10,7 +10,8 @@ addLayer('mag', {
             element: 'none',
         };
     },
-    layerShown() { return inChallenge('b', 61) || hasChallenge('b', 61); },
+    layerShown() { return (inChallenge('b', 61) || hasChallenge('b', 61)) && !hasUpgrade('a', 44); },
+    deactivated() { return !hasUpgrade('a', 44); },
     nodeStyle() {
         const style = {};
 
@@ -192,6 +193,8 @@ addLayer('mag', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.mag.elements).find(element => layers.mag.elements[element] == this); },
             effects() {
+                if (tmp.mag.deactivated) return {};
+
                 return {
                     xp: {
                         damage_multiplier: D.dTwo,
@@ -217,6 +220,8 @@ addLayer('mag', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.mag.elements).find(element => layers.mag.elements[element] == this); },
             effects() {
+                if (tmp.mag.deactivated) return {};
+
                 return {
                     xp: {
                         drop_multiplier: D.dTwo,
@@ -236,6 +241,8 @@ addLayer('mag', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.mag.elements).find(element => layers.mag.elements[element] == this); },
             effects() {
+                if (tmp.mag.deactivated) return {};
+
                 return {
                     xp: {
                         drop_multiplier: D(.5),
@@ -255,6 +262,8 @@ addLayer('mag', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.mag.elements).find(element => layers.mag.elements[element] == this); },
             effects() {
+                if (tmp.mag.deactivated) return {};
+
                 return {
                     mining: {
                         chance_multiplier: D(.5),
