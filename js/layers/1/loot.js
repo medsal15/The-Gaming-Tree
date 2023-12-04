@@ -1872,6 +1872,7 @@ addLayer('lo', {
             },
         },
         73: {
+            //todo boost freezer
             title: 'Breeze Alloy',
             display() {
                 const amount = getBuyableAmount(this.layer, this.id),

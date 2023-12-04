@@ -1092,7 +1092,7 @@ addLayer('fr', {
 
             gain = gain.times(tmp.k.dishes.popsicle.effect);
 
-            gain = gain.times(tmp.con.condiments['*'].total.f.water ?? D.dOne);
+            gain = gain.times(tmp.con.condiments['*'].total.fr.water ?? D.dOne);
 
             return gain;
         },
@@ -1112,7 +1112,7 @@ addLayer('fr', {
 
             gain = gain.times(tmp.k.dishes.popsicle.effect);
 
-            gain = gain.times(tmp.con.condiments['*'].total.f.cold ?? D.dOne);
+            gain = gain.times(tmp.con.condiments['*'].total.fr.cold ?? D.dOne);
 
             const loss = player.fr.points.div(100);
 

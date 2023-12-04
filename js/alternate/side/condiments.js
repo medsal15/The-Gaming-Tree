@@ -60,7 +60,7 @@ addLayer('con', {
                 [
                     'column',
                     () => Object.keys(layers.con.condiments)
-                        .filter(cond => cond != '*')
+                        .filter(cond => cond != '*' && cond != '')
                         .map(cond => {
                             const amount = player.con.condiments[cond].amount,
                                 tmp_cond = tmp.con.condiments[cond];
@@ -98,7 +98,7 @@ addLayer('con', {
                                     {
                                         to = {},
                                         k = {},
-                                        f = {},
+                                        fr = {},
                                     } = tmp.con.condiments[condiment].effect,
                                     forms = tmp.con.condiments[condiment].formulas;
 
@@ -154,8 +154,8 @@ addLayer('con', {
                                     if (D.gt(add, 0)) pros.push(`Increases stomach size by ${add_text}`);
                                     else cons.push(`Decreases stomach size by ${add_text}`);
                                 }
-                                if ('water' in f && D.neq(f.water, 1)) {
-                                    const mult = f.water;
+                                if ('water' in fr && D.neq(fr.water, 1)) {
+                                    const mult = fr.water;
                                     let mult_text;
                                     if (shiftDown) {
                                         mult_text = `[${forms.f.water}]`;
@@ -168,8 +168,8 @@ addLayer('con', {
                                     if (D.gt(mult, 1)) pros.push(`Multiplies water gain by ${mult_text}`);
                                     else cons.push(`Divides water gain by ${mult_text}`);
                                 }
-                                if ('cold' in f && D.neq(f.cold, 1)) {
-                                    const mult = f.cold;
+                                if ('cold' in fr && D.neq(fr.cold, 1)) {
+                                    const mult = fr.cold;
                                     let mult_text;
                                     if (shiftDown) {
                                         mult_text = `[${forms.f.cold}]`;
@@ -184,30 +184,32 @@ addLayer('con', {
                                 }
 
                                 return { pros, cons, };
-                            };
+                            },
+                            condiments = Object.keys(layers.con.condiments)
+                                .filter(cond => cond != '*' && cond != '');
+
+                        if (inChallenge('b', 91)) condiments.push('');
 
                         return [
                             ['Condiment', 'Amount', 'Effects'],
-                            ...Object.keys(layers.con.condiments)
-                                .filter(cond => cond != '*')
-                                .map(cond => {
-                                    let change = tmp.con.condiments['*'].loss.neg(),
-                                        change_str = '';
-                                    const effect = effects(cond);
+                            ...condiments.map(cond => {
+                                let change = tmp.con.condiments['*'].loss.neg(),
+                                    change_str = '';
+                                const effect = effects(cond);
 
-                                    if (player.con.condiment == cond) change = change.add(tmp.con.condiments['*'].gain);
-                                    if (D.abs(change).gt(1e-4)) change_str = ` (${condiment_color(cond, (change.gt(0) ? '+' : '-') + format(change))} /s)`;
+                                if (player.con.condiment == cond) change = change.add(tmp.con.condiments['*'].gain);
+                                if (D.abs(change).gt(1e-4)) change_str = ` (${condiment_color(cond, (change.gt(0) ? '+' : '-') + format(change))} /s)`;
 
-                                    return [
-                                        [['display-text', condiment_color(cond, capitalize(tmp.con.condiments[cond].name))]],
-                                        [['display-text', condiment_color(cond, format(player.con.condiments[cond].amount)) + change_str]],
-                                        [
-                                            ...effect.pros.map(eff => ['display-text', `<span style="color:#55AA55;">${eff}</span>`]),
-                                            'h-line',
-                                            ...effect.cons.map(eff => ['display-text', `<span class="warning">${eff}</span>`]),
-                                        ],
-                                    ];
-                                }),
+                                return [
+                                    [['display-text', condiment_color(cond, capitalize(tmp.con.condiments[cond].name))]],
+                                    [['display-text', condiment_color(cond, format(player.con.condiments[cond].amount)) + change_str]],
+                                    [
+                                        ...effect.pros.map(eff => ['display-text', `<span style="color:#55AA55;">${eff}</span>`]),
+                                        'h-line',
+                                        ...effect.cons.map(eff => ['display-text', `<span class="warning">${eff}</span>`]),
+                                    ],
+                                ];
+                            }),
                         ];
                     },
                 ],
@@ -443,15 +445,15 @@ addLayer('con', {
                             .reduce(D.add, 0);
                     },
                 },
-                f: {
+                fr: {
                     water() {
                         return Object.values(tmp.con.condiments)
-                            .map(value => 'effect' in value ? (value.effect.f?.water ?? D.dOne) : D.dOne)
+                            .map(value => 'effect' in value ? (value.effect.fr?.water ?? D.dOne) : D.dOne)
                             .reduce(D.times, 1);
                     },
                     cold() {
                         return Object.values(tmp.con.condiments)
-                            .map(value => 'effect' in value ? (value.effect.f?.cold ?? D.dOne) : D.dOne)
+                            .map(value => 'effect' in value ? (value.effect.fr?.cold ?? D.dOne) : D.dOne)
                             .reduce(D.times, 1);
                     },
                 },
@@ -467,7 +469,50 @@ addLayer('con', {
                 return condiments.sort(([, data_a], [, data_b]) => D.cmp(data_a.amount, data_b.amount))[0][0];
             },
         },
-        //todo condimentless nerf for challenge
+        '': {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.con.condiments).find(condiment => layers.con.condiments[condiment] == this); },
+            effect() {
+                if (inChallenge('b', 91) && !player.con.condiment) {
+                    const amount = player.con.points,
+                        amlo = D.add(amount, 50).log(50).max(0).minus(1);
+                    return {
+                        to: {
+                            material_cost: D.pow(2, amlo),
+                            floor_cost: D.pow(.5, amlo),
+                        },
+                        k: {
+                            oven_size: amlo.neg(),
+                            stomach_size: amlo.neg(),
+                        },
+                        fr: {
+                            water: D.pow(.5, amlo),
+                            cold: D.pow(.5, amlo),
+                        },
+                    }
+                };
+                return {};
+            },
+            formulas() {
+                if (inChallenge('b', 91)) return {
+                    to: {
+                        material_cost: '* 2 ^ (log50(spice + 50) - 1)',
+                        floor_cost: '/ 2 ^ (log50(spice + 50) - 1)',
+                    },
+                    k: {
+                        oven_size: '- (log50(spice + 50) - 1)',
+                        stomach_size: '- (log50(spice + 50) - 1)',
+                    },
+                    fr: {
+                        water: '/ 2 ^ (log50(spice + 50) - 1)',
+                        cold: '/ 2 ^ (log50(spice + 50) - 1)',
+                    },
+                };
+                return {};
+            },
+            name: 'none',
+            color: '#00000000',
+        },
         pepper: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.con.condiments).find(condiment => layers.con.condiments[condiment] == this); },
@@ -481,7 +526,7 @@ addLayer('con', {
                         oven_size: amlo,
                         stomach_size: amlo,
                     },
-                    f: {
+                    fr: {
                         water: D.pow(.5, amlo),
                         cold: D.pow(.5, amlo),
                     },
@@ -489,12 +534,12 @@ addLayer('con', {
             },
             formulas: {
                 k: {
-                    oven_size: '+ log100(pepper + 100)',
-                    stomach_size: '+ log100(pepper + 100)',
+                    oven_size: '+ (log100(pepper + 100) - 1)',
+                    stomach_size: '+ (log100(pepper + 100) - 1)',
                 },
-                f: {
-                    water: '/ 2 ^ log100(pepper + 100)',
-                    cold: '/ 2 ^ log100(pepper + 100)',
+                fr: {
+                    water: '/ 2 ^ (log100(pepper + 100) - 1)',
+                    cold: '/ 2 ^ (log100(pepper + 100) - 1)',
                 },
             },
             name: 'pepper',
@@ -515,7 +560,7 @@ addLayer('con', {
                     k: {
                         oven_size: amlo.neg(),
                     },
-                    f: {
+                    fr: {
                         water: D.pow(2, amlo),
                         cold: D.pow(2, amlo),
                     },
@@ -523,14 +568,14 @@ addLayer('con', {
             },
             formulas: {
                 to: {
-                    material_cost: '* 2 ^ log100(mint + 100)',
+                    material_cost: '* 2 ^ (log100(mint + 100) - 1)',
                 },
                 k: {
-                    oven_size: '- log100(mint + 100)',
+                    oven_size: '- (log100(mint + 100) - 1)',
                 },
-                f: {
-                    water: '* 2 ^ log100(mint + 100)',
-                    cold: '* 2 ^ log100(mint + 100)'
+                fr: {
+                    water: '* 2 ^ (log100(mint + 100) - 1)',
+                    cold: '* 2 ^ (log100(mint + 100) - 1)'
                 },
             },
             name: 'mint',
@@ -552,21 +597,21 @@ addLayer('con', {
                         oven_size: amlo,
                         stomach_size: amlo.neg(),
                     },
-                    f: {
+                    fr: {
                         water: D.pow(.5, amlo),
                     },
                 };
             },
             formulas: {
                 to: {
-                    floor_cost: '* 2 ^ log100(vinegar + 100)',
+                    floor_cost: '* 2 ^ (log100(vinegar + 100) - 1)',
                 },
                 k: {
-                    oven_size: 'log100(vinegar + 100)',
-                    stomach_size: '- log100(vinegar + 100)',
+                    oven_size: '+ (log100(vinegar + 100) - 1)',
+                    stomach_size: '- (log100(vinegar + 100) - 1)',
                 },
-                f: {
-                    water: '/ 2 ^ log100(vinegar + 100)'
+                fr: {
+                    water: '/ 2 ^ (log100(vinegar + 100) - 1)'
                 },
             },
             name: 'vinegar',
@@ -588,21 +633,21 @@ addLayer('con', {
                     k: {
                         oven_size: amlo.neg(),
                     },
-                    f: {
+                    fr: {
                         cold: D.pow(.5, amlo),
                     },
                 };
             },
             formulas: {
                 to: {
-                    material_cost: '/ 2 ^ log100(ginger + 100)',
-                    floor_cost: '* 2 ^ log100(ginger + 100)',
+                    material_cost: '/ 2 ^ (log100(ginger + 100) - 1)',
+                    floor_cost: '* 2 ^ (log100(ginger + 100) - 1)',
                 },
                 k: {
-                    oven_size: '- log100(ginger + 100)',
+                    oven_size: '- (log100(ginger + 100) - 1)',
                 },
-                f: {
-                    cold: '/ 2 ^ log100(ginger + 100)',
+                fr: {
+                    cold: '/ 2 ^ (log100(ginger + 100) - 1)',
                 },
             },
             name: 'ginger',

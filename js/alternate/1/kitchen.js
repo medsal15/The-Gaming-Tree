@@ -532,6 +532,7 @@ addLayer('k', {
         },
     },
     dishes: {
+        //todo add value from s 31
         '*': {
             amount() { return Object.values(player.k.dishes).reduce((sum, { amount }) => D.add(sum, amount), D.dZero); },
             value() {

@@ -2325,7 +2325,7 @@ type Layers = {
                         stomach_size(): Decimal
                     }
                     /** gain multipliers */
-                    f: {
+                    fr: {
                         water(): Decimal
                         cold(): Decimal
                     }
@@ -2353,7 +2353,7 @@ type Layers = {
                         stomach_size?: Decimal
                     }
                     /** gain multipliers */
-                    f?: {
+                    fr?: {
                         water?: Decimal
                         cold?: Decimal
                     }
@@ -2367,7 +2367,7 @@ type Layers = {
                         oven_size?: string
                         stomach_size?: string
                     }
-                    f?: {
+                    fr?: {
                         water?: string
                         cold?: string
                     }

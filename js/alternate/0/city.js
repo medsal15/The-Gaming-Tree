@@ -2112,7 +2112,7 @@ addLayer('c', {
                 const items = [['normal_log', D(1 / 4)]];
 
                 items.forEach(([, amount], i) => {
-                    let mult = placed.times(tmp.c.buildings['*'].produce_mult).times(tmp.c.buildings['*'].item_consume_mult);
+                    let mult = placed.times(tmp.c.buildings['*'].consume_mult).times(tmp.c.buildings['*'].item_consume_mult);
 
                     if (hasUpgrade('c', 22)) mult = mult.times(upgradeEffect('c', 22));
                     if (hasUpgrade('c', 62)) mult = mult.times(upgradeEffect('c', 62));
@@ -2321,7 +2321,7 @@ addLayer('c', {
                 const items = [['coal', D(1 / 20)]];
 
                 items.forEach(([item, amount], i) => {
-                    let mult = placed.times(tmp.c.buildings['*'].produce_mult).times(tmp.c.buildings['*'].item_consume_mult);
+                    let mult = placed.times(tmp.c.buildings['*'].consume_mult).times(tmp.c.buildings['*'].item_consume_mult);
 
                     if (hasUpgrade('c', 63)) mult = mult.times(upgradeEffect('c', 63));
 
@@ -2586,7 +2586,7 @@ addLayer('c', {
                 );
 
                 items.forEach(([item, amount], i) => {
-                    let mult = placed.times(tmp.c.buildings['*'].produce_mult).times(tmp.c.buildings['*'].item_consume_mult);
+                    let mult = placed.times(tmp.c.buildings['*'].consume_mult).times(tmp.c.buildings['*'].item_consume_mult);
 
                     if (item == 'coal') mult = mult.div(buyableEffect('fr', 22));
 
@@ -2745,7 +2745,7 @@ addLayer('c', {
                     resources = [['energy', D(1 / 5)]];
 
                 items.forEach(([, amount], i) => {
-                    let mult = placed.times(tmp.c.buildings['*'].produce_mult).times(tmp.c.buildings['*'].item_consume_mult);
+                    let mult = placed.times(tmp.c.buildings['*'].consume_mult).times(tmp.c.buildings['*'].item_consume_mult);
 
                     items[i][1] = D.times(amount, mult);
                 });
