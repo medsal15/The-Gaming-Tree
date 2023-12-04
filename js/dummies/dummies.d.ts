@@ -2058,6 +2058,7 @@ type Layers = {
     lo: Layer<'lo'> & {
         buyables: Layer<'lo'>['buyables'] & {
             [id: number]: Buyable<'lo'> & {
+                /** Value per buyable */
                 value(): Decimal
                 cost(): { [item in items]: Decimal }
             }
@@ -2686,7 +2687,6 @@ type Layers = {
                 type: 'food' | 'drink'
                 /** @default true */
                 unlocked?: Computable<boolean>
-                //duration: Computable<{ unit: time_units, time: DecimalSource }>
                 duration: {
                     readonly id: dish
                     unit: time_units
@@ -2694,7 +2694,7 @@ type Layers = {
                 }
                 effect(duration: Decimal): any
                 effect_description(duration: Decimal): string
-                /** Total value of the dish */
+                /** Value per dish */
                 value: Computable<Decimal>
                 condiment: {
                     good: string[]

@@ -532,7 +532,6 @@ addLayer('k', {
         },
     },
     dishes: {
-        //todo add value from s 31
         '*': {
             amount() { return Object.values(player.k.dishes).reduce((sum, { amount }) => D.add(sum, amount), D.dZero); },
             value() {
@@ -601,7 +600,7 @@ addLayer('k', {
                         Duration: ${duration_format(dish.duration.time)} ${name}<br>\
                         ${layers.k.dishes[dish_id].effect_description(dish.duration.time)}<br>\
                         ${good}${bad}\
-                        Value: ${format(dish.value)}`;
+                        Value: ${format(D.times(dish.value, player.k.dishes[dish_id].amount))}`;
             },
             units: {
                 kills: {
@@ -662,7 +661,13 @@ addLayer('k', {
                 return D.dOne;
             },
             effect_description(duration) { return `Multiplies XP gain, building production/consumption, and harvest yield by 0.5`; },
-            value: D.dZero,
+            value() {
+                let value = D.dZero;
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             condiment: {
                 good: [],
                 bad: [],
@@ -708,7 +713,13 @@ addLayer('k', {
                 let effect = shiftDown ? '[time left / 60 + 1]' : format(this.effect(duration));
                 return `Multiplies plant harvest yield by ${effect}`;
             },
-            value() { return D.times(1, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D.dOne;
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             condiment: {
                 good: ['pepper'],
                 bad: ['mint'],
@@ -755,7 +766,13 @@ addLayer('k', {
                 let effect = shiftDown ? '[2 ^ (time left / 60)]' : format(this.effect(duration));
                 return `Multiplies plant growth speed by ${effect}`;
             },
-            value() { return D.times(1, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D.dOne;
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             condiment: {
                 good: ['pepper'],
                 bad: ['ginger'],
@@ -801,7 +818,13 @@ addLayer('k', {
                 let effect = shiftDown ? '[1.25 ^ (time left / 20)]' : format(this.effect(duration));
                 return `Multiplies city production/consumption by ${effect}`;
             },
-            value() { return D.times(2, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D.dTwo;
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             condiment: {
                 good: ['vinegar'],
                 bad: ['mint'],
@@ -847,7 +870,13 @@ addLayer('k', {
                 let effect = shiftDown ? '[1.5 ^ (time left / 5)]' : format(this.effect(duration));
                 return `Multiplies passive monster gain by ${effect}`;
             },
-            value() { return D.times(2, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D.dTwo;
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             condiment: {
                 good: ['mint'],
                 bad: ['pepper'],
@@ -893,7 +922,13 @@ addLayer('k', {
                 let effect = shiftDown ? '[1.25 ^ (time left / 10)]' : format(this.effect(duration));
                 return `Divides city consumption by ${effect}`;
             },
-            value() { return D.times(2, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D.dTwo;
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             condiment: {
                 good: ['vinegar'],
                 bad: ['ginger'],
@@ -935,7 +970,13 @@ addLayer('k', {
                 return { tames: D.dOne, prod: D.dOne };
             },
             effect_description(duration) { return `Multiplies monster tames by 2, but divides monster production by 2`; },
-            value() { return D.times(3, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D(3);
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             condiment: {
                 good: ['pepper'],
                 bad: ['mint'],
@@ -981,7 +1022,13 @@ addLayer('k', {
                 let effect = shiftDown ? '[1.25 ^ (time left / 5)]' : format(this.effect(duration));
                 return `Multiplies taming progress by ${effect}`;
             },
-            value() { return D.times(4, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D(4);
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             condiment: {
                 good: ['mint'],
                 bad: ['vinegar'],
@@ -1027,7 +1074,13 @@ addLayer('k', {
                 let effect = shiftDown ? '[1.1 ^ (time left / 15)]' : format(this.effect(duration));
                 return `Multiplies slime and freezer production by ${effect}`;
             },
-            value() { return D.times(3, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D(3);
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             unlocked() { return tmp.fr.layerShown; },
             condiment: {
                 good: ['mint'],
@@ -1075,7 +1128,13 @@ addLayer('k', {
                 const tower_effect = tmp.to.layerShown ? ' and divides tower cost' : '';
                 return `Multiplies freezer production${tower_effect} by ${effect}`;
             },
-            value() { return D.times(3, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D(3);
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             unlocked() { return tmp.fr.layerShown; },
             condiment: {
                 good: ['mint'],
@@ -1118,7 +1177,13 @@ addLayer('k', {
                 return D.dOne;
             },
             effect_description(duration) { return `Multiplies cooking speed by 2`; },
-            value() { return D.times(3, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D(3);
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             condiment: {
                 good: ['pepper'],
                 bad: ['vinegar'],
@@ -1164,7 +1229,13 @@ addLayer('k', {
                 let effect = shiftDown ? '[time left / 30 * 100]' : format(this.effect(duration).times(100));
                 return `Passively tames zombies with ${effect}% efficiency`;
             },
-            value() { return D.times(3, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D(3);
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             unlocked() { return tmp.xp_alt.monsters.zombie.unlocked || tmp.xp_alt.monsters.amalgam.unlocked; },
             condiment: {
                 good: ['mint'],
@@ -1210,7 +1281,13 @@ addLayer('k', {
                 let effect = shiftDown ? '[time left / 10]' : formatTime(this.effect(duration).time);
                 return `Increases base star time by ${effect}, and stomach size by 2`;
             },
-            value() { return D.times(10, player.k.dishes[this.id].amount); },
+            value() {
+                let value = D.dTen;
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
             condiment: {
                 good: ['mint', 'pepper'],
                 bad: ['vinegar', 'ginger'],
