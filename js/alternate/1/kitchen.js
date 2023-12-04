@@ -236,7 +236,7 @@ addLayer('k', {
 
                 size = size.add(tmp.con.condiments['*'].total.k.oven_size ?? D.dZero);
 
-                return size.floor().max(0);
+                return size.round().max(0);
             },
             default_amount(recipe, amount) {
                 if (D.gt(amount, 0)) return D(amount);
@@ -547,7 +547,7 @@ addLayer('k', {
 
                 size = size.add(tmp.con.condiments['*'].total.k.stomach_size ?? D.dZero);
 
-                return size.floor().max(0).toNumber();
+                return size.round().max(0).toNumber();
             },
             grid_to_dish(id) {
                 if (!id) return false;
@@ -593,8 +593,8 @@ addLayer('k', {
                     name = layers.k.dishes['*'].units[unit].name,
                     /** @type {(condiment: string) => string} */
                     condiment_text = condiment => `<span style="color:${tmp.con.condiments[condiment].color};">${tmp.con.condiments[condiment].name}</span>`,
-                    good = (tmp.con.layerShown && dish.condiment.good.length) ? `Tastes better with ${listFormat(dish.condiment.good.map(condiment_text))}<br>` : '',
-                    bad = (tmp.con.layerShown && dish.condiment.bad.length) ? `Tastes worse with ${listFormat(dish.condiment.bad.map(condiment_text))}<br>` : '',
+                    good = (tmp.con.layerShown && dish.condiment.good.length) ? `Tastes better with ${listFormat.format(dish.condiment.good.map(condiment_text))}<br>` : '',
+                    bad = (tmp.con.layerShown && dish.condiment.bad.length) ? `Tastes worse with ${listFormat.format(dish.condiment.bad.map(condiment_text))}<br>` : '',
                     value = shiftDown ? `Value: ${format(dish.value)} each` : `Total value: ${format(D.times(dish.value, player.k.dishes[dish_id].amount))}`;
 
                 return `${capitalize(dish.name)}<br>\

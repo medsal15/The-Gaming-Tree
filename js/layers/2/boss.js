@@ -569,11 +569,13 @@ addLayer('b', {
             onEnter() {
                 player.con.points = D.dZero;
                 Object.values(player.con.condiments).forEach(data => data.amount = D.dZero);
+                Object.keys(player.con.buyables).forEach(id => setBuyableAmount('con', id, D.dZero))
             },
             onComplete() {
                 player.subtabs.con.mainTabs = 'Condiments';
                 player.con.points = D.dZero;
                 Object.values(player.con.condiments).forEach(data => data.amount = D.dZero);
+                Object.keys(player.con.buyables).forEach(id => setBuyableAmount('con', id, D.dZero))
             },
         },
         //todo 92

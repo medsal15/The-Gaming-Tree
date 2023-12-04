@@ -2341,6 +2341,24 @@ type Layers = {
                         cold?: string
                     }
                 }>
+                /**
+                 * If set and true, says the effect as positive
+                 * If set and false, says the effect as negative
+                 */
+                positive: Computable<{
+                    to?: {
+                        material_cost?: boolean
+                        floor_cost?: boolean
+                    }
+                    k?: {
+                        oven_size?: boolean
+                        stomach_size?: boolean
+                    }
+                    fr?: {
+                        water?: boolean
+                        cold?: boolean
+                    }
+                }>
                 name: string
                 color: string
             }

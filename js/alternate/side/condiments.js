@@ -69,18 +69,19 @@ addLayer('con', {
                             const amount = player.con.condiments[cond].amount,
                                 tmp_cond = tmp.con.condiments[cond];
 
-                            let change_str = '';
+                            let change_str = '',
+                                change = D.times(amount, tmp.con.condiments['*'].loss).neg();
                             if (player.con.condiment == cond) {
-                                const change = tmp.con.condiments['*'].gain;
-                                if (D.abs(change).gt(1e-4)) change_str = ` (<span style="color:${tmp_cond.color}>${(change.gt(0) ? '+' : '-') + format(change)}</span> /s)`;
+                                change = D.add(change, tmp.con.condiments['*'].gain);
                             }
+                            if (D.abs(change).gt(1e-4)) change_str = ` (<span style="color:${tmp_cond.color}">${(change.gt(0) ? '+' : '') + format(change)}</span> /s)`;
 
                             return ['display-text', `You have <span style="color:${tmp_cond.color};font-size:1.25em;">${format(amount)}</span>${change_str} ${tmp_cond.name}`];
                         })
                 ],
                 ['display-text', () => `<span class="warning">You lose ${formatWhole(tmp.con.condiments['*'].loss.times(100))}% of your condiment amounts every second</span>`],
                 ['display-text', () => `Using the good condiment multiplies food duration by ${format(tmp.con.condiments['*'].bonus)}`],
-                ['display-text', () => `<span class="warning">Using the bad condiment multiplies food duration by ${format(tmp.con.condiments['*'].bonus)}</span>`],
+                ['display-text', () => `<span class="warning">Using the bad condiment multiplies food duration by ${format(tmp.con.condiments['*'].malus)}</span>`],
                 ['clickables', [1]],
                 'blank',
                 ['buyable-tree', [[11, 12, 13]]],
@@ -99,110 +100,167 @@ addLayer('con', {
                                 const pros = [],
                                     /** @type {string[]} */
                                     cons = [],
+                                    eff = tmp.con.condiments[condiment].effect,
+                                    /** @type {Computed<Layers['con']['condiments'][string]['formulas']>} */
+                                    formulas = tmp.con.condiments[condiment].formulas,
+                                    /** @type {Computed<Layers['con']['condiments'][string]['positive']>} */
                                     {
                                         to = {},
                                         k = {},
                                         fr = {},
-                                    } = tmp.con.condiments[condiment].effect,
-                                    forms = tmp.con.condiments[condiment].formulas;
+                                    } = tmp.con.condiments[condiment].positive;
 
-                                if ('material_cost' in to && D.neq(to.material_cost, 1)) {
-                                    const mult = to.material_cost;
+                                if ('material_cost' in to) {
                                     let mult_text;
                                     if (shiftDown) {
-                                        mult_text = `[${forms.to.material_cost}]`;
-                                    } else if (D.gt(mult, 1)) {
-                                        mult_text = format(mult);
-                                    } else {
-                                        mult_text = format(mult.pow(-1));
+                                        mult_text = `[${formulas.to.material_cost}]`;
                                     }
 
-                                    if (D.gt(mult, 1)) cons.push(`Multiplies tower block costs by ${mult_text}`);
-                                    else pros.push(`Divides tower block costs by ${mult_text}`);
+                                    if (to.material_cost) {
+                                        pros.push(`Divides tower block costs by ${mult_text ?? format(eff.to?.material_cost.pow(-1))}`);
+                                    } else {
+                                        cons.push(`Multiplies tower block costs by ${mult_text ?? format(eff.to?.material_cost)}`);
+                                    }
                                 }
-                                if ('floor_cost' in to && D.neq(to.floor_cost, 1)) {
-                                    const mult = to.floor_cost;
+                                if ('floor_cost' in to) {
                                     let mult_text;
                                     if (shiftDown) {
-                                        mult_text = `[${forms.to.material_cost}]`;
-                                    } else if (D.gt(mult, 1)) {
-                                        mult_text = format(mult);
-                                    } else {
-                                        mult_text = format(mult.pow(-1));
+                                        mult_text = `[${formulas.to.floor_cost}]`;
                                     }
 
-                                    if (D.gt(mult, 1)) pros.push(`Divides tower floor cost by ${mult_text}`);
-                                    else cons.push(`Multiplies tower floor cost by ${mult_text}`);
+                                    if (to.floor_cost) {
+                                        pros.push(`Divides tower floor cost by ${mult_text ?? format(eff.to?.floor_cost)}`);
+                                    } else {
+                                        cons.push(`Multiplies tower floor cost by ${mult_text ?? format(eff.to?.floor_cost.pow(-1))}`);
+                                    }
                                 }
-                                if ('oven_size' in k && D.neq(k.oven_size, 0)) {
-                                    const add = k.oven_size;
+
+                                if ('oven_size' in k) {
                                     let add_text;
                                     if (shiftDown) {
-                                        add_text = `[${forms.k.oven_size}]`;
+                                        add_text = `[${formulas.k.oven_size}]`;
                                     } else {
-                                        add_text = format(add.abs());
+                                        add_text = format(eff.k?.oven_size.abs());
                                     }
 
-                                    if (D.gt(add, 0)) pros.push(`Increases oven size by ${add_text}`);
-                                    else cons.push(`Decreases oven size by ${add_text}`);
+                                    if (k.oven_size) {
+                                        pros.push(`Increases oven size by ${add_text}`);
+                                    } else {
+                                        cons.push(`Decreases oven size by ${add_text}`);
+                                    }
                                 }
-                                if ('stomach_size' in k && D.neq(k.stomach_size, 0)) {
-                                    const add = k.stomach_size;
+                                if ('stomach_size' in k) {
                                     let add_text;
                                     if (shiftDown) {
-                                        add_text = `[${forms.k.stomach_size}]`;
+                                        add_text = `[${formulas.k.stomach_size}]`;
                                     } else {
-                                        add_text = format(add.abs());
+                                        add_text = format(eff.k?.stomach_size.abs());
                                     }
 
-                                    if (D.gt(add, 0)) pros.push(`Increases stomach size by ${add_text}`);
-                                    else cons.push(`Decreases stomach size by ${add_text}`);
+                                    if (k.stomach_size) {
+                                        pros.push(`Increases stomach size by ${add_text}`);
+                                    } else {
+                                        cons.push(`Decreases stomach size by ${add_text}`);
+                                    }
                                 }
-                                if ('water' in fr && D.neq(fr.water, 1)) {
-                                    const mult = fr.water;
+
+                                if ('water' in fr) {
                                     let mult_text;
                                     if (shiftDown) {
-                                        mult_text = `[${forms.f.water}]`;
-                                    } else if (D.gt(mult, 1)) {
-                                        mult_text = format(mult);
-                                    } else {
-                                        mult_text = format(mult.pow(-1));
+                                        mult_text = `[${formulas.fr.water}]`;
                                     }
 
-                                    if (D.gt(mult, 1)) pros.push(`Multiplies water gain by ${mult_text}`);
-                                    else cons.push(`Divides water gain by ${mult_text}`);
+                                    if (fr.water) {
+                                        pros.push(`Multiplies water gain by ${mult_text ?? format(eff.fr?.water)}`);
+                                    } else {
+                                        cons.push(`Divides water gain by ${mult_text ?? format(eff.fr?.water.pow(-1))}`);
+                                    }
                                 }
-                                if ('cold' in fr && D.neq(fr.cold, 1)) {
-                                    const mult = fr.cold;
+                                if ('cold' in fr) {
                                     let mult_text;
                                     if (shiftDown) {
-                                        mult_text = `[${forms.f.cold}]`;
-                                    } else if (D.gt(mult, 1)) {
-                                        mult_text = format(mult);
-                                    } else {
-                                        mult_text = format(mult.pow(-1));
+                                        mult_text = `[${formulas.fr.cold}]`;
                                     }
 
-                                    if (D.gt(mult, 1)) pros.push(`Multiplies cold gain by ${mult_text}`);
-                                    else cons.push(`Divides cold gain by ${mult_text}`);
+                                    if (fr.cold) {
+                                        pros.push(`Multiplies cold gain by ${mult_text ?? format(eff.fr?.cold)}`);
+                                    } else {
+                                        cons.push(`Divides cold gain by ${mult_text ?? format(eff.fr?.cold.pow(-1))}`);
+                                    }
                                 }
 
                                 return { pros, cons, };
                             },
                             condiments = Object.keys(layers.con.condiments)
-                                .filter(cond => cond != '*' && cond != '');
+                                .filter(cond => cond != '*' && cond != ''),
+                            total_effects = () => {
+                                /** @type {string[]} */
+                                const lines = [],
+                                    {
+                                        to,
+                                        k,
+                                        fr,
+                                    } = tmp.con.condiments['*'].total,
+                                    pos = text => `<span style="color:#55AA55;">${text}</span>`,
+                                    neg = text => `<span class="warning">${text}</span>`;
 
-                        if (inChallenge('b', 91)) condiments.push('');
+                                if (to.material_cost.eq_tolerance(1, .001)) {
+                                    lines.push(`No effects on tower block costs`);
+                                } else if (to.material_cost.lt(1)) {
+                                    lines.push(pos(`Divide tower block costs by ${format(to.material_cost.pow(-1))}`));
+                                } else {
+                                    lines.push(neg(`Multiply tower block costs by ${format(to.material_cost)}`));
+                                }
+                                if (to.floor_cost.eq_tolerance(1, .001)) {
+                                    lines.push(`No effects on tower floor costs`);
+                                } else if (to.floor_cost.gt(1)) {
+                                    lines.push(pos(`Divide tower floor costs by ${format(to.floor_cost)}`));
+                                } else {
+                                    lines.push(neg(`Multiply tower floor costs by ${format(to.floor_cost.pow(-1))}`));
+                                }
 
-                        return [
+                                if (k.oven_size.eq_tolerance(0, .001)) {
+                                    lines.push(`No effects on oven size`);
+                                } else if (k.oven_size.gt(0)) {
+                                    lines.push(pos(`Increase oven size by ${format(k.oven_size)}`));
+                                } else {
+                                    lines.push(neg(`Decrease oven size by ${format(k.oven_size.abs())}`));
+                                }
+                                if (k.stomach_size.eq_tolerance(0, .001)) {
+                                    lines.push(`No effects on stomach size`);
+                                } else if (k.stomach_size.gt(0)) {
+                                    lines.push(pos(`Increase stomach size by ${format(k.stomach_size)}`));
+                                } else {
+                                    lines.push(neg(`Decrease stomach size by ${format(k.stomach_size.abs())}`));
+                                }
+
+                                if (fr.water.eq_tolerance(1, .001)) {
+                                    lines.push(`No effects on water gain`);
+                                } else if (fr.water.gt(1)) {
+                                    lines.push(pos(`Multiply water gain by ${format(fr.water)}`));
+                                } else {
+                                    lines.push(neg(`Divide water gain by ${format(fr.water.pow(-1))}`));
+                                }
+                                if (fr.cold.eq_tolerance(1, .001)) {
+                                    lines.push(`No effects on cold gain`);
+                                } else if (fr.cold.gt(1)) {
+                                    lines.push(pos(`Multiply cold gain by ${format(fr.cold)}`));
+                                } else {
+                                    lines.push(neg(`Divide cold gain by ${format(fr.cold.pow(-1))}`));
+                                }
+
+                                return lines.map(eff => ['display-text', eff]);
+                            };
+
+                        const lines = [
                             ['Condiment', 'Amount', 'Effects'],
                             ...condiments.map(cond => {
-                                let change = tmp.con.condiments['*'].loss.neg(),
+                                let change = D.times(tmp.con.condiments['*'].loss, player.con.condiments[cond].amount).neg(),
                                     change_str = '';
                                 const effect = effects(cond);
 
                                 if (player.con.condiment == cond) change = change.add(tmp.con.condiments['*'].gain);
-                                if (D.abs(change).gt(1e-4)) change_str = ` (${condiment_color(cond, (change.gt(0) ? '+' : '-') + format(change))} /s)`;
+                                if (D.abs(change).gt(1e-4)) change_str = ` (${condiment_color(cond, (change.gt(0) ? '+' : '') + format(change))} /s)`;
 
                                 return [
                                     [['display-text', condiment_color(cond, capitalize(tmp.con.condiments[cond].name))]],
@@ -215,6 +273,23 @@ addLayer('con', {
                                 ];
                             }),
                         ];
+
+                        if (inChallenge('b', 91)) lines.push([
+                            [['display-text', 'None']],
+                            [['display-text', format(player.con.points)]],
+                            [
+                                ['display-text', 'With no condiment selected:'],
+                                ...effects('').cons.map(eff => ['display-text', `<span class="warning">${eff}</span>`])
+                            ],
+                        ]);
+
+                        lines.push([
+                            [['display-text', '<u>Total</u>']],
+                            [],
+                            [...total_effects()],
+                        ]);
+
+                        return lines;
                     },
                 ],
                 ['clickables', [1]],
@@ -339,12 +414,9 @@ addLayer('con', {
             },
             canClick: true,
             style() {
-                const style = {};
-                if (player.con.condiment == this.condiment) style['box-shadow'] = `${tmp.con.color} 0 0 20px`;
-
-                style['background-color'] = tmp.con.condiments[this.condiment].color;
-
-                return style;
+                return {
+                    'background-color': tmp.con.condiments[this.condiment].color,
+                };
             },
         },
         12: {
@@ -359,12 +431,9 @@ addLayer('con', {
             },
             canClick: true,
             style() {
-                const style = {};
-                if (player.con.condiment == this.condiment) style['box-shadow'] = `${tmp.con.color} 0 0 20px`;
-
-                style['background-color'] = tmp.con.condiments[this.condiment].color;
-
-                return style;
+                return {
+                    'background-color': tmp.con.condiments[this.condiment].color,
+                };
             },
         },
         13: {
@@ -379,12 +448,9 @@ addLayer('con', {
             },
             canClick: true,
             style() {
-                const style = {};
-                if (player.con.condiment == this.condiment) style['box-shadow'] = `${tmp.con.color} 0 0 20px`;
-
-                style['background-color'] = tmp.con.condiments[this.condiment].color;
-
-                return style;
+                return {
+                    'background-color': tmp.con.condiments[this.condiment].color,
+                };
             },
         },
         14: {
@@ -399,22 +465,25 @@ addLayer('con', {
             },
             canClick: true,
             style() {
-                const style = {};
-                if (player.con.condiment == this.condiment) style['box-shadow'] = `${tmp.con.color} 0 0 20px`;
-
-                style['background-color'] = tmp.con.condiments[this.condiment].color;
-
-                return style;
+                return {
+                    'background-color': tmp.con.condiments[this.condiment].color,
+                };
             },
         },
     },
     spice: {
-        gain() { return ['pepper', 'mint', 'vinegar', 'ginger'].reduce((sum, condiment) => D.add(sum, player.con.condiments[condiment].amount.add(10).log10()), 0); },
+        gain() {
+            if (!player.con.unlocked && !inChallenge('b', 91) && !hasChallenge('b', 91)) return D.dZero;
+
+            return ['pepper', 'mint', 'vinegar', 'ginger'].reduce((sum, condiment) => D.add(sum, player.con.condiments[condiment].amount.add(10).log10().minus(1)), 0);
+        },
         formula: 'log10(pepper + 10) + log10(mint + 10) + log10(vinegar + 10) + log10(ginger + 10)',
     },
     condiments: {
         '*': {
             gain() {
+                if (!player.con.unlocked && !inChallenge('b', 91) && !hasChallenge('b', 91)) return D.dZero;
+
                 let gain = buyableEffect('con', 11);
 
                 gain = gain.times(buyableEffect('con', 12));
@@ -470,7 +539,7 @@ addLayer('con', {
 
                 if (!condiments.length) return '';
 
-                return condiments.sort(([, data_a], [, data_b]) => D.cmp(data_a.amount, data_b.amount))[0][0];
+                return condiments.sort(([, data_a], [, data_b]) => D.cmp(data_b.amount, data_a.amount))[0][0];
             },
         },
         '': {
@@ -479,7 +548,7 @@ addLayer('con', {
             effect() {
                 if (inChallenge('b', 91) && !player.con.condiment) {
                     const amount = player.con.points,
-                        amlo = D.add(amount, 50).log(50).max(0).minus(1);
+                        amlo = D.add(amount, 10).log(10).max(0).minus(1);
                     return {
                         to: {
                             material_cost: D.pow(2, amlo),
@@ -493,29 +562,46 @@ addLayer('con', {
                             water: D.pow(.5, amlo),
                             cold: D.pow(.5, amlo),
                         },
-                    }
+                    };
                 };
                 return {};
             },
             formulas() {
                 if (inChallenge('b', 91)) return {
                     to: {
-                        material_cost: '* 2 ^ (log50(spice + 50) - 1)',
-                        floor_cost: '/ 2 ^ (log50(spice + 50) - 1)',
+                        material_cost: '2 ^ (log10(spice + 10) - 1)',
+                        floor_cost: '2 ^ (log10(spice + 10) - 1)',
                     },
                     k: {
-                        oven_size: '- (log50(spice + 50) - 1)',
-                        stomach_size: '- (log50(spice + 50) - 1)',
+                        oven_size: 'log10(spice + 10) - 1',
+                        stomach_size: 'log10(spice + 10) - 1',
                     },
                     fr: {
-                        water: '/ 2 ^ (log50(spice + 50) - 1)',
-                        cold: '/ 2 ^ (log50(spice + 50) - 1)',
+                        water: '2 ^ (log10(spice + 10) - 1)',
+                        cold: '2 ^ (log10(spice + 10) - 1)',
+                    },
+                };
+                return {};
+            },
+            positive() {
+                if (inChallenge('b', 91)) return {
+                    to: {
+                        material_cost: false,
+                        floor_cost: false,
+                    },
+                    k: {
+                        oven_size: false,
+                        stomach_size: false,
+                    },
+                    fr: {
+                        water: false,
+                        cold: false,
                     },
                 };
                 return {};
             },
             name: 'none',
-            color: '#00000000',
+            color: '#FFFFFF',
         },
         pepper: {
             _id: null,
@@ -523,7 +609,7 @@ addLayer('con', {
             effect() {
                 /** @type {Decimal} */
                 const amount = player.con.condiments[this.id].amount,
-                    amlo = D.add(amount, 100).log(100).max(0).minus(1);
+                    amlo = D.add(amount, 10).log(10).max(0).minus(1);
 
                 return {
                     k: {
@@ -538,12 +624,22 @@ addLayer('con', {
             },
             formulas: {
                 k: {
-                    oven_size: '+ (log100(pepper + 100) - 1)',
-                    stomach_size: '+ (log100(pepper + 100) - 1)',
+                    oven_size: 'log10(pepper + 10) - 1',
+                    stomach_size: 'log10(pepper + 10) - 1',
                 },
                 fr: {
-                    water: '/ 2 ^ (log100(pepper + 100) - 1)',
-                    cold: '/ 2 ^ (log100(pepper + 100) - 1)',
+                    water: '2 ^ (log10(pepper + 10) - 1)',
+                    cold: '2 ^ (log10(pepper + 10) - 1)',
+                },
+            },
+            positive: {
+                k: {
+                    oven_size: true,
+                    stomach_size: true,
+                },
+                fr: {
+                    water: false,
+                    cold: false,
                 },
             },
             name: 'pepper',
@@ -555,7 +651,7 @@ addLayer('con', {
             effect() {
                 /** @type {Decimal} */
                 const amount = player.con.condiments[this.id].amount,
-                    amlo = D.add(amount, 100).log(100).max(0).minus(1);
+                    amlo = D.add(amount, 10).log(10).max(0).minus(1);
 
                 return {
                     to: {
@@ -572,14 +668,26 @@ addLayer('con', {
             },
             formulas: {
                 to: {
-                    material_cost: '* 2 ^ (log100(mint + 100) - 1)',
+                    material_cost: '2 ^ (log10(mint + 10) - 1)',
                 },
                 k: {
-                    oven_size: '- (log100(mint + 100) - 1)',
+                    oven_size: 'log10(mint + 10) - 1',
                 },
                 fr: {
-                    water: '* 2 ^ (log100(mint + 100) - 1)',
-                    cold: '* 2 ^ (log100(mint + 100) - 1)'
+                    water: '2 ^ (log10(mint + 10) - 1)',
+                    cold: '2 ^ (log10(mint + 10) - 1)'
+                },
+            },
+            positive: {
+                to: {
+                    material_cost: false,
+                },
+                k: {
+                    oven_size: false,
+                },
+                fr: {
+                    water: true,
+                    cold: true,
                 },
             },
             name: 'mint',
@@ -591,7 +699,7 @@ addLayer('con', {
             effect() {
                 /** @type {Decimal} */
                 const amount = player.con.condiments[this.id].amount,
-                    amlo = D.add(amount, 100).log(100).max(0).minus(1);
+                    amlo = D.add(amount, 10).log(10).max(0).minus(1);
 
                 return {
                     to: {
@@ -608,18 +716,30 @@ addLayer('con', {
             },
             formulas: {
                 to: {
-                    floor_cost: '* 2 ^ (log100(vinegar + 100) - 1)',
+                    floor_cost: '2 ^ (log10(vinegar + 10) - 1)',
                 },
                 k: {
-                    oven_size: '+ (log100(vinegar + 100) - 1)',
-                    stomach_size: '- (log100(vinegar + 100) - 1)',
+                    oven_size: 'log10(vinegar + 10) - 1',
+                    stomach_size: 'log10(vinegar + 10) - 1',
                 },
                 fr: {
-                    water: '/ 2 ^ (log100(vinegar + 100) - 1)'
+                    water: '2 ^ (log10(vinegar + 10) - 1)'
+                },
+            },
+            positive: {
+                to: {
+                    floor_cost: true,
+                },
+                k: {
+                    oven_size: true,
+                    stomach_size: false,
+                },
+                fr: {
+                    water: false,
                 },
             },
             name: 'vinegar',
-            color: '#DDAA55',
+            color: '#CC9944',
         },
         ginger: {
             _id: null,
@@ -627,7 +747,7 @@ addLayer('con', {
             effect() {
                 /** @type {Decimal} */
                 const amount = player.con.condiments[this.id].amount,
-                    amlo = D.add(amount, 100).log(100).max(0).minus(1);
+                    amlo = D.add(amount, 10).log(10).max(0).minus(1);
 
                 return {
                     to: {
@@ -644,20 +764,42 @@ addLayer('con', {
             },
             formulas: {
                 to: {
-                    material_cost: '/ 2 ^ (log100(ginger + 100) - 1)',
-                    floor_cost: '* 2 ^ (log100(ginger + 100) - 1)',
+                    material_cost: '2 ^ (log10(ginger + 10) - 1)',
+                    floor_cost: '2 ^ (log10(ginger + 10) - 1)',
                 },
                 k: {
-                    oven_size: '- (log100(ginger + 100) - 1)',
+                    oven_size: 'log10(ginger + 10) - 1',
                 },
                 fr: {
-                    cold: '/ 2 ^ (log100(ginger + 100) - 1)',
+                    cold: '2 ^ (log10(ginger + 10) - 1)',
+                },
+            },
+            positive: {
+                to: {
+                    material_cost: false,
+                    floor_cost: true,
+                },
+                k: {
+                    oven_size: false,
+                },
+                fr: {
+                    cold: true,
                 },
             },
             name: 'ginger',
             color: '#BB6600',
         },
     },
-    //todo update
+    update(diff) {
+        if (!tmp.con.layerShown) return;
+
+        player.con.points = D.times(tmp.con.spice.gain, diff).add(player.con.points);
+
+        if (player.con.condiment) {
+            player.con.condiments[player.con.condiment].amount = D.times(tmp.con.condiments['*'].gain, diff).add(player.con.condiments[player.con.condiment].amount);
+        }
+        Object.values(player.con.condiments).forEach(data => data.amount = D.minus(data.amount, D.times(data.amount, tmp.con.condiments['*'].loss)));
+    },
     shouldNotify() { return inChallenge('b', 91) && canCompleteChallenge('b', 91); },
+    //todo prestigeNotify when can buy buyable
 });

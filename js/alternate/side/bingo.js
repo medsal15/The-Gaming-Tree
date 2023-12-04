@@ -316,7 +316,7 @@ addLayer('bin', {
     update(diff) {
         if (!tmp.bin.layerShown) return;
 
-        if (!inChallenge('b', 82) || !canCompleteChallenge('b', 82)) {
+        if (!inChallenge('b', 82) || !canCompleteChallenge('b', 82) || !hasChallenge('b', 82)) {
             player.bin.time = D.add(player.bin.time, diff);
         }
 
