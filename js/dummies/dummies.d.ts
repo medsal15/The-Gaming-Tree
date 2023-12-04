@@ -2580,15 +2580,15 @@ type Layers = {
          */
         materials: {
             cost_mult(): Decimal
+            /** Returns 3 random items, one per type */
+            randomize(): items[]
+        } & {
             [type in 'low' | 'medium' | 'high']: Computable<{
                 [item in items]: {
                     base: DecimalSource
                     exp: DecimalSource
                 }
             }>
-        } & {
-            /** Returns 3 random items, one per type */
-            randomize(): items[]
         }
     }
     k: Layer<'k'> & {

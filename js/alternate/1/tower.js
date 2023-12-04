@@ -580,7 +580,6 @@ addLayer('to', {
 
             return mult;
         },
-        //todo add ice
         low() {
             const low = {
                 'slime_goo': {
@@ -606,22 +605,41 @@ addLayer('to', {
                 exp: 1.5,
             }
 
+            if (player.fr.unlocked) low['ice'] = {
+                base: 10,
+                exp: 2,
+            };
+
             return low;
         },
-        //todo add icestone/rust
-        medium: {
-            'slime_core_shard': {
-                base: 50,
-                exp: 2,
-            },
-            'pyrite_coin': {
-                base: 50,
-                exp: 1.75,
-            },
-            'corn': {
-                base: 50,
-                exp: 1.5,
-            },
+        medium() {
+            const medium = {
+                'slime_core_shard': {
+                    base: 50,
+                    exp: 2,
+                },
+                'pyrite_coin': {
+                    base: 50,
+                    exp: 1.75,
+                },
+                'corn': {
+                    base: 50,
+                    exp: 1.5,
+                },
+            };
+
+            if (player.fr.unlocked) {
+                medium['icestone'] = {
+                    base: 10,
+                    exp: 1.75,
+                };
+                medium['rust_ingot'] = {
+                    base: 10,
+                    exp: 1.5,
+                };
+            }
+
+            return medium;
         },
         high() {
             const high = {

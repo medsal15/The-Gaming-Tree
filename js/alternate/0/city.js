@@ -129,6 +129,7 @@ addLayer('c', {
                         ]]
                     };
                 },
+                //todo convert to layer-table
                 ['column', () => Object.keys(layers.c.buildings).map(id => layers.c.buildings['*'].show_building(id))],
             ],
         },
