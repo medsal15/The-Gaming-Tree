@@ -1,6 +1,5 @@
 'use strict';
 
-//todo add energy/science gains per second
 addLayer('c', {
     name: 'City',
     symbol: 'C',
@@ -111,23 +110,41 @@ addLayer('c', {
                     ];
                 },
                 () => {
-                    if (hasUpgrade('c', 51)) return ['column', [
-                        [
-                            'display-text',
-                            `You have <span style="color:${tmp.c.resources.energy.color};font-size:1.5em;">\
+                    if (hasUpgrade('c', 51)) {
+                        const gain = tmp.c.resources.energy.gain;
+
+                        let gain_str = '';
+                        if (D.abs(gain).gt(1e-4)) gain_str = ` (<span style="color:${tmp.c.resources.energy.color};">${(gain.gt(0) ? '+' : '-') + format(gain)}</span> /s)`;
+
+                        return ['column', [
+                            [
+                                'display-text',
+                                `You have <span style="color:${tmp.c.resources.energy.color};font-size:1.5em;">\
                                 ${format(player.c.resources.energy.amount)}\
                                 </span>\
+                                ${gain_str}\
                                 ${tmp.c.resources.energy.name}`,
-                        ],
-                        'blank',
-                    ]];
+                            ],
+                            'blank',
+                        ]]
+                    };
                 },
                 ['column', () => Object.keys(layers.c.buildings).map(id => layers.c.buildings['*'].show_building(id))],
             ],
         },
         'Research': {
             content: [
-                ['display-text', () => `You have <span style="color:${tmp.c.resources.science.color};font-size:1.5em;">${format(player.c.resources.science.amount)}</span> ${tmp.c.resources.science.name}`],
+                [
+                    'display-text',
+                    () => {
+                        const gain = tmp.c.resources.science.gain;
+
+                        let gain_str = '';
+                        if (D.abs(gain).gt(1e-4)) gain_str = ` (<span style="color:${tmp.c.resources.science.color};">${(gain.gt(0) ? '+' : '-') + format(gain)}</span> /s)`;
+
+                        return `You have <span style="color:${tmp.c.resources.science.color};font-size:1.5em;">${format(player.c.resources.science.amount)}</span>${gain_str} ${tmp.c.resources.science.name}`;
+                    }
+                ],
                 ['row', [
                     ['display-text', 'Automatically research'],
                     'blank',
@@ -2830,6 +2847,32 @@ addLayer('c', {
 
                 return mult;
             },
+            gain() {
+                return Object.keys(tmp.c.buildings)
+                    .filter(building => building != '*' && (tmp.c.buildings[building].unlocked ?? true) && D.gt(player.c.buyables[building], 0))
+                    .reduce((sum, building) => {
+                        const build = tmp.c.buildings[building];
+
+                        if (build.consumes && 'resources' in build.consumes) {
+                            sum = D.minus(
+                                sum,
+                                build.consumes.resources
+                                    .filter(([res]) => res == this.id)
+                                    .reduce((sum, [, cons]) => D.add(sum, cons), 0)
+                            );
+                        }
+                        if (build.produces && 'resources' in build.produces) {
+                            sum = D.add(
+                                sum,
+                                build.produces.resources
+                                    .filter(([res]) => res == this.id)
+                                    .reduce((sum, [, cons]) => D.add(sum, cons), 0)
+                            );
+                        }
+
+                        return sum;
+                    }, D.dZero);
+            },
         },
         energy: {
             _id: null,
@@ -2849,6 +2892,32 @@ addLayer('c', {
                 mult = mult.times(tmp.p.plants.potato_battery.effect);
 
                 return mult;
+            },
+            gain() {
+                return Object.keys(tmp.c.buildings)
+                    .filter(building => building != '*' && (tmp.c.buildings[building].unlocked ?? true) && D.gt(player.c.buyables[building], 0))
+                    .reduce((sum, building) => {
+                        const build = tmp.c.buildings[building];
+
+                        if (build.consumes && 'resources' in build.consumes) {
+                            sum = D.minus(
+                                sum,
+                                build.consumes.resources
+                                    .filter(([res]) => res == this.id)
+                                    .reduce((sum, [, cons]) => D.add(sum, cons), 0)
+                            );
+                        }
+                        if (build.produces && 'resources' in build.produces) {
+                            sum = D.add(
+                                sum,
+                                build.produces.resources
+                                    .filter(([res]) => res == this.id)
+                                    .reduce((sum, [, cons]) => D.add(sum, cons), 0)
+                            );
+                        }
+
+                        return sum;
+                    }, D.dZero);
             },
         },
     },

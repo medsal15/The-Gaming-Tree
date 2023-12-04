@@ -2500,6 +2500,12 @@ type Layers = {
                 name: Computable<string>
                 color: Computable<string>
                 gain_mult(): Decimal
+                /**
+                 * **Theorical** gain from all active buildings
+                 *
+                 * May be negative
+                 */
+                gain(): Decimal
             }
         }
         floors: {
