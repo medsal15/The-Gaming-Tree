@@ -26,14 +26,6 @@ addLayer('tic', {
     row: 'side',
     position: 1.5,
     tabFormat: {
-        'Seal': {
-            content: [
-                ['display-text', () => `Base time speed: ${format(tmp.tic.time_speed)} seconds/s`],
-                'blank',
-                ['layer-proxy', ['b', [['challenge', 81]]]],
-            ],
-            unlocked() { return !hasChallenge('b', 81) || inChallenge('b', 81); },
-        },
         'Generation': {
             content: [
                 ['display-text', () => `Base time speed: ${shiftDown ? '[log10(cubes + 10)]' : format(tmp.tic.time_speed)} seconds/s`],
@@ -43,6 +35,14 @@ addLayer('tic', {
             ],
             unlocked() { return hasChallenge('b', 81); },
         },
+        'Seal': {
+            content: [
+                ['display-text', () => `Base time speed: ${format(tmp.tic.time_speed)} seconds/s`],
+                'blank',
+                ['layer-proxy', ['b', [['challenge', 81]]]],
+            ],
+            unlocked() { return !hasChallenge('b', 81) || inChallenge('b', 81); },
+        },
     },
     clickables: {
         11: {
@@ -51,16 +51,18 @@ addLayer('tic', {
                 else return 'Reverse time speed but start producing time cubes';
             },
             onClick() { player.tic.invert = !player.tic.invert; },
-            canClick: true,
+            canClick() { return player.tic.invert || hasChallenge('b', 81); },
         },
     },
     cubes: {
         gain() {
-            if (player.tic.invert) return D.dOne;
+            if (player.tic.invert && hasChallenge('b', 81)) return D.dOne;
             return D.dZero;
         },
     },
     time_speed(layer) {
+        if (!hasChallenge('b', 81)) return D.dOne;
+
         let speed = player.tic.points.max(0).add(10).log10();
 
         const main = [

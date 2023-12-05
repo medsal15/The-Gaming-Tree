@@ -1460,7 +1460,7 @@ addLayer('k', {
                             precipe().amount_target.gt(0) &&
                             layers.k.recipes['*'].can_cook(recipe_id) &&
                             recipe().heats.includes(tmp.k.temperatures.current) &&
-                            tmp.k.recipes['*'].size.gt(0);
+                            tmp.k.recipes['*'].size.gte(precipe().amount_target);
                     },
                     display() {
                         const out = is_output(),

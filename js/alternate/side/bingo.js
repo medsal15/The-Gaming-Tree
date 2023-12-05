@@ -31,12 +31,6 @@ addLayer('bin', {
     resource: 'bingo bucks',
     type: 'none',
     tabFormat: {
-        'Seal': {
-            content: [
-                ['layer-proxy', ['b', [['challenge', 82]]]],
-            ],
-            unlocked() { return !hasChallenge('b', 82) || inChallenge('b', 82); },
-        },
         'Bingo': {
             content: [
                 ['display-text', () => `You have ${layerColor('bin', format(player.bin.points), 'font-size:1.5em;')} ${tmp.bin.resource}`],
@@ -87,6 +81,12 @@ addLayer('bin', {
                 ],
             ],
             unlocked() { return inChallenge('b', 82) || hasChallenge('b', 82); },
+        },
+        'Seal': {
+            content: [
+                ['layer-proxy', ['b', [['challenge', 82]]]],
+            ],
+            unlocked() { return !hasChallenge('b', 82) || inChallenge('b', 82); },
         },
     },
     cards: {
@@ -316,7 +316,7 @@ addLayer('bin', {
     update(diff) {
         if (!tmp.bin.layerShown) return;
 
-        if (!inChallenge('b', 82) || !canCompleteChallenge('b', 82) || !hasChallenge('b', 82)) {
+        if (inChallenge('b', 82) && (!canCompleteChallenge('b', 82) || !hasChallenge('b', 82))) {
             player.bin.time = D.add(player.bin.time, diff);
         }
 

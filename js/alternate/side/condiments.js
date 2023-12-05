@@ -35,12 +35,6 @@ addLayer('con', {
     resource: 'spice',
     type: 'none',
     tabFormat: {
-        'Seal': {
-            content: [
-                ['layer-proxy', ['b', [['challenge', 91]]]],
-            ],
-            unlocked() { return !hasChallenge('b', 91) || inChallenge('b', 91); },
-        },
         'Condiments': {
             content: [
                 ['display-text', () => {
@@ -298,6 +292,12 @@ addLayer('con', {
             ],
             unlocked() { return inChallenge('b', 91) || hasChallenge('b', 91); },
         },
+        'Seal': {
+            content: [
+                ['layer-proxy', ['b', [['challenge', 91]]]],
+            ],
+            unlocked() { return !hasChallenge('b', 91) || inChallenge('b', 91); },
+        },
     },
     clickables: {
         11: {
@@ -307,7 +307,8 @@ addLayer('con', {
                 return `Cost: ${cost} spice`;
             },
             canClick() {
-                return D.gte(player.con.points, tmp.con.condiments['*'].cost) &&
+                return (inChallenge('b', 91) || hasChallenge('b', 91)) &&
+                    D.gte(player.con.points, tmp.con.condiments['*'].cost) &&
                     // I pray this is right
                     Object.values(player.con.grid).filter(data => data.condiment != '').length < 25;
             },
@@ -358,7 +359,8 @@ addLayer('con', {
                 return `Cost: ${cost} spice`;
             },
             canClick() {
-                return D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
+                return (inChallenge('b', 91) || hasChallenge('b', 91)) &&
+                    D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
                     // I pray this is right
                     Object.values(player.con.grid).filter(data => data.condiment != '').length < 25;
             },
@@ -403,7 +405,8 @@ addLayer('con', {
                 return `Cost: ${cost} spice`;
             },
             canClick() {
-                return D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
+                return (inChallenge('b', 91) || hasChallenge('b', 91)) &&
+                    D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
                     // I pray this is right
                     Object.values(player.con.grid).filter(data => data.condiment != '').length < 25;
             },
@@ -448,7 +451,8 @@ addLayer('con', {
                 return `Cost: ${cost} spice`;
             },
             canClick() {
-                return D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
+                return (inChallenge('b', 91) || hasChallenge('b', 91)) &&
+                    D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
                     // I pray this is right
                     Object.values(player.con.grid).filter(data => data.condiment != '').length < 25;
             },
@@ -493,7 +497,8 @@ addLayer('con', {
                 return `Cost: ${cost} spice`;
             },
             canClick() {
-                return D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
+                return (inChallenge('b', 91) || hasChallenge('b', 91)) &&
+                    D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
                     // I pray this is right
                     Object.values(player.con.grid).filter(data => data.condiment != '').length < 25;
             },
@@ -534,7 +539,10 @@ addLayer('con', {
         21: {
             title: 'Respec your condiments',
             display() { return `You must have bought at least ${formatWhole(player.con.respecs)} condiments`; },
-            canClick() { return D.gte(player.con.bought, player.con.respecs); },
+            canClick() {
+                return (inChallenge('b', 91) || hasChallenge('b', 91)) &&
+                    D.gte(player.con.bought, player.con.respecs);
+            },
             onClick() {
                 if (!confirm('Are you sure you want to respec your condiments?')) return;
                 player.con.respecs = D.add(player.con.respecs, 1);
@@ -597,7 +605,7 @@ addLayer('con', {
     },
     spice: {
         gain() {
-            if (!player.con.unlocked && !inChallenge('b', 91) && !hasChallenge('b', 91)) return D.dZero;
+            if (!inChallenge('b', 91) && !hasChallenge('b', 91)) return D.dZero;
 
             return ['pepper', 'mint', 'vinegar', 'ginger'].reduce((sum, condiment) => D.add(sum, player.con.condiments[condiment].amount.add(10).log10().minus(1)), 0);
         },
@@ -766,6 +774,8 @@ addLayer('con', {
             name: 'pepper',
             color: '#DD3355',
             gain() {
+                if (!inChallenge('b', 91) && !hasChallenge('b', 91)) return D.dZero;
+
                 return Object.values(player.con.grid)
                     .filter(data => data.condiment == this.id)
                     .reduce((sum, data) => D.add(sum, D.pow(2.5, data.tier.minus(1))), 0);
@@ -819,6 +829,8 @@ addLayer('con', {
             name: 'mint',
             color: '#99FF99',
             gain() {
+                if (!inChallenge('b', 91) && !hasChallenge('b', 91)) return D.dZero;
+
                 return Object.values(player.con.grid)
                     .filter(data => data.condiment == this.id)
                     .reduce((sum, data) => D.add(sum, D.pow(2.5, data.tier.minus(1))), 0);
@@ -872,6 +884,8 @@ addLayer('con', {
             name: 'vinegar',
             color: '#CC9944',
             gain() {
+                if (!inChallenge('b', 91) && !hasChallenge('b', 91)) return D.dZero;
+
                 return Object.values(player.con.grid)
                     .filter(data => data.condiment == this.id)
                     .reduce((sum, data) => D.add(sum, D.pow(2.5, data.tier.minus(1))), 0);
@@ -925,6 +939,8 @@ addLayer('con', {
             name: 'ginger',
             color: '#BB6600',
             gain() {
+                if (!inChallenge('b', 91) && !hasChallenge('b', 91)) return D.dZero;
+
                 return Object.values(player.con.grid)
                     .filter(data => data.condiment == this.id)
                     .reduce((sum, data) => D.add(sum, D.pow(2.5, data.tier.minus(1))), 0);

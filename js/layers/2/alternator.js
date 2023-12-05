@@ -347,7 +347,7 @@ addLayer('a', {
             },
             unlocked() { return tmp.clo.layerShown || tmp.tic.layerShown; },
             canAfford() { return hasChallenge('b', 51) && player.lo.items.stardust.amount.gte(this.cost); },
-            onPurchase() { player.tic.unlocked = true; },
+            onPurchase() { player.tic.unlocked = true; player.subtabs.tic.mainTabs = 'Seal'; },
             pay() { gain_items('stardust', -1); },
         },
         31: {
@@ -457,7 +457,7 @@ addLayer('a', {
             },
             unlocked() { return tmp.cas.layerShown || tmp.bin.layerShown; },
             canAfford() { return hasChallenge('b', 52) && player.lo.items.stardust.amount.gte(this.cost); },
-            onPurchase() { player.bin.unlocked = true; },
+            onPurchase() { player.bin.unlocked = true; player.subtabs.bin.mainTabs = 'Seal'; },
             pay() { gain_items('stardust', -1); },
         },
         44: {
@@ -488,7 +488,7 @@ addLayer('a', {
             },
             unlocked() { return tmp.mag.layerShown; },
             canAfford() { return hasChallenge('b', 61) && player.lo.items.stardust.amount.gte(this.cost); },
-            onPurchase() { player.con.unlocked = true; },
+            onPurchase() { player.con.unlocked = true; player.subtabs.con.mainTabs = 'Seal'; },
             pay() { gain_items('stardust', -1); },
         },
         54: {
