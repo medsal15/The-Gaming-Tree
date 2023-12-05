@@ -2276,8 +2276,6 @@ type Layers = {
         }
         condiments: {
             '*': {
-                /** Gain of the current condiment */
-                gain(): Decimal
                 /** Loss of all condiments */
                 loss(): Decimal
                 total: {
@@ -2305,6 +2303,14 @@ type Layers = {
                 malus: Computable<Decimal>
                 /** Condiment with highest amount */
                 highest(): string
+                /**
+                 * Cost of a random condiment after buying `x`
+                 */
+                cost(x?: DecimalSource): Decimal
+                cost_formula: string
+                cost_specific(x?: DecimalSource): Decimal
+                cost_formula_specific: string
+                /** Amount to add to the bought amount for specific condiment purchase */
             }
             [condiment: string]: {
                 readonly id: string
@@ -2361,9 +2367,9 @@ type Layers = {
                 }>
                 name: string
                 color: string
+                gain(): Decimal
             }
         }
-        clickables: Layer<'con'>['clickables'] & { [id: string]: Clickable<'con'> & { condiment: string } }
     }
     // Alt Row 0
     xp_alt: Layer<'xp_alt'> & {
@@ -3001,12 +3007,22 @@ type Player = {
         swap: keyof Layers | ''
     }
     con: LayerData & {
-        condiment: string
         condiments: {
             [condiment: string]: {
                 amount: Decimal
             }
         }
+        grid: {
+            [id: number]: {
+                /** Condiment on the cell */
+                condiment: string
+                /** Condiment tier */
+                tier: Decimal
+            }
+        }
+        swap: number | false
+        bought: Decimal
+        respecs: Decimal
     }
     // Alt Row 0
     xp_alt: LayerData & {
@@ -3025,15 +3041,6 @@ type Player = {
         auto_upgrade: boolean
     }
     c: LayerData & {
-        /** @deprecated */
-        grid: {
-            [id: number]: {
-                /** Building placed on that tile */
-                building: string
-                /** Whether the building is active */
-                enabled: boolean
-            }
-        }
         floors: {
             [id: number]: {
                 /** Building placed on that tile */

@@ -502,7 +502,7 @@ addLayer('suc', {
 
                 return 'Unseal Condiments';
             },
-            done() { return false; },
+            done() { return hasChallenge('b', 91); },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Bonus Success Completed!", 3, 'rgb(255,127,0)'); },
             style() {
                 let s = {};

@@ -367,12 +367,12 @@ addLayer('b', {
                 return style;
             },
             onEnter() {
-                layerDataReset('cas');
+                layerDataReset('cas', ['respecs']);
                 player.cas.swaps.challenge = layers.cas.items.shuffle();
                 layers.cas.items.clean_swaps();
             },
-            onComplete() { layerDataReset('cas'); },
-            onExit() { layerDataReset('cas'); },
+            onComplete() { layerDataReset('cas', ['respecs']); },
+            onExit() { layerDataReset('cas', ['respecs']); },
         },
         61: {
             name: 'Differences',
@@ -466,6 +466,7 @@ addLayer('b', {
                     layerDataReset('cas');
                     player.cas.swaps.challenge = layers.cas.items.shuffle();
                     layers.cas.items.clean_swaps();
+                    player.cas.respecs = D.dZero;
                 }
                 if (challenges.includes(61)) {
                     player.mag.points = D(50);
@@ -480,6 +481,12 @@ addLayer('b', {
                 if (challenges.includes(91)) {
                     player.con.points = D.dZero;
                     Object.values(player.con.condiments).forEach(data => data.amount = D.dZero);
+                    Object.values(player.con.grid).forEach(data => {
+                        data.condiment = '';
+                        data.tier = D.dZero;
+                    });
+                    player.con.bought = D.dZero;
+                    player.con.respecs = D.dZero;
                 }
             },
         },
@@ -555,10 +562,19 @@ addLayer('b', {
             challengeDescription: `\
                 Unlock food condiments. Not using a condiment heavily nerfs row 2 layers.\
                 <span class="warning">This works like a Boss challenge</span>`,
-            //todo reach ??? spice
-            goalDescription: '???',
-            canComplete: false,
-            rewardDescription: 'Unlock the true potential of Condiments',
+            goalDescription() {
+                const highest = Object.values(player.con.grid)
+                    .filter(data => data.condiment != '')
+                    .sort((a, b) => D.cmp(b.tier, a.tier));
+                return `Get a grade ${formatWhole(highest[0]?.tier)}/5 condiment`;
+            },
+            canComplete() {
+                const highest = Object.values(player.con.grid)
+                    .filter(data => data.condiment != '')
+                    .sort((a, b) => D.cmp(b.tier, a.tier));
+                return D.gte(highest[0]?.tier, 5);
+            },
+            rewardDescription: 'Unlock the true potential of Condiments<br>Your condiment respecs are reset',
             buttonStyle() {
                 const active = activeChallenge('b'),
                     style = { 'background-color': tmp.con.color, };
@@ -569,13 +585,31 @@ addLayer('b', {
             onEnter() {
                 player.con.points = D.dZero;
                 Object.values(player.con.condiments).forEach(data => data.amount = D.dZero);
-                Object.keys(player.con.buyables).forEach(id => setBuyableAmount('con', id, D.dZero))
+                Object.values(player.con.grid).forEach(data => {
+                    data.condiment = '';
+                    data.tier = D.dZero;
+                });
+                player.con.bought = D.dZero;
+            },
+            onExit() {
+                player.con.points = D.dZero;
+                Object.values(player.con.condiments).forEach(data => data.amount = D.dZero);
+                Object.values(player.con.grid).forEach(data => {
+                    data.condiment = '';
+                    data.tier = D.dZero;
+                });
+                player.con.bought = D.dZero;
             },
             onComplete() {
                 player.subtabs.con.mainTabs = 'Condiments';
                 player.con.points = D.dZero;
                 Object.values(player.con.condiments).forEach(data => data.amount = D.dZero);
-                Object.keys(player.con.buyables).forEach(id => setBuyableAmount('con', id, D.dZero))
+                Object.values(player.con.grid).forEach(data => {
+                    data.condiment = '';
+                    data.tier = D.dZero;
+                });
+                player.con.bought = D.dZero;
+                player.con.respecs = D.dZero;
             },
         },
         //todo 92

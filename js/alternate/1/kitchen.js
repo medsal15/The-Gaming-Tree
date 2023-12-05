@@ -827,7 +827,7 @@ addLayer('k', {
                 return value;
             },
             condiment: {
-                good: ['vinegar'],
+                good: ['ginger'],
                 bad: ['mint'],
             },
         },
@@ -1186,7 +1186,7 @@ addLayer('k', {
                 return value;
             },
             condiment: {
-                good: ['pepper'],
+                good: ['ginger'],
                 bad: ['vinegar'],
             },
         },
@@ -1390,7 +1390,7 @@ addLayer('k', {
                             }[tmp.k.dishes[dish_id]?.type] ?? 'Consume';
                         return `${type} ${name}`;
                     },
-                    canClick() { return player.k.selected != '' && D.gte(player.k.dishes[player.k.selected].amount, 1); },
+                    canClick() { return player.k.selected != '' && D.gte(player.k.dishes[player.k.selected].amount, 1) && D.gt(tmp.k.dishes['*'].size, 0); },
                     onClick() {
                         const selected = player.k.selected;
 
@@ -1459,7 +1459,8 @@ addLayer('k', {
                             precipe().amount_cooking.lte(0) &&
                             precipe().amount_target.gt(0) &&
                             layers.k.recipes['*'].can_cook(recipe_id) &&
-                            recipe().heats.includes(tmp.k.temperatures.current);
+                            recipe().heats.includes(tmp.k.temperatures.current) &&
+                            tmp.k.recipes['*'].size.gt(0);
                     },
                     display() {
                         const out = is_output(),
@@ -1498,10 +1499,12 @@ addLayer('k', {
                     },
                     onClick() {
                         if (is_output()) {
-                            const amount = precipe().amount_target;
+                            const amount = precipe().amount_target.max(tmp.k.recipes['*'].size);
 
-                            recipe().consumes.forEach(([item, amount]) => {
-                                gain_items(item, D.neg(amount));
+                            if (amount.lte(0)) return;
+
+                            recipe().consumes.forEach(([item, cost]) => {
+                                gain_items(item, D.times(cost, amount).neg());
                             });
                             precipe().amount_cooking = amount;
                         }

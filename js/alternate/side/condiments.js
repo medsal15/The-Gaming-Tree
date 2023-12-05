@@ -7,12 +7,14 @@ addLayer('con', {
         return {
             points: D.dZero,
             unlocked: false,
-            condiment: '',
             condiments: Object.fromEntries(
                 Object.keys(layers.con.condiments)
                     .filter(condiment => condiment != '*')
                     .map(condiment => [condiment, { amount: D.dZero, }])
             ),
+            swap: false,
+            bought: D.dZero,
+            respecs: D.dZero,
         };
     },
     layerShown() { return player.con.unlocked; },
@@ -70,10 +72,8 @@ addLayer('con', {
                                 tmp_cond = tmp.con.condiments[cond];
 
                             let change_str = '',
-                                change = D.times(amount, tmp.con.condiments['*'].loss).neg();
-                            if (player.con.condiment == cond) {
-                                change = D.add(change, tmp.con.condiments['*'].gain);
-                            }
+                                change = D.times(amount, tmp.con.condiments['*'].loss).neg()
+                                    .add(tmp.con.condiments[cond].gain);
                             if (D.abs(change).gt(1e-4)) change_str = ` (<span style="color:${tmp_cond.color}">${(change.gt(0) ? '+' : '') + format(change)}</span> /s)`;
 
                             return ['display-text', `You have <span style="color:${tmp_cond.color};font-size:1.25em;">${format(amount)}</span>${change_str} ${tmp_cond.name}`];
@@ -82,9 +82,10 @@ addLayer('con', {
                 ['display-text', () => `<span class="warning">You lose ${formatWhole(tmp.con.condiments['*'].loss.times(100))}% of your condiment amounts every second</span>`],
                 ['display-text', () => `Using the good condiment multiplies food duration by ${format(tmp.con.condiments['*'].bonus)}`],
                 ['display-text', () => `<span class="warning">Using the bad condiment multiplies food duration by ${format(tmp.con.condiments['*'].malus)}</span>`],
-                ['clickables', [1]],
                 'blank',
-                ['buyable-tree', [[11, 12, 13]]],
+                'grid',
+                'blank',
+                ['clickables', [1, 2]],
             ],
             unlocked() { return inChallenge('b', 91) || hasChallenge('b', 91); },
         },
@@ -255,11 +256,11 @@ addLayer('con', {
                         const lines = [
                             ['Condiment', 'Amount', 'Effects'],
                             ...condiments.map(cond => {
-                                let change = D.times(tmp.con.condiments['*'].loss, player.con.condiments[cond].amount).neg(),
+                                let change = D.times(tmp.con.condiments['*'].loss, player.con.condiments[cond].amount).neg()
+                                    .add(tmp.con.condiments[cond].gain),
                                     change_str = '';
                                 const effect = effects(cond);
 
-                                if (player.con.condiment == cond) change = change.add(tmp.con.condiments['*'].gain);
                                 if (D.abs(change).gt(1e-4)) change_str = ` (${condiment_color(cond, (change.gt(0) ? '+' : '') + format(change))} /s)`;
 
                                 return [
@@ -278,7 +279,7 @@ addLayer('con', {
                             [['display-text', 'None']],
                             [['display-text', format(player.con.points)]],
                             [
-                                ['display-text', 'With no condiment selected:'],
+                                //['display-text', 'With no condiment selected:'],
                                 ...effects('').cons.map(eff => ['display-text', `<span class="warning">${eff}</span>`])
                             ],
                         ]);
@@ -292,183 +293,306 @@ addLayer('con', {
                         return lines;
                     },
                 ],
+                'blank',
                 ['clickables', [1]],
             ],
             unlocked() { return inChallenge('b', 91) || hasChallenge('b', 91); },
         },
     },
-    //? Might need to nerf/change these
-    //if so, use a merge minigame
-    buyables: {
-        11: {
-            title: 'Condiment Producer',
-            display() {
-                const amount = getBuyableAmount(this.layer, this.id);
-                if (!shiftDown) {
-                    /** @type {Decimal} */
-                    const effect = buyableEffect(this.layer, this.id);
-
-                    return `Your ${formatWhole(amount)} condiment producers\
-                        produce ${format(effect)} condiment per second<br><br>\
-                        Cost: ${format(tmp[this.layer].buyables[this.id].cost)}`;
-                } else {
-                    let formula_effect = 'amount',
-                        formula_cost = '3 ^ amount';
-
-                    return `Your ${formatWhole(amount)} condiment producers\
-                        produce [${formula_effect}] condiment per second<br><br>\
-                        Cost: [${formula_cost}]`;
-                }
-            },
-            cost(x) {
-                if (D.lt(x, 1)) return D.dZero;
-
-                return D.pow(3, x);
-            },
-            effect(x) { return x; },
-            canAfford() { return D.gte(player.con.points, tmp[this.layer].buyables[this.id].cost); },
-            buy() {
-                player.con.points = D.minus(player.con.points, tmp[this.layer].buyables[this.id].cost);
-                addBuyables(this.layer, this.id, 1);
-            },
-            branches: [12],
-        },
-        12: {
-            title: 'Condiment Factory',
-            display() {
-                const amount = getBuyableAmount(this.layer, this.id);
-                if (!shiftDown) {
-                    /** @type {Decimal} */
-                    const effect = buyableEffect(this.layer, this.id);
-
-                    return `Your ${formatWhole(amount)} condiment factories\
-                        multiply condiment gain by ${format(effect)}<br><br>\
-                        Cost: ${format(tmp[this.layer].buyables[this.id].cost)}`;
-                } else {
-                    let formula_effect = 'amount + 1',
-                        formula_cost = '5 ^ (amount + 2)';
-
-                    return `Your ${formatWhole(amount)} condiment factories\
-                        multiply condiment gain by [${formula_effect}]<br><br>\
-                        Cost: [${formula_cost}]`;
-                }
-            },
-            cost(x) {
-                x = D.add(x, 2);
-
-                return D.pow(5, x);
-            },
-            effect(x) { return D.add(x, 1); },
-            canAfford() { return D.gte(player.con.points, tmp[this.layer].buyables[this.id].cost); },
-            buy() {
-                player.con.points = D.minus(player.con.points, tmp[this.layer].buyables[this.id].cost);
-                addBuyables(this.layer, this.id, 1);
-            },
-            unlocked() { return D.gte(getBuyableAmount('con', 11), 1); },
-            branches: [13],
-        },
-        13: {
-            title: 'Condiment Gigafactory',
-            display() {
-                const amount = getBuyableAmount(this.layer, this.id);
-                if (!shiftDown) {
-                    /** @type {Decimal} */
-                    const effect = buyableEffect(this.layer, this.id);
-
-                    return `Your ${formatWhole(amount)} condiment gigafactories\
-                        multiply condiment gain by ${format(effect)}<br><br>\
-                        Cost: ${format(tmp[this.layer].buyables[this.id].cost)}`;
-                } else {
-                    let formula_effect = 'amount * 2 + 1',
-                        formula_cost = '7 ^ (amount + 4)';
-
-                    return `Your ${formatWhole(amount)} condiment gigafactories\
-                        multiply condiment gain by [${formula_effect}]<br><br>\
-                        Cost: [${formula_cost}]`;
-                }
-            },
-            cost(x) {
-                x = D.add(x, 4);
-
-                return D.pow(7, x);
-            },
-            effect(x) { return D.times(x, 2).add(1); },
-            canAfford() { return D.gte(player.con.points, tmp[this.layer].buyables[this.id].cost); },
-            buy() {
-                player.con.points = D.minus(player.con.points, tmp[this.layer].buyables[this.id].cost);
-                addBuyables(this.layer, this.id, 1);
-            },
-            unlocked() { return D.gte(getBuyableAmount('con', 12), 1); },
-        },
-    },
     clickables: {
         11: {
-            condiment: 'pepper',
-            title() {
-                if (player.con.condiment == this.condiment) return `Deselect ${tmp.con.condiments[this.condiment].name}`;
-                else return `Select ${tmp.con.condiments[this.condiment].name}`;
+            title: 'Random Condiment',
+            display() {
+                const cost = shiftDown ? `[${tmp.con.condiments['*'].cost_formula}]` : format(tmp.con.condiments['*'].cost);
+                return `Cost: ${cost} spice`;
+            },
+            canClick() {
+                return D.gte(player.con.points, tmp.con.condiments['*'].cost) &&
+                    // I pray this is right
+                    Object.values(player.con.grid).filter(data => data.condiment != '').length < 25;
             },
             onClick() {
-                if (player.con.condiment == this.condiment) player.con.condiment = '';
-                else player.con.condiment = this.condiment;
+                if (!this.canClick()) return;
+
+                const condiment = ['pepper', 'mint', 'vinegar', 'ginger'][Math.floor(Math.random() * 4)],
+                    empty = Object.keys(player.con.grid)
+                        .map(id => +id)
+                        .filter(id => player.con.grid[id].condiment == ''),
+                    cell = empty[Math.floor(Math.random() * empty.length)];
+
+                player.con.grid[cell].condiment = condiment;
+                player.con.grid[cell].tier = D.dOne;
+                player.con.points = D.minus(player.con.points, tmp.con.condiments['*'].cost);
+                player.con.bought = D.add(player.con.bought, 1);
             },
-            canClick: true,
+            onHold() {
+                if (!this.canClick()) return;
+
+                const condiment = ['pepper', 'mint', 'vinegar', 'ginger'][Math.floor(Math.random() * 4)],
+                    empty = Object.keys(player.con.grid)
+                        .map(id => +id)
+                        .filter(id => player.con.grid[id].condiment == ''),
+                    cell = empty[Math.floor(Math.random() * empty.length)];
+
+                player.con.grid[cell].condiment = condiment;
+                player.con.grid[cell].tier = D.dOne;
+                player.con.points = D.minus(player.con.points, tmp.con.condiments['*'].cost);
+                player.con.bought = D.add(player.con.bought, 1);
+            },
             style() {
-                return {
-                    'background-color': tmp.con.condiments[this.condiment].color,
+                const colors = ['pepper', 'vinegar', 'mint', 'ginger']
+                    .map((cond, i) => [`${tmp.con.condiments[cond].color} ${25 * i}%`, `${tmp.con.condiments[cond].color} ${25 * i + 25}%`])
+                    .flat();
+                if (tmp[this.layer].clickables[this.id].canClick) return {
+                    'background-image': `conic-gradient(${colors.join(',')})`,
+                    'background-repeat': 'no-repeat',
+                    'background-position': 'center',
+                    'background-size': 'contain',
                 };
             },
         },
         12: {
-            condiment: 'mint',
-            title() {
-                if (player.con.condiment == this.condiment) return `Deselect ${tmp.con.condiments[this.condiment].name}`;
-                else return `Select ${tmp.con.condiments[this.condiment].name}`;
+            title: 'Pepper',
+            display() {
+                const cost = shiftDown ? `[${tmp.con.condiments['*'].cost_formula_specific}]` : format(tmp.con.condiments['*'].cost_specific);
+                return `Cost: ${cost} spice`;
+            },
+            canClick() {
+                return D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
+                    // I pray this is right
+                    Object.values(player.con.grid).filter(data => data.condiment != '').length < 25;
             },
             onClick() {
-                if (player.con.condiment == this.condiment) player.con.condiment = '';
-                else player.con.condiment = this.condiment;
+                if (!this.canClick()) return;
+
+                const condiment = 'pepper',
+                    empty = Object.keys(player.con.grid)
+                        .map(id => +id)
+                        .filter(id => player.con.grid[id].condiment == ''),
+                    cell = empty[Math.floor(Math.random() * empty.length)];
+
+                player.con.grid[cell].condiment = condiment;
+                player.con.grid[cell].tier = D.dOne;
+                player.con.points = D.minus(player.con.points, tmp.con.condiments['*'].cost);
+                player.con.bought = D.add(player.con.bought, 1);
             },
-            canClick: true,
+            onHold() {
+                if (!this.canClick()) return;
+
+                const condiment = 'pepper',
+                    empty = Object.keys(player.con.grid)
+                        .map(id => +id)
+                        .filter(id => player.con.grid[id].condiment == ''),
+                    cell = empty[Math.floor(Math.random() * empty.length)];
+
+                player.con.grid[cell].condiment = condiment;
+                player.con.grid[cell].tier = D.dOne;
+                player.con.points = D.minus(player.con.points, tmp.con.condiments['*'].cost);
+                player.con.bought = D.add(player.con.bought, 1);
+            },
             style() {
-                return {
-                    'background-color': tmp.con.condiments[this.condiment].color,
+                if (tmp[this.layer].clickables[this.id].canClick) return {
+                    'background-color': tmp.con.condiments.pepper.color,
                 };
             },
         },
         13: {
-            condiment: 'vinegar',
-            title() {
-                if (player.con.condiment == this.condiment) return `Deselect ${tmp.con.condiments[this.condiment].name}`;
-                else return `Select ${tmp.con.condiments[this.condiment].name}`;
+            title: 'Mint',
+            display() {
+                const cost = shiftDown ? `[${tmp.con.condiments['*'].cost_formula_specific}]` : format(tmp.con.condiments['*'].cost_specific);
+                return `Cost: ${cost} spice`;
+            },
+            canClick() {
+                return D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
+                    // I pray this is right
+                    Object.values(player.con.grid).filter(data => data.condiment != '').length < 25;
             },
             onClick() {
-                if (player.con.condiment == this.condiment) player.con.condiment = '';
-                else player.con.condiment = this.condiment;
+                if (!this.canClick()) return;
+
+                const condiment = 'mint',
+                    empty = Object.keys(player.con.grid)
+                        .map(id => +id)
+                        .filter(id => player.con.grid[id].condiment == ''),
+                    cell = empty[Math.floor(Math.random() * empty.length)];
+
+                player.con.grid[cell].condiment = condiment;
+                player.con.grid[cell].tier = D.dOne;
+                player.con.points = D.minus(player.con.points, tmp.con.condiments['*'].cost);
+                player.con.bought = D.add(player.con.bought, 1);
             },
-            canClick: true,
+            onHold() {
+                if (!this.canClick()) return;
+
+                const condiment = 'mint',
+                    empty = Object.keys(player.con.grid)
+                        .map(id => +id)
+                        .filter(id => player.con.grid[id].condiment == ''),
+                    cell = empty[Math.floor(Math.random() * empty.length)];
+
+                player.con.grid[cell].condiment = condiment;
+                player.con.grid[cell].tier = D.dOne;
+                player.con.points = D.minus(player.con.points, tmp.con.condiments['*'].cost);
+                player.con.bought = D.add(player.con.bought, 1);
+            },
             style() {
-                return {
-                    'background-color': tmp.con.condiments[this.condiment].color,
+                if (tmp[this.layer].clickables[this.id].canClick) return {
+                    'background-color': tmp.con.condiments.mint.color,
                 };
             },
         },
         14: {
-            condiment: 'ginger',
-            title() {
-                if (player.con.condiment == this.condiment) return `Deselect ${tmp.con.condiments[this.condiment].name}`;
-                else return `Select ${tmp.con.condiments[this.condiment].name}`;
+            title: 'Vinegar',
+            display() {
+                const cost = shiftDown ? `[${tmp.con.condiments['*'].cost_formula_specific}]` : format(tmp.con.condiments['*'].cost_specific);
+                return `Cost: ${cost} spice`;
+            },
+            canClick() {
+                return D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
+                    // I pray this is right
+                    Object.values(player.con.grid).filter(data => data.condiment != '').length < 25;
             },
             onClick() {
-                if (player.con.condiment == this.condiment) player.con.condiment = '';
-                else player.con.condiment = this.condiment;
+                if (!this.canClick()) return;
+
+                const condiment = 'vinegar',
+                    empty = Object.keys(player.con.grid)
+                        .map(id => +id)
+                        .filter(id => player.con.grid[id].condiment == ''),
+                    cell = empty[Math.floor(Math.random() * empty.length)];
+
+                player.con.grid[cell].condiment = condiment;
+                player.con.grid[cell].tier = D.dOne;
+                player.con.points = D.minus(player.con.points, tmp.con.condiments['*'].cost);
+                player.con.bought = D.add(player.con.bought, 1);
             },
-            canClick: true,
+            onHold() {
+                if (!this.canClick()) return;
+
+                const condiment = 'vinegar',
+                    empty = Object.keys(player.con.grid)
+                        .map(id => +id)
+                        .filter(id => player.con.grid[id].condiment == ''),
+                    cell = empty[Math.floor(Math.random() * empty.length)];
+
+                player.con.grid[cell].condiment = condiment;
+                player.con.grid[cell].tier = D.dOne;
+                player.con.points = D.minus(player.con.points, tmp.con.condiments['*'].cost);
+                player.con.bought = D.add(player.con.bought, 1);
+            },
             style() {
-                return {
-                    'background-color': tmp.con.condiments[this.condiment].color,
+                if (tmp[this.layer].clickables[this.id].canClick) return {
+                    'background-color': tmp.con.condiments.vinegar.color,
                 };
             },
+        },
+        15: {
+            title: 'Ginger',
+            display() {
+                const cost = shiftDown ? `[${tmp.con.condiments['*'].cost_formula_specific}]` : format(tmp.con.condiments['*'].cost_specific);
+                return `Cost: ${cost} spice`;
+            },
+            canClick() {
+                return D.gte(player.con.points, tmp.con.condiments['*'].cost_specific) &&
+                    // I pray this is right
+                    Object.values(player.con.grid).filter(data => data.condiment != '').length < 25;
+            },
+            onClick() {
+                if (!this.canClick()) return;
+
+                const condiment = 'ginger',
+                    empty = Object.keys(player.con.grid)
+                        .map(id => +id)
+                        .filter(id => player.con.grid[id].condiment == ''),
+                    cell = empty[Math.floor(Math.random() * empty.length)];
+
+                player.con.grid[cell].condiment = condiment;
+                player.con.grid[cell].tier = D.dOne;
+                player.con.points = D.minus(player.con.points, tmp.con.condiments['*'].cost);
+                player.con.bought = D.add(player.con.bought, 1);
+            },
+            onHold() {
+                if (!this.canClick()) return;
+
+                const condiment = 'ginger',
+                    empty = Object.keys(player.con.grid)
+                        .map(id => +id)
+                        .filter(id => player.con.grid[id].condiment == ''),
+                    cell = empty[Math.floor(Math.random() * empty.length)];
+
+                player.con.grid[cell].condiment = condiment;
+                player.con.grid[cell].tier = D.dOne;
+                player.con.points = D.minus(player.con.points, tmp.con.condiments['*'].cost);
+                player.con.bought = D.add(player.con.bought, 1);
+            },
+            style() {
+                if (tmp[this.layer].clickables[this.id].canClick) return {
+                    'background-color': tmp.con.condiments.ginger.color,
+                };
+            },
+        },
+        21: {
+            title: 'Respec your condiments',
+            display() { return `You must have bought at least ${formatWhole(player.con.respecs)} condiments`; },
+            canClick() { return D.gte(player.con.bought, player.con.respecs); },
+            onClick() {
+                if (!confirm('Are you sure you want to respec your condiments?')) return;
+                player.con.respecs = D.add(player.con.respecs, 1);
+                player.con.points = D.dZero;
+                Object.values(player.con.condiments).forEach(data => data.amount = D.dZero);
+                Object.values(player.con.grid).forEach(data => {
+                    data.condiment = '';
+                    data.tier = D.dZero;
+                });
+                player.con.bought = D.dZero;
+            },
+        },
+    },
+    grid: {
+        rows: 5,
+        cols: 5,
+        getStartData(_) {
+            return {
+                condiment: '',
+                tier: D.dZero,
+            };
+        },
+        getTitle(data, _) { return capitalize(tmp.con.condiments[data.condiment].name); },
+        getDisplay(data, _) {
+            if (data.condiment) {
+                return `Grade ${formatWhole(data.tier)}\
+                    +${format(D.pow(2.5, data.tier.minus(1)))} /s`;
+            }
+        },
+        getStyle(data, id) {
+            if (id == player.con.swap) return { 'background-color': '#FFFFFF' };
+            if (data.condiment) return { 'background-color': tmp.con.condiments[data.condiment].color };
+            return { 'background-color': '#664422' };
+        },
+        onClick(data, id) {
+            if (!player.con.swap) {
+                // Mark for swapping
+                player.con.swap = id;
+                return;
+            } else if (id == player.con.swap) {
+                // Unmark for swapping
+                player.con.swap = false;
+                return;
+            }
+
+            const target = player.con.grid[player.con.swap];
+            if (target.condiment == data.condiment && target.tier.eq(data.tier)) {
+                // Merge merge merge
+                data.tier = D.add(data.tier, 1);
+                target.tier = D.dZero;
+                target.condiment = '';
+                player.con.swap = false;
+            } else {
+                // Swap
+                [data.tier, target.tier] = [target.tier, data.tier];
+                [data.condiment, target.condiment] = [target.condiment, data.condiment];
+                player.con.swap = false;
+            }
         },
     },
     spice: {
@@ -481,17 +605,6 @@ addLayer('con', {
     },
     condiments: {
         '*': {
-            gain() {
-                if (!player.con.unlocked && !inChallenge('b', 91) && !hasChallenge('b', 91)) return D.dZero;
-
-                let gain = buyableEffect('con', 11);
-
-                gain = gain.times(buyableEffect('con', 12));
-
-                gain = gain.times(buyableEffect('con', 13));
-
-                return gain;
-            },
             loss() { return D(.01); },
             total: {
                 to: {
@@ -541,14 +654,22 @@ addLayer('con', {
 
                 return condiments.sort(([, data_a], [, data_b]) => D.cmp(data_b.amount, data_a.amount))[0][0];
             },
+            cost(x = player.con.bought) {
+                if (D.lte(x)) return D.dZero;
+
+                return D.minus(x, 1).pow_base(1.5);
+            },
+            cost_formula: '(bought - 1) ^ 1.5',
+            cost_specific(x = player.con.bought) { return this.cost(D.add(x, 3)); },
+            cost_formula_specific: '(bought + 2) ^ 1.5',
         },
         '': {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.con.condiments).find(condiment => layers.con.condiments[condiment] == this); },
             effect() {
-                if (inChallenge('b', 91) && !player.con.condiment) {
+                if (inChallenge('b', 91)) {
                     const amount = player.con.points,
-                        amlo = D.add(amount, 10).log(10).max(0).minus(1);
+                        amlo = D.add(amount, 50).log(50).max(0).minus(1);
                     return {
                         to: {
                             material_cost: D.pow(2, amlo),
@@ -569,16 +690,16 @@ addLayer('con', {
             formulas() {
                 if (inChallenge('b', 91)) return {
                     to: {
-                        material_cost: '2 ^ (log10(spice + 10) - 1)',
-                        floor_cost: '2 ^ (log10(spice + 10) - 1)',
+                        material_cost: '2 ^ (log50(spice + 50) - 1)',
+                        floor_cost: '2 ^ (log50(spice + 50) - 1)',
                     },
                     k: {
-                        oven_size: 'log10(spice + 10) - 1',
-                        stomach_size: 'log10(spice + 10) - 1',
+                        oven_size: 'log50(spice + 50) - 1',
+                        stomach_size: 'log50(spice + 50) - 1',
                     },
                     fr: {
-                        water: '2 ^ (log10(spice + 10) - 1)',
-                        cold: '2 ^ (log10(spice + 10) - 1)',
+                        water: '2 ^ (log50(spice + 50) - 1)',
+                        cold: '2 ^ (log50(spice + 50) - 1)',
                     },
                 };
                 return {};
@@ -644,6 +765,11 @@ addLayer('con', {
             },
             name: 'pepper',
             color: '#DD3355',
+            gain() {
+                return Object.values(player.con.grid)
+                    .filter(data => data.condiment == this.id)
+                    .reduce((sum, data) => D.add(sum, D.pow(2.5, data.tier.minus(1))), 0);
+            },
         },
         mint: {
             _id: null,
@@ -692,6 +818,11 @@ addLayer('con', {
             },
             name: 'mint',
             color: '#99FF99',
+            gain() {
+                return Object.values(player.con.grid)
+                    .filter(data => data.condiment == this.id)
+                    .reduce((sum, data) => D.add(sum, D.pow(2.5, data.tier.minus(1))), 0);
+            },
         },
         vinegar: {
             _id: null,
@@ -740,6 +871,11 @@ addLayer('con', {
             },
             name: 'vinegar',
             color: '#CC9944',
+            gain() {
+                return Object.values(player.con.grid)
+                    .filter(data => data.condiment == this.id)
+                    .reduce((sum, data) => D.add(sum, D.pow(2.5, data.tier.minus(1))), 0);
+            },
         },
         ginger: {
             _id: null,
@@ -788,6 +924,11 @@ addLayer('con', {
             },
             name: 'ginger',
             color: '#BB6600',
+            gain() {
+                return Object.values(player.con.grid)
+                    .filter(data => data.condiment == this.id)
+                    .reduce((sum, data) => D.add(sum, D.pow(2.5, data.tier.minus(1))), 0);
+            },
         },
     },
     update(diff) {
@@ -795,11 +936,14 @@ addLayer('con', {
 
         player.con.points = D.times(tmp.con.spice.gain, diff).add(player.con.points);
 
-        if (player.con.condiment) {
-            player.con.condiments[player.con.condiment].amount = D.times(tmp.con.condiments['*'].gain, diff).add(player.con.condiments[player.con.condiment].amount);
-        }
-        Object.values(player.con.condiments).forEach(data => data.amount = D.minus(data.amount, D.times(data.amount, tmp.con.condiments['*'].loss)));
+        Object.entries(player.con.condiments).forEach(([cond, data]) => {
+            const gain = tmp.con.condiments[cond].gain,
+                loss = D.times(data.amount, tmp.con.condiments['*'].loss),
+                sum = D.minus(gain, loss);
+
+            player.con.condiments[cond].amount = D.add(player.con.condiments[cond].amount, sum.times(diff));
+        });
     },
     shouldNotify() { return inChallenge('b', 91) && canCompleteChallenge('b', 91); },
-    //todo prestigeNotify when can buy buyable
+    prestigeNotify() { return D.gte(player.con.points, tmp.con.condiments['*'].cost); },
 });
