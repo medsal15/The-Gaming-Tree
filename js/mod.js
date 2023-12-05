@@ -72,7 +72,7 @@ let VERSION = {
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
 	name: 'Towering Temperatures',
-	beta: true,
+	beta: false,
 };
 
 /**
