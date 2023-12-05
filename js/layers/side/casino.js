@@ -42,6 +42,7 @@ addLayer('cas', {
                 ['display-text', '<sub>Because of the way the game is made, some items cannot be swapped with others.</sub>'],
                 'blank',
                 ['clickable', 'respec_swaps'],
+                //todo convert to layer-table
                 [
                     'column',
                     () => Object.keys(layers.lo.items)
