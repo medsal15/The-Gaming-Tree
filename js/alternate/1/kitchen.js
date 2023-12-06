@@ -583,6 +583,7 @@ addLayer('k', {
                     ${duration_format(active.time)} / ${duration_format(dish.duration.time)} ${name}<br>\
                     ${layers.k.dishes[active.id].effect_description(active.time)}`;
             },
+            //todo display groups
             description_dish(dish_id) {
                 if (!dish_id || !(tmp.k.dishes[dish_id].unlocked ?? true)) return;
 
@@ -673,6 +674,7 @@ addLayer('k', {
                 good: [],
                 bad: [],
             },
+            groups: ['failure'],
         },
         grilled_corn: {
             _id: null,
@@ -725,6 +727,7 @@ addLayer('k', {
                 good: ['pepper'],
                 bad: ['mint'],
             },
+            groups: ['vegetable', 'hot'],
         },
         roasted_eggplant: {
             _id: null,
@@ -778,6 +781,7 @@ addLayer('k', {
                 good: ['pepper'],
                 bad: ['ginger'],
             },
+            groups: ['vegetable', 'hot'],
         },
         bread: {
             _id: null,
@@ -830,6 +834,7 @@ addLayer('k', {
                 good: ['ginger'],
                 bad: ['mint'],
             },
+            groups: ['baked'],
         },
         berries_bowl: {
             _id: null,
@@ -882,6 +887,7 @@ addLayer('k', {
                 good: ['mint'],
                 bad: ['pepper'],
             },
+            groups: ['cold'],
         },
         french_fries: {
             _id: null,
@@ -934,6 +940,7 @@ addLayer('k', {
                 good: ['vinegar'],
                 bad: ['ginger'],
             },
+            groups: ['hot'],
         },
         fried_eggs: {
             _id: null,
@@ -982,6 +989,7 @@ addLayer('k', {
                 good: ['pepper'],
                 bad: ['mint'],
             },
+            groups: ['meat', 'hot'],
         },
         cake: {
             _id: null,
@@ -1034,6 +1042,7 @@ addLayer('k', {
                 good: ['mint'],
                 bad: ['vinegar'],
             },
+            groups: ['baked', 'cold'],
         },
         ice_cream: {
             _id: null,
@@ -1087,6 +1096,7 @@ addLayer('k', {
                 good: ['mint'],
                 bad: ['ginger'],
             },
+            groups: ['cold'],
         },
         popsicle: {
             _id: null,
@@ -1141,6 +1151,7 @@ addLayer('k', {
                 good: ['mint'],
                 bad: ['pepper'],
             },
+            groups: ['cold', 'vegetables'],
         },
         slime_juice: {
             _id: null,
@@ -1189,6 +1200,7 @@ addLayer('k', {
                 good: ['ginger'],
                 bad: ['vinegar'],
             },
+            groups: ['hot', 'monster', 'cold'],
         },
         monster_meal: {
             _id: null,
@@ -1242,6 +1254,7 @@ addLayer('k', {
                 good: ['mint'],
                 bad: ['ginger'],
             },
+            groups: ['meat', 'monster', 'hot'],
         },
         star_crunch: {
             _id: null,
@@ -1293,6 +1306,7 @@ addLayer('k', {
                 good: ['mint', 'pepper'],
                 bad: ['vinegar', 'ginger'],
             },
+            groups: ['monster', 'hot'],
         },
     },
     grid: {

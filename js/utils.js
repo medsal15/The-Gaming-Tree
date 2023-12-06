@@ -447,7 +447,7 @@ function isFunction(obj) {
 
 /**
  * @param {any} obj
- * @returns {Boolean}
+ * @returns {obj is Object}
  */
 function isPlainObject(obj) {
 	return (!!obj) && (obj.constructor === Object)

@@ -1771,6 +1771,8 @@ type dishes = 'failure' |
     'ice_cream' | 'popsicle' |
     'slime_juice' | 'monster_meal' | 'star_crunch';
 type time_units = 'seconds' | 'tames' | 'kills';
+type dish_groups = 'vegetable' | 'baked' | 'cold' | 'hot' | 'meat' | 'monster' | 'failure';
+type rarities = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
 type Layers = {
     // Side
@@ -2676,6 +2678,7 @@ type Layers = {
                     good: string[]
                     bad: string[]
                 }
+                groups: dish_groups[]
             }
         }
     }
@@ -2752,6 +2755,32 @@ type Layers = {
                 time(amount?: Decimal): Decimal
                 /** Formulas that determine amounts consumed **and** time */
                 formulas: Computable<{ [key in items | 'time']: string }>
+            }
+        }
+    }
+    // Alt Row 2
+    bl: Layer<'bl'> & {}
+    v: Layer<'v'> & {
+        items: {
+            [item in items]: {
+                readonly id: item
+                rarity: rarities
+                cost: Decimal
+                /** Amount of the item being sold */
+                amount: {
+                    max: Computable<Decimal>
+                    min: Computable<Decimal>
+                }
+            }
+        }
+        rarities: {
+            [rarity in rarities]: {
+                readonly id: rarity
+                /** Amount of items being sold */
+                amount: {
+                    max: Computable<Decimal>
+                    min: Computable<Decimal>
+                }
             }
         }
     }
@@ -3151,6 +3180,23 @@ type Player = {
                  * If true, the recipe is rerun on completion
                  */
                 auto: boolean
+            }
+        }
+    }
+    // Alt Row 2
+    bl: LayerData & {}
+    v: LayerData & {
+        refresh: {
+            specific: Decimal
+        } & {
+            [rarity in rarities]: Decimal
+        }
+        entries: {
+            group: dish_groups
+        } & {
+            [rarity in rarities]: {
+                items: [items, Decimal][]
+                upgrades: number[]
             }
         }
     }

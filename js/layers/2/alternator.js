@@ -378,7 +378,7 @@ addLayer('a', {
         },
         32: {
             title: 'Alternate Shop',
-            description: 'Not Yet Implemented<br>Did anything change?<br><br>Requires all 2nd row layer alternates',
+            description: 'Did anything change?<br><br>Requires all 2nd row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -388,9 +388,10 @@ addLayer('a', {
                 const style = {};
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.v.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.s.color}, ${tmp.v.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.s.color;
                 }
@@ -398,9 +399,14 @@ addLayer('a', {
                 return style;
             },
             canAfford() {
-                return [21, 22, 23].every(id => hasUpgrade('a', id)) && false &&
+                return [21, 22, 23].every(id => hasUpgrade('a', id)) &&
                     D.gte(player.lo.items.stardust.amount, this.cost());
             },
+            onPurchase() {
+                player.v.unlocked = true;
+                doReset('s', true);
+            },
+            pay() { gain_items('stardust', -1); },
         },
         33: {
             title: 'Alternate Alternator',

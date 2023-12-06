@@ -32,9 +32,11 @@ let modInfo = {
 		'layers/1/level.js', 'layers/1/loot.js', 'layers/1/forge.js',
 		'layers/2/boss.js', 'layers/2/shop.js', 'layers/2/alternator.js',
 
+		//todo alternate/side/party.js
 		'alternate/side/successes.js', 'alternate/side/time_cubes.js', 'alternate/side/bingo.js', 'alternate/side/condiments.js',
 		'alternate/0/experience.js', 'alternate/0/city.js', 'alternate/0/plants.js',
 		'alternate/1/tower.js', 'alternate/1/kitchen.js', 'alternate/1/freezer.js',
+		'alternate/2/blessing.js', 'alternate/2/vending.js',
 	],
 	/**
 	 * If you have a Discord server or other discussion place, you can add a link to it.
@@ -67,18 +69,21 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.B',
+	num: 'R0.C',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
-	name: 'Towering Temperatures',
-	beta: false,
+	name: 'Blessing of Greed',
+	beta: true,
 };
 
 /**
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.C</h3><br>
+		- Added 3 new layers.<br>
+		- Update endgame: Alternate all non-alternator layers.<br>
 	<h3>v0.B</h3><br>
 		- Added 5 new layers.<br>
 		- QoL: Add quick select buttons for city and plant.<br>
@@ -163,7 +168,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return [21, 22, 23].every(id => hasUpgrade('a', id));
+	return [31, 32].every(id => hasUpgrade('a', id));
 }
 
 

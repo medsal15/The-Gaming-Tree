@@ -1,5 +1,6 @@
 'use strict';
 
+//todo add building production/consumption in grid tooltip
 addLayer('c', {
     name: 'City',
     symbol: 'C',

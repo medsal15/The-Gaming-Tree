@@ -662,3 +662,11 @@ function roll_new_ball() {
 
     return n;
 }
+function random_dish_group() {
+    /** @type {dish_groups[]} */
+    const groups = ['vegetable', 'baked', 'cold', 'hot', 'meat', 'monster', 'failure'];
+
+    return groups[Math.floor(Math.random() * groups.length)];
+}
+//todo random_rarity_items
+//todo random_rarity_upgrade

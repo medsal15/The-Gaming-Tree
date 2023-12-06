@@ -22,7 +22,7 @@ addLayer('s', {
         }
     },
     layerShown() { return (inChallenge('b', 12) || player.s.unlocked) && !tmp.s.deactivated; },
-    deactivated() { return inChallenge('b', 31); },
+    deactivated() { return inChallenge('b', 31) || hasUpgrade('a', 32); },
     color: '#DDDD22',
     row: 2,
     position: 1,
@@ -30,7 +30,7 @@ addLayer('s', {
         {
             key: 's',
             description: 'S: Reset for coins',
-            unlocked() { return tmp.s.layerShown; },
+            unlocked() { return tmp.s.layerShown || tmp.v.layerShown; },
             onPress() { doReset('s'); },
         },
         {
