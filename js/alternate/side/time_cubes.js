@@ -61,7 +61,7 @@ addLayer('tic', {
         },
     },
     time_speed(layer) {
-        if (!hasChallenge('b', 81)) return D.dOne;
+        if (!hasChallenge('b', 81) && !inChallenge('b', 81)) return D.dOne;
 
         let speed = player.tic.points.max(0).add(10).log10();
 
