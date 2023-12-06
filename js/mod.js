@@ -84,6 +84,8 @@ let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.C</h3><br>
 		- Added 3 new layers.<br>
 		- Update endgame: Alternate all non-alternator layers.<br>
+	<h3>v0.B.1</h3><br>
+		- Fixed a bug with the Freezer.<br>
 	<h3>v0.B</h3><br>
 		- Added 5 new layers.<br>
 		- QoL: Add quick select buttons for city and plant.<br>
