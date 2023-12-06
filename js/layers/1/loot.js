@@ -2474,7 +2474,7 @@ addLayer('lo', {
                 lines = [];
             let sources = item.sources ?? {};
 
-            if (inChallenge('b', 52) || hasChallenge('b', 52)) sources = layers.cas.items.sources(item_id);
+            if ((inChallenge('b', 52) || hasChallenge('b', 52)) && !tmp.cas.deactivated) sources = layers.cas.items.sources(item_id);
 
             if ('chances' in sources && sources.chances) {
                 lines.push(
