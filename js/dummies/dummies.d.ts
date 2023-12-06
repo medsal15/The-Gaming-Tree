@@ -2781,6 +2781,7 @@ type Layers = {
                     max: Computable<Decimal>
                     min: Computable<Decimal>
                 }
+                color: string
             }
         }
     }
