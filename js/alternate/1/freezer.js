@@ -1180,7 +1180,10 @@ addLayer('fr', {
                     /** @type {() => [items, Decimal]} */
                     entry = () => {
                         if (+index < recipe().consumes.length) {
-                            let e = [...recipe().consumes[+index]];
+                            let e = recipe().consumes[+index];
+                            // I'm assuming the problem is here
+                            if (!e || !Array.isArray(e)) return ['stone', D.dZero];
+                            else e = Array.from(e);
                             e[1] = e[1].neg();
                             return e;
                         } else {

@@ -67,7 +67,7 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.B',
+	num: 'R0.B.1',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
@@ -79,6 +79,8 @@ let VERSION = {
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.B.1</h3><br>
+		- Fixed a bug with the Freezer.<br>
 	<h3>v0.B</h3><br>
 		- Added 5 new layers.<br>
 		- QoL: Add quick select buttons for city and plant.<br>
