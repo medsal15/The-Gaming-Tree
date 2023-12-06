@@ -1,4 +1,5 @@
 // ************ Save stuff ************
+let warned_autosave = false;
 function save(force) {
 	NaNcheck(player)
 	if (NaNalert && !force) return
@@ -326,8 +327,14 @@ var saveInterval = setInterval(function () {
 		return;
 	if (tmp.gameEnded && !player.keepGoing)
 		return;
-	if (options.autosave)
-		save();
+	if (options.autosave) {
+		try {
+			save();
+		} catch (e) {
+			if (!warned_autosave) alert(`Autosave failed!\nError: ${e}`);
+			warned_autosave = true;
+		}
+	}
 }, 5000);
 
 window.onbeforeunload = () => {
