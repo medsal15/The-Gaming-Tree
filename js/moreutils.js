@@ -381,7 +381,7 @@ function get_tree_drops(tree, amount) {
 function get_type_drops(type = player.xp.type, chance_multiplier = D.dOne) {
     if (!can_drop(type) || D.lte(chance_multiplier, 0)) return [];
 
-    const items = (inChallenge('b', 52) || hasChallenge('b', 52)) ? layers.cas.items.items(type) : layers.lo.items['*'].items(type),
+    const items = ((inChallenge('b', 52) || hasChallenge('b', 52)) && !tmp.cas.deactivated) ? layers.cas.items.items(type) : layers.lo.items['*'].items(type),
         /** @type {{[item_id: string]: Decimal}} */
         results = {},
         /** @type {[string, Decimal][]} */
@@ -459,7 +459,7 @@ function get_type_drops(type = player.xp.type, chance_multiplier = D.dOne) {
         results[item] = results[item].times(gain_mult);
     });
 
-    if (inChallenge('b', 52) || hasChallenge('b', 52)) {
+    if ((inChallenge('b', 52) || hasChallenge('b', 52)) && !tmp.cas.deactivated) {
         // Roll for tokens
         const chance = tmp.cas.token.chance.times(chance_multiplier);
 
