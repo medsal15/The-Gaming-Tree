@@ -28,11 +28,11 @@ addLayer('t', {
                 return `<span style="color:${color};text-shadow:${color} 0 0 10px;">${formatWhole(player.lo.items[item].amount)}</span>`;
             };
 
-            return tmp.t.trees['*'].items.map?.(style).join(', ');
+            return tmp.t?.trees['*'].items.map?.(style).join(', ');
         } else {
             const line = item => `${formatWhole(player.lo.items[item].amount)} ${tmp.lo.items[item].name}`;
 
-            return tmp.t.trees['*'].items.map?.(line).join('<br>');
+            return tmp.t?.trees['*'].items.map?.(line).join('<br>');
         }
     },
     layerShown() { return player[this.layer].unlocked && !tmp[this.layer].deactivated; },
@@ -73,7 +73,7 @@ addLayer('t', {
                         </span>${change_str} ${itemp.name}`;
                     };
 
-                    return `You have ${listFormat.format(tmp.t.trees['*'].items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
+                    return `You have ${listFormat.format(tmp.t?.trees['*'].items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
                 }],
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
@@ -88,8 +88,8 @@ addLayer('t', {
                 'blank',
                 ['bar', 'health'],
                 ['clickables', [1]],
-                ['display-text', () => `Current damage: ${format(tmp.t.trees['*'].damage_base)}`],
-                ['display-text', () => `Chance to cut an additionnal piece of wood: ${format_chance(tmp.t.trees['*'].chance)}`],
+                ['display-text', () => `Current damage: ${format(tmp.t?.trees['*'].damage_base)}`],
+                ['display-text', () => `Chance to cut an additionnal piece of wood: ${format_chance(tmp.t?.trees['*'].chance)}`],
                 ['display-text', () => {
                     let drops = 'nothing',
                         count = '';
@@ -110,8 +110,8 @@ addLayer('t', {
                             ['focus', [
                                 ['', 'none'],
                                 ...Object.keys(layers.t.trees)
-                                    .filter(tree => tree != '*' && (tmp.t.trees[tree].unlocked ?? true))
-                                    .map(tree => [tree, tmp.t.trees[tree].name])
+                                    .filter(tree => tree != '*' && (tmp.t?.trees[tree].unlocked ?? true))
+                                    .map(tree => [tree, tmp.t?.trees[tree].name])
                             ]],
                         ],
                     ]];
@@ -119,12 +119,12 @@ addLayer('t', {
                 ['display-text', () => {
                     /** @param {string} tree */
                     const row = tree => {
-                        const regen = tmp.t.trees[tree].growth;
+                        const regen = tmp.t?.trees[tree].growth;
 
                         return `<tr>\
-                            <td>${capitalize(tmp.t.trees[tree].name)}</td>\
-                            <td>${format(player.t.trees[tree].amount)} / ${format(tmp.t.trees[tree].cap)} ${regen.gt(0) ? `(+${format(regen)}/s)` : ''}</td>\
-                            <td>${format(tmp.t.trees[tree].size)}</td>\
+                            <td>${capitalize(tmp.t?.trees[tree].name)}</td>\
+                            <td>${format(player.t.trees[tree].amount)} / ${format(tmp.t?.trees[tree].cap)} ${regen.gt(0) ? `(+${format(regen)}/s)` : ''}</td>\
+                            <td>${format(tmp.t?.trees[tree].size)}</td>\
                         </tr>`;
                     };
 
@@ -134,7 +134,7 @@ addLayer('t', {
                             <th>Amount</th>\
                             <th>Size</th>\
                         </tr>\
-                        ${Object.keys(tmp.t.trees).filter(tree => tree != '*' && tmp.t.trees[tree].unlocked).map(row).join('')}\
+                        ${Object.keys(tmp.t?.trees).filter(tree => tree != '*' && tmp.t?.trees[tree].unlocked).map(row).join('')}\
                     </table>`;
                 }],
             ],
@@ -152,7 +152,7 @@ addLayer('t', {
                         </span>${change_str} ${itemp.name}`;
                     };
 
-                    return `You have ${listFormat.format(tmp.t.trees['*'].items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
+                    return `You have ${listFormat.format(tmp.t?.trees['*'].items.filter(item => tmp.lo.items[item].unlocked).map(line))}.`;
                 }],
                 ['row', [
                     ['display-text', 'Short tooltip mode'],
@@ -188,7 +188,7 @@ addLayer('t', {
             onClick() {
                 player.t.clicked = true;
                 const type = player.t.current,
-                    damage = tmp.t.trees['*'].damage_base.min(player.t.trees[type].health);
+                    damage = tmp.t?.trees['*'].damage_base.min(player.t.trees[type].health);
                 if (!type) return;
 
                 player.t.trees[type].health = player.t.trees[type].health.minus(damage);
@@ -197,8 +197,8 @@ addLayer('t', {
                 let drops = [];
 
                 if (options.noRNG) {
-                    drops = get_tree_drops(type, damage.times(tmp.t.trees['*'].chance));
-                } else if (tmp.t.trees['*'].chance.gt(Math.random())) {
+                    drops = get_tree_drops(type, damage.times(tmp.t?.trees['*'].chance));
+                } else if (tmp.t?.trees['*'].chance.gt(Math.random())) {
                     drops = get_tree_drops(type, damage);
                 } else {
                     drops = [];
@@ -219,7 +219,7 @@ addLayer('t', {
             onHold() {
                 player.t.clicked = true;
                 const type = player.t.current,
-                    damage = tmp.t.trees['*'].damage_base.min(player.t.trees[type].health);
+                    damage = tmp.t?.trees['*'].damage_base.min(player.t.trees[type].health);
                 if (!type) return;
 
                 player.t.trees[type].health = player.t.trees[type].health.minus(damage);
@@ -228,8 +228,8 @@ addLayer('t', {
                 let drops = [];
 
                 if (options.noRNG) {
-                    drops = get_tree_drops(type, damage.times(tmp.t.trees['*'].chance));
-                } else if (tmp.t.trees['*'].chance.gt(Math.random())) {
+                    drops = get_tree_drops(type, damage.times(tmp.t?.trees['*'].chance));
+                } else if (tmp.t?.trees['*'].chance.gt(Math.random())) {
                     drops = get_tree_drops(type, damage);
                 } else {
                     drops = [];
@@ -262,28 +262,28 @@ addLayer('t', {
             display() { return player.t.focus == 'driftwood' ? 'ON' : 'OFF'; },
             canClick() { return player.t.focus != 'driftwood'; },
             onClick() { player.t.focus = 'driftwood'; },
-            unlocked() { return tmp.t.trees.driftwood.unlocked ?? true; },
+            unlocked() { return tmp.t?.trees.driftwood.unlocked ?? true; },
         },
         23: {
             title: 'Focus on Oak',
             display() { return player.t.focus == 'oak' ? 'ON' : 'OFF'; },
             canClick() { return player.t.focus != 'oak'; },
             onClick() { player.t.focus = 'oak'; },
-            unlocked() { return tmp.t.trees.oak.unlocked ?? true; },
+            unlocked() { return tmp.t?.trees.oak.unlocked ?? true; },
         },
         24: {
             title: 'Focus on Birch',
             display() { return player.t.focus == 'birch' ? 'ON' : 'OFF'; },
             canClick() { return player.t.focus != 'birch'; },
             onClick() { player.t.focus = 'birch'; },
-            unlocked() { return tmp.t.trees.birch.unlocked ?? true; },
+            unlocked() { return tmp.t?.trees.birch.unlocked ?? true; },
         },
         25: {
             title: 'Focus on Baobab',
             display() { return player.t.focus == 'baobab' ? 'ON' : 'OFF'; },
             canClick() { return player.t.focus != 'baobab'; },
             onClick() { player.t.focus = 'baobab'; },
-            unlocked() { return tmp.t.trees.baobab.unlocked ?? true; },
+            unlocked() { return tmp.t?.trees.baobab.unlocked ?? true; },
         },
     },
     upgrades: {
@@ -387,7 +387,7 @@ addLayer('t', {
             title: 'Mechanical Sawmill',
             description: 'Passively cut the current tree with 25% of your damage',
             effect() { return D(.25); },
-            effectDisplay() { return `${format(D.times(upgradeEffect(this.layer, this.id), tmp.t.trees['*'].damage_base))} dps`; },
+            effectDisplay() { return `${format(D.times(upgradeEffect(this.layer, this.id), tmp.t?.trees['*'].damage_base))} dps`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
             cost: D(80),
             item: 'normal_log',
@@ -439,8 +439,8 @@ addLayer('t', {
             title: 'Driftwood Destroyer',
             description: 'Increases damage by driftwood health when chopping driftwood<br>Or by 10% of it when not',
             effect() {
-                if (player.t.current != 'driftwood') return tmp.t.trees['driftwood'].health.times(.1);
-                return tmp.t.trees['driftwood'].health;
+                if (player.t.current != 'driftwood') return tmp.t?.trees['driftwood'].health.times(.1);
+                return tmp.t?.trees['driftwood'].health;
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
@@ -506,16 +506,16 @@ addLayer('t', {
             width: 200,
             height: 50,
             progress() {
-                let max = tmp.t.trees[player.t.current]?.health;
+                let max = tmp.t?.trees[player.t.current]?.health;
                 if (D.lte(max, 0)) return 0;
                 return D.div(player.t.trees[player.t.current].health ?? max, max);
             },
             display() {
                 const current = player.t.current,
-                    regen = tmp.t.trees[current].regen,
+                    regen = tmp.t?.trees[current].regen,
                     regen_text = regen.neq(0) ? `<br>(+${format(regen)} /s)` : '';
-                return `${capitalize(tmp.t.trees[current].name)}<br>\
-                ${format(player.t.trees[current].health)} / ${format(tmp.t.trees[current].health)}\
+                return `${capitalize(tmp.t?.trees[current].name)}<br>\
+                ${format(player.t.trees[current].health)} / ${format(tmp.t?.trees[current].health)}\
                 ${regen_text}`;
             },
             baseStyle: { 'background-color': 'brown' },
@@ -631,7 +631,7 @@ addLayer('t', {
 
                 health = health.add(buyableEffect('lo', 61)?.soaked);
 
-                health = health.times(tmp.t.trees['*'].health_mult);
+                health = health.times(tmp.t?.trees['*'].health_mult);
 
                 return health;
             },
@@ -639,48 +639,48 @@ addLayer('t', {
             growth() {
                 let regen = D(1 / 20);
 
-                regen = regen.times(tmp.t.trees['*'].growth_mult);
+                regen = regen.times(tmp.t?.trees['*'].growth_mult);
 
                 return regen;
             },
             damage() {
-                let damage = tmp.t.trees['*'].damage_base;
+                let damage = tmp.t?.trees['*'].damage_base;
 
                 return damage;
             },
             dps() {
-                let mult = tmp.t.trees['*'].dps_mult_inactive;
+                let mult = tmp.t?.trees['*'].dps_mult_inactive;
 
-                if (player.t.current == this.id) mult = mult.add(tmp.t.trees['*'].dps_mult_active);
+                if (player.t.current == this.id) mult = mult.add(tmp.t?.trees['*'].dps_mult_active);
 
-                return tmp.t.trees[this.id].damage.times(mult);
+                return tmp.t?.trees[this.id].damage.times(mult);
             },
             size() {
                 let size = D(5);
 
                 size = size.add(buyableEffect('lo', 61).soaked);
 
-                size = size.add(tmp.t.trees['*'].size_add);
+                size = size.add(tmp.t?.trees['*'].size_add);
 
-                size = size.times(tmp.t.trees['*'].size_mult);
+                size = size.times(tmp.t?.trees['*'].size_mult);
 
                 return size;
             },
             cap() {
                 let cap = D(1);
 
-                cap = cap.add(tmp.t.trees['*'].cap_add);
+                cap = cap.add(tmp.t?.trees['*'].cap_add);
 
-                cap = cap.times(tmp.t.trees['*'].cap_mult);
+                cap = cap.times(tmp.t?.trees['*'].cap_mult);
 
                 return cap.floor();
             },
             regen() {
-                let mult = tmp.t.trees['*'].regen_add;
+                let mult = tmp.t?.trees['*'].regen_add;
 
                 if (mult.eq(0)) return D.dZero;
 
-                return mult.times(tmp.t.trees[this.id].health);
+                return mult.times(tmp.t?.trees[this.id].health);
             },
         },
         oak: {
@@ -690,7 +690,7 @@ addLayer('t', {
             health() {
                 let health = D(15);
 
-                health = health.times(tmp.t.trees['*'].health_mult);
+                health = health.times(tmp.t?.trees['*'].health_mult);
 
                 return health;
             },
@@ -698,46 +698,46 @@ addLayer('t', {
             growth() {
                 let regen = player.t.trees[this.id].amount.add(1).root(2).div(50);
 
-                regen = regen.times(tmp.t.trees['*'].growth_mult);
+                regen = regen.times(tmp.t?.trees['*'].growth_mult);
 
                 return regen;
             },
             damage() {
-                let damage = tmp.t.trees['*'].damage_base;
+                let damage = tmp.t?.trees['*'].damage_base;
 
                 return damage;
             },
             dps() {
-                let mult = tmp.t.trees['*'].dps_mult_inactive;
+                let mult = tmp.t?.trees['*'].dps_mult_inactive;
 
-                if (player.t.current == this.id) mult = mult.add(tmp.t.trees['*'].dps_mult_active);
+                if (player.t.current == this.id) mult = mult.add(tmp.t?.trees['*'].dps_mult_active);
 
-                return tmp.t.trees[this.id].damage.times(mult);
+                return tmp.t?.trees[this.id].damage.times(mult);
             },
             size() {
                 let size = D(20);
 
-                size = size.add(tmp.t.trees['*'].size_add);
+                size = size.add(tmp.t?.trees['*'].size_add);
 
-                size = size.times(tmp.t.trees['*'].size_mult);
+                size = size.times(tmp.t?.trees['*'].size_mult);
 
                 return size;
             },
             cap() {
                 let cap = D(100);
 
-                cap = cap.add(tmp.t.trees['*'].cap_add);
+                cap = cap.add(tmp.t?.trees['*'].cap_add);
 
-                cap = cap.times(tmp.t.trees['*'].cap_mult);
+                cap = cap.times(tmp.t?.trees['*'].cap_mult);
 
                 return cap.floor();
             },
             regen() {
-                let mult = tmp.t.trees['*'].regen_add;
+                let mult = tmp.t?.trees['*'].regen_add;
 
                 if (mult.eq(0)) return D.dZero;
 
-                return mult.times(tmp.t.trees[this.id].health);
+                return mult.times(tmp.t?.trees[this.id].health);
             },
         },
         birch: {
@@ -747,7 +747,7 @@ addLayer('t', {
             health() {
                 let health = D(10);
 
-                health = health.times(tmp.t.trees['*'].health_mult);
+                health = health.times(tmp.t?.trees['*'].health_mult);
 
                 return health;
             },
@@ -755,46 +755,46 @@ addLayer('t', {
             growth() {
                 let regen = player.t.trees[this.id].amount.add(1).root(2).div(35);
 
-                regen = regen.times(tmp.t.trees['*'].growth_mult);
+                regen = regen.times(tmp.t?.trees['*'].growth_mult);
 
                 return regen;
             },
             damage() {
-                let damage = tmp.t.trees['*'].damage_base;
+                let damage = tmp.t?.trees['*'].damage_base;
 
                 return damage;
             },
             dps() {
-                let mult = tmp.t.trees['*'].dps_mult_inactive;
+                let mult = tmp.t?.trees['*'].dps_mult_inactive;
 
-                if (player.t.current == this.id) mult = mult.add(tmp.t.trees['*'].dps_mult_active);
+                if (player.t.current == this.id) mult = mult.add(tmp.t?.trees['*'].dps_mult_active);
 
-                return tmp.t.trees[this.id].damage.times(mult);
+                return tmp.t?.trees[this.id].damage.times(mult);
             },
             size() {
                 let size = D(10);
 
-                size = size.add(tmp.t.trees['*'].size_add);
+                size = size.add(tmp.t?.trees['*'].size_add);
 
-                size = size.times(tmp.t.trees['*'].size_mult);
+                size = size.times(tmp.t?.trees['*'].size_mult);
 
                 return size;
             },
             cap() {
                 let cap = D(100);
 
-                cap = cap.add(tmp.t.trees['*'].cap_add);
+                cap = cap.add(tmp.t?.trees['*'].cap_add);
 
-                cap = cap.times(tmp.t.trees['*'].cap_mult);
+                cap = cap.times(tmp.t?.trees['*'].cap_mult);
 
                 return cap.floor();
             },
             regen() {
-                let mult = tmp.t.trees['*'].regen_add;
+                let mult = tmp.t?.trees['*'].regen_add;
 
                 if (mult.eq(0)) return D.dZero;
 
-                return mult.times(tmp.t.trees[this.id].health);
+                return mult.times(tmp.t?.trees[this.id].health);
             },
         },
         baobab: {
@@ -804,7 +804,7 @@ addLayer('t', {
             health() {
                 let health = D(20);
 
-                health = health.times(tmp.t.trees['*'].health_mult);
+                health = health.times(tmp.t?.trees['*'].health_mult);
 
                 return health;
             },
@@ -812,46 +812,46 @@ addLayer('t', {
             growth() {
                 let regen = player.t.trees[this.id].amount.add(1).root(2).div(100);
 
-                regen = regen.times(tmp.t.trees['*'].growth_mult);
+                regen = regen.times(tmp.t?.trees['*'].growth_mult);
 
                 return regen;
             },
             damage() {
-                let damage = tmp.t.trees['*'].damage_base;
+                let damage = tmp.t?.trees['*'].damage_base;
 
                 return damage;
             },
             dps() {
-                let mult = tmp.t.trees['*'].dps_mult_inactive;
+                let mult = tmp.t?.trees['*'].dps_mult_inactive;
 
-                if (player.t.current == this.id) mult = mult.add(tmp.t.trees['*'].dps_mult_active);
+                if (player.t.current == this.id) mult = mult.add(tmp.t?.trees['*'].dps_mult_active);
 
-                return tmp.t.trees[this.id].damage.times(mult);
+                return tmp.t?.trees[this.id].damage.times(mult);
             },
             size() {
                 let size = D(40);
 
-                size = size.add(tmp.t.trees['*'].size_add);
+                size = size.add(tmp.t?.trees['*'].size_add);
 
-                size = size.times(tmp.t.trees['*'].size_mult);
+                size = size.times(tmp.t?.trees['*'].size_mult);
 
                 return size;
             },
             cap() {
                 let cap = D(10);
 
-                cap = cap.add(tmp.t.trees['*'].cap_add);
+                cap = cap.add(tmp.t?.trees['*'].cap_add);
 
-                cap = cap.times(tmp.t.trees['*'].cap_mult);
+                cap = cap.times(tmp.t?.trees['*'].cap_mult);
 
                 return cap.floor();
             },
             regen() {
-                let mult = tmp.t.trees['*'].regen_add;
+                let mult = tmp.t?.trees['*'].regen_add;
 
                 if (mult.eq(0)) return D.dZero;
 
-                return mult.times(tmp.t.trees[this.id].health);
+                return mult.times(tmp.t?.trees[this.id].health);
             },
         },
         // Special tree for when the player is not chopping any
@@ -863,16 +863,16 @@ addLayer('t', {
             name: 'none',
             growth: D.dZero,
             damage() {
-                let damage = tmp.t.trees['*'].damage_base;
+                let damage = tmp.t?.trees['*'].damage_base;
 
                 return damage;
             },
             dps() {
-                let mult = tmp.t.trees['*'].dps_mult_inactive;
+                let mult = tmp.t?.trees['*'].dps_mult_inactive;
 
-                if (player.t.current == this.id) mult = mult.add(tmp.t.trees['*'].dps_mult_active);
+                if (player.t.current == this.id) mult = mult.add(tmp.t?.trees['*'].dps_mult_active);
 
-                return tmp.t.trees[this.id].damage.times(mult);
+                return tmp.t?.trees[this.id].damage.times(mult);
             },
             size: D.dZero,
             cap: D.dZero,
@@ -940,9 +940,9 @@ addLayer('t', {
             });
         }
 
-        for (const tree of Object.keys(layers.t.trees).filter(tree => tree != '*' && tmp.t.trees[tree].unlocked)) {
+        for (const tree of Object.keys(layers.t.trees).filter(tree => tree != '*' && tmp.t?.trees[tree].unlocked)) {
             const player_tree = player.t.trees[tree],
-                tmp_tree = tmp.t.trees[tree];
+                tmp_tree = tmp.t?.trees[tree];
 
             // Grow tree
             if (tmp_tree.growth.gt(0) && player_tree.amount.lt(tmp_tree.cap)) {
@@ -982,14 +982,14 @@ addLayer('t', {
             if (D.lte(player.t.trees[tree].health, 0)) {
                 // Tree is dead
                 if (player.t.clicked) {
-                    const drops = get_tree_drops(tree, tmp.t.trees[tree].size);
+                    const drops = get_tree_drops(tree, tmp.t?.trees[tree].size);
 
                     player.t.trees[tree].last_drops.push(...drops);
                     player.t.trees[tree].last_drops_times = D.dOne;
                     gain_items(drops);
                 }
 
-                player.t.trees[tree].health = tmp.t.trees[tree].health;
+                player.t.trees[tree].health = tmp.t?.trees[tree].health;
 
                 if (tree == player.t.current) player.t.current = '';
             }
