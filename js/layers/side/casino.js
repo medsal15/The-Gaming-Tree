@@ -54,7 +54,8 @@ addLayer('cas', {
     },
     items: {
         sources(item_id) {
-            if (!item_id || tmp.cas.deactivated) return {};
+            if (!item_id) return {};
+            if (tmp.cas.deactivated) return tmp.lo.items[item_id].sources;
 
             const swaps = player.cas.swaps;
             if (inChallenge('b', 52)) {
@@ -94,7 +95,8 @@ addLayer('cas', {
             return (Object.entries(player.cas.swaps[type]).find(([, it]) => it == item) ?? [''])[0];
         },
         items(source) {
-            if (!source || tmp.cas.deactivated) return {};
+            if (!source) return {};
+            if (tmp.cas.deactivated) return layers.lo.items['*'].items(source);
 
             const swaps = player.cas.swaps;
             if (inChallenge('b', 52)) {
