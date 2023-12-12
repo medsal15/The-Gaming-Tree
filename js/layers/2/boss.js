@@ -356,7 +356,7 @@ addLayer('b', {
         52: {
             name: 'Misfortune',
             challengeDescription: 'Item drops are shuffled (only affects unlocked items).<br>Swap cost base is decreased for the challenge.',
-            goalDescription: 'Restore the items drops to their original sources.',
+            goalDescription: 'Restore the items drops to their original sources by swapping them back.',
             canComplete() { return Object.keys(player.cas.swaps.challenge).length == 0; },
             rewardDescription: 'Unlock The Casino, a special layer to change your luck.',
             unlocked() { return hasChallenge('b', 32); },
