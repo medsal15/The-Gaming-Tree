@@ -2426,7 +2426,7 @@ addLayer('lo', {
         },
     },
     grid: {
-        rows: 12,
+        rows: 13,
         cols: 6,
         getStartData(_) { return {}; },
         getStyle(_, id) {
@@ -2509,6 +2509,7 @@ addLayer('lo', {
         },
     },
     items: {
+        //todo add shop to other sources
         '*': {
             global_chance_multiplier() {
                 let mult = D.dOne;
@@ -2630,6 +2631,9 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() {
+                    if (player.v.unlocked) return ['vending:common'];
+                },
             },
             name: 'slime goo',
             style: {
@@ -2669,6 +2673,9 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() {
+                    if (player.v.unlocked) return ['vending:common'];
+                },
             },
             name: 'slime core shard',
             style: {
@@ -2693,7 +2700,12 @@ addLayer('lo', {
                     chances['tamed_kill:slime'] = chances['enemy:slime'];
                     return chances;
                 },
-                other() { if (player.fr.unlocked) return ['freezer:freezing']; },
+                other() {
+                    const other = [];
+                    if (player.fr.unlocked) other.push('freezer:freezing');
+                    if (player.v.unlocked) other.push('vending:common');
+                    return other;
+                },
             },
             name: 'slime core',
             style: {
@@ -4165,11 +4177,62 @@ addLayer('lo', {
             },
             unlocked() { return tmp.fr.layerShown; },
         },
+        // Oil
+        oil: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1201,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+            },
+            name: 'oil',
+            style: {
+                'background-image': `url('./resources/images/drop.svg')`,
+                'background-color': '#000000',
+            },
+            unlocked() { return hasMilestone('to', 6) || tmp.fr.layerShown; },
+        },
         // Special
         holy_water: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1201,
+            grid: 1301,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
@@ -4192,7 +4255,7 @@ addLayer('lo', {
         stardust: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1202,
+            grid: 1302,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },

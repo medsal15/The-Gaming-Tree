@@ -544,6 +544,8 @@ function type_name(type) {
             return `built ${tmp.c.buildings[sub].name}`;
         case 'plant':
             return `grown ${tmp.p.plants[sub].name}`;
+        case 'vending':
+            return `purchasing`;
     }
 }
 /**
@@ -667,6 +669,15 @@ function random_dish_group() {
     const groups = ['vegetable', 'baked', 'cold', 'hot', 'meat', 'monster', 'failure'];
 
     return groups[Math.floor(Math.random() * groups.length)];
+}
+/**
+ * @param {rarities} rarity
+ * @param {string} text
+ * @param {string} [style=''] additional style, appended raw
+ */
+function rarity_color(rarity, text, style = '') {
+    const rar = tmp.v.rarities[rarity];
+    return `<span style="color:${rar.color};${style}">${text}</span>`;
 }
 //todo random_rarity_items
 //todo random_rarity_upgrade

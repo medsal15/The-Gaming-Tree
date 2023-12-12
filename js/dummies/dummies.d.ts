@@ -1749,7 +1749,7 @@ declare class LayerData {
     challenges?: { [id: number]: number }
 }
 
-type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building' | 'plant' | 'freezer';
+type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building' | 'plant' | 'freezer' | 'vending';
 type resources = 'science' | 'energy';
 type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
     'red_fabric' | 'pyrite_coin' | 'rusty_gear' |
@@ -1762,6 +1762,7 @@ type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
     'wheat' | 'corn' | 'strawberry' | 'potato' | 'eggplant' | 'egg' |
     'water' | 'ice' |
     'icestone' | 'rust_ingot' |
+    'oil' | //'fuel'|
     'stardust' | 'holy_water';
 type temperatures = 'none' | 'low' | 'medium' | 'high' | 'burning';
 type dishes = 'failure' |
@@ -2762,28 +2763,65 @@ type Layers = {
     bl: Layer<'bl'> & {}
     v: Layer<'v'> & {
         items: {
-            [item in items]: {
-                readonly id: item
-                rarity: rarities
-                cost: Decimal
+            '*': {
+                /** Multiplies amount of items being sold */
+                amount_mult(): Decimal
+                /** Multiplies cost of items being sold */
+                cost_mult(): Decimal
+            }
+        } & {
+            //todo support dishes
+            [entry: string]: {
+                /** @deprecated */
+                item: items
+                merch: {
+                    type: 'item'
+                    item: items
+                } | {
+                    type: 'dish'
+                    dish: dishes
+                }
+                rarity: Computable<rarities>
+                /** Cost in copper coins each */
+                cost: {
+                    max: Computable<DecimalSource>
+                    min: Computable<DecimalSource>
+                }
                 /** Amount of the item being sold */
                 amount: {
-                    max: Computable<Decimal>
-                    min: Computable<Decimal>
+                    max: Computable<DecimalSource>
+                    min: Computable<DecimalSource>
                 }
+                unlocked?: Computable<boolean>
             }
         }
         rarities: {
+            '*': {
+                /** Multiplies amount of different items available */
+                amount_mult(): Decimal
+            }
+        } & {
             [rarity in rarities]: {
                 readonly id: rarity
                 /** Amount of items being sold */
                 amount: {
-                    max: Computable<Decimal>
-                    min: Computable<Decimal>
+                    max: Computable<DecimalSource>
+                    min: Computable<DecimalSource>
                 }
                 color: string
             }
         }
+        /** Time between refreshes */
+        time: {
+            '*': {
+                /** Divides time between refreshes */
+                time_div(): Decimal
+            }
+            specific: Computable<Decimal>
+        } & {
+            [rarity in rarities]: Computable<Decimal>
+        }
+        upgrades: { [id: string]: Upgrade<'v'> & { rarity: rarities } }
     }
     // Special
     star: Layer<'star'> & {
@@ -3196,7 +3234,7 @@ type Player = {
             group: dish_groups
         } & {
             [rarity in rarities]: {
-                items: [items, Decimal][]
+                items: [item: items, amount: Decimal, cost: Decimal][]
                 upgrades: number[]
             }
         }

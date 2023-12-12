@@ -810,6 +810,7 @@ addLayer('fr', {
             },
         },
         // Simple convertions
+        //todo oil -> coal
         soaked_log: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.fr.recipes).find(recipe => layers.fr.recipes[recipe] == this); },
