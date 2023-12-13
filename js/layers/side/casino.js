@@ -199,7 +199,7 @@ addLayer('cas', {
             if (!item_id || item_id == '*') return;
 
             const item = tmp.lo.items[item_id];
-            if (!(item.unlocked ?? true)) return;
+            if (!(item.unlocked ?? true) && !(inChallenge('b', 52) && item_id in player.cas.swaps.challenge)) return;
 
             if (inChallenge('b', 52)) {
                 if (!(item_id in player.cas.swaps.challenge)) return;
@@ -277,6 +277,7 @@ addLayer('cas', {
                         return `<h3>${capitalize((side == 'left' ? item() : target()).name)}</h3><br><br>${capitalize(mode_text)}`;
                     },
                     unlocked() {
+                        //if (mode() == 'challenge' && item_id in player.cas.swaps.challenge) return true;
                         if (!(item().unlocked ?? true) && !(item_id in player.cas.swaps[mode()])) return false;
 
                         if (inChallenge('b', 52)) return r_mode == 'chances';

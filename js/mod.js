@@ -67,7 +67,7 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.B.5',
+	num: 'R0.B.6',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
@@ -79,6 +79,8 @@ let VERSION = {
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.B.6</h3><br>
+		- Misfortune should no longer break when you alternate a layer during it.<br>
 	<h3>v0.B.5</h3><br>
 		- Fixed a bug where the Kitchen had control of the Forge's smelting.<br>
 	<h3>v0.B.4</h3><br>
