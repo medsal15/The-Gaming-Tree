@@ -1731,7 +1731,7 @@ addLayer('k', {
         addPoints('f', gain);
     },
     automate() {
-        Object.entries(player.f.recipes)
+        Object.entries(player.k.recipes)
             .forEach(([id, recipe]) => {
                 // Prevent overflow in some cases
                 if (recipe.amount_target.gt(tmp.k.recipes['*'].size)) recipe.amount_target = tmp.k.recipes['*'].size;
