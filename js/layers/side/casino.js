@@ -38,7 +38,7 @@ addLayer('cas', {
                 ['display-text', () => `<span class="warning">You need to swap ${format(player.cas.respecs)} times to respec</span>`],
                 'blank',
                 ['display-text', 'Click an item on the left column to select it.'],
-                ['display-text', 'Click an item on the right column to swap with the selected item.'],
+                ['display-text', 'The click an item on the right column to swap with the selected item.'],
                 ['display-text', '<sub>Because of the way the game is made, some items cannot be swapped with others.</sub>'],
                 'blank',
                 ['clickable', 'respec_swaps'],
