@@ -3104,6 +3104,19 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
+
+                    if (tmp.p.layerShown) {
+                        let amount = D(100);
+
+                        chances['plant:copper_wheat'] = amount;
+                        chances['plant:copper_wheat:old'] = D.div(amount, 10);
+                    }
+
+                    return chances;
+                },
             },
             name: 'copper ore',
             style: {
@@ -3931,12 +3944,18 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() {
-                    const list = [];
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
 
-                    if (tmp.p.layerShown) list.push('plant:wheat', 'plant:copper_wheat');
+                    if (tmp.p.layerShown) {
+                        let amount = D.dOne;
 
-                    return list;
+                        chances['plant:wheat'] = chances['plant:copper_wheat'] = amount;
+                        chances['plant:wheat:old'] = chances['plant:copper_wheat:old'] = D.div(amount, 10);
+                    }
+
+                    return chances;
                 },
             },
             name: 'wheat',
@@ -3953,12 +3972,18 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() {
-                    const list = [];
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
 
-                    if (tmp.p.layerShown) list.push('plant:corn', 'plant:candy_corn');
+                    if (tmp.p.layerShown) {
+                        let amount = D.dTwo;
 
-                    return list;
+                        chances['plant:corn'] = chances['plant:candy_corn'] = amount;
+                        chances['plant:corn:old'] = chances['plant:candy_corn:old'] = D.div(amount, 10);
+                    }
+
+                    return chances;
                 },
             },
             name: 'corn',
@@ -3982,6 +4007,19 @@ addLayer('lo', {
 
                     return list;
                 },
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
+
+                    if (tmp.p.layerShown) {
+                        let amount = D.dTwo;
+
+                        chances['plant:strawberry'] = chances['plant:clockberry'] = amount;
+                        chances['plant:strawberry:old'] = chances['plant:clockberry:old'] = D.div(amount, 10);
+                    }
+
+                    return chances;
+                },
             },
             name: 'strawberry',
             style: {
@@ -4004,6 +4042,21 @@ addLayer('lo', {
 
                     return list;
                 },
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
+
+                    if (tmp.p.layerShown) {
+                        let amount = D.dOne;
+
+                        chances['plant:potato'] = D.times(amount, 2);
+                        chances['plant:potato_battery'] = amount;
+                        chances['plant:potato:old'] = D.div(amount, 10).times(2);
+                        chances['plant:potato_battery:old'] = D.div(amount, 10);
+                    }
+
+                    return chances;
+                },
             },
             name: 'potato',
             style: {
@@ -4019,12 +4072,18 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() {
-                    const list = [];
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
 
-                    if (tmp.p.layerShown) list.push('plant:eggplant');
+                    if (tmp.p.layerShown) {
+                        let amount = D.dOne;
 
-                    return list;
+                        chances['plant:eggplant'] = amount;
+                        chances['plant:eggplant:old'] = D.div(amount, 10);
+                    }
+
+                    return chances;
                 },
             },
             name: 'eggplant',
@@ -4041,12 +4100,18 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() {
-                    const list = [];
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
 
-                    if (tmp.p.layerShown) list.push('plant:egg_plant');
+                    if (tmp.p.layerShown) {
+                        let amount = D.dOne;
 
-                    return list;
+                        chances['plant:egg_plant'] = amount;
+                        chances['plant:egg_plant:old'] = D.div(amount, 10);
+                    }
+
+                    return chances;
                 },
             },
             name: 'egg',

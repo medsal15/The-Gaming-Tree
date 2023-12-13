@@ -556,26 +556,9 @@ addLayer('p', {
             produce(age) {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
-                /** @type {[string, Decimal][]} */
-                const items = [['wheat', D.dOne]];
+                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
 
-                items.forEach(([item, amount], i) => {
-                    let mult = tmp.p.plants['*'].harvest_mult;
-
-                    // The plant got too old, lose most of the harvest
-                    if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) mult = mult.div(10);
-
-                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
-                    if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
-                    } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
-                    }
-
-                    items[i][1] = amount.times(mult);
-                });
-
-                return items;
+                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
             },
             produces: ['wheat'],
             seeds(age) {
@@ -649,26 +632,9 @@ addLayer('p', {
             produce(age) {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
-                /** @type {[string, Decimal][]} */
-                const items = [['copper_ore', D(100)], ['wheat', D.dOne]];
+                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
 
-                items.forEach(([item, amount], i) => {
-                    let mult = tmp.p.plants['*'].harvest_mult;
-
-                    // The plant got too old, lose most of the harvest
-                    if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) mult = mult.div(10);
-
-                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
-                    if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
-                    } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
-                    }
-
-                    items[i][1] = amount.times(mult);
-                });
-
-                return items;
+                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
             },
             produces: ['copper_ore', 'wheat'],
             seeds(age) {
@@ -740,26 +706,9 @@ addLayer('p', {
             produce(age) {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
-                /** @type {[string, Decimal][]} */
-                const items = [['corn', D(2)]];
+                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
 
-                items.forEach(([item, amount], i) => {
-                    let mult = tmp.p.plants['*'].harvest_mult;
-
-                    // The plant got too old, lose most of the harvest
-                    if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) mult = mult.div(10);
-
-                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
-                    if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
-                    } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
-                    }
-
-                    items[i][1] = amount.times(mult);
-                });
-
-                return items;
+                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
             },
             produces: ['corn'],
             seeds(age) {
@@ -835,26 +784,9 @@ addLayer('p', {
             produce(age) {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
-                /** @type {[string, Decimal][]} */
-                const items = [['corn', D(2)]];
+                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
 
-                items.forEach(([item, amount], i) => {
-                    let mult = tmp.p.plants['*'].harvest_mult;
-
-                    // The plant got too old, lose most of the harvest
-                    if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) mult = mult.div(10);
-
-                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
-                    if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
-                    } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
-                    }
-
-                    items[i][1] = amount.times(mult);
-                });
-
-                return items;
+                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
             },
             produces: ['corn'],
             seeds(age) {
@@ -963,26 +895,9 @@ addLayer('p', {
             produce(age) {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
-                /** @type {[string, Decimal][]} */
-                const items = [['strawberry', D(2)]];
+                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
 
-                items.forEach(([item, amount], i) => {
-                    let mult = tmp.p.plants['*'].harvest_mult;
-
-                    // The plant got too old, lose most of the harvest
-                    if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) mult = mult.div(10);
-
-                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
-                    if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
-                    } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
-                    }
-
-                    items[i][1] = amount.times(mult);
-                });
-
-                return items;
+                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
             },
             produces: ['strawberry'],
             seeds(age) {
@@ -1056,26 +971,9 @@ addLayer('p', {
             produce(age) {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
-                /** @type {[string, Decimal][]} */
-                const items = [['strawberry', D(2)]];
+                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
 
-                items.forEach(([item, amount], i) => {
-                    let mult = tmp.p.plants['*'].harvest_mult;
-
-                    // The plant got too old, lose most of the harvest
-                    if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) mult = mult.div(10);
-
-                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
-                    if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
-                    } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
-                    }
-
-                    items[i][1] = amount.times(mult);
-                });
-
-                return items;
+                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
             },
             produces: ['strawberry'],
             seeds(age) {
@@ -1397,26 +1295,9 @@ addLayer('p', {
             produce(age) {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
-                /** @type {[string, Decimal][]} */
-                const items = [['potato', D(2)]];
+                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
 
-                items.forEach(([item, amount], i) => {
-                    let mult = tmp.p.plants['*'].harvest_mult;
-
-                    // The plant got too old, lose most of the harvest
-                    if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) mult = mult.div(10);
-
-                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
-                    if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
-                    } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
-                    }
-
-                    items[i][1] = amount.times(mult);
-                });
-
-                return items;
+                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
             },
             produces: ['potato'],
             seeds(age) {
@@ -1490,26 +1371,9 @@ addLayer('p', {
             produce(age) {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
-                /** @type {[string, Decimal][]} */
-                const items = [['potato', D(1)]];
+                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
 
-                items.forEach(([item, amount], i) => {
-                    let mult = tmp.p.plants['*'].harvest_mult;
-
-                    // The plant got too old, lose most of the harvest
-                    if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) mult = mult.div(10);
-
-                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
-                    if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
-                    } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
-                    }
-
-                    items[i][1] = amount.times(mult);
-                });
-
-                return items;
+                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
             },
             produces: ['potato'],
             seeds(age) {
@@ -1618,26 +1482,9 @@ addLayer('p', {
             produce(age) {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
-                /** @type {[string, Decimal][]} */
-                const items = [['eggplant', D(1)]];
+                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
 
-                items.forEach(([item, amount], i) => {
-                    let mult = tmp.p.plants['*'].harvest_mult;
-
-                    // The plant got too old, lose most of the harvest
-                    if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) mult = mult.div(10);
-
-                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
-                    if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
-                    } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
-                    }
-
-                    items[i][1] = amount.times(mult);
-                });
-
-                return items;
+                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
             },
             produces: ['eggplant'],
             seeds(age) {
@@ -1711,26 +1558,9 @@ addLayer('p', {
             produce(age) {
                 if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
 
-                /** @type {[string, Decimal][]} */
-                const items = [['egg', D(1)]];
+                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
 
-                items.forEach(([item, amount], i) => {
-                    let mult = tmp.p.plants['*'].harvest_mult;
-
-                    // The plant got too old, lose most of the harvest
-                    if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) mult = mult.div(10);
-
-                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
-                    if (upg && hasUpgrade('s', upg)) {
-                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
-                    } else if (inChallenge('b', 12)) {
-                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
-                    }
-
-                    items[i][1] = amount.times(mult);
-                });
-
-                return items;
+                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
             },
             produces: ['egg'],
             seeds(age) {

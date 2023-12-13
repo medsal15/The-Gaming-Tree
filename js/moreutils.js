@@ -515,8 +515,8 @@ function format_chance(chance) {
  * @param {`${drop_sources}:${string}`} type
  */
 function type_name(type) {
-    /** @type {[drop_sources, string]} */
-    const [from, sub] = type.split(':');
+    /** @type {[drop_sources, string, string?]} */
+    const [from, sub, more] = type.split(':');
     switch (from) {
         case 'enemy':
             return tmp.xp.enemies[sub].name;
@@ -542,8 +542,13 @@ function type_name(type) {
             return `tamed ${tmp.xp_alt.monsters[sub].name}`;
         case 'building':
             return `built ${tmp.c.buildings[sub].name}`;
-        case 'plant':
-            return `grown ${tmp.p.plants[sub].name}`;
+        case 'plant': {
+            let text = `grown ${tmp.p.plants[sub].name}`;
+
+            if (more == 'old') text += ' (old age)';
+
+            return text;
+        }
         case 'vending':
             return `purchasing`;
     }
