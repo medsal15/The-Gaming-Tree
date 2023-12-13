@@ -446,12 +446,15 @@ addLayer('l', {
         return div;
     },
     type: 'static',
-    baseResource: 'experience points',
+    baseResource() {
+        if (tmp.xp.layerShown ^ tmp.xp_alt.layerShown) return 'experience points';
+        return 'total experience points';
+    },
     baseAmount() {
         const max = tmp.xp.enemies['*'].exp_cap;
-        let amount;
-        if (tmp.xp.layerShown) amount = player.xp.points;
-        else amount = player.xp_alt.points;
+        let amount = D.dZero;
+        if (tmp.xp.layerShown) amount = amount.add(player.xp.points);
+        if (tmp.xp_alt.layerShown) amount = amount.add(player.xp_alt.points);
         return amount.min(max);
     },
     requires: D(12_500),
