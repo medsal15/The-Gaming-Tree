@@ -236,6 +236,8 @@ addLayer('k', {
 
                 size = size.add(tmp.con.condiments['*'].total.k.oven_size ?? D.dZero);
 
+                if (hasUpgrade('v', 22)) size = size.add(upgradeEffect('v', 22));
+
                 return size.round().max(0);
             },
             default_amount(recipe, amount) {
@@ -537,7 +539,7 @@ addLayer('k', {
             value() {
                 return Object.values(tmp.k.dishes).reduce((sum, dish) => {
                     if (!(dish.unlocked ?? true) || !('id' in dish)) return sum;
-                    return D.add(sum, dish.value);
+                    return D.add(sum, D.times(dish.value, player.k.dishes[dish.id].amount));
                 }, D.dZero);
             },
             size() {
@@ -546,6 +548,8 @@ addLayer('k', {
                 size = size.add(tmp.k.dishes.star_crunch.effect.size);
 
                 size = size.add(tmp.con.condiments['*'].total.k.stomach_size ?? D.dZero);
+
+                if (hasUpgrade('v', 42)) size = size.add(upgradeEffect('v', 42));
 
                 return size.round().max(0).toNumber();
             },
@@ -583,7 +587,6 @@ addLayer('k', {
                     ${duration_format(active.time)} / ${duration_format(dish.duration.time)} ${name}<br>\
                     ${layers.k.dishes[active.id].effect_description(active.time)}`;
             },
-            //todo display groups
             description_dish(dish_id) {
                 if (!dish_id || !(tmp.k.dishes[dish_id].unlocked ?? true)) return;
 
@@ -596,11 +599,13 @@ addLayer('k', {
                     condiment_text = condiment => `<span style="color:${tmp.con.condiments[condiment].color};">${tmp.con.condiments[condiment].name}</span>`,
                     good = (tmp.con.layerShown && dish.condiment.good.length) ? `Tastes better with ${listFormat.format(dish.condiment.good.map(condiment_text))}<br>` : '',
                     bad = (tmp.con.layerShown && dish.condiment.bad.length) ? `Tastes worse with ${listFormat.format(dish.condiment.bad.map(condiment_text))}<br>` : '',
-                    value = shiftDown ? `Value: ${format(dish.value)} each` : `Total value: ${format(D.times(dish.value, player.k.dishes[dish_id].amount))}`;
+                    value = shiftDown ? `Value: ${format(dish.value)} each` : `Total value: ${format(D.times(dish.value, player.k.dishes[dish_id].amount))}`,
+                    group = tmp.v.layerShown ? `Types: ${listFormat.format(dish.groups.map(group => tmp.k.groups[group].name))}<br>` : '';
 
                 return `${capitalize(dish.name)}<br>\
                         Duration: ${duration_format(dish.duration.time)} ${name}<br>\
                         ${layers.k.dishes[dish_id].effect_description(dish.duration.time)}<br>\
+                        ${group}\
                         ${good}${bad}\
                         ${value}`;
             },
@@ -1151,7 +1156,7 @@ addLayer('k', {
                 good: ['mint'],
                 bad: ['pepper'],
             },
-            groups: ['cold', 'vegetables'],
+            groups: ['cold', 'vegetable'],
         },
         slime_juice: {
             _id: null,
@@ -1309,6 +1314,29 @@ addLayer('k', {
             groups: ['monster', 'hot'],
         },
     },
+    groups: {
+        vegetable: {
+            name: 'vegetable',
+        },
+        baked: {
+            name: 'baked',
+        },
+        cold: {
+            name: 'cold',
+        },
+        hot: {
+            name: 'hot',
+        },
+        meat: {
+            name: 'meat',
+        },
+        monster: {
+            name: 'monster',
+        },
+        failure: {
+            name: 'failed',
+        },
+    },
     grid: {
         rows: 6,
         cols: 3,
@@ -1368,6 +1396,17 @@ addLayer('k', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
+        if (layer == 'v_soft') {
+            Object.values(player.k.recipes).forEach(data => {
+                data.amount_cooking = D.dZero;
+                data.progress = D.dZero;
+            });
+            Object.values(player.k.dishes).forEach(data => {
+                data.amount = D.dZero;
+            });
+            return;
+        }
+
         const keep = ['mode'],
             /** @type {[id: string, data: {amount_target: Decimal, auto: boolean}][]} */
             rec = Object.entries(player.k.recipes).map(([id, data]) => [id, {
@@ -1382,6 +1421,7 @@ addLayer('k', {
         rec.forEach(([id, data]) => {
             player.k.recipes[id].amount_target = data.amount_target;
             player.k.recipes[id].auto = data.auto;
+            player.k.recipes[id].progress = D.dZero;
         });
     },
     clickables: new Proxy({}, {
@@ -1708,14 +1748,18 @@ addLayer('k', {
                 /** @type {false|dishes} */
                 let result = false;
 
+                // Tick recipe progress
+                let gain = D.times(diff, tmp.k.recipes['*'].speed);
+                precipe.progress = D.add(precipe.progress, gain);
+
                 // Wrong temperature
                 if (!recipe.heats.includes(tmp.k.temperatures.current)) {
-                    result = 'failure';
+                    if (hasUpgrade('v', 53)) {
+                        gain = gain.div(upgradeEffect('v', 53));
+                    } else {
+                        result = 'failure';
+                    }
                 }
-
-                // Tick recipe progress
-                const gain = D.times(diff, tmp.k.recipes['*'].speed);
-                precipe.progress = D.add(precipe.progress, gain);
 
                 if (D.gte(precipe.progress, recipe.time)) {
                     result = recipe.produces;

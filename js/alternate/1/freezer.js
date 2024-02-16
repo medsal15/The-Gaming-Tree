@@ -892,9 +892,21 @@ addLayer('fr', {
             consumes(amount) {
                 amount = layers.fr.recipes['*'].default_amount(this.id, amount);
 
+                /** @type {Record<items, Decimal>} */
+                const exps = {
+                    'iron_ore': D(.25),
+                };
+
+                Object.entries(exps).forEach(/**@param {[items,Decimal]}*/([item, exp]) => {
+                    if (hasUpgrade('v', 54)) {
+                        exp = exp.times(upgradeEffect('v', 54));
+                    }
+                    exps[item] = exp;
+                });
+
                 /** @type {[items, Decimal][]} */
                 const items = [
-                    ['iron_ore', D.pow(amount, 1.25).times(50)],
+                    ['iron_ore', D.pow(amount, D.add(1, exps.iron_ore)).times(50)],
                 ];
 
                 const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
@@ -929,10 +941,23 @@ addLayer('fr', {
             consumes(amount) {
                 amount = layers.fr.recipes['*'].default_amount(this.id, amount);
 
+                /** @type {Record<items, Decimal>} */
+                const exps = {
+                    'stone': D(.25),
+                    'ice': D(.25),
+                };
+
+                Object.entries(exps).forEach(/**@param {[items,Decimal]}*/([item, exp]) => {
+                    if (hasUpgrade('v', 54)) {
+                        exp = exp.times(upgradeEffect('v', 54));
+                    }
+                    exps[item] = exp;
+                });
+
                 /** @type {[items, Decimal][]} */
                 const items = [
-                    ['stone', D.pow(amount, 1.25).times(50)],
-                    ['ice', D.pow(amount, 1.25).times(10)],
+                    ['stone', D.pow(amount, D.add(1, exps.stone)).times(50)],
+                    ['ice', D.pow(amount, D.add(1, exps.ice)).times(10)],
                 ];
 
                 const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
@@ -967,10 +992,23 @@ addLayer('fr', {
             consumes(amount) {
                 amount = layers.fr.recipes['*'].default_amount(this.id, amount);
 
+                /** @type {Record<items, Decimal>} */
+                const exps = {
+                    'iron_ore': D(.5),
+                    'water': D(.25),
+                };
+
+                Object.entries(exps).forEach(/**@param {[items,Decimal]}*/([item, exp]) => {
+                    if (hasUpgrade('v', 54)) {
+                        exp = exp.times(upgradeEffect('v', 54));
+                    }
+                    exps[item] = exp;
+                });
+
                 /** @type {[items, Decimal][]} */
                 const items = [
-                    ['iron_ore', D.pow(amount, 1.5).times(75)],
-                    ['water', D.pow(amount, 1.25).times(25)],
+                    ['iron_ore', D.pow(amount, D.add(1, exps.iron_ore)).times(75)],
+                    ['water', D.pow(amount, D.add(1, exps.water)).times(25)],
                 ];
 
                 const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
@@ -1005,10 +1043,23 @@ addLayer('fr', {
             consumes(amount) {
                 amount = layers.fr.recipes['*'].default_amount(this.id, amount);
 
+                /** @type {Record<items, Decimal>} */
+                const exps = {
+                    'iron_ingot': D(.5),
+                    'water': D(.25),
+                };
+
+                Object.entries(exps).forEach(/**@param {[items,Decimal]}*/([item, exp]) => {
+                    if (hasUpgrade('v', 54)) {
+                        exp = exp.times(upgradeEffect('v', 54));
+                    }
+                    exps[item] = exp;
+                });
+
                 /** @type {[items, Decimal][]} */
                 const items = [
-                    ['iron_ingot', D.pow(amount, 1.5).times(7.5)],
-                    ['water', D.pow(amount, 1.25).times(25)],
+                    ['iron_ingot', D.pow(amount, D.add(1, exps.iron_ingot)).times(7.5)],
+                    ['water', D.pow(amount, D.add(1, exps.water)).times(25)],
                 ];
 
                 const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
@@ -1044,11 +1095,24 @@ addLayer('fr', {
             consumes(amount) {
                 amount = layers.fr.recipes['*'].default_amount(this.id, amount);
 
+                /** @type {Record<items, Decimal>} */
+                const exps = {
+                    'copper_ingot': D(.25),
+                    'gold_ingot': D(.25),
+                };
+
+                Object.entries(exps).forEach(/**@param {[items,Decimal]}*/([item, exp]) => {
+                    if (hasUpgrade('v', 54)) {
+                        exp = exp.times(upgradeEffect('v', 54));
+                    }
+                    exps[item] = exp;
+                });
+
                 /** @type {[items, Decimal][]} */
                 const items = [
                     ['water', D.times(amount, 100)],
-                    ['copper_ingot', D.pow(amount, 1.25).times(50)],
-                    ['gold_ingot', D.pow(amount, 1.25)],
+                    ['copper_ingot', D.pow(amount, D.add(1, exps.copper_ingot)).times(50)],
+                    ['gold_ingot', D.pow(amount, D.add(1, exps.gold_ingot))],
                 ];
 
                 const upg = layers.s.investloans.item_upgrade[this.produces] ?? false;
@@ -1087,6 +1151,8 @@ addLayer('fr', {
 
             gain = gain.add(buyableEffect('fr', 11));
 
+            if (hasUpgrade('v', 23)) gain = gain.add(upgradeEffect('v', 23));
+
             gain = gain.times(tmp.bin.cards.multipliers['fr'] ?? 1);
 
             gain = gain.times(tmp.k.dishes.ice_cream.effect);
@@ -1115,6 +1181,8 @@ addLayer('fr', {
 
             gain = gain.times(tmp.con.condiments['*'].total.fr.cold ?? D.dOne);
 
+            if (hasUpgrade('v', 14)) gain = gain.times(upgradeEffect('v', 14));
+
             const loss = player.fr.points.div(100);
 
             return gain.add(tmp.fr.ice.consumes).minus(loss);
@@ -1139,6 +1207,8 @@ addLayer('fr', {
 
             gain = gain.times(tmp.k.dishes.popsicle.effect);
 
+            if (hasUpgrade('v', 43)) gain = gain.times(upgradeEffect('v', 43));
+
             return gain;
         },
         consumes() { return D.min(player.fr.points, player.lo.items.water.amount).div(100).neg(); },
@@ -1147,6 +1217,15 @@ addLayer('fr', {
     },
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
+
+        if (layer == 'v_soft') {
+            player.fr.points = D.dZero;
+            Object.values(player.fr.recipes).forEach(data => {
+                data.amount_freezing = D.dZero;
+                data.progress = D.dZero;
+            });
+            return;
+        }
 
         const keep = [],
             // Keep amounts being made and automation

@@ -465,6 +465,14 @@ addLayer('l', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
+        if (layer == 'v_soft') {
+            Object.values(player.l.skills).forEach(data => {
+                data.level = D.dZero;
+                data.progress = D.dZero;
+            });
+            return;
+        }
+
         const keep = [];
 
         layerDataReset(this.layer, keep);

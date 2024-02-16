@@ -11,10 +11,11 @@ const listFormat = new Intl.ListFormat('en');
 
 /**
  * @param {keyof Layers} layer
- * @param {'static'|'normal'|'none'|'custom'|null} useType
+ * @param {'static'|'normal'|'none'|'custom'|null} [useType=null]
+ * @param {boolean} [floor=true]
  * @return {Decimal}
  */
-function getResetGain(layer, useType = null) {
+function getResetGain(layer, useType = null, floor = true) {
 	let type = useType
 	if (!useType) {
 		type = tmp[layer].type
@@ -30,11 +31,12 @@ function getResetGain(layer, useType = null) {
 		gain = gain.times(tmp[layer].directMult)
 		return gain.floor().sub(player[layer].points).add(1).max(1);
 	} else if (type == "normal") {
-		if (tmp[layer].baseAmount.lt(tmp[layer].requires)) return decimalZero
+		if (floor && tmp[layer].baseAmount.lt(tmp[layer].requires)) return decimalZero
 		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).pow(tmp[layer].exponent).times(tmp[layer].gainMult).pow(tmp[layer].gainExp)
 		if (gain.gte(tmp[layer].softcap)) gain = gain.pow(tmp[layer].softcapPower).times(tmp[layer].softcap.pow(decimalOne.sub(tmp[layer].softcapPower)))
 		gain = gain.times(tmp[layer].directMult)
-		return gain.floor().max(0);
+		if (floor) gain = gain.floor();
+		return gain.max(0);
 	} else if (type == "custom") {
 		return layers[layer].getResetGain()
 	} else {

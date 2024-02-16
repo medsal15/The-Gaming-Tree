@@ -373,6 +373,19 @@ function updateAchievements(layer) {
 }
 
 /**
+ * @param {keyof Layers} layer
+ * @param {string|number} id
+ */
+function giveAchievement(layer, id) {
+	if (tmp[layer].deactivated) return;
+	if (isPlainObject(layers[layer].achievements[id]) && !(hasAchievement(layer, id))) {
+		player[layer].achievements.push(id);
+		if (layers[layer].achievements[id].onComplete) layers[layer].achievements[id].onComplete();
+		if (tmp[layer].achievementPopups || tmp[layer].achievementPopups === undefined) doPopup("achievement", tmp[layer].achievements[id].name, "Achievement Gotten!", 3, tmp[layer].color);
+	}
+}
+
+/**
  * @param {Number} diff
  * @param {keyof Layers} layer
  */

@@ -9,7 +9,7 @@ addLayer('a', {
             unlocked: true,
         };
     },
-    layerShown() { return hasChallenge('b', 22) && !inChallenge('b', 31); },
+    layerShown() { return hasChallenge('b', 22) && !inChallenge('b', 31) && !hasUpgrade('a', 33); },
     tooltip() { return `${formatWhole(player.lo.items.stardust.amount)} stardust`; },
     color: '#773377',
     nodeStyle: {
@@ -22,7 +22,7 @@ addLayer('a', {
         {
             key: 'A',
             description: 'Shift + A: Display alternator layer',
-            unlocked() { return tmp.s.layerShown; },
+            unlocked() { return tmp.a.layerShown; },
             onPress() { showTab('a'); },
         },
     ],
@@ -527,13 +527,7 @@ addLayer('a', {
         },
     },
     type: 'none',
-    doReset(layer) {
-        if (layers[layer].row <= this.row) return;
-
-        const keep = ['upgrades'];
-
-        layerDataReset(this.layer, keep);
-    },
+    doReset(layer) { },
     branches: [() => tmp.f.layerShown ? 'f' : ['fr', 3]],
     change_efficiency() {
         return D(.5);

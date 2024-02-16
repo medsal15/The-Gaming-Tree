@@ -1,5 +1,6 @@
 'use strict';
 
+//todo change plant aging from list of ages to list of time to wait
 //todo recycle plant seeds into seeds (item)
 addLayer('p', {
     name: 'Plants',
@@ -485,6 +486,8 @@ addLayer('p', {
 
                 mult = mult.times(tmp.k.dishes.grilled_corn.effect);
 
+                if (hasUpgrade('v', 13)) mult = mult.times(upgradeEffect('v', 13));
+
                 return mult;
             },
             grow_mult() {
@@ -495,6 +498,8 @@ addLayer('p', {
                 mult = mult.times(tmp.p.plants.clockberry.effect);
 
                 mult = mult.times(tmp.k.dishes.roasted_eggplant.effect);
+
+                if (hasUpgrade('v', 33)) mult = mult.times(upgradeEffect('v', 33));
 
                 return mult;
             },
@@ -1638,6 +1643,23 @@ addLayer('p', {
     type: 'none',
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
+
+        if (layer == 'v_soft') {
+            const max_seeds = D.add(buyableEffect('lo', 62).t_hold.pow(tmp.a.change_efficiency), buyableEffect('fr', 31).p_hold),
+                hold = Object.entries(player.p.plants).map(([plant, data]) => [plant, {
+                    seeds: D.min(max_seeds, data.seeds),
+                }]);
+            hold.forEach(([plant, data]) => Object.assign(player.p.plants[plant], {
+                dead: D.dZero,
+                harvested: D.dZero,
+                seeds: data.seeds,
+                last_harvest: [],
+                last_harvest_seeds: D.dZero,
+                last_harvest_count: D.dZero,
+            }));
+            player.p.grid = getStartGrid(this.layer);
+            return;
+        }
 
         const keep = ['mode', 'plant', 'infuse_target', 'infuse_item'],
             max_seeds = D.add(buyableEffect('lo', 62).t_hold.pow(tmp.a.change_efficiency), buyableEffect('fr', 31).p_hold),

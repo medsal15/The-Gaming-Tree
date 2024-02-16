@@ -147,11 +147,13 @@ addLayer('c', {
                         return `You have <span style="color:${tmp.c.resources.science.color};font-size:1.5em;">${format(player.c.resources.science.amount)}</span>${gain_str} ${tmp.c.resources.science.name}`;
                     }
                 ],
-                ['row', [
-                    ['display-text', 'Automatically research'],
-                    'blank',
-                    ['toggle', ['c', 'auto_research']]
-                ]],
+                ['row', () => {
+                    if (hasChallenge('b', 21) && tmp.b.layerShown) return [
+                        ['display-text', 'Automatically research'],
+                        'blank',
+                        ['toggle', ['c', 'auto_research']]
+                    ];
+                }],
                 'blank',
                 ['upgrade-tree', [
                     [11],
@@ -1830,6 +1832,8 @@ addLayer('c', {
                 mult = mult.times(tmp.k.dishes.failure.effect);
                 mult = mult.times(tmp.k.dishes.bread.effect);
 
+                if (hasUpgrade('v', 12)) mult = mult.times(upgradeEffect('v', 12));
+
                 return mult;
             },
             item_produce_mult() {
@@ -1851,6 +1855,9 @@ addLayer('c', {
                 mult = mult.times(tmp.k.dishes.failure.effect);
                 mult = mult.times(tmp.k.dishes.bread.effect);
                 mult = mult.div(tmp.k.dishes.french_fries.effect);
+
+                if (hasUpgrade('v', 12)) mult = mult.times(upgradeEffect('v', 12));
+                if (hasUpgrade('v', 32)) mult = mult.times(upgradeEffect('v', 32));
 
                 return mult;
             },
@@ -2792,6 +2799,261 @@ addLayer('c', {
             unlocked() { return hasMilestone('to', 7); },
         },
         // Oil
+        oil_pump: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
+            name: 'oil pump',
+            description() { return layers.c.buildings['*'].description(this.id); },
+            style: {
+                general: {
+                    'background-color'() { return tmp.lo.items.oil.style['background-color']; },
+                },
+                grid: {
+                    'background-image': `url('./resources/images/oil-pump.svg')`,
+                },
+            },
+            produces(amount_placed) {
+                const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
+                    .add(tmp.c.buildings.duplicator.effect[this.id]);
+
+                /** @type {[items, Decimal][]} */
+                const items = [
+                    ['oil', D(1 / 8)],
+                    ['coal', D(1 / 32)],
+                ];
+
+                items.forEach(([item, amount], i) => {
+                    let mult = placed.times(tmp.c.buildings['*'].produce_mult).times(tmp.c.buildings['*'].item_produce_mult);
+
+                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
+                    if (upg && hasUpgrade('s', upg)) {
+                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    } else if (inChallenge('b', 12)) {
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    }
+
+                    items[i][1] = D.times(amount, mult);
+                });
+
+                return {
+                    items,
+                };
+            },
+            consumes(amount_placed) {
+                const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
+                    .add(tmp.c.buildings.duplicator.effect[this.id]);
+
+                /** @type {[items, Decimal][]} */
+                const items = [
+                    ['water', D(1 / 4)],
+                ];
+
+                items.forEach(([item, amount], i) => {
+                    let mult = placed.times(tmp.c.buildings['*'].consume_mult).times(tmp.c.buildings['*'].item_consume_mult);
+
+                    items[i][1] = D.times(amount, mult);
+                });
+
+                return {
+                    items,
+                };
+            },
+            cost(amount_built) {
+                const built = D(amount_built ?? getBuyableAmount('c', this.id));
+
+                /** @type {[items, Decimal][]} */
+                const cost = [
+                    ['iron_ingot', D.pow(1.5, built).times(50)],
+                    ['copper_ingot', D.pow(1.5, built).times(50)],
+                ];
+
+                cost.forEach(([, amount], i) => {
+                    let mult = tmp.c.buildings['*'].cost_mult;
+
+                    cost[i][1] = D.times(amount, mult);
+                });
+
+                return cost;
+            },
+            formulas: {
+                cost: [
+                    ['iron_ingot', '(1.5 ^ built) * 50'],
+                    ['copper_ingot', '(1.5 ^ built) * 50'],
+                ],
+            },
+            unlocked() { return hasUpgrade('v', 25); },
+        },
+        refinery: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
+            name: 'refinery',
+            description() { return layers.c.buildings['*'].description(this.id); },
+            style: {
+                general: {
+                    'background-color'() { return tmp.lo.items.fuel.style['background-color']; },
+                },
+                grid: {
+                    'background-image': `url('./resources/images/refinery.svg')`,
+                },
+            },
+            produces(amount_placed) {
+                const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
+                    .add(tmp.c.buildings.duplicator.effect[this.id]);
+
+                /** @type {[items, Decimal][]} */
+                const items = [
+                    ['fuel', D(1 / 15)],
+                ];
+
+                items.forEach(([item, amount], i) => {
+                    let mult = placed.times(tmp.c.buildings['*'].produce_mult).times(tmp.c.buildings['*'].item_produce_mult);
+
+                    const upg = tmp.s.investloans.item_upgrade[item] ?? false;
+                    if (upg && hasUpgrade('s', upg)) {
+                        mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    } else if (inChallenge('b', 12)) {
+                        mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    }
+
+                    items[i][1] = D.times(amount, mult);
+                });
+
+                return {
+                    items,
+                };
+            },
+            consumes(amount_placed) {
+                const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
+                    .add(tmp.c.buildings.duplicator.effect[this.id]);
+
+                /** @type {[items, Decimal][]} */
+                const items = [
+                    // bronze
+                    ['oil', D(1 / 10)],
+                ],
+                    /** @type {[resources, Decimal][]} */
+                    resources = [['energy', D(1 / 2)]];
+
+                items.forEach(([, amount], i) => {
+                    let mult = placed.times(tmp.c.buildings['*'].consume_mult).times(tmp.c.buildings['*'].item_consume_mult);
+
+                    items[i][1] = D.times(amount, mult);
+                });
+                resources.forEach(([resource, amount], i) => {
+                    let mult = placed.times(tmp.c.buildings['*'].produce_mult)
+                        .times(tmp.c.resources[resource].gain_mult);
+
+                    resources[i][1] = D.times(amount, mult);
+                });
+
+                return {
+                    items,
+                    resources,
+                };
+            },
+            cost(amount_built) {
+                const built = D(amount_built ?? getBuyableAmount('c', this.id));
+
+                /** @type {[items, Decimal][]} */
+                const cost = [
+                    ['steel_ingot', D.pow(1.5, built).times(10)],
+                    ['bronze_ingot', D.pow(1.5, built).times(10)],
+                ];
+
+                cost.forEach(([, amount], i) => {
+                    let mult = tmp.c.buildings['*'].cost_mult;
+
+                    cost[i][1] = D.times(amount, mult);
+                });
+
+                return cost;
+            },
+            formulas: {
+                cost: [
+                    ['steel_ingot', '(1.5 ^ built) * 10'],
+                    ['bronze_ingot', '(1.5 ^ built) * 10'],
+                ],
+            },
+            unlocked() { return hasUpgrade('v', 35); },
+        },
+        fuel_generator: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.c.buildings).find(item => layers.c.buildings[item] == this); },
+            name: 'fuel generator',
+            description() { return layers.c.buildings['*'].description(this.id); },
+            style: {
+                general: {
+                    'background-color'() { return tmp.lo.items.fuel.style['background-color']; },
+                },
+                grid: {
+                    'background-image': `url('./resources/images/electric.svg')`,
+                },
+            },
+            produces(amount_placed) {
+                const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
+                    .add(tmp.c.buildings.duplicator.effect[this.id]);
+
+                /** @type {[keyof typeof player.c.resources, Decimal][]} */
+                const resources = [['energy', D(1 / 2)]];
+
+                resources.forEach(([resource, amount], i) => {
+                    let mult = placed.times(tmp.c.buildings['*'].produce_mult)
+                        .times(tmp.c.resources[resource].gain_mult);
+
+                    if (hasUpgrade('c', 63)) mult = mult.times(upgradeEffect('c', 63));
+
+                    resources[i][1] = D.times(amount, mult);
+                });
+
+                return {
+                    resources,
+                };
+            },
+            consumes(amount_placed) {
+                const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
+                    .add(tmp.c.buildings.duplicator.effect[this.id]);
+
+                /** @type {[items, Decimal][]} */
+                const items = [['fuel', D(1 / 2)]];
+
+                items.forEach(([item, amount], i) => {
+                    let mult = placed.times(tmp.c.buildings['*'].consume_mult).times(tmp.c.buildings['*'].item_consume_mult);
+
+                    if (hasUpgrade('c', 63)) mult = mult.times(upgradeEffect('c', 63));
+
+                    if (item == 'coal') mult = mult.div(buyableEffect('fr', 22));
+
+                    items[i][1] = D.times(amount, mult);
+                });
+
+                return {
+                    items,
+                };
+            },
+            cost(amount_built) {
+                const built = D(amount_built ?? getBuyableAmount('c', this.id));
+
+                /** @type {[items, Decimal][]} */
+                const cost = [
+                    ['stone_brick', D.pow(1.5, built).times(100)],
+                    ['steel_ingot', D.pow(1.25, built).times(25)],
+                ];
+
+                cost.forEach(([, amount], i) => {
+                    let mult = tmp.c.buildings['*'].cost_mult;
+
+                    if (hasUpgrade('c', 73)) mult = mult.times(upgradeEffect('c', 73));
+
+                    cost[i][1] = D.times(amount, mult);
+                });
+
+                return cost;
+            },
+            formulas: {
+                cost: [['stone_brick', '(1.5 ^ built) * 100'], ['steel_ingot', '(1.25 ^ built) * 25']],
+            },
+            unlocked() { return hasUpgrade('v', 45); },
+        },
         /**
          * TODO
          *
@@ -2799,9 +3061,6 @@ addLayer('c', {
          * Factory -> crafts
          * Shop -> auto sells
          *
-         * Oil Well -> oil + coal
-         * Refinery -> energy + oil => fuel
-         * Fuel Generator -> fuel => energy
          * Launch Pad -> fuel => research + stardust
          */
     },
@@ -2972,6 +3231,12 @@ addLayer('c', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
+        if (layer == 'v_soft') {
+            Object.keys(player.c.resources).forEach(res => player.c.resources[res] = { amount: D.dZero, });
+            player.c.floors = [{}];
+            return;
+        }
+
         /** @type {(keyof player['c'])[]} */
         const keep = [],
             max_ups = D.add(buyableEffect('lo', 23).m_hold.pow(tmp.a.change_efficiency), buyableEffect('fr', 33).c_hold).floor(),
@@ -2985,5 +3250,5 @@ addLayer('c', {
         player.c.floors = [{}];
     },
     branches: [() => tmp.k.layerShown ? 'k' : ['lo', 3]],
-    autoUpgrade() { return hasChallenge('b', 21) && player.c.auto_research && player.c.unlocked; },
+    autoUpgrade() { return hasChallenge('b', 21) && tmp.b.layerShown && player.c.auto_research && player.c.unlocked; },
 });

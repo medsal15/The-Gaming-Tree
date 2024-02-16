@@ -578,6 +578,8 @@ addLayer('to', {
 
             mult = mult.times(tmp.con.condiments['*'].total.to.material_cost ?? D.dOne);
 
+            if (hasUpgrade('v', 41)) mult = mult.div(upgradeEffect('v', 41));
+
             return mult;
         },
         low() {
@@ -678,6 +680,8 @@ addLayer('to', {
         let start = D.div(12.5, tmp.to.gainMult),
             ratio = D(2);
 
+        if (hasUpgrade('v', 51)) ratio = ratio.minus(upgradeEffect('v', 51));
+
         let max_gain = D.affordGeometricSeries(tmp.to.baseAmount, start, ratio, player.to.points);
 
         if (!tmp.to.canBuyMax) max_gain = max_gain.min(1);
@@ -689,6 +693,8 @@ addLayer('to', {
 
         let start = D.div(12.5, tmp.to.gainMult),
             ratio = D(2);
+
+        if (hasUpgrade('v', 51)) ratio = ratio.minus(upgradeEffect('v', 51));
 
         if (!canMax) {
             return player.to.points.pow_base(ratio).times(start);
@@ -708,15 +714,25 @@ addLayer('to', {
                 .filter(id => !['layer', 'rows', 'cols'].includes(id))
                 .forEach(id => setBuyableAmount('to', id, D.dZero));
             player.to.random = randomize_tower_materials();
-        } else if (tmp[layer].row > this.row) {
-            const milestones = [];
-            if (hasMilestone('to', 3)) milestones.push(3);
-            if (hasMilestone('to', 7)) milestones.push(7);
-
-            layerDataReset(this.layer);
-
-            player.to.milestones.push(...milestones);
+            return;
         }
+        if (tmp[layer].row <= this.row) return
+
+        if (layer == 'v_soft') {
+            Object.keys(tmp.to.buyables)
+                .filter(id => !['layer', 'rows', 'cols'].includes(id))
+                .forEach(id => setBuyableAmount('to', id, D.dZero));
+            player.to.random = randomize_tower_materials();
+            return;
+        }
+
+        const milestones = [];
+        if (hasMilestone('to', 3)) milestones.push(3);
+        if (hasMilestone('to', 7)) milestones.push(7);
+
+        layerDataReset(this.layer);
+
+        player.to.milestones.push(...milestones);
     },
     prestigeNotify() { return canReset('to') || canAffordLayerBuyable('to'); },
     gainMult() {
@@ -728,6 +744,20 @@ addLayer('to', {
 
         mult = mult.times(tmp.con.condiments['*'].total.to.floor_cost ?? D.dOne);
 
+        if (hasUpgrade('v', 21)) mult = mult.times(upgradeEffect('v', 21));
+
         return mult;
+    },
+    automate() {
+        // Some resets may give locked materials.
+        /** @type {[number, 'low'|'medium'|'high'][]} */
+        const same = [
+            [0, 'low'],
+            [1, 'medium'],
+            [2, 'high'],
+        ];
+        if (same.some(([i, r]) => !(player.to.random[i] in tmp.to.materials[r]))) {
+            player.to.random = randomize_tower_materials();
+        }
     },
 });

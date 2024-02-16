@@ -94,32 +94,73 @@ function itemColor(item, text, style = "") {
     return `<span style="color:${color};text-shadow:${color} 0 0 10px;${style}">${text}</span>`;
 }
 /**
- * Like format, but returns an array of each coin types, limited to 100.
+ * Like format, but returns an array of smaller numbers
  *
- * If the highest coin type is above 1e9, it will be the only one returned.
- *
- * @param {DecimalSource} decimal
- * @param {number} coin_types Amount of coin types
+ * @param {DecimalSource} decimal Number to format
+ * @param {number} group_size Maximum of a group. **Must be a number!**
+ * @param {number} max_groups Maximum amount of groups, the last group will ignore `group_size`. **Must be a number!**
  * @returns {string[]}
  */
-function formatCoins(decimal, coin_types) {
-    if (!coin_types) return [format(decimal)];
+function formatGroups(decimal, group_size, max_groups) {
+    if (!max_groups || group_size <= 0) return [format(decimal)];
 
-    let d = new Decimal(decimal);
-    const limit = new Decimal(100).pow(coin_types).times(1e9);
-
-    if (d.gte(limit)) {
-        const arr = new Array(coin_types - 1).fill("0");
-        arr.push(format(d.div(limit)));
+    // If decimal is bigger than that, we just return a mostly empty array
+    const limit = D.pow(group_size, max_groups).times(1e9);
+    if (D.gte(decimal, limit)) {
+        const arr = Array.from({ length: max_groups - 1 }, (_, i) => '0');
+        arr.push(formatWhole(D.div(decimal, limit)));
         return arr;
     }
 
-    return new Array(coin_types).fill(0).map((_, i) => {
-        if (i == coin_types - 1) return formatWhole(d);
-        let c = d.toNumber() % 100;
-        d = d.div(100).floor();
-        return formatWhole(c);
+    return Array.from({ length: max_groups }, (_, i) => {
+        if (i == max_groups - 1) return formatWhole(decimal);
+
+        let group = D(decimal).toNumber() % group_size;
+        decimal = D.div(decimal, group_size).floor();
+        if (i == 0) return format(group);
+        return formatWhole(group);
     });
+}
+/**
+ * @param {DecimalSource} chance
+ */
+function format_chance(chance) {
+    if (D.gte(chance, 1) || options.noRNG) return `+${format(chance)}`;
+    if (D.lte(chance, 0)) return format(0);
+
+    const fractional = options.chanceMode == 'NOT_GUARANTEED' || (options.chanceMode == 'LESS_HALF' && D.lt(chance, .5));
+
+    if (fractional) {
+        return `1/${format(D.pow(chance, -1))}`;
+    } else {
+        return `${format(D.times(chance, 100))}%`;
+    }
+}
+/**
+ * @param {DecimalSource} amount
+ * @param {string[]} types
+ * @param {string[]} [styles=[]] Style for each coin type, may be omitted for no style
+ */
+function format_coins_split(amount, types, styles = []) {
+    const coins = formatGroups(amount, 100, types.length)
+        .map(/**@return{[string,number]}*/(form, i) => [form, i])
+        .filter(([form]) => (+form) > 0);
+    if (!coins.length) coins.push(['0', 0]);
+
+    const lines = coins.map(([form, i]) => {
+        let style = styles[i] ?? '';
+        return `<span style="${style}">${form}</span> ${types[i]}`;
+    }).reverse();
+
+    return lines;
+}
+/**
+ * @param {DecimalSource} amount
+ * @param {string[]} types
+ * @param {string[]} [styles=[]] Style for each coin type, may be omitted for no style
+ */
+function format_coins(amount, types, styles = []) {
+    return listFormat.format(format_coins_split(amount, types, styles));
 }
 /**
  * Shorthand for Decimal and shorter way to create one
@@ -497,21 +538,6 @@ function get_monster_drops(monster, kills) {
     }
 }
 /**
- * @param {DecimalSource} chance
- */
-function format_chance(chance) {
-    if (D.gte(chance, 1) || options.noRNG) return `+${format(chance)}`;
-    if (D.lte(chance, 0)) return format(0);
-
-    const fractional = options.chanceMode == 'NOT_GUARANTEED' || (options.chanceMode == 'LESS_HALF' && D.lt(chance, .5));
-
-    if (fractional) {
-        return `1/${format(D.pow(chance, -1))}`;
-    } else {
-        return `${format(D.times(chance, 100))}%`;
-    }
-}
-/**
  * @param {`${drop_sources}:${string}`} type
  */
 function type_name(type) {
@@ -684,5 +710,92 @@ function rarity_color(rarity, text, style = '') {
     const rar = tmp.v.rarities[rarity];
     return `<span style="color:${rar.color};${style}">${text}</span>`;
 }
-//todo random_rarity_items
-//todo random_rarity_upgrade
+/**
+ * @param {string} entry
+ */
+function show_shop_row_item(entry) {
+    const tment = tmp.v.items[entry],
+        /** @type {Player['v']['entries'][rarities]['items'][number]?} */
+        plent = player.v.entries[tment?.rarity]?.items.find(([id]) => id == entry);
+
+    if (!plent || !tment) return;
+
+    return [
+        [['clickable', `item_${entry}_display`]],
+        [['display-text', format(plent[1])]],
+        [['display-text', format_coins(plent[2], layers.s.coins.names.map(name => `${name} coins`))]],
+        [['clickable', `item_${entry}_buy`]],
+    ];
+}
+/**
+ * @param {number} id
+ */
+function show_shop_row_upgrade(id) {
+    if (!id || !tmp.v.upgrades[id].unlocked) return;
+
+    const upg = tmp.v.upgrades[id];
+
+    return [
+        [['upgrade', id]],
+        [['display-text', upg.description]],
+        [['display-text', format_coins(upg.cost, layers.s.coins.names.map(name => `${name} coins`))]],
+        [],
+    ];
+}
+/**
+ * @param {rarities} rarity
+ * @returns {[string, Decimal, Decimal][]}
+ */
+function random_rarity_items(rarity) {
+    const valid = Object.keys(layers.v.items)
+        .filter(item => tmp.v.items[item].rarity == rarity)
+        // shuffle
+        //todo support noRNG
+        .sort(() => .5 - Math.random()),
+        tmprarity = tmp.v.rarities[rarity],
+        amount = D.minus(tmprarity.amount.max, tmprarity.amount.min).times(Math.random()).add(tmprarity.amount.min).floor().toNumber(),
+        entries = valid.slice(0, amount);
+
+    return entries.map(entry => {
+        const temptry = tmp.v.items[entry];
+
+        let amount, cost;
+        if (options.noRNG) {
+            amount = D.add(temptry.amount.max, temptry.amount.min).div(2).times(tmp.v.items['*'].amount_mult).floor();
+            cost = D.add(temptry.cost.max, temptry.cost.min).div(2).times(tmp.v.items['*'].cost_mult);
+        } else {
+            let amount_range = D.minus(temptry.amount.max, temptry.amount.min);
+            amount = D.times(Math.random(), amount_range).add(temptry.amount.min).times(tmp.v.items['*'].amount_mult).floor();
+            let cost_range = D.minus(temptry.cost.max, temptry.cost.min);
+            cost = D.times(Math.random(), cost_range).add(temptry.cost.min).times(tmp.v.items['*'].cost_mult);
+        }
+
+        return [entry, amount, cost];
+    });
+}
+/**
+ * @param {rarities} rarity
+ */
+function random_rarity_upgrade(rarity) {
+    let i;
+    switch (rarity) {
+        case 'common':
+            i = 10;
+            break;
+        case 'uncommon':
+            i = 20;
+            break;
+        case 'rare':
+            i = 30;
+            break;
+        case 'epic':
+            i = 40;
+            break;
+        case 'legendary':
+            i = 50;
+            break;
+    }
+
+    //todo support noRNG
+    return i + Math.floor(Math.random() * 5) + 1;
+}

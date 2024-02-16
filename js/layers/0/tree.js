@@ -1021,6 +1021,16 @@ addLayer('t', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
+        if (layer == 'v_soft') {
+            Object.keys(player.t.trees).forEach(tree => player.t.trees[tree] = {
+                amount: D.dZero,
+                health: D.dZero,
+                last_drops: [],
+                last_drops_times: D.dZero,
+            });
+            return;
+        }
+
         const keep = ['convert', 'short_mode', 'focus'],
             max_ups = D.add(buyableEffect('lo', 62).t_hold, buyableEffect('fr', 31).p_hold.pow(tmp.a.change_efficiency)).floor(),
             kept_ups = [...player.t.upgrades];

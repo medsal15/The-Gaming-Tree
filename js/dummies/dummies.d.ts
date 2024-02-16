@@ -1744,6 +1744,7 @@ declare class LayerData {
     resetTime?: number
     upgrades?: number[]
     milestones?: number[]
+    achievements?: number[]
     activeChallenge?: number | null
     buyables?: { [id: number]: Decimal }
     challenges?: { [id: number]: number }
@@ -1762,7 +1763,7 @@ type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
     'wheat' | 'corn' | 'strawberry' | 'potato' | 'eggplant' | 'egg' |
     'water' | 'ice' |
     'icestone' | 'rust_ingot' |
-    'oil' | //'fuel'|
+    'oil' | 'fuel' |
     'stardust' | 'holy_water';
 type temperatures = 'none' | 'low' | 'medium' | 'high' | 'burning';
 type dishes = 'failure' |
@@ -2190,12 +2191,10 @@ type Layers = {
     b: Layer<'b'> & {}
     s: Layer<'s'> & {
         coins: {
-            /** List of coins */
-            types: [name: string, color: string][]
-            /** Default format coin method which returns a string with the amount of every coin type */
-            format(amount?: DecimalSource, color?: boolean, split?: false): string
-            /** Alternate format coin method that splits coin types in their own entry */
-            format(amount?: DecimalSource, color?: boolean, split: true): string[]
+            /** List of coin names */
+            names: string[]
+            /** List of coin colors */
+            colors: string[]
         }
         investloans: {
             /**
@@ -2562,6 +2561,7 @@ type Layers = {
         materials: {
             cost_mult(): Decimal
         } & {
+            //todo use unlock instead of computable
             [type in 'low' | 'medium' | 'high']: Computable<{
                 [item in items]: {
                     base: DecimalSource
@@ -2682,6 +2682,11 @@ type Layers = {
                 groups: dish_groups[]
             }
         }
+        groups: {
+            [group in dish_groups]: {
+                name: string
+            }
+        }
     }
     fr: Layer<'fr'> & {
         buyables: Layer<'fr'>['buyables'] & {
@@ -2768,12 +2773,10 @@ type Layers = {
                 amount_mult(): Decimal
                 /** Multiplies cost of items being sold */
                 cost_mult(): Decimal
+                regex: RegExp
             }
         } & {
-            //todo support dishes
             [entry: string]: {
-                /** @deprecated */
-                item: items
                 merch: {
                     type: 'item'
                     item: items
@@ -2809,13 +2812,15 @@ type Layers = {
                     min: Computable<DecimalSource>
                 }
                 color: string
+                /** Chance to get an upgrade */
+                upgrade_chance: number
             }
         }
-        /** Time between refreshes */
+        /** Time between refreshes, in seconds */
         time: {
             '*': {
                 /** Divides time between refreshes */
-                time_div(): Decimal
+                time_mult(): Decimal
             }
             specific: Computable<Decimal>
         } & {
@@ -2823,6 +2828,9 @@ type Layers = {
         }
         upgrades: { [id: string]: Upgrade<'v'> & { rarity: rarities } }
     }
+    sp: Layer<'sp'> & {}
+    // Hidden, for vending soft resets
+    v_soft: Layer<'v_soft'>
     // Special
     star: Layer<'star'> & {
         star: {
@@ -3234,11 +3242,14 @@ type Player = {
             group: dish_groups
         } & {
             [rarity in rarities]: {
-                items: [item: items, amount: Decimal, cost: Decimal][]
+                items: [entry: string, amount: Decimal, cost: Decimal][]
                 upgrades: number[]
             }
         }
+        buy: Decimal
     }
+    v_soft: LayerData
+    sp: LayerData
     // Special
     star: LayerData & {
         targets: number[]

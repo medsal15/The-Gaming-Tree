@@ -58,6 +58,7 @@ function getStartPlayer() {
 	}
 	return playerdata;
 }
+/** @param {keyof Layers} layer */
 function getStartLayerData(layer) {
 	let layerdata = {};
 	if (layers[layer].startData)
@@ -89,6 +90,7 @@ function getStartLayerData(layer) {
 
 	return layerdata;
 }
+/** @param {keyof Layers} layer */
 function getStartBuyables(layer) {
 	let data = {};
 	if (layers[layer].buyables) {
@@ -98,6 +100,7 @@ function getStartBuyables(layer) {
 	}
 	return data;
 }
+/** @param {keyof Layers} layer */
 function getStartClickables(layer) {
 	let data = {};
 	if (layers[layer].clickables) {
@@ -107,6 +110,7 @@ function getStartClickables(layer) {
 	}
 	return data;
 }
+/** @param {keyof Layers} layer */
 function getStartChallenges(layer) {
 	let data = {};
 	if (layers[layer].challenges) {
@@ -116,6 +120,7 @@ function getStartChallenges(layer) {
 	}
 	return data;
 }
+/** @param {keyof Layers} layer */
 function getStartGrid(layer) {
 	let data = {};
 	if (!layers[layer].grid) return data

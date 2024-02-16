@@ -4291,7 +4291,57 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/drop.svg')`,
                 'background-color': '#000000',
             },
-            unlocked() { return hasMilestone('to', 6) || tmp.fr.layerShown; },
+            unlocked() { return tmp.v.layerShown; },
+        },
+        fuel: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1202,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                per_second() {
+                    const per_second = {};
+
+                    if (tmp.c.layerShown) {
+                        const buildings = tmp.c.buildings;
+                        Object.keys(buildings).forEach(building => {
+                            if (building == '*' || !(buildings[building].unlocked ?? true)) return;
+
+                            const build = buildings[building];
+                            /** @type {false|Decimal} */
+                            let gain = false;
+
+                            if (build.produces && 'items' in build.produces && Array.isArray(build.produces.items)) {
+                                const entry = build.produces.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.add(gain, entry[1]);
+                                }
+                            }
+
+                            if (build.consumes && 'items' in build.consumes && Array.isArray(build.consumes.items)) {
+                                const entry = build.consumes.items.find(([item]) => item == this.id);
+                                if (entry) {
+                                    gain = D.minus(gain, entry[1]);
+                                }
+                            }
+
+                            if (gain) {
+                                per_second[`building:${building}`] = gain;
+                            }
+                        });
+                    }
+
+                    return per_second;
+                },
+                total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+            },
+            name: 'fuel',
+            style: {
+                'background-image': `url('./resources/images/drop.svg')`,
+                'background-color': '#FFBB00',
+            },
+            unlocked() { return tmp.v.layerShown; },
         },
         // Special
         holy_water: {
@@ -4341,6 +4391,13 @@ addLayer('lo', {
     branches: [() => tmp.xp.layerShown ? 'xp' : ['xp_alt', 3]],
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
+
+        if (layer == 'v_soft') {
+            Object.entries(player.lo.items).forEach(/**@param {[items, {amount: Decimal}]}*/([item, data]) => {
+                if (item != 'stardust') data.amount = D.dZero;
+            });
+            return;
+        }
 
         const keep = ['shown'],
             stardust = D(player.lo.items.stardust.amount);

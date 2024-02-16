@@ -825,7 +825,13 @@ addLayer('m', {
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 
-        const keep = ['show_deep', 'mode', 'short_mode'],
+        if (layer == 'v_soft') {
+            player.m.health = D.dZero;
+            player.m.last_drops_times = D.dZero;
+            return;
+        }
+
+        const keep = ['show_deep', 'mode', 'short_mode', 'auto_upgrade'],
             max_ups = D.add(buyableEffect('lo', 23).m_hold, buyableEffect('fr', 33).c_hold.pow(tmp.a.change_efficiency)).floor(),
             kept_ups = [...player.m.upgrades];
 

@@ -161,11 +161,14 @@ addLayer('xp_alt', {
 
                     return ['display-text', `You will unlock a new upgrades at ${formatWhole(next[1])} kills`];
                 },
-                () => hasChallenge('b', 12) ? ['row', [
-                    ['display-text', 'Automatically buy upgrades'],
-                    'blank',
-                    ['toggle', ['xp_alt', 'auto_upgrade']],
-                ]] : undefined,
+                () => {
+                    if (hasChallenge('b', 12) && tmp.b.layerShown)
+                        return ['row', [
+                            ['display-text', 'Automatically buy upgrades'],
+                            'blank',
+                            ['toggle', ['xp_alt', 'auto_upgrade']],
+                        ]];
+                },
                 'blank',
                 ['upgrades', [1, 2, 3, 4, 5]],
             ],
@@ -613,6 +616,8 @@ addLayer('xp_alt', {
 
                 mult = mult.times(tmp.k.dishes.cake.effect);
 
+                if (hasUpgrade('v', 11)) mult = mult.times(upgradeEffect('v', 11));
+
                 return mult;
             },
             difficulty_add() {
@@ -641,6 +646,8 @@ addLayer('xp_alt', {
                 mult = mult.times(tmp.k.dishes.fried_eggs.effect.prod);
 
                 mult = mult.times(buyableEffect('fr', 33).monster);
+
+                if (hasUpgrade('v', 31)) mult = mult.times(upgradeEffect('v', 31).produce);
 
                 return mult;
             },
@@ -1103,6 +1110,16 @@ addLayer('xp_alt', {
     doReset(layer, force = false) {
         if (!force && layers[layer].row <= this.row) return;
 
+        if (layer == 'v_soft') {
+            Object.keys(player.xp_alt.monsters).forEach(type => player.xp_alt.monsters[type] = {
+                progress: D.dZero,
+                last_drops: [],
+                last_drops_times: D.dZero,
+                tamed: D.dZero,
+            });
+            return;
+        }
+
         /** @type {(keyof player['xp_alt'])[]} */
         const keep = ['type'],
             max_ups = D.add(buyableEffect('lo', 12).xp_hold.pow(tmp.a.change_efficiency), buyableEffect('fr', 32).xp_hold).floor(),
@@ -1156,5 +1173,5 @@ addLayer('xp_alt', {
         }
         if (!(tmp.xp_alt.monsters[player.xp_alt.type].unlocked ?? true)) player.xp_alt.type = 'slime';
     },
-    autoUpgrade() { return player.xp_alt.auto_upgrade && hasChallenge('b', 12) && player.xp_alt.unlocked; },
+    autoUpgrade() { return player.xp_alt.auto_upgrade && hasChallenge('b', 12) && tmp.b.layerShown && player.xp_alt.unlocked; },
 });

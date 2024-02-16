@@ -231,7 +231,7 @@ addLayer('clo', {
             costDisplay() {
                 if (!player.s.unlocked) return 'Cost: Unknown';
 
-                return layers.s.coins.format(this.cost, false);
+                return format_coins(this.cost, layers.s.coins.names.map(name => `${name} coins`));
             },
             cost: D(100),
             canAfford() { return !inChallenge('b', 51) && player.s.points.gte(this.cost); },
@@ -713,7 +713,7 @@ addLayer('clo', {
 
                     return `Your ${formatWhole(getBuyableAmount(this.layer, this.id))} money gears\
                     increase time speed by ${format(buyableEffect(this.layer, this.id))}<br><br>\
-                    Cost: ${layers.s.coins.format(cost, false)}`;
+                    Cost: ${format_coins(cost, layers.s.coins.names.map(name => `${name} coins`))}`;
                 } else {
                     let effect_formula = 'amount / 15',
                         cost_formula = '(2 ^ amount) * 100';
@@ -1113,7 +1113,7 @@ addLayer('clo', {
         const alt = [
             'xp_alt', 'c', 'p',
             'to', 'k', 'fr',
-            //'bl', 'v', 'sp', 'yy',
+            'bl', 'v', //'sp', 'yy',
         ];
 
         if (alt.includes(layer)) speed = speed.pow(tmp.a.change_efficiency);

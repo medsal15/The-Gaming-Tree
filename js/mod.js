@@ -36,7 +36,7 @@ let modInfo = {
 		'alternate/side/successes.js', 'alternate/side/time_cubes.js', 'alternate/side/bingo.js', 'alternate/side/condiments.js',
 		'alternate/0/experience.js', 'alternate/0/city.js', 'alternate/0/plants.js',
 		'alternate/1/tower.js', 'alternate/1/kitchen.js', 'alternate/1/freezer.js',
-		'alternate/2/blessing.js', 'alternate/2/vending.js',
+		'alternate/2/blessing.js', 'alternate/2/vending.js', 'alternate/2/splitter.js',
 	],
 	/**
 	 * If you have a Discord server or other discussion place, you can add a link to it.
@@ -82,8 +82,8 @@ let VERSION = {
  */
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.C</h3><br>
-		- Added 3 new layers.<br>
-		- Update endgame: Alternate all non-alternator layers.<br>
+		- Added 4 new layers.<br>
+		- Update endgame: Alternate the Alternator.<br>
 	<h3>v0.B.1</h3><br>
 		- Fixed a bug with the Freezer.<br>
 	<h3>v0.B</h3><br>

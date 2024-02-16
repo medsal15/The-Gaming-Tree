@@ -1561,6 +1561,17 @@ addLayer('xp', {
     doReset(layer, force = false) {
         if (!force && layers[layer].row <= this.row) return;
 
+        if (layer == 'v_soft') {
+            Object.keys(player.xp.enemies).forEach(type => player.xp.enemies[type] = {
+                health: tmp.xp.enemies[type].health,
+                last_drops: [],
+                last_drops_times: D.dZero,
+                kills: D.dZero,
+                element: layers.mag.elements['*'].element(type),
+            });
+            return;
+        }
+
         /** @type {(keyof player['xp'])[]} */
         const keep = ['type'],
             max_ups = D.add(buyableEffect('lo', 12).xp_hold, buyableEffect('fr', 32).xp_hold.pow(tmp.a.change_efficiency)).floor(),

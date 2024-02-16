@@ -531,6 +531,7 @@ addLayer('f', {
                     .reduce((sum, [_, fuel]) => D.add(sum, fuel.consuming), D.dZero);
             },
         },
+        //todo add oil & fuel
         coal: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.f.fuels).find(fuel => layers.f.fuels[fuel] == this); },
@@ -1338,6 +1339,15 @@ addLayer('f', {
     },
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
+
+        if (layer == 'v_soft') {
+            player.f.points = D.dZero;
+            Object.values(player.f.recipes).forEach(data => {
+                data.amount_smelting = D.dZero;
+                data.progress = D.dZero;
+            });
+            return;
+        }
 
         const keep = ['alloys'],
             // Keep amounts being made and automation

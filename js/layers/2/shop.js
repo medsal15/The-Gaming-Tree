@@ -12,13 +12,11 @@ addLayer('s', {
         };
     },
     tooltip() {
+        const coins = tmp.s.coins;
         if (player.s.short_mode) {
-            /** @type {[string, number][]} */
-            const coins = formatCoins(player.s.points, layers.s.coins.types.length).map((c, i) => [c, i]).filter(([c]) => (+c) > 0);
-            if (!coins.length) coins.push(['0', 0]);
-            return coins.map(([c, i]) => `<span style="color:${layers.s.coins.types[i][1]};">${c}</span>`).join(' | ');
+            return format_coins_split(player.s.points, coins.names.map(() => ''), coins.colors.map(color => `color: ${color};`)).join(' | ');
         } else {
-            return layers.s.coins.format(player.s.points, false, true).join('<br>');
+            return format_coins_split(player.s.points, coins.names.map(name => `${name} coins`)).join('<br>');
         }
     },
     layerShown() { return (inChallenge('b', 12) || player.s.unlocked) && !tmp.s.deactivated; },
@@ -43,7 +41,11 @@ addLayer('s', {
     tabFormat: {
         'Upgrades': {
             content: [
-                ['display-text', () => `You have ${tmp.s.coins.format}`],
+                ['display-text', () => {
+                    const coins = tmp.s.coins,
+                        text = format_coins(player.s.points, coins.names.map(name => `${name} coins`), coins.colors.map(color => `color: ${color}; font-size: 1.5em; text-shadow: ${color} 0 0 10px;`));
+                    return `You have ${text}`;
+                }],
                 'prestige-button',
                 ['display-text', () => `Your items have ${format(tmp.s.baseAmount)} total value`],
                 'blank',
@@ -63,7 +65,11 @@ addLayer('s', {
         },
         'Loans': {
             content: [
-                ['display-text', () => `You have ${tmp.s.coins.format}`],
+                ['display-text', () => {
+                    const coins = tmp.s.coins,
+                        text = format_coins(player.s.points, coins.names.map(name => `${name} coins`), coins.colors.map(color => `color: ${color}; font-size: 1.5em; text-shadow: ${color} 0 0 10px;`));
+                    return `You have ${text}`;
+                }],
                 'prestige-button',
                 'blank',
                 ['display-text', () => {
@@ -136,7 +142,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         42: {
             title() {
@@ -162,7 +168,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return tmp.xp.layerShown; },
         },
         43: {
@@ -189,7 +195,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return tmp.l.layerShown; },
         },
         51: {
@@ -216,7 +222,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         52: {
             title() {
@@ -242,7 +248,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         53: {
             title() {
@@ -268,7 +274,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         61: {
             title() {
@@ -294,7 +300,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         62: {
             title() {
@@ -320,7 +326,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         63: {
             title() {
@@ -346,7 +352,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         71: {
             title() {
@@ -372,7 +378,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         72: {
             title() {
@@ -398,7 +404,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         73: {
             title() {
@@ -424,7 +430,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         81: {
             title() {
@@ -460,7 +466,7 @@ addLayer('s', {
 
                 return { width };
             },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
         },
         91: {
             title() {
@@ -486,7 +492,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return hasChallenge('b', 32) || inChallenge('b', 32); },
         },
         92: {
@@ -513,7 +519,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return hasChallenge('b', 32) || inChallenge('b', 32); },
         },
         101: {
@@ -540,7 +546,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.m.show_deep; },
         },
         102: {
@@ -567,7 +573,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return hasChallenge('b', 32) || inChallenge('b', 32); },
         },
         103: {
@@ -594,7 +600,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.m.show_deep; },
         },
         111: {
@@ -621,7 +627,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.t.layerShown; },
         },
         112: {
@@ -648,7 +654,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && (tmp.t.layerShown || tmp.c.layerShown); },
         },
         113: {
@@ -675,7 +681,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && (tmp.t.layerShown || tmp.c.layerShown); },
         },
         121: {
@@ -702,7 +708,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         122: {
@@ -729,7 +735,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
         },
         123: {
@@ -756,7 +762,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && player.f.alloys; },
         },
         131: {
@@ -783,7 +789,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         132: {
@@ -810,7 +816,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         133: {
@@ -837,7 +843,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         141: {
@@ -864,7 +870,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         142: {
@@ -891,7 +897,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.f.layerShown; },
         },
         143: {
@@ -918,7 +924,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && tmp.lo.items.holy_water.unlocked; },
         },
         151: {
@@ -945,7 +951,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && hasChallenge('b', 21); },
         },
         152: {
@@ -972,7 +978,7 @@ addLayer('s', {
                 }
             },
             cost() { return powerRound(D(1.5).pow(layers.s.investloans.amount(true)), 100); },
-            costDisplay() { return `Cost: ${layers.s.coins.format(tmp[this.layer].upgrades[this.id].cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(tmp[this.layer].upgrades[this.id].cost, layers.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return (hasChallenge('b', 32) || inChallenge('b', 32)) && hasChallenge('b', 21); },
         },
         //#endregion Loans/Investments
@@ -981,7 +987,7 @@ addLayer('s', {
             title: 'Mining Map',
             description: 'Mining chance is rooted, and it can go above 1',
             cost: D.dOne,
-            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             effect() {
                 let root = D(3);
 
@@ -1001,7 +1007,7 @@ addLayer('s', {
                 return `Formula: ${formula}`;
             },
             cost: D(2),
-            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             effect() {
                 let mult = player.l.points.add(1).root(2);
 
@@ -1019,7 +1025,7 @@ addLayer('s', {
                 return `Formula: ${formula}`;
             },
             cost: D(5),
-            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             effect() {
                 let mult = D(.95).pow(player.s.upgrades.filter(id => !layers.s.investloans.is_upg_loan(id)).length);
 
@@ -1037,7 +1043,7 @@ addLayer('s', {
                 return `Formula: ${formula}`;
             },
             cost: D(10),
-            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             effect() {
                 let mult = player.s.points.max(0).add(8).log(8);
 
@@ -1054,13 +1060,13 @@ addLayer('s', {
                 Changes the effect of ${layerColor('lo', tmp.lo.upgrades[11].title)} and ${layerColor('m', tmp.m.upgrades[33].title)}'s formula`;
             },
             cost: D(25),
-            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
         },
         23: {
             title: 'Book of Skills',
             description: 'Skill points are stronger',
             cost: D(50),
-            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             effect() {
                 let mult = D(2);
 
@@ -1082,7 +1088,7 @@ addLayer('s', {
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))} value`; },
             cost: D(100),
-            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
         },
         32: {
             title: 'Cash Shop',
@@ -1096,7 +1102,7 @@ addLayer('s', {
             effect() { return tmp.s.investloans.amount.add(2).root(2); },
             effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(300),
-            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
         },
         33: {
             title: 'Better Paper',
@@ -1104,7 +1110,7 @@ addLayer('s', {
             effect() { return D(1); },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(750),
-            costDisplay() { return `Cost: ${layers.s.coins.format(this.cost, false)}`; },
+            costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
         },
         //#endregion Normal upgrades
     },
@@ -1115,20 +1121,11 @@ addLayer('s', {
     exponent: D(.5),
     prestigeButtonText() {
         const next = player.s.points.gte(100) || getResetGain('s').gte(1_000) ? '' : `<br>Next at ${format(getNextAt('s'))} total value`;
-        return `Sell your items for ${layers.s.coins.format(getResetGain('s'), false)}${next}`;
+        return `Sell your items for ${format_coins(getResetGain('s'), layers.s.coins.names.map(name => `${name} coins`))}${next}`;
     },
     coins: {
-        types: [['copper', '#BB7733'], ['bronze', '#C4995E'], ['iron', '#CCCCCC'], ['gold', '#FFDD00'], ['platinum', '#CCCCFF']],
-        format(amount = player.s.points, color = true, split = false) {
-            /** @type {[string, number][]} */
-            const coins = formatCoins(amount, this.types.length).map((c, i) => [c, i]).filter(([c]) => (+c) > 0);
-            if (!coins.length) coins.push(['0', 0]);
-            const lines = coins.map(([c, i]) => {
-                return `<span${color ? ` style="color:${this.types[i][1]};font-size:1.5em;text-shadow:${this.types[i][1]} 0 0 10px;font-family:'Lucida Console', 'Courier New', monospace;"` : ''}>${c}</span> ${this.types[i][0]} coins`;
-            }).reverse();
-            if (split) return lines;
-            return listFormat.format(lines);
-        },
+        names: ['copper', 'bronze', 'iron', 'gold', 'platinum'],
+        colors: ['#BB7733', '#C4995E', '#CCCCCC', '#FFDD00', '#CCCCFF'],
     },
     investloans: {
         amount(real = false) {
@@ -1175,6 +1172,12 @@ addLayer('s', {
         mult = mult.times(tmp.l.skills.bartering.effect);
 
         mult = mult.times(buyableEffect('fr', 23));
+
+        if (hasUpgrade('v', 15)) mult = mult.times(upgradeEffect('v', 15));
+        if (hasUpgrade('v', 24)) mult = mult.times(upgradeEffect('v', 24));
+        if (hasUpgrade('v', 34)) mult = mult.times(upgradeEffect('v', 34));
+        if (hasUpgrade('v', 44)) mult = mult.times(upgradeEffect('v', 44));
+        if (hasUpgrade('v', 55)) mult = mult.times(upgradeEffect('v', 55));
 
         return mult;
     },

@@ -450,6 +450,8 @@ addLayer('suc', {
             },
             unlocked() { return tmp.fr.layerShown; },
         },
+        //todo 9X blessings
+        //todo 10X vending
         //#endregion Normal Successes
         //#region Bonus Successes
         11: {
@@ -477,7 +479,6 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 31); },
         },
         13: {
             name: 'This one is not for research',
@@ -493,7 +494,6 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 32); },
         },
         14: {
             name: 'Tasty',
@@ -509,7 +509,6 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 41); },
         },
         15: {
             name: 'Tell your friends',
@@ -525,7 +524,6 @@ addLayer('suc', {
                 if (hasAchievement(this.layer, this.id)) s['background-color'] = 'rgb(255,127,0)';
                 return s;
             },
-            unlocked() { return hasChallenge('b', 42); },
         },
         //todo bonus successes for bonus challenges in final challenge
         //#endregion Bonus Successes
