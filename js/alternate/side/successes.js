@@ -451,7 +451,66 @@ addLayer('suc', {
             unlocked() { return tmp.fr.layerShown; },
         },
         //todo 9X blessings
-        //todo 10X vending
+        101: {
+            name: 'Gambler',
+            tooltip: 'Get a vending upgrade',
+            done() { return player.v.upgrades.length > 0; },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.v.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.v.color;
+                return s;
+            },
+            unlocked() { return tmp.v.layerShown; },
+        },
+        102: {
+            name: 'A satisfied customer',
+            tooltip: 'Sell a requested dish',
+            done() { return false; }, // check the code in vending
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.v.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.v.color;
+                return s;
+            },
+            unlocked() { return tmp.v.layerShown; },
+        },
+        103: {
+            name: 'I can\'t believe you sold that',
+            tooltip: 'Sell a failed dish',
+            done() { return false; }, // check the code in vending
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.v.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.v.color;
+                return s;
+            },
+            unlocked() { return tmp.v.layerShown; },
+        },
+        104: {
+            name: 'In the name of the Federation',
+            tooltip: 'Get the fabled black gold',
+            done() { return player.lo.items.oil.amount.gt(0); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.v.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.v.color;
+                return s;
+            },
+            unlocked() { return tmp.v.layerShown; },
+        },
+        105: {
+            name: 'Illegal upgrade',
+            tooltip: 'Purchase a legendary upgrade',
+            done() { return player.v.upgrades.some(id => id >= 50); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.v.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.v.color;
+                return s;
+            },
+            unlocked() { return tmp.v.layerShown; },
+        },
         //#endregion Normal Successes
         //#region Bonus Successes
         11: {
@@ -573,7 +632,7 @@ addLayer('suc', {
         switch (type) {
             case 'normal':
             default:
-                rows = [2, 3, 4, 5, 6, 7];
+                rows = [2, 3, 4, 5, 6, 7, 9, 10];
                 break;
             case 'bonus':
                 rows = [1];

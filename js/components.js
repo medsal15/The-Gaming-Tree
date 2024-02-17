@@ -17,6 +17,17 @@ function loadVue() {
 			`
 	})
 
+	// data = a function returning the content (actually HTML)
+	Vue.component('display-text-tooltip', {
+		props: ['layer', 'data'],
+		template: `
+			<div class="tooltipBox">
+				<span class="instant" v-html="data[0]"></span>
+				<tooltip :text="data[1]"></tooltip>
+			</div>
+		`
+	})
+
 	// Blank space, data = optional height in px or pair with width and height in px
 	Vue.component('blank', {
 		props: ['layer', 'data'],

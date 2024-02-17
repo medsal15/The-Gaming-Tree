@@ -75,7 +75,11 @@ addLayer('v', {
     tabFormat: {
         'Vending': {
             content: [
-                ['display-text', () => `You have ${format(player.v.points)} stone coins (10 stone coins are worth 1 copper coin)`],
+                ['display-text', () => {
+                    return `You have <span style="color:#BBBBBB;text-shadow:#BBBBBB 0 0 10px;font-size:1.15em;">\
+                        ${format(player.v.points)}</span>\
+                        stone coins (10 stone coins are worth 1 copper coin)`;
+                }],
                 ['display-text', () => {
                     const coins = tmp.s.coins,
                         text = format_coins(player.s.points, coins.names.map(name => `${name} coins`), coins.colors.map(color => `color: ${color}; font-size: 1.5em; text-shadow: ${color} 0 0 10px;`));
@@ -127,7 +131,11 @@ addLayer('v', {
         },
         'Upgrades': {
             content: [
-                ['display-text', () => `You have ${format(player.v.points)} stone coins (10 stone coins are worth 1 copper coin)`],
+                ['display-text', () => {
+                    return `You have <span style="color:#BBBBBB;text-shadow:#BBBBBB 0 0 10px;font-size:1.15em;">\
+                        ${format(player.v.points)}</span>\
+                        stone coins (10 stone coins are worth 1 copper coin)`;
+                }],
                 ['display-text', () => {
                     const coins = tmp.s.coins,
                         text = format_coins(player.s.points, coins.names.map(name => `${name} coins`), coins.colors.map(color => `color: ${color}; font-size: 1.5em; text-shadow: ${color} 0 0 10px;`));
@@ -205,6 +213,8 @@ addLayer('v', {
                         const earn = gain();
                         addPoints('v', earn);
                         doReset('v_soft', true);
+                        giveAchievement('ach', 102);
+                        if (player.v.entries.group == 'failure') giveAchievement('ach', 103);
                     },
                     display() {
                         const coins = [...layers.s.coins.names].map(name => `${name} coins`),
@@ -718,7 +728,7 @@ addLayer('v', {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.v.rarities).find(rarity => layers.v.rarities[rarity] == this); },
             amount: {
-                min: D.dNegOne,
+                min: D.dZero,
                 max: D.dOne,
             },
             color: '#AA55FF',
@@ -738,6 +748,7 @@ addLayer('v', {
             regex: /^item_([a-z_]+)_(buy|display)$/,
         },
         //todo add a few duplicates (and more items!)
+        //todo might need to lower prices more
         //#region Common
         slime_goo: {
             merch: {
@@ -1316,42 +1327,42 @@ addLayer('v', {
         },
         //todo? lower base time to 10 minutes
         specific() {
-            let time = D(15 * 60);
+            let time = D(5 * 60);
 
             time = time.times(tmp.v.time['*'].time_mult);
 
             return time;
         },
         common() {
-            let time = D(15 * 60);
+            let time = D(5 * 60);
 
             time = time.times(tmp.v.time['*'].time_mult);
 
             return time;
         },
         uncommon() {
-            let time = D(30 * 60);
+            let time = D(10 * 60);
 
             time = time.times(tmp.v.time['*'].time_mult);
 
             return time;
         },
         rare() {
-            let time = D(45 * 60);
+            let time = D(15 * 60);
 
             time = time.times(tmp.v.time['*'].time_mult);
 
             return time;
         },
         epic() {
-            let time = D(60 * 60);
+            let time = D(20 * 60);
 
             time = time.times(tmp.v.time['*'].time_mult);
 
             return time;
         },
         legendary() {
-            let time = D(75 * 60);
+            let time = D(30 * 60);
 
             time = time.times(tmp.v.time['*'].time_mult);
 
@@ -1415,4 +1426,5 @@ addLayer('v_soft', {
     type: 'static',
     baseAmount: D.dZero,
     requires: D.dOne,
+    row: 2,
 });

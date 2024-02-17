@@ -672,6 +672,7 @@ addLayer('k', {
                 let value = D.dZero;
 
                 if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+                if (player.v.entries.group == 'failure') value = value.add(1);
 
                 return value;
             },

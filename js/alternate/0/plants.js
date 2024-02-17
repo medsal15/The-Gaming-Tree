@@ -1,7 +1,6 @@
 'use strict';
 
 //todo change plant aging from list of ages to list of time to wait
-//todo recycle plant seeds into seeds (item)
 addLayer('p', {
     name: 'Plants',
     symbol: 'P',
@@ -52,6 +51,13 @@ addLayer('p', {
                             'blank',
                         ],
                     ];
+                },
+                () => {
+                    if (tmp.p.plants['*'].harvest_mult.neq(1))
+                        return [
+                            'display-text',
+                            `Harvest yield multiplier: *${format(tmp.p.plants['*'].harvest_mult)}`,
+                        ];
                 },
                 [
                     'row',

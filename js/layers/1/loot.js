@@ -1,6 +1,5 @@
 'use strict';
 
-//todo display total per second to items
 //todo add buyMax to buyables
 addLayer('lo', {
     name: 'Loot',
@@ -2462,8 +2461,14 @@ addLayer('lo', {
         getDisplay(_, id) {
             const item_id = grid_to_item(id);
             if (!item_id) return;
+            /** @type {Decimal} */
+            const gain = tmp.lo.items[item_id].sources.total_per_second ?? D.dZero;
 
-            return format(player.lo.items[item_id].amount);
+            let display = format(player.lo.items[item_id].amount);
+
+            if (gain.neq_tolerance(0, 1e-3)) display += `<br>${format(gain)} /s`
+
+            return display;
         },
         getTooltip(_, id) {
             const item_id = grid_to_item(id);
@@ -2509,7 +2514,6 @@ addLayer('lo', {
         },
     },
     items: {
-        //todo add shop to other sources
         '*': {
             global_chance_multiplier() {
                 let mult = D.dOne;
@@ -2747,6 +2751,9 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() {
+                    if (player.v.unlocked) return ['vending:uncommon'];
+                },
             },
             name: 'red fabric',
             style: {
@@ -2785,6 +2792,9 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() {
+                    if (player.v.unlocked) return ['vending:uncommon'];
+                },
             },
             name: 'pyrite coin',
             style: {
@@ -2808,7 +2818,12 @@ addLayer('lo', {
                     chances['tamed_kill:goblin'] = chances['enemy:goblin'];
                     return chances;
                 },
-                other() { if (player.fr.unlocked) return ['freezer:freezing']; },
+                other() {
+                    const other = [];
+                    if (player.fr.unlocked) other.push('freezer:freezing');
+                    if (player.v.unlocked) other.push('vending:uncommon');
+                    return other;
+                },
             },
             name: 'rusty gear',
             style: {
@@ -2848,6 +2863,9 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() {
+                    if (player.v.unlocked) return ['vending:rare'];
+                },
             },
             name: 'rotten flesh',
             style: {
@@ -2884,6 +2902,9 @@ addLayer('lo', {
                     }
 
                     return per_second;
+                },
+                other() {
+                    if (player.v.unlocked) return ['vending:rare'];
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
@@ -2925,13 +2946,16 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() {
+                    if (player.v.unlocked) return ['vending:epic'];
+                },
             },
             name: 'leaf',
             style: {
                 'background-image': `url('./resources/images/falling-leaf.svg')`,
                 'background-color': () => tmp.xp.enemies['ent'].color,
             },
-            unlocked() { return hasChallenge('b', 21); },
+            unlocked() { return hasChallenge('b', 21) || player.v.unlocked; },
         },
         seed: {
             _id: null,
@@ -2963,13 +2987,16 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() {
+                    if (player.v.unlocked) return ['vending:epic'];
+                },
             },
             name: 'seed',
             style: {
                 'background-image': `url('./resources/images/sesame.svg')`,
                 'background-color': () => tmp.xp.enemies['ent'].color,
             },
-            unlocked() { return hasChallenge('b', 21); },
+            unlocked() { return hasChallenge('b', 21) || player.v.unlocked; },
         },
         // Mining
         stone: {
@@ -3034,6 +3061,7 @@ addLayer('lo', {
 
                     if (hasUpgrade('m', 32)) sources.push('mining:shallow');
                     if (hasUpgrade('m', 52)) sources.push('mining:deep');
+                    if (player.v.unlocked) sources.push('vending:common');
 
                     return sources;
                 },
@@ -3117,6 +3145,9 @@ addLayer('lo', {
 
                     return chances;
                 },
+                other() {
+                    if (player.v.unlocked) return ['vending:common'];
+                },
             },
             name: 'copper ore',
             style: {
@@ -3182,6 +3213,9 @@ addLayer('lo', {
                     }
 
                     return per_second;
+                },
+                other() {
+                    if (player.v.unlocked) return ['vending:common'];
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
@@ -3253,7 +3287,12 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
-                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
+                other() {
+                    const other = [];
+                    if (tmp.f.layerShown) other.push('forge:smelt');
+                    if (player.v.unlocked) other.push('vending:uncommon');
+                    return other;
+                },
             },
             name: 'coal',
             style: {
@@ -3324,6 +3363,9 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() {
+                    if (player.v.unlocked) return ['vending:uncommon'];
+                },
             },
             name: 'iron ore',
             style: {
@@ -3384,6 +3426,9 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                other() {
+                    if (player.v.unlocked) return ['vending:uncommon'];
+                },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'gold ore',
@@ -3401,7 +3446,12 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
+                other() {
+                    const other = [];
+                    if (tmp.f.layerShown) other.push('forge:smelt');
+                    if (player.v.unlocked) other.push('vending:rare');
+                    return other;
+                },
                 per_second() {
                     const per_second = {};
 
@@ -3452,7 +3502,12 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
+                other() {
+                    const other = [];
+                    if (tmp.f.layerShown) other.push('forge:smelt');
+                    if (player.v.unlocked) other.push('vending:rare');
+                    return other;
+                },
                 per_second() {
                     const per_second = {};
 
@@ -3503,7 +3558,12 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
+                other() {
+                    const other = [];
+                    if (tmp.f.layerShown) other.push('forge:smelt');
+                    if (player.v.unlocked) other.push('vending:rare');
+                    return other;
+                },
                 per_second() {
                     const per_second = {};
 
@@ -3554,7 +3614,12 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
+                other() {
+                    const other = [];
+                    if (tmp.f.layerShown) other.push('forge:smelt');
+                    if (player.v.unlocked) other.push('vending:epic');
+                    return other;
+                },
                 per_second() {
                     const per_second = {};
 
@@ -3605,7 +3670,12 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
+                other() {
+                    const other = [];
+                    if (tmp.f.layerShown) other.push('forge:smelt');
+                    if (player.v.unlocked) other.push('vending:epic');
+                    return other;
+                },
                 per_second() {
                     const per_second = {};
 
@@ -3657,7 +3727,12 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (player.f.alloys) return ['forge:smelt']; },
+                other() {
+                    const other = [];
+                    if (player.f.alloys) other.push('forge:smelt');
+                    if (player.v.unlocked) other.push('vending:legendary');
+                    return other;
+                },
                 per_second() {
                     const per_second = {};
 
@@ -3699,7 +3774,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
                 'background-color': '#BB8844',
             },
-            unlocked() { return player.f.alloys || hasMilestone('to', 7); },
+            unlocked() { return player.f.alloys || hasMilestone('to', 7) || player.v.unlocked; },
         },
         steel_ingot: {
             _id: null,
@@ -3708,7 +3783,12 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (player.f.alloys) return ['forge:smelt']; },
+                other() {
+                    const other = [];
+                    if (player.f.alloys) other.push('forge:smelt');
+                    if (player.v.unlocked) other.push('vending:legendary');
+                    return other;
+                },
                 per_second() {
                     const per_second = {};
 
@@ -3750,7 +3830,7 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/metal-bar.svg')`,
                 'background-color': '#777777',
             },
-            unlocked() { return player.f.alloys || hasMilestone('to', 7); },
+            unlocked() { return player.f.alloys || hasMilestone('to', 7) || player.v.unlocked; },
         },
         // Trees
         soaked_log: {
@@ -3865,7 +3945,12 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
-                other() { if (tmp.f.layerShown) return ['forge:smelt']; },
+                other() {
+                    const other = [];
+                    if (player.v.unlocked) other.push('vending:common');
+                    if (tmp.f.layerShown) other.push('forge:smelt');
+                    return other;
+                },
             },
             name: 'normal log',
             style: {
@@ -3927,6 +4012,9 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                other() {
+                    if (player.v.unlocked) return ['vending:uncommon'];
+                },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'plank',
@@ -3957,6 +4045,9 @@ addLayer('lo', {
 
                     return chances;
                 },
+                other() {
+                    if (player.v.unlocked) return ['vending:common'];
+                },
             },
             name: 'wheat',
             style: {
@@ -3985,6 +4076,9 @@ addLayer('lo', {
 
                     return chances;
                 },
+                other() {
+                    if (player.v.unlocked) return ['vending:common'];
+                },
             },
             name: 'corn',
             style: {
@@ -4003,7 +4097,7 @@ addLayer('lo', {
                 other() {
                     const list = [];
 
-                    if (tmp.p.layerShown) list.push('plant:strawberry', 'plant:clockberry');
+                    if (player.v.unlocked) list.push('vending:uncommon');
 
                     return list;
                 },
@@ -4038,7 +4132,7 @@ addLayer('lo', {
                 other() {
                     const list = [];
 
-                    if (tmp.p.layerShown) list.push('plant:potato', 'plant:potato_battery');
+                    if (player.v.unlocked) list.push('vending:uncommon');
 
                     return list;
                 },
@@ -4085,6 +4179,9 @@ addLayer('lo', {
 
                     return chances;
                 },
+                other() {
+                    if (player.v.unlocked) return ['vending:rare'];
+                },
             },
             name: 'eggplant',
             style: {
@@ -4112,6 +4209,9 @@ addLayer('lo', {
                     }
 
                     return chances;
+                },
+                other() {
+                    if (player.v.unlocked) return ['vending:rare'];
                 },
             },
             name: 'egg',
@@ -4173,6 +4273,9 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                other() {
+                    if (player.v.unlocked) return ['vending:common'];
+                },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'water',
@@ -4200,6 +4303,9 @@ addLayer('lo', {
 
                     return per_second;
                 },
+                other() {
+                    if (player.v.unlocked) return ['vending:rare'];
+                },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
             },
             name: 'ice',
@@ -4217,7 +4323,12 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (tmp.fr.layerShown) return ['freezer:freezing']; },
+                other() {
+                    const other = [];
+                    if (tmp.fr.layerShown) other.push('freezer:freezing');
+                    if (player.v.unlocked) other.push('vending:epic');
+                    return other;
+                },
             },
             name: 'icestone',
             style: {
@@ -4233,7 +4344,12 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (tmp.fr.layerShown) return ['freezer:freezing']; },
+                other() {
+                    const other = [];
+                    if (tmp.fr.layerShown) other.push('freezer:freezing');
+                    if (player.v.unlocked) other.push('vending:legendary');
+                    return other;
+                },
             },
             name: 'rust ingot',
             style: {
@@ -4285,6 +4401,9 @@ addLayer('lo', {
                     return per_second;
                 },
                 total_per_second() { return sumValues(tmp.lo.items[this.id].sources.per_second); },
+                other() {
+                    if (player.v.unlocked) return ['vending:rare'];
+                },
             },
             name: 'oil',
             style: {
@@ -4374,7 +4493,12 @@ addLayer('lo', {
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
-                other() { if (hasChallenge('b', 22)) return ['enemy:star']; },
+                other() {
+                    const other = [];
+                    if (hasChallenge('b', 22)) other.push('enemy:star');
+                    if (player.v.unlocked) other.push('vending:legendary');
+                    return other;
+                },
             },
             name: 'stardust',
             style: {

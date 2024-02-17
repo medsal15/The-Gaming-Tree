@@ -604,6 +604,8 @@ function can_drop(type) {
             return tmp.c.layerShown;
         case 'plant':
             return tmp.p.layerShown && (tmp.p.plants[sub].unlocked ?? true);
+        case 'vending':
+            return tmp.v.layerShown;
     }
 
     return false;

@@ -94,9 +94,6 @@ Seed Mastery (Plant)
 
 ### Seals ###
 
-Condiments
-    - ???
-
 Party
     - ???
 
@@ -190,6 +187,7 @@ Supernova
 ## Post endgame ##
 
 Easy mode
+    - Plants stop aging when mature
     - ???
 
 Hard mode
