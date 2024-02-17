@@ -806,7 +806,16 @@ addLayer('fr', {
 
                 speed = speed.div(tmp.f.heat.slow);
 
+                speed = speed.times(tmp.k.dishes.candy_cane.effect.speed);
+
                 return speed;
+            },
+            cost_div() {
+                let div = D.dOne;
+
+                div = div.times(tmp.k.dishes.chocolate.effect.cost_mult);
+
+                return div;
             },
         },
         // Simple convertions
@@ -829,6 +838,10 @@ addLayer('fr', {
                 } else if (inChallenge('b', 12)) {
                     items.forEach(([, amount], i) => items[i] = D.times(amount, D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10()));
                 }
+
+                items.forEach(([, cost], i) => {
+                    items[i][1] = D.div(cost, tmp.fr?.recipes['*'].cost_div);
+                });
 
                 return items;
             },
@@ -866,6 +879,10 @@ addLayer('fr', {
                 } else if (inChallenge('b', 12)) {
                     items.forEach(([, amount], i) => items[i] = D.times(amount, D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10()));
                 }
+
+                items.forEach(([, cost], i) => {
+                    items[i][1] = D.div(cost, tmp.fr?.recipes['*'].cost_div);
+                });
 
                 return items;
             },
@@ -915,6 +932,10 @@ addLayer('fr', {
                 } else if (inChallenge('b', 12)) {
                     items.forEach(([, amount], i) => items[i] = D.times(amount, D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10()));
                 }
+
+                items.forEach(([, cost], i) => {
+                    items[i][1] = D.div(cost, tmp.fr?.recipes['*'].cost_div);
+                });
 
                 return items;
             },
@@ -967,6 +988,10 @@ addLayer('fr', {
                     items.forEach(([, amount], i) => items[i] = D.times(amount, D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10()));
                 }
 
+                items.forEach(([, cost], i) => {
+                    items[i][1] = D.div(cost, tmp.fr?.recipes['*'].cost_div);
+                });
+
                 return items;
             },
             produces: 'icestone',
@@ -1018,6 +1043,10 @@ addLayer('fr', {
                     items.forEach(([, amount], i) => items[i] = D.times(amount, D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10()));
                 }
 
+                items.forEach(([, cost], i) => {
+                    items[i][1] = D.div(cost, tmp.fr?.recipes['*'].cost_div);
+                });
+
                 return items;
             },
             produces: 'rust_ingot',
@@ -1068,6 +1097,10 @@ addLayer('fr', {
                 } else if (inChallenge('b', 12)) {
                     items.forEach(([, amount], i) => items[i] = D.times(amount, D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10()));
                 }
+
+                items.forEach(([, cost], i) => {
+                    items[i][1] = D.div(cost, tmp.fr?.recipes['*'].cost_div);
+                });
 
                 return items;
             },
@@ -1122,6 +1155,10 @@ addLayer('fr', {
                     items.forEach(([, amount], i) => items[i] = D.times(amount, D.add(D.max(player.lo.items[this.produces].amount, 0), 10).log10()));
                 }
 
+                items.forEach(([, cost], i) => {
+                    items[i][1] = D.div(cost, tmp.fr?.recipes['*'].cost_div);
+                });
+
                 return items;
             },
             produces: 'holy_water',
@@ -1156,8 +1193,8 @@ addLayer('fr', {
             gain = gain.times(tmp.bin.cards.multipliers['fr'] ?? 1);
 
             gain = gain.times(tmp.k.dishes.ice_cream.effect);
-
             gain = gain.times(tmp.k.dishes.popsicle.effect);
+            gain = gain.times(tmp.k.dishes.candy_cane.effect.production);
 
             gain = gain.times(tmp.con.condiments['*'].total.fr.water ?? D.dOne);
 
@@ -1176,8 +1213,8 @@ addLayer('fr', {
             gain = gain.times(buyableEffect('fr', 12));
 
             gain = gain.times(tmp.k.dishes.ice_cream.effect);
-
             gain = gain.times(tmp.k.dishes.popsicle.effect);
+            gain = gain.times(tmp.k.dishes.candy_cane.effect.production);
 
             gain = gain.times(tmp.con.condiments['*'].total.fr.cold ?? D.dOne);
 
@@ -1204,8 +1241,8 @@ addLayer('fr', {
             gain = gain.times(buyableEffect('fr', 21));
 
             gain = gain.times(tmp.k.dishes.ice_cream.effect);
-
             gain = gain.times(tmp.k.dishes.popsicle.effect);
+            gain = gain.times(tmp.k.dishes.candy_cane.effect.production);
 
             if (hasUpgrade('v', 43)) gain = gain.times(upgradeEffect('v', 43));
 

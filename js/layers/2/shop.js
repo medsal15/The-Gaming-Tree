@@ -1171,6 +1171,8 @@ addLayer('s', {
 
         mult = mult.times(tmp.l.skills.bartering.effect);
 
+        mult = mult.times(tmp.k.dishes.chocolate.effect.coin_gain);
+
         mult = mult.times(buyableEffect('fr', 23));
 
         if (hasUpgrade('v', 15)) mult = mult.times(upgradeEffect('v', 15));

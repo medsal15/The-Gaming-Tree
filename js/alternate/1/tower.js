@@ -60,7 +60,13 @@ addLayer('to', {
     milestones: {
         1: {
             requirementDescription: 'Layering: Build a floor',
-            effect() { return D.root(player.to.points, 2).floor(); },
+            effect() {
+                let effect = D.root(player.to.points, 2).floor();
+
+                effect = effect.times(tmp.k.dishes.chocolate.effect.milestone_mult)
+
+                return effect;
+            },
             effectDescription() {
                 const effect = shiftDown ? '[2√(floors)]' : formatWhole(tmp[this.layer].milestones[this.id].effect);
                 return `Increase city size by ${effect} layers`;
@@ -69,7 +75,13 @@ addLayer('to', {
         },
         2: {
             requirementDescription: 'Hatchery: Build 2 floors',
-            effect() { return D.pow(1.1, player.to.points); },
+            effect() {
+                let effect = D.pow(1.1, player.to.points);
+
+                effect = effect.times(tmp.k.dishes.chocolate.effect.milestone_mult)
+
+                return effect;
+            },
             effectDescription() {
                 const effect = shiftDown ? '[1.1 ^ floors]' : format(tmp[this.layer].milestones[this.id].effect);
                 return `Multiply taming progress gain by ${effect}<br>\
@@ -79,6 +91,13 @@ addLayer('to', {
         },
         3: {
             requirementDescription: 'Engineering: Build 3 floors',
+            effect() {
+                let effect = player.c.resources.science.amount.add(10).log10();
+
+                effect = effect.times(tmp.k.dishes.chocolate.effect.milestone_mult)
+
+                return effect;
+            },
             effectDescription() {
                 const effect = shiftDown ? '[log10(science + 10)]' : format(tmp[this.layer].milestones[this.id].effect);
                 return `Unlock more tower materials<br>\
@@ -86,12 +105,17 @@ addLayer('to', {
                     Science divides materials costs by ${effect}<br>\
                     Keep this milestone`;
             },
-            effect() { return player.c.resources.science.amount.add(10).log10(); },
             done() { return player.to.points.gte(3); },
         },
         4: {
             requirementDescription: 'Planetarium: Build 4 floors',
-            effect() { return D.add(player.to.points, 2).log2(); },
+            effect() {
+                let effect = D.add(player.to.points, 2).log2();
+
+                effect = effect.times(tmp.k.dishes.chocolate.effect.milestone_mult)
+
+                return effect;
+            },
             effectDescription() {
                 const effect = shiftDown ? '[log2(floors + 2)]' : format(tmp[this.layer].milestones[this.id].effect);
                 return `Multiply star time by ${effect}`;
@@ -100,7 +124,13 @@ addLayer('to', {
         },
         5: {
             requirementDescription: 'Greenhouse: Build 5 floors',
-            effect() { return D.pow(1.25, player.to.points); },
+            effect() {
+                let effect = D.pow(1.25, player.to.points);
+
+                effect = effect.times(tmp.k.dishes.chocolate.effect.milestone_mult)
+
+                return effect;
+            },
             effectDescription() {
                 const effect = shiftDown ? '[1.25 ^ floors]' : format(tmp[this.layer].milestones[this.id].effect);
                 return `Multiply harvest yield by ${effect}`;
@@ -576,6 +606,8 @@ addLayer('to', {
 
             if (hasMilestone('to', 3)) mult = mult.div(tmp.to.milestones[3].effect);
 
+            mult = mult.times(tmp.k.dishes.pizza.effect.material);
+
             mult = mult.times(tmp.con.condiments['*'].total.to.material_cost ?? D.dOne);
 
             if (hasUpgrade('v', 41)) mult = mult.div(upgradeEffect('v', 41));
@@ -741,6 +773,7 @@ addLayer('to', {
         if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['to'] ?? 1);
 
         mult = mult.times(tmp.k.dishes.popsicle.effect);
+        mult = mult.times(tmp.k.dishes.soda.effect.floor);
 
         mult = mult.times(tmp.con.condiments['*'].total.to.floor_cost ?? D.dOne);
 

@@ -1771,7 +1771,8 @@ type dishes = 'failure' |
     'bread' | 'berries_bowl' | 'french_fries' |
     'fried_eggs' | 'cake' |
     'ice_cream' | 'popsicle' |
-    'slime_juice' | 'monster_meal' | 'star_crunch';
+    'slime_juice' | 'monster_meal' | 'star_crunch' |
+    'soda' | 'coffee' | 'candy_cane' | 'pizza' | 'chocolate';
 type time_units = 'seconds' | 'tames' | 'kills';
 type dish_groups = 'vegetable' | 'baked' | 'cold' | 'hot' | 'meat' | 'monster' | 'failure';
 type rarities = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
@@ -2736,6 +2737,8 @@ type Layers = {
                 /** Computes a recipe's default amount (for tmp display) */
                 default_amount(recipe: string, amount?: Decimal): Decimal
                 speed(): Decimal
+                /** Divides resource costs for freezing */
+                cost_div(): Decimal
             }
             [recipe: string]: {
                 readonly id: string

@@ -234,6 +234,8 @@ addLayer('k', {
             size() {
                 let size = D.dOne;
 
+                size = size.add(tmp.k.dishes.chocolate.effect.oven_size);
+
                 size = size.add(tmp.con.condiments['*'].total.k.oven_size ?? D.dZero);
 
                 if (hasUpgrade('v', 22)) size = size.add(upgradeEffect('v', 22));
@@ -546,6 +548,7 @@ addLayer('k', {
                 let size = D.dOne;
 
                 size = size.add(tmp.k.dishes.star_crunch.effect.size);
+                size = size.add(tmp.k.dishes.pizza.effect.size);
 
                 size = size.add(tmp.con.condiments['*'].total.k.stomach_size ?? D.dZero);
 
@@ -632,6 +635,7 @@ addLayer('k', {
                 return mult;
             },
         },
+        // Failure
         failure: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
@@ -682,6 +686,7 @@ addLayer('k', {
             },
             groups: ['failure'],
         },
+        // Simple plant cooked
         grilled_corn: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
@@ -789,6 +794,7 @@ addLayer('k', {
             },
             groups: ['vegetable', 'hot'],
         },
+        // Slightly more complex
         bread: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
@@ -948,6 +954,7 @@ addLayer('k', {
             },
             groups: ['hot'],
         },
+        // Eggs
         fried_eggs: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
@@ -1050,6 +1057,7 @@ addLayer('k', {
             },
             groups: ['baked', 'cold'],
         },
+        // Cold
         ice_cream: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
@@ -1159,6 +1167,7 @@ addLayer('k', {
             },
             groups: ['cold', 'vegetable'],
         },
+        // Monsters
         slime_juice: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
@@ -1314,6 +1323,310 @@ addLayer('k', {
             },
             groups: ['monster', 'hot'],
         },
+        // Vending only
+        soda: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
+            grid: 701,
+            style: {
+                'background-image': `url('./resources/images/soda-can.svg')`,
+                'background-color': '#FF5533',
+            },
+            type: 'drink',
+            name: 'soda',
+            duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
+                unit: 'seconds',
+                time() {
+                    let time = D(90);
+
+                    time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
+
+                    return time;
+                },
+            },
+            effect(duration) {
+                duration = layers.k.dishes['*'].default_duration(this.id, duration);
+                if (tmp.k.deactivated) duration = D.dZero;
+                if (D.gt(duration, 0)) return { city: D.div(duration, 30).add(1), floor: D.div(duration, 45).add(1) };
+                return { city: D.dOne, floor: D.dOne };
+            },
+            effect_description(duration) {
+                if (D.lte(duration, 0)) duration = D(tmp.k.dishes[this.id].duration.time);
+                let city_effect = shiftDown ? '[time left / 30 + 1]' : format(this.effect(duration).city),
+                    floor_effect = shiftDown ? '[time left / 45 + 1]' : format(this.effect(duration).floor);
+                return `Multiplies city production by ${city_effect}, and divides floor cost by ${floor_effect}`;
+            },
+            value() {
+                let value = D.dOne;
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
+            condiment: {
+                good: ['pepper'],
+                bad: ['vinegar'],
+            },
+            groups: ['cold'],
+            unlocked() { return player.v.unlocked; },
+        },
+        coffee: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
+            grid: 702,
+            style: {
+                'background-image': `url('./resources/images/coffee-mug.svg')`,
+                'background-color': '#664433',
+            },
+            name: 'coffee',
+            type: 'drink',
+            duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
+                unit: 'seconds',
+                time() {
+                    let time = D(120);
+
+                    time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
+
+                    return time;
+                },
+            },
+            effect(duration) {
+                duration = layers.k.dishes['*'].default_duration(this.id, duration);
+                if (tmp.k.deactivated) duration = D.dZero;
+                if (D.gt(duration, 0)) return { plant: D.div(duration, 30).add(1), monster: D.div(duration, 20).add(1) };
+                return { plant: D.dOne, monster: D.dOne };
+            },
+            effect_description(duration) {
+                if (D.lte(duration, 0)) duration = D(tmp.k.dishes[this.id].duration.time);
+                let plant_effect = shiftDown ? '[time left / 30 + 1]' : format(this.effect(duration).plant),
+                    monster_effect = shiftDown ? '[time left / 20 + 1]' : format(this.effect(duration).monster);
+                return `Multiplies plant growth speed by ${plant_effect}, and monster production (inculding XP) by ${monster_effect}`;
+            },
+            value() {
+                let value = D.dTwo;
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
+            condiment: {
+                good: ['ginger'],
+                bad: ['pepper'],
+            },
+            groups: ['hot'],
+            unlocked() { return player.v.unlocked; },
+        },
+        candy_cane: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
+            grid: 703,
+            style: {
+                'background-image': `url('./resources/images/candy-canes.svg'), linear-gradient(45deg, #EE0022, #FFFFFF)`,
+                'background-origin': 'border-box',
+            },
+            type: 'food',
+            name: 'candy cane',
+            duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
+                unit: 'seconds',
+                time() {
+                    let time = D(100);
+
+                    time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
+
+                    return time;
+                },
+            },
+            effect(duration) {
+                duration = layers.k.dishes['*'].default_duration(this.id, duration);
+                if (tmp.k.deactivated) duration = D.dZero;
+                if (D.gt(duration, 0)) return { production: D.div(duration, 33).add(1), speed: D.div(duration, 67).add(1) };
+                return { production: D.dOne, speed: D.dOne };
+            },
+            effect_description(duration) {
+                if (D.lte(duration, 0)) duration = D(tmp.k.dishes[this.id].duration.time);
+                let production_effect = shiftDown ? '[time left / 33 + 1]' : format(this.effect(duration).production),
+                    speed_effect = shiftDown ? '[time left / 67 + 1]' : format(this.effect(duration).speed);
+                return `Multiplies freezer production by ${production_effect}, and freezer speed by ${speed_effect}`;
+            },
+            value() {
+                let value = D(3);
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
+            condiment: {
+                good: ['mint'],
+                bad: ['pepper', 'ginger'],
+            },
+            groups: ['cold'],
+            unlocked() { return player.v.unlocked; },
+        },
+        pizza: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
+            grid: 704,
+            style: {
+                'background-image': `url('./resources/images/pizza-slice.svg')`,
+                'background-color': '#FFAA00',
+            },
+            name: 'pizza',
+            type: 'food',
+            duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
+                unit: 'seconds',
+                time() {
+                    let time = D(150);
+
+                    time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
+
+                    return time;
+                },
+            },
+            effect(duration) {
+                duration = layers.k.dishes['*'].default_duration(this.id, duration);
+                if (tmp.k.deactivated) duration = D.dZero;
+                if (D.gt(duration, 0)) return { material: D.div(duration, 75).add(1), size: D.dOne };
+                return { material: D.dOne, size: D.dZero };
+            },
+            effect_description(duration) {
+                if (D.lte(duration, 0)) duration = D(tmp.k.dishes[this.id].duration.time);
+                let material_effect = shiftDown ? '[time left / 75 + 1]' : format(this.effect(duration).material),
+                    size_effect = shiftDown ? '[1]' : formatWhole(this.effect(duration).size);
+                return `Divides tower material costs by ${material_effect}, and increases stomach size by ${size_effect}`;
+            },
+            value() {
+                let value = D(4);
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
+            condiment: {
+                good: ['pepper', 'vinegar'],
+                bad: ['mint'],
+            },
+            groups: ['hot', 'vegetable', 'baked'],
+            unlocked() { return player.v.unlocked; },
+        },
+        chocolate: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
+            grid: 705,
+            style: {
+                'background-image': `url('./resources/images/chocolate-bar.svg')`,
+                'background-color': '#DD6611',
+            },
+            name: 'chocolate',
+            type: 'food',
+            duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
+                unit: 'seconds',
+                time() {
+                    let time = D(180);
+
+                    time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
+
+                    return time;
+                },
+            },
+            effect(duration) {
+                duration = layers.k.dishes['*'].default_duration(this.id, duration);
+                if (tmp.k.deactivated) duration = D.dZero;
+                if (D.gt(duration, 0)) return {
+                    // Row 1
+                    milestone_mult: D.div(duration, 90).add(1),
+                    oven_size: D.dTwo,
+                    cost_mult: D.div(duration, 100).add(1),
+                    // Row 2
+                    coin_gain: D.add(duration, 10).log10(),
+                };
+                return {
+                    // Row 1
+                    milestone_mult: D.dOne,
+                    oven_size: D.dZero,
+                    cost_mult: D.dOne,
+                    // Row 2
+                    coin_gain: D.dOne,
+                };
+            },
+            effect_description(duration) {
+                if (D.lte(duration, 0)) duration = D(tmp.k.dishes[this.id].duration.time);
+                /**
+                 * @type {{
+                 *  milestone_mult: Decimal
+                 *  oven_size: Decimal
+                 *  cost_mult: Decimal
+                 *  coin_gain: Decimal
+                 * }}
+                 */
+                const effect = this.effect(duration);
+                let milestone_effect = shiftDown ? '[time left / 90 + 1]' : format(effect.milestone_mult),
+                    oven_effect = shiftDown ? '[2]' : formatWhole(effect.oven_size),
+                    cost_effect = shiftDown ? '[time left / 100 + 1]' : format(effect.cost_mult),
+                    coin_effect = shiftDown ? '[log10(time left + 10)]' : format(effect.coin_gain);
+                return `Multiplies tower milestones effects by ${milestone_effect},\
+                    increases oven size by ${oven_effect},\
+                    divides freezing costs by ${cost_effect},\
+                    and multiplies coin gain by ${coin_effect}.`;
+            },
+            value() {
+                let value = D(5);
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
+            condiment: {
+                good: ['mint'],
+                bad: ['pepper'],
+            },
+            groups: ['hot', 'vegetable', 'cold'],
+            unlocked() { return player.v.unlocked; },
+        },
     },
     groups: {
         vegetable: {
@@ -1339,8 +1652,8 @@ addLayer('k', {
         },
     },
     grid: {
-        rows: 6,
-        cols: 3,
+        rows: 7,
+        cols: 5,
         getStartData(_) { return {}; },
         getStyle(_, id) {
             const dish_id = layers.k.dishes['*'].grid_to_dish(id);

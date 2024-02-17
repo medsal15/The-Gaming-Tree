@@ -14,6 +14,7 @@ By [Lorc](https://lorcblog.blogspot.com/):
 - [brain](https://game-icons.net/1x1/lorc/brain.html)
 - [cake slice](https://game-icons.net/1x1/lorc/cake-slice.html)
 - [carrion](https://game-icons.net/1x1/lorc/carrion.html)
+- [coffee mug](https://game-icons.net/1x1/lorc/coffee-mug.html)
 - [cog](https://game-icons.net/1x1/lorc/cog.html)
 - [conway game of life glider](https://game-icons.net/1x1/delapouite/conway-life-glider.html)
 - [cracked disk](https://game-icons.net/1x1/lorc/cracked-disc.html)
@@ -41,6 +42,7 @@ By [Lorc](https://lorcblog.blogspot.com/):
 By [Delapouite](https://delapouite.com/):
 
 - [berries bowl](https://game-icons.net/1x1/delapouite/berries-bowl.html)
+- [candy canes](https://game-icons.net/1x1/delapouite/candy-canes.html)
 - [clay brick](https://game-icons.net/1x1/delapouite/clay-brick.html)
 - [crafting](https://game-icons.net/1x1/delapouite/crafting.html)
 - [corn](https://game-icons.net/1x1/delapouite/corn.html)
@@ -57,6 +59,7 @@ By [Delapouite](https://delapouite.com/):
 - [observatory](https://game-icons.net/1x1/delapouite/observatory.html)
 - [oil pump](https://game-icons.net/1x1/delapouite/oil-pump.html)
 - [pickaxe](https://game-icons.net/1x1/delapouite/war-pick.html)
+- [pizza slice](https://game-icons.net/1x1/delapouite/pizza-slice.html)
 - [potato](https://game-icons.net/1x1/delapouite/potato.html)
 - [planks](https://game-icons.net/1x1/delapouite/planks.html)
 - [previous button](https://game-icons.net/1x1/delapouite/previous-button.html)
@@ -81,6 +84,14 @@ By [sbed](http://opengameart.org/content/95-game-icons)
 - [big egg](https://game-icons.net/1x1/sbed/big-egg.html)
 - [electric](https://game-icons.net/1x1/sbed/electric.html)
 - [flamer](https://game-icons.net/1x1/sbed/flamer.html)
+
+By [Guard13007](https://guard13007.com/)
+
+- [soda can](https://game-icons.net/1x1/guard13007/soda-can.html)
+
+By [rihlsul](https://game-icons.net/)
+
+- [chocolate bar](https://game-icons.net/1x1/rihlsul/chocolate-bar.html)
 
 Images available from [OpenGameArt](https://opengameart.org)
 

@@ -504,6 +504,7 @@ addLayer('p', {
                 mult = mult.times(tmp.p.plants.clockberry.effect);
 
                 mult = mult.times(tmp.k.dishes.roasted_eggplant.effect);
+                mult = mult.times(tmp.k.dishes.coffee.effect.plant);
 
                 if (hasUpgrade('v', 33)) mult = mult.times(upgradeEffect('v', 33));
 

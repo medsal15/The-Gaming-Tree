@@ -1,5 +1,6 @@
 'use strict';
 
+//todo? add quest board for easy money (refreshed at same rate as legendary)
 addLayer('v', {
     name: 'Shop?',
     symbol: 'V',
@@ -214,7 +215,6 @@ addLayer('v', {
                         addPoints('v', earn);
                         doReset('v_soft', true);
                         giveAchievement('ach', 102);
-                        if (player.v.entries.group == 'failure') giveAchievement('ach', 103);
                     },
                     display() {
                         const coins = [...layers.s.coins.names].map(name => `${name} coins`),
@@ -416,7 +416,7 @@ addLayer('v', {
             description: 'Floor gain is increased by 50%',
             effect() { return D(1.5); },
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
-            cost: D(15),
+            cost: D(5),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
             style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
@@ -442,7 +442,7 @@ addLayer('v', {
             description: 'Water gain is increased by 1',
             effect() { return D.dOne; },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
-            cost: D(15),
+            cost: D(10),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
             style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
@@ -455,7 +455,7 @@ addLayer('v', {
             description: 'Coin gain is increased by 50%',
             effect() { return D(1.5); },
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
-            cost: D(15),
+            cost: D(5),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
             style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
@@ -481,7 +481,7 @@ addLayer('v', {
             description: 'Monster production is increased by 75%',
             effect() { return D(1.75); },
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
-            cost: D(75),
+            cost: D(50),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
             style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
@@ -507,7 +507,7 @@ addLayer('v', {
             description: 'Plant grow speed is increased by 75%',
             effect() { return D(1.75); },
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
-            cost: D(75),
+            cost: D(50),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
             style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
@@ -520,7 +520,7 @@ addLayer('v', {
             description: 'Coin gain is increased by 75%',
             effect() { return D(1.75); },
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
-            cost: D(75),
+            cost: D(50),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
             style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
@@ -546,7 +546,7 @@ addLayer('v', {
             description: 'Floor materials are cheaper',
             effect() { return D.dTwo; },
             effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}`; },
-            cost: D(150),
+            cost: D(125),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
             style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
@@ -585,7 +585,7 @@ addLayer('v', {
             description: 'Coin gain is doubled',
             effect() { return D.dTwo; },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            cost: D(150),
+            cost: D(100),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
             style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
@@ -748,6 +748,7 @@ addLayer('v', {
             regex: /^item_([a-z_]+)_(buy|display)$/,
         },
         //todo add a few duplicates (and more items!)
+        //todo add cheaper rarer duplicates
         //todo might need to lower prices more
         //#region Common
         slime_goo: {
@@ -900,6 +901,36 @@ addLayer('v', {
                 max: D(.9),
             },
         },
+        bread: {
+            merch: {
+                type: 'dish',
+                dish: 'bread',
+            },
+            rarity: 'common',
+            amount: {
+                max: D(15),
+                min: D(10),
+            },
+            cost: {
+                min: D(1 / 3),
+                max: D(5),
+            },
+        },
+        soda: {
+            merch: {
+                type: 'dish',
+                dish: 'soda',
+            },
+            rarity: 'common',
+            amount: {
+                max: D(50),
+                min: D(5),
+            },
+            cost: {
+                min: D(1 / 5),
+                max: D(5),
+            },
+        },
         //#endregion Common
         //#region Uncommon
         red_fabric: {
@@ -1035,6 +1066,36 @@ addLayer('v', {
             cost: {
                 min: D(.1),
                 max: D(1.3),
+            },
+        },
+        french_fries: {
+            merch: {
+                type: 'dish',
+                dish: 'french_fries',
+            },
+            rarity: 'uncommon',
+            amount: {
+                max: D(10),
+                min: D(4),
+            },
+            cost: {
+                min: D(.5),
+                max: D(7),
+            },
+        },
+        coffee: {
+            merch: {
+                type: 'dish',
+                dish: 'coffee',
+            },
+            rarity: 'uncommon',
+            amount: {
+                max: D(50),
+                min: D(5),
+            },
+            cost: {
+                min: D(1 / 2),
+                max: D(10),
             },
         },
         //#endregion Uncommon
@@ -1174,6 +1235,51 @@ addLayer('v', {
                 max: D(1.6),
             },
         },
+        slime_juice: {
+            merch: {
+                type: 'dish',
+                dish: 'slime_juice',
+            },
+            rarity: 'rare',
+            amount: {
+                max: D(30),
+                min: D(5),
+            },
+            cost: {
+                min: D(1),
+                max: D(15),
+            },
+        },
+        ice_cream: {
+            merch: {
+                type: 'dish',
+                dish: 'ice_cream',
+            },
+            rarity: 'rare',
+            amount: {
+                max: D(10),
+                min: D(1),
+            },
+            cost: {
+                min: D(4),
+                max: D(9),
+            },
+        },
+        candy_cane: {
+            merch: {
+                type: 'dish',
+                dish: 'candy_cane',
+            },
+            rarity: 'rare',
+            amount: {
+                max: D(25),
+                min: D(5),
+            },
+            cost: {
+                min: D(3),
+                max: D(15),
+            },
+        },
         //#endregion Rare
         //#region Epic
         leaf: {
@@ -1251,6 +1357,51 @@ addLayer('v', {
                 max: D(15),
             },
         },
+        monster_meal: {
+            merch: {
+                type: 'dish',
+                dish: 'monster_meal',
+            },
+            rarity: 'epic',
+            amount: {
+                max: D(20),
+                min: D(1),
+            },
+            cost: {
+                min: D(6.66),
+                max: D(16.66),
+            },
+        },
+        cake: {
+            merch: {
+                type: 'dish',
+                dish: 'cake',
+            },
+            rarity: 'epic',
+            amount: {
+                max: D(50),
+                min: D(10),
+            },
+            cost: {
+                min: D(7.5),
+                max: D(25),
+            },
+        },
+        pizza: {
+            merch: {
+                type: 'dish',
+                dish: 'pizza',
+            },
+            rarity: 'epic',
+            amount: {
+                max: D(25),
+                min: D(5),
+            },
+            cost: {
+                min: D(5),
+                max: D(25),
+            },
+        },
         //#endregion Epic
         //#region Legendary
         stardust: {
@@ -1311,6 +1462,36 @@ addLayer('v', {
             cost: {
                 min: D(30),
                 max: D(70),
+            },
+        },
+        star_crunch: {
+            merch: {
+                type: 'dish',
+                dish: 'star_crunch',
+            },
+            rarity: 'legendary',
+            amount: {
+                max: D(5),
+                min: D(1),
+            },
+            cost: {
+                min: D(7.7),
+                max: D(77),
+            },
+        },
+        chocolate: {
+            merch: {
+                type: 'dish',
+                dish: 'chocolate',
+            },
+            rarity: 'legendary',
+            amount: {
+                max: D(25),
+                min: D(5),
+            },
+            cost: {
+                min: D(7.5),
+                max: D(30),
             },
         },
         //#endregion Legendary
@@ -1417,6 +1598,7 @@ addLayer('v', {
             'border-width': '4px',
         },
     },
+    prestigeNotify() { return tmp.s.prestigeNotify; },
 });
 
 // Only for soft resets in vending

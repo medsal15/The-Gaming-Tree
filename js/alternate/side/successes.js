@@ -476,9 +476,9 @@ addLayer('suc', {
             unlocked() { return tmp.v.layerShown; },
         },
         103: {
-            name: 'I can\'t believe you sold that',
-            tooltip: 'Sell a failed dish',
-            done() { return false; }, // check the code in vending
+            name: 'It\'s Pizza Time!',
+            tooltip: 'Get some pizza',
+            done() { return player.k.dishes.pizza.amount.gt(0); },
             onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.v.color); },
             style() {
                 let s = {};

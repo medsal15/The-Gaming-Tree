@@ -582,6 +582,7 @@ addLayer('xp_alt', {
                 if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['xp_alt'] ?? 1);
 
                 mult = mult.times(tmp.k.dishes.failure.effect);
+                mult = mult.times(tmp.k.dishes.coffee.effect.monster);
 
                 // Main
                 if (hasUpgrade('xp', 12)) mult = mult.times(upgradeEffect('xp', 12).experience.pow(tmp.a.change_efficiency));
@@ -644,6 +645,7 @@ addLayer('xp_alt', {
                 if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['xp_alt'] ?? 1);
 
                 mult = mult.times(tmp.k.dishes.fried_eggs.effect.prod);
+                mult = mult.times(tmp.k.dishes.coffee.effect.monster);
 
                 mult = mult.times(buyableEffect('fr', 33).monster);
 

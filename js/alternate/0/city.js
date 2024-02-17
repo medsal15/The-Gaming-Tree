@@ -1831,6 +1831,7 @@ addLayer('c', {
 
                 mult = mult.times(tmp.k.dishes.failure.effect);
                 mult = mult.times(tmp.k.dishes.bread.effect);
+                mult = mult.times(tmp.k.dishes.soda.effect.city);
 
                 if (hasUpgrade('v', 12)) mult = mult.times(upgradeEffect('v', 12));
 
