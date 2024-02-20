@@ -1,6 +1,7 @@
 'use strict';
 
 //todo change plant aging from list of ages to list of time to wait
+//todo change plant age to no longer be relative to grow speed
 addLayer('p', {
     name: 'Plants',
     symbol: 'P',

@@ -1171,6 +1171,8 @@ addLayer('s', {
 
         mult = mult.times(tmp.l.skills.bartering.effect);
 
+        if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['v'] ?? 1);
+
         mult = mult.times(tmp.k.dishes.chocolate.effect.coin_gain);
 
         mult = mult.times(buyableEffect('fr', 23));

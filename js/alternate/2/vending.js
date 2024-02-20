@@ -1,6 +1,6 @@
 'use strict';
 
-//todo? add quest board for easy money (refreshed at same rate as legendary)
+//todo add quest board with blessing for easy money (refreshed at same rate as legendary)
 addLayer('v', {
     name: 'Shop?',
     symbol: 'V',
