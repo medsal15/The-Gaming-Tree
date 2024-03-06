@@ -6,6 +6,8 @@ Add an export save to file
 
 Show effect difference when buying a buyable
 
+Use [\<dialog\>](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog) for import
+
 Final pre-1.0 is `0.~`
 
 ## Cleanup/Prettying up ##

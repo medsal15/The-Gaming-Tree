@@ -169,14 +169,6 @@ addLayer('xp', {
         },
         'Upgrades': {
             content: [
-                [
-                    'display-text',
-                    () => {
-                        const kill_style = (text, ...style) => `<span style="color:${tmp.xp.color_kill};text-shadow:${tmp.xp.color_kill} 0 0 10px;${style.join(';')}">${text}</span>`;
-                        return `You have ${layerColor('xp', format(player.xp.points, player.xp.points.gte('1e9') ? 2 : 0), 'font-size:1.5em;')} experience
-                            and ${kill_style(formatWhole(tmp.xp.total.kills), 'font-size:1.5em')} kills`;
-                    },
-                ],
                 () => {
                     if (hasChallenge('b', 11)) return;
 
@@ -377,8 +369,33 @@ addLayer('xp', {
                 return base;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp.total.kills.gte(5) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(5) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(5),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 5 kills<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp.color} dashed 2px`,
+                    };
+                }
+            },
         },
         12: {
             title: 'Stronger Monsters',
@@ -399,8 +416,33 @@ addLayer('xp', {
                 const { health, experience } = upgradeEffect(this.layer, this.id);
                 return `+${format(health)} health, *${format(experience)} xp`;
             },
-            unlocked() { return tmp.xp.total.kills.gte(10) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(10) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(10),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 10 kills<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp.color} dashed 2px`,
+                    };
+                }
+            },
         },
         13: {
             title: 'Bloodthirst',
@@ -423,8 +465,33 @@ addLayer('xp', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp.total.kills.gte(15) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(15) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(15),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 15 kills<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp.color} dashed 2px`,
+                    };
+                }
+            },
         },
         21: {
             title: 'Bloodlust',
@@ -445,8 +512,33 @@ addLayer('xp', {
                 return effect;
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp.total.kills.gte(30) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(30) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(50),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 30 kills<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp.color} dashed 2px`,
+                    };
+                }
+            },
         },
         22: {
             title: 'Sword Trap',
@@ -472,8 +564,33 @@ addLayer('xp', {
                 if (hasChallenge('b', 12)) return '';
                 return `${format(tmp.xp.enemies[player.xp.type].damage.times(upgradeEffect(this.layer, this.id).active))} /s`;
             },
-            unlocked() { return tmp.xp.total.kills.gte(50) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(50) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(150),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 50 kills<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp.color} dashed 2px`,
+                    };
+                }
+            },
         },
         23: {
             title: 'Notebook',
@@ -486,8 +603,33 @@ addLayer('xp', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp.total.kills.gte(70) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(70) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(250),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 70 kills<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp.color} dashed 2px`,
+                    };
+                }
+            },
         },
         31: {
             title: 'Sword of Knowledge',
@@ -502,13 +644,37 @@ addLayer('xp', {
             },
             effect() { return player.xp.points.max(0).max(0).add(5).log(5); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp.total.kills.gte(100) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(100) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(400),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 100 kills<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp.color} dashed 2px`,
+                    };
+                }
+            },
         },
         32: {
             title: 'Book of Numbers',
             description: 'Reapply first row upgrades effects',
-            unlocked() { return tmp.xp.total.kills.gte(125) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             effect() {
                 let effect = D.dTwo;
 
@@ -517,15 +683,66 @@ addLayer('xp', {
                 return effect;
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1))} times`; },
+            allow() { return tmp.xp.total.kills.gte(125) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(600),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 125 kills<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp.color} dashed 2px`,
+                    };
+                }
+            },
         },
         33: {
             title: 'Better Power',
             description: 'Unlock 2 new layers<br>Deal 50% more damage',
             effect() { return D(1.5); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp.total.kills.gte(150) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(150) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(900),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 150 kills<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp.color} dashed 2px`,
+                    };
+                }
+            },
         },
         41: {
             title: 'Sword of Death',

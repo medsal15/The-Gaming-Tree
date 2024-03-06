@@ -84,6 +84,7 @@ let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.C</h3><br>
 		- Added 4 new layers.<br>
 		- QoL: Items now display the total gain/loss per second.<br>
+		- QoL: Improved experience upgrade display.<br>
 		- Update endgame: Alternate the Alternator.<br>
 	<h3>v0.B.1</h3><br>
 		- Fixed a bug with the Freezer.<br>

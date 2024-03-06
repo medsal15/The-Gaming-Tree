@@ -1959,6 +1959,7 @@ type Layers = {
         total: {
             kills(): Decimal
         }
+        upgrades: { [id: string]: Upgrade<'xp'> & { allow(): boolean } }
     }
     m: Layer<'m'> & {
         upgrades: {
@@ -2418,6 +2419,7 @@ type Layers = {
         total: {
             tamed(): Decimal
         }
+        upgrades: { [id: string]: Upgrade<'xp_alt'> & { allow(): boolean } }
     }
     c: Layer<'c'> & {
         upgrades: {

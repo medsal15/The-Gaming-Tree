@@ -132,14 +132,6 @@ addLayer('xp_alt', {
         },
         'Upgrades': {
             content: [
-                [
-                    'display-text',
-                    () => {
-                        const tame_style = (text, ...style) => `<span style="color:${tmp.xp_alt.color_tame};text-shadow:${tmp.xp_alt.color_tame} 0 0 10px;${style.join(';')}">${text}</span>`;
-                        return `You have ${layerColor('xp_alt', format(player.xp_alt.points), 'font-size:1.5em;')} experience
-                            and ${tame_style(formatWhole(tmp.xp_alt.total.tamed), 'font-size:1.5em')} tamed monsters`;
-                    },
-                ],
                 () => {
                     if (hasChallenge('b', 11)) return;
 
@@ -370,8 +362,33 @@ addLayer('xp_alt', {
                 return base;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp_alt.total.tamed.gte(5) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(5) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(5),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 5 tames<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp_alt.color} dashed 2px`,
+                    };
+                }
+            },
         },
         12: {
             title: 'Softer Monsters',
@@ -387,8 +404,33 @@ addLayer('xp_alt', {
                 const { difficulty, produce } = upgradeEffect(this.layer, this.id);
                 return `+${format(difficulty)} difficulty, *${format(produce)} production`;
             },
-            unlocked() { return tmp.xp_alt.total.tamed.gte(10) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(10) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(10),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 10 tames<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp_alt.color} dashed 2px`,
+                    };
+                }
+            },
         },
         13: {
             title: 'Friendsmell',
@@ -407,8 +449,33 @@ addLayer('xp_alt', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp_alt.total.tamed.gte(15) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(15) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(15),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 15 tames<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp_alt.color} dashed 2px`,
+                    };
+                }
+            },
         },
         21: {
             title: 'Sweet Scent',
@@ -427,8 +494,33 @@ addLayer('xp_alt', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp_alt.total.tamed.gte(30) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(30) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(50),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 30 tames<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp_alt.color} dashed 2px`,
+                    };
+                }
+            },
         },
         22: {
             title: 'Slime Trap',
@@ -445,8 +537,33 @@ addLayer('xp_alt', {
                     return `Formula: ${formula}`;
                 }
             },
-            unlocked() { return tmp.xp_alt.total.tamed.gte(50) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(50) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(150),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 50 tames<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp_alt.color} dashed 2px`,
+                    };
+                }
+            },
         },
         23: {
             title: 'Group Reading',
@@ -459,8 +576,33 @@ addLayer('xp_alt', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp_alt.total.tamed.gte(70) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(70) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(250),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 23 tames<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp_alt.color} dashed 2px`,
+                    };
+                }
+            },
         },
         31: {
             title: 'Crunchy Carrots',
@@ -475,8 +617,33 @@ addLayer('xp_alt', {
             },
             effect() { return tmp.xp_alt.total.tamed.max(0).add(5).log(5); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp_alt.total.tamed.gte(100) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(100) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(400),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 100 tames<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp_alt.color} dashed 2px`,
+                    };
+                }
+            },
         },
         32: {
             title: 'How to Care for Monsters for Dummies',
@@ -489,16 +656,66 @@ addLayer('xp_alt', {
                 return mult;
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1).times(100))}%`; },
-            unlocked() { return tmp.xp_alt.total.tamed.gte(125) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(125) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(600),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 125 tames<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp_alt.color} dashed 2px`,
+                    };
+                }
+            },
         },
         33: {
             title: 'Shiny Coin',
             description: 'Unlock goblins<br>Halve taming difficulty',
             effect() { return D(2); },
             effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp_alt.total.tamed.gte(150) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(150) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(900),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 150 tames<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp_alt.color} dashed 2px`,
+                    };
+                }
+            },
         },
         41: {
             title: 'Fish Fingers',
@@ -555,8 +772,33 @@ addLayer('xp_alt', {
             },
             effect() { return tmp.xp_alt.total.tamed.div(50); },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return tmp.xp_alt.total.tamed.gte(567) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(567) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
             cost: D(1234),
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        Cost: ${formatWhole(thismp.cost)} experience`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    Requires 567 tames<br><br>\
+                    Cost: ??? experience`;
+            },
+            canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
+            style() {
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    return {
+                        'background-color': 'transparent',
+                        'color': 'white',
+                        'border': `${tmp.xp_alt.color} dashed 2px`,
+                    };
+                }
+            },
         },
     },
     monsters: {
