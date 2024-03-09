@@ -1,7 +1,5 @@
 'use strict';
 
-//todo change plant aging from list of ages to list of time to wait
-//todo change plant age to no longer be relative to grow speed
 addLayer('p', {
     name: 'Plants',
     symbol: 'P',
@@ -112,6 +110,8 @@ addLayer('p', {
                         ],
                     ];
                 },
+                ['display-text', () => `Grow speed: *${format(tmp.p.plants['*'].grow_mult)}`],
+                'blank',
                 ['row', [
                     ['display-text', 'Currently planting'],
                     'blank',
@@ -129,7 +129,10 @@ addLayer('p', {
 
                                 return [
                                     [['display-text', capitalize(plant.name)]],
-                                    [['display-text', `Maturation: ${formatTime(plant.maturation)}`], ['display-text', `Lifespan: ${formatTime(plant.ages.at(-1)[1])}`]],
+                                    [
+                                        ['display-text', `Maturation: ${formatTime(plant_maturation_time(plant_id))}`],
+                                        ['display-text', `Lifespan: ${formatTime(plant_lifespan(plant_id))}`]
+                                    ],
                                     [['display-text', plant.effect_text ?? 'None']],
                                     [['display-text', `${format(player.p.plants[plant_id].seeds)} seeds`], 'h-line', ...produces],
                                 ];
@@ -407,8 +410,9 @@ addLayer('p', {
                 // prevent accidental double clicking
                 if (D.lt(data.age, 1)) return;
                 // Get items
-                const drops = layers.p.plants[data.plant].produce(data.age),
-                    seeds = layers.p.plants[data.plant].seeds(data.age),
+                const stage = tmp.p.plants[data.plant].times[plant_age_index(data.plant, data.age)][1],
+                    drops = layers.p.plants[data.plant].produce(stage),
+                    seeds = layers.p.plants[data.plant].seeds(stage),
                     player_data = player.p.plants[data.plant],
                     equal = drops.length == player_data.last_harvest.length &&
                         seeds.eq(player_data.last_harvest_seeds) &&
@@ -446,14 +450,12 @@ addLayer('p', {
 
             const plant = tmp.p.plants[data.plant],
                 nega = data.age.lt(0),
-                /** @type {number} */
-                stage = plant.ages.findIndex(([from, to]) => D.gt(data.age.abs(), from) && D.lte(data.age.abs(), to)),
-                image = plant.images[stage],
                 negastyle = {
                     'transform': `scaleY(-1)`,
                     'filter': `invert(1)`,
                     'z-index': 10,
                 };
+            const image = plant.images[plant_age_index(data.plant, data.age)];
 
             return Object.assign(
                 {},
@@ -532,32 +534,14 @@ addLayer('p', {
                     'background-color': '#FFDDBB',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(.5 * 60)],
-                    [D(.5 * 60), D(1 * 60)],
-                    [D(1 * 60), D(1.5 * 60)],
-                    [D(1.5 * 60), D(2 * 60)],
-                    [D(2 * 60), D(5 * 60)], // mature
-                    [D(5 * 60), D(6 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(2 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [30, 'growing'],
+                [30, 'growing'],
+                [30, 'growing'],
+                [30, 'growing'],
+                [180, 'mature'],
+                [60, 'wilting']
+            ],
             images: [
                 'resources/images/plants/wheat/age1.png',
                 'resources/images/plants/wheat/age2.png',
@@ -566,33 +550,33 @@ addLayer('p', {
                 'resources/images/plants/wheat/age5.png',
                 'resources/images/plants/wheat/age6.png',
             ],
-            produce(age) {
-                if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
-
-                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
-
-                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+            produce(stage) {
+                switch (stage) {
+                    case 'growing': return [];
+                    case 'mature': return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+                    case 'wilting': return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
+                }
             },
             produces: ['wheat'],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.5);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.5, mult);
+                return seeds;
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, plant_maturation_time(this.id))); },
             infusions: {
                 'copper_ore': 'copper_wheat',
                 'slime_goo': 'corn',
@@ -608,32 +592,14 @@ addLayer('p', {
                     'background-color': '#BB7733',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(1 * 60)],
-                    [D(1 * 60), D(2 * 60)],
-                    [D(2 * 60), D(3 * 60)],
-                    [D(3 * 60), D(4 * 60)],
-                    [D(4 * 60), D(8 * 60)], // mature
-                    [D(8 * 60), D(10 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(4 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [60, 'growing'],
+                [60, 'growing'],
+                [60, 'growing'],
+                [60, 'growing'],
+                [4 * 60, 'mature'],
+                [2 * 60, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/copper_wheat/age1.png',
                 'resources/images/plants/copper_wheat/age2.png',
@@ -642,33 +608,33 @@ addLayer('p', {
                 'resources/images/plants/copper_wheat/age5.png',
                 'resources/images/plants/copper_wheat/age6.png',
             ],
-            produce(age) {
-                if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
-
-                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
-
-                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+            produce(stage) {
+                switch (stage) {
+                    case 'growing': return [];
+                    case 'mature': return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+                    case 'wilting': return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
+                }
             },
             produces: ['copper_ore', 'wheat'],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.1);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.1, mult);
+                return seeds;
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, plant_maturation_time(this.id))); },
             infusions: {},
             unlocked() { return player.p.plants.wheat.infusions.includes(this.id); },
             hint: 'Needs copper',
@@ -682,32 +648,14 @@ addLayer('p', {
                     'background-color': '#FFEE55',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(1 * 60)],
-                    [D(1 * 60), D(2 * 60)],
-                    [D(2 * 60), D(3 * 60)],
-                    [D(3 * 60), D(4 * 60)],
-                    [D(4 * 60), D(10 * 60)], // mature
-                    [D(10 * 60), D(11 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(4 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [60, 'growing'],
+                [60, 'growing'],
+                [60, 'growing'],
+                [60, 'growing'],
+                [360, 'mature'],
+                [60, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/corn/age1.png',
                 'resources/images/plants/corn/age2.png',
@@ -716,33 +664,33 @@ addLayer('p', {
                 'resources/images/plants/corn/age5.png',
                 'resources/images/plants/corn/age6.png',
             ],
-            produce(age) {
-                if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
-
-                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
-
-                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+            produce(stage) {
+                switch (stage) {
+                    case 'growing': return [];
+                    case 'mature': return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+                    case 'wilting': return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
+                }
             },
             produces: ['corn'],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.25);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.25, mult);
+                return seeds;
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, plant_maturation_time(this.id))); },
             infusions: {
                 'wheat': 'candy_corn',
                 'red_fabric': 'strawberry',
@@ -760,32 +708,14 @@ addLayer('p', {
                     'background-color': '#FF5500',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(1.5 * 60)],
-                    [D(1.5 * 60), D(3 * 60)],
-                    [D(3 * 60), D(4.5 * 60)],
-                    [D(4.5 * 60), D(6 * 60)],
-                    [D(6 * 60), D(16 * 60)], // mature
-                    [D(16 * 60), D(18 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(6 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [90, 'growing'],
+                [90, 'growing'],
+                [90, 'growing'],
+                [90, 'growing'],
+                [600, 'mature'],
+                [120, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/candy_corn/age1.png',
                 'resources/images/plants/candy_corn/age2.png',
@@ -794,31 +724,31 @@ addLayer('p', {
                 'resources/images/plants/candy_corn/age5.png',
                 'resources/images/plants/candy_corn/age6.png',
             ],
-            produce(age) {
-                if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
-
-                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
-
-                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+            produce(stage) {
+                switch (stage) {
+                    case 'growing': return [];
+                    case 'mature': return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+                    case 'wilting': return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
+                }
             },
             produces: ['corn'],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.1);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.1, mult);
+                return seeds;
             },
             notify: false,
             infusions: {},
@@ -832,10 +762,9 @@ addLayer('p', {
 
                     return row > 0 && row <= tmp.p.grid.rows && col > 0 && col <= tmp.p.grid.cols;
                 }).map(([, data]) => data),
-                    ages = tmp.p.plants[this.id].ages,
-                    /** @type {{[age: number]: Decimal}} */
+                    /** @type {{[stage: number]: Decimal}} */
                     amounts = planted.reduce((set, data) => {
-                        const i = ages.findIndex(([from, to]) => data.age.gt(from) && data.age.lte(to));
+                        const i = plant_age_index(this.id, data.age);
 
                         set[i] = D.add(set[i], 1);
 
@@ -871,32 +800,14 @@ addLayer('p', {
                     'background-color': '#FF4444',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(1.5 * 60)],
-                    [D(1.5 * 60), D(2.5 * 60)],
-                    [D(2.5 * 60), D(3.5 * 60)],
-                    [D(3.5 * 60), D(5.5 * 60)],
-                    [D(5.5 * 60), D(11 * 60)], // mature
-                    [D(11 * 60), D(13 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(5.5 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [90, 'growing'],
+                [60, 'growing'],
+                [60, 'growing'],
+                [120, 'growing'],
+                [330, 'mature'],
+                [120, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/strawberry/age1.png',
                 'resources/images/plants/strawberry/age2.png',
@@ -905,33 +816,33 @@ addLayer('p', {
                 'resources/images/plants/strawberry/age5.png',
                 'resources/images/plants/strawberry/age6.png',
             ],
-            produce(age) {
-                if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
-
-                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
-
-                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+            produce(stage) {
+                switch (stage) {
+                    case 'growing': return [];
+                    case 'mature': return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+                    case 'wilting': return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
+                }
             },
             produces: ['strawberry'],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.25);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.25, mult);
+                return seeds;
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, plant_maturation_time(this.id))); },
             infusions: {
                 'iron_ore': 'clockberry',
             },
@@ -947,32 +858,14 @@ addLayer('p', {
                     'background-color': '#FFFFFF',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(1.5 * 60)],
-                    [D(1.5 * 60), D(2.5 * 60)],
-                    [D(2.5 * 60), D(3.5 * 60)],
-                    [D(3.5 * 60), D(5.5 * 60)],
-                    [D(5.5 * 60), D(25.5 * 60)], // mature
-                    [D(25.5 * 60), D(30 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(5.5 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [90, 'growing'],
+                [60, 'growing'],
+                [60, 'growing'],
+                [120, 'growing'],
+                [1200, 'mature'],
+                [300, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/clockberry/age1.png',
                 'resources/images/plants/clockberry/age2.png',
@@ -981,31 +874,31 @@ addLayer('p', {
                 'resources/images/plants/clockberry/age5.png',
                 'resources/images/plants/clockberry/age6.png',
             ],
-            produce(age) {
-                if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
-
-                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
-
-                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+            produce(stage) {
+                switch (stage) {
+                    case 'growing': return [];
+                    case 'mature': return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+                    case 'wilting': return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
+                }
             },
             produces: ['strawberry'],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.1);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.1, mult);
+                return seeds;
             },
             notify: false,
             infusions: {},
@@ -1019,10 +912,8 @@ addLayer('p', {
 
                     return row > 0 && row <= tmp.p.grid.rows && col > 0 && col <= tmp.p.grid.cols;
                 }).map(([, data]) => data),
-                    ages = tmp.p.plants[this.id].ages,
-                    /** @type {{[age: number]: Decimal}} */
                     amounts = planted.reduce((set, data) => {
-                        const i = ages.findIndex(([from, to]) => data.age.gt(from) && data.age.lte(to));
+                        const i = plant_age_index(this.id, data.age);
 
                         set[i] = D.add(set[i], 1);
 
@@ -1058,32 +949,14 @@ addLayer('p', {
                     'background-color': '#FFCC33',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(2 * 60)],
-                    [D(2 * 60), D(3 * 60)],
-                    [D(3 * 60), D(4 * 60)],
-                    [D(4 * 60), D(6 * 60)],
-                    [D(6 * 60), D(9 * 60)], // mature
-                    [D(9 * 60), D(11 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(6 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [120, 'growing'],
+                [60, 'growing'],
+                [60, 'growing'],
+                [120, 'growing'],
+                [240, 'mature'],
+                [120, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/sunflower/age1.png',
                 'resources/images/plants/sunflower/age2.png',
@@ -1092,25 +965,25 @@ addLayer('p', {
                 'resources/images/plants/sunflower/age5.png',
                 'resources/images/plants/sunflower/age6.png',
             ],
-            produce(age) { return []; },
+            produce(stage) { return []; },
             produces: [],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.25);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.25, mult);
+                return seeds;
             },
             notify: false,
             unlocked() { return player.p.plants.corn.infusions.includes(this.id); },
@@ -1127,10 +1000,8 @@ addLayer('p', {
 
                     return row > 0 && row <= tmp.p.grid.rows && col > 0 && col <= tmp.p.grid.cols;
                 }).map(([, data]) => data),
-                    ages = tmp.p.plants[this.id].ages,
-                    /** @type {{[age: number]: Decimal}} */
                     amounts = planted.reduce((set, data) => {
-                        const i = ages.findIndex(([from, to]) => data.age.gt(from) && data.age.lte(to));
+                        const i = plant_age_index(this.id, data.age);
 
                         set[i] = D.add(set[i], 1);
 
@@ -1166,32 +1037,14 @@ addLayer('p', {
                     'background-color'() { return tmp.xp.enemies.star.color; },
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(2 * 60)],
-                    [D(2 * 60), D(4 * 60)],
-                    [D(4 * 60), D(6 * 60)],
-                    [D(6 * 60), D(8 * 60)],
-                    [D(8 * 60), D(38 * 60)], // mature
-                    [D(38 * 60), D(40 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(8 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [120, 'growing'],
+                [120, 'growing'],
+                [120, 'growing'],
+                [120, 'growing'],
+                [1800, 'mature'],
+                [120, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/starflower/age1.png',
                 'resources/images/plants/starflower/age2.png',
@@ -1200,25 +1053,25 @@ addLayer('p', {
                 'resources/images/plants/starflower/age5.png',
                 'resources/images/plants/starflower/age6.png',
             ],
-            produce(age) { return []; },
+            produce(stage) { return []; },
             produces: [],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.1);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.1, mult);
+                return seeds;
             },
             notify: false,
             unlocked() { return player.p.plants.sunflower.infusions.includes(this.id); },
@@ -1232,10 +1085,9 @@ addLayer('p', {
 
                     return row > 0 && row <= tmp.p.grid.rows && col > 0 && col <= tmp.p.grid.cols;
                 }).map(([, data]) => data),
-                    ages = tmp.p.plants[this.id].ages,
                     /** @type {{[age: number]: Decimal}} */
                     amounts = planted.reduce((set, data) => {
-                        const i = ages.findIndex(([from, to]) => data.age.gt(from) && data.age.lte(to));
+                        const i = plant_age_index(this.id, data.age);
 
                         set[i] = D.add(set[i], 1);
 
@@ -1271,32 +1123,14 @@ addLayer('p', {
                     'background-color': '#FFCC88',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(1 * 60)],
-                    [D(1 * 60), D(2 * 60)],
-                    [D(2 * 60), D(3 * 60)],
-                    [D(3 * 60), D(4 * 60)],
-                    [D(4 * 60), D(8 * 60)], // mature
-                    [D(8 * 60), D(10 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(4 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [60, 'growing'],
+                [60, 'growing'],
+                [60, 'growing'],
+                [60, 'growing'],
+                [240, 'mature'],
+                [120, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/potato/age1.png',
                 'resources/images/plants/potato/age2.png',
@@ -1305,33 +1139,33 @@ addLayer('p', {
                 'resources/images/plants/potato/age5.png',
                 'resources/images/plants/potato/age6.png',
             ],
-            produce(age) {
-                if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
-
-                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
-
-                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+            produce(stage) {
+                switch (stage) {
+                    case 'growing': return [];
+                    case 'mature': return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+                    case 'wilting': return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
+                }
             },
             produces: ['potato'],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.25);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.25, mult);
+                return seeds;
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, plant_maturation_time(this.id))); },
             infusions: {
                 'gold_ore': 'potato_battery',
             },
@@ -1347,32 +1181,14 @@ addLayer('p', {
                     'background-color': '#FFEE00',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(1.5 * 60)],
-                    [D(1.5 * 60), D(3 * 60)],
-                    [D(3 * 60), D(4.5 * 60)],
-                    [D(4.5 * 60), D(6 * 60)],
-                    [D(6 * 60), D(16 * 60)], // mature
-                    [D(16 * 60), D(20 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(6 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [90, 'growing'],
+                [90, 'growing'],
+                [90, 'growing'],
+                [90, 'growing'],
+                [600, 'mature'],
+                [240, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/potato_battery/age1.png',
                 'resources/images/plants/potato_battery/age2.png',
@@ -1381,31 +1197,31 @@ addLayer('p', {
                 'resources/images/plants/potato_battery/age5.png',
                 'resources/images/plants/potato_battery/age6.png',
             ],
-            produce(age) {
-                if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
-
-                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
-
-                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+            produce(stage) {
+                switch (stage) {
+                    case 'growing': return [];
+                    case 'mature': return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+                    case 'wilting': return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
+                }
             },
             produces: ['potato'],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.1);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.1, mult);
+                return seeds;
             },
             notify: false,
             infusions: {},
@@ -1419,10 +1235,9 @@ addLayer('p', {
 
                     return row > 0 && row <= tmp.p.grid.rows && col > 0 && col <= tmp.p.grid.cols;
                 }).map(([, data]) => data),
-                    ages = tmp.p.plants[this.id].ages,
                     /** @type {{[age: number]: Decimal}} */
                     amounts = planted.reduce((set, data) => {
-                        const i = ages.findIndex(([from, to]) => data.age.gt(from) && data.age.lte(to));
+                        const i = plant_age_index(this.id, data.age);
 
                         set[i] = D.add(set[i], 1);
 
@@ -1458,32 +1273,14 @@ addLayer('p', {
                     'background-color': '#664455',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(1.5 * 60)],
-                    [D(1.5 * 60), D(3 * 60)],
-                    [D(3 * 60), D(4 * 60)],
-                    [D(4 * 60), D(5 * 60)],
-                    [D(5 * 60), D(13 * 60)], // mature
-                    [D(13 * 60), D(15 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(5 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [90, 'growing'],
+                [90, 'growing'],
+                [60, 'growing'],
+                [60, 'growing'],
+                [480, 'mature'],
+                [120, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/eggplant/age1.png',
                 'resources/images/plants/eggplant/age2.png',
@@ -1492,33 +1289,33 @@ addLayer('p', {
                 'resources/images/plants/eggplant/age5.png',
                 'resources/images/plants/eggplant/age6.png',
             ],
-            produce(age) {
-                if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
-
-                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
-
-                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+            produce(stage) {
+                switch (stage) {
+                    case 'growing': return [];
+                    case 'mature': return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+                    case 'wilting': return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
+                }
             },
             produces: ['eggplant'],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.25);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.25, mult);
+                return seeds;
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, plant_maturation_time(this.id))); },
             infusions: {
                 'slime_core': 'egg_plant',
             },
@@ -1534,32 +1331,14 @@ addLayer('p', {
                     'background-color': '#FFEEDD',
                 },
             },
-            ages() {
-                /** @type {[Decimal, Decimal][]} */
-                const ages = [
-                    [D(-1), D(2.5 * 60)],
-                    [D(2.5 * 60), D(5 * 60)],
-                    [D(5 * 60), D(7.5 * 60)],
-                    [D(7.5 * 60), D(11 * 60)],
-                    [D(11 * 60), D(60 * 60)], // mature
-                    [D(60 * 60), D(65 * 60)], // wilting
-                ];
-
-                ages.forEach(([from, to], i) => {
-                    let div = tmp.p.plants['*'].grow_mult;
-
-                    ages[i] = [from.div(div), to.div(div)];
-                });
-
-                return ages;
-            },
-            maturation() {
-                let maturation = D(11 * 60);
-
-                maturation = maturation.div(tmp.p.plants['*'].grow_mult);
-
-                return maturation;
-            },
+            times: [
+                [150, 'growing'],
+                [150, 'growing'],
+                [150, 'growing'],
+                [150, 'growing'],
+                [3000, 'mature'],
+                [300, 'wilting'],
+            ],
             images: [
                 'resources/images/plants/egg_plant/age1.png',
                 'resources/images/plants/egg_plant/age2.png',
@@ -1568,33 +1347,33 @@ addLayer('p', {
                 'resources/images/plants/egg_plant/age5.png',
                 'resources/images/plants/egg_plant/age6.png',
             ],
-            produce(age) {
-                if (D.lte(age, tmp.p.plants[this.id].maturation)) return [];
-
-                if (D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0])) return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
-
-                return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+            produce(stage) {
+                switch (stage) {
+                    case 'growing': return [];
+                    case 'mature': return get_type_drops(`plant:${this.id}`, tmp.p.plants['*'].harvest_mult);
+                    case 'wilting': return get_type_drops(`plant:${this.id}:old`, tmp.p.plants['*'].harvest_mult);
+                }
             },
             produces: ['egg'],
-            seeds(age) {
-                let mult = D.dOne;
+            seeds(stage) {
+                if (stage == 'growing') return D.dOne;
+
+                let seeds = D(1.1);
 
                 const upg = false;
                 if (upg && hasUpgrade('s', upg)) {
-                    mult = mult.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
+                    seeds = seeds.times(upgradeEffect('s', upg).pow(tmp.a.change_efficiency));
                 } else if (inChallenge('b', 12)) {
-                    mult = mult.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
+                    seeds = seeds.div(D.add(player.p.plants[this.id].seeds.max(0), 10).log10().pow(tmp.a.change_efficiency));
                 }
 
-                if (D.lte(age, tmp.p.plants[this.id].maturation) ||
-                    D.gt(age, tmp.p.plants[this.id].ages.at(-1)[0]) ||
-                    D.gt(player.p.plants[this.id].seeds, 1e3)) return mult;
+                seeds = seeds.times(tmp.p.plants['*'].seeds_mult);
 
-                mult = mult.times(tmp.p.plants['*'].seeds_mult);
+                if (stage == 'wilting') seeds = seeds.sqrt();
 
-                return D.times(1.1, mult);
+                return seeds;
             },
-            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, tmp.p.plants[this.id].maturation)); },
+            notify() { return Object.values(player.p.grid).some(data => data.plant == this.id && D.gt(data.age, plant_maturation_time(this.id))); },
             infusions: {},
             unlocked() { return player.p.plants.eggplant.infusions.includes(this.id); },
             hint() { if (tmp.p.plants.eggplant.unlocked) return 'Add something... circular?'; },
@@ -1604,14 +1383,16 @@ addLayer('p', {
         if (tmp.clo.layerShown) diff = D.times(diff, layers.clo.time_speed(this.layer));
         if (tmp.tic.layerShown) diff = D.times(diff, layers.tic.time_speed(this.layer));
 
+        const grow = D.times(diff, tmp.p.plants['*'].grow_mult);
+
         Object.entries(player.p.grid).forEach(([, data]) => {
             if (data.plant == '') return;
 
-            data.age = D.add(data.age, diff);
-            if (D.gte(data.age, tmp.p.plants[data.plant].ages.at(-1)[1])) {
+            data.age = D.add(data.age, grow);
+            if (D.gte(data.age, plant_lifespan(data.plant))) {
                 // Oops, plant is dead
-                const drops = layers.p.plants[data.plant].produce(data.age),
-                    seeds = layers.p.plants[data.plant].seeds(data.age),
+                const drops = layers.p.plants[data.plant].produce('wilting'),
+                    seeds = layers.p.plants[data.plant].seeds('wilting'),
                     player_data = player.p.plants[data.plant],
                     equal = drops.length == player_data.last_harvest.length &&
                         seeds.eq(player_data.last_harvest_seeds) &&

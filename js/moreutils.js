@@ -538,6 +538,63 @@ function get_monster_drops(monster, kills) {
     }
 }
 /**
+ * @type {((plant: string, age: DecimalSource) => number) & {
+ *  cache: { [plant: string]: [min: Decimal, max: Decimal][] }
+ * }}
+ */
+const plant_age_index = (plant, age) => {
+    if (!plant) return -1;
+
+    const cache = plant_age_index.cache ??= {},
+        list = cache[plant] ??= [];
+    if (!list.length) {
+        const tmplant = tmp.p.plants[plant];
+        for (let s = D.dZero, i = 0; i < tmplant.times.length; i++) {
+            /** @type {DecimalSource} */
+            let t = tmplant.times[i][0];
+            list.push([s, D.add(s, t)]);
+            s = s.add(t);
+        }
+    }
+
+    return list.findIndex(([min, max]) => D.gte(age, min) && D.lt(age, max));
+};
+/**
+ * @type {((plant: string) => Decimal) & {
+ *  cache: { [plant: string]: Decimal }
+ * }}
+ */
+const plant_maturation_time = plant => {
+    if (!plant) return D.dZero;
+
+    const cache = plant_maturation_time.cache ??= {};
+    if (!(plant in cache)) {
+        const tmplant = tmp.p.plants[plant];
+        let mat_t = D.dZero;
+        for (let i = 0; i < tmplant.times.length; i++) {
+            if (tmplant.times[i][1] == 'mature') break;
+            mat_t = mat_t.add(tmplant.times[i][0]);
+        }
+        cache[plant] = mat_t;
+    }
+    return cache[plant];
+};
+/**
+ * @type {((plant: string) => Decimal) & {
+ *  cache: { [plant: string]: Decimal }
+ * }}
+ */
+const plant_lifespan = plant => {
+    if (!plant) return D.dZero;
+
+    const cache = plant_lifespan.cache ??= {};
+    if (!(plant in cache)) {
+        const tmplant = tmp.p.plants[plant];
+        cache[plant] = tmplant.times.reduce((sum, [t]) => D.add(sum, t), D.dZero);
+    }
+    return cache[plant];
+};
+/**
  * @param {`${drop_sources}:${string}`} type
  */
 function type_name(type) {
@@ -745,40 +802,73 @@ function show_shop_row_upgrade(id) {
     ];
 }
 /**
- * @param {rarities} rarity
- * @returns {[string, Decimal, Decimal][]}
+ * @type {((rarity: rarities) => [string, Decimal, Decimal][]) & {
+ *  unrolled: {[r in rarities]: string[]}
+ * }}
  */
-function random_rarity_items(rarity) {
+const random_rarity_items = rarity => {
     const valid = Object.keys(layers.v.items)
-        .filter(item => tmp.v.items[item].rarity == rarity)
-        // shuffle
-        //todo support noRNG
-        .sort(() => .5 - Math.random()),
-        tmprarity = tmp.v.rarities[rarity],
-        amount = D.minus(tmprarity.amount.max, tmprarity.amount.min).times(Math.random()).add(tmprarity.amount.min).floor().toNumber(),
-        entries = valid.slice(0, amount);
+        .filter(entry => tmp.v.items[entry].rarity == rarity),
+        tmprarity = tmp.v.rarities[rarity];
+    let amount;
 
-    return entries.map(entry => {
-        const temptry = tmp.v.items[entry];
-
-        let amount, cost;
-        if (options.noRNG) {
-            amount = D.add(temptry.amount.max, temptry.amount.min).div(2).times(tmp.v.items['*'].amount_mult).floor();
-            cost = D.add(temptry.cost.max, temptry.cost.min).div(2).times(tmp.v.items['*'].cost_mult);
-        } else {
-            let amount_range = D.minus(temptry.amount.max, temptry.amount.min);
-            amount = D.times(Math.random(), amount_range).add(temptry.amount.min).times(tmp.v.items['*'].amount_mult).floor();
-            let cost_range = D.minus(temptry.cost.max, temptry.cost.min);
-            cost = D.times(Math.random(), cost_range).add(temptry.cost.min).times(tmp.v.items['*'].cost_mult);
+    if (options.noRNG) {
+        amount = D.minus(tmprarity.amount.max, tmprarity.amount.min).div(2).add(tmprarity.amount.min).floor().toNumber();
+        const unrolled = (random_rarity_items.unrolled ??= {}),
+            unrolled_last = unrolled[rarity] ??= [];
+        // Refill future rolls
+        if (unrolled_last.length < amount) unrolled_last.push(...valid);
+        // Replace result with a semi random list of entries
+        // You're guaranteed to see all entries over ceil(amount/total) rolls
+        valid.length = 0;
+        valid.push(...unrolled_last.splice(0, amount));
+        // Try to remove duplicates as they cause problems
+        let attempts = 0;
+        while (new Set(valid).size != valid.length && attempts < 5) {
+            const sorted = [...valid].sort(),
+                dupes = sorted.filter((s, i) => s == sorted[i + 1]),
+                uniques = new Set(valid);
+            unrolled_last.push(...dupes);
+            valid.length = 0;
+            valid.push(...uniques, ...unrolled_last.splice(0, amount - uniques.size));
+            attempts++;
         }
+        // Failed to replace duplicates with valid entries, keep only unique entries
+        if (new Set(valid).size != valid.length) {
+            const uniques = new Set(valid);
+            valid.length = 0;
+            valid.push(...uniques);
+        }
+    } else {
+        amount = D.minus(tmprarity.amount.max, tmprarity.amount.min).times(Math.random()).add(tmprarity.amount.min).floor().toNumber();
+    }
+    // Randomize order as it no longer affects rolls
+    valid.sort(() => .5 - Math.random());
 
-        return [entry, amount, cost];
-    });
+    return valid.slice(0, amount)
+        .map(entry => {
+            const temptry = tmp.v.items[entry];
+
+            let amount, cost;
+            if (options.noRNG) {
+                amount = D.add(temptry.amount.max, temptry.amount.min).div(2).times(tmp.v.items['*'].amount_mult).floor();
+                cost = D.add(temptry.cost.max, temptry.cost.min).div(2).times(tmp.v.items['*'].cost_mult);
+            } else {
+                let amount_range = D.minus(temptry.amount.max, temptry.amount.min);
+                amount = D.times(Math.random(), amount_range).add(temptry.amount.min).times(tmp.v.items['*'].amount_mult).floor();
+                let cost_range = D.minus(temptry.cost.max, temptry.cost.min);
+                cost = D.times(Math.random(), cost_range).add(temptry.cost.min).times(tmp.v.items['*'].cost_mult);
+            }
+
+            return [entry, amount, cost];
+        });
 }
 /**
- * @param {rarities} rarity
+ * @type {((rarity: rarities) => number) & {
+ *  last: {[r in rarities]: number}
+ * }}
  */
-function random_rarity_upgrade(rarity) {
+const random_rarity_upgrade = rarity => {
     let i;
     switch (rarity) {
         case 'common':
@@ -798,6 +888,12 @@ function random_rarity_upgrade(rarity) {
             break;
     }
 
-    //todo support noRNG
-    return i + Math.floor(Math.random() * 5) + 1;
-}
+    if (options.noRNG) {
+        const last = random_rarity_upgrade.last ??= {};
+        if (!(rarity in last)) last[rarity] = 0;
+        last[rarity] = (last[rarity] + 1) % 5;
+        return i + last[rarity];
+    } else {
+        return i + Math.floor(Math.random() * 5) + 1;
+    }
+};

@@ -959,22 +959,6 @@ declare class Achievement<L extends string> {
      * and the values are the values for those attributes (both as strings).
      */
     textStyle?: Computable<CSSStyles>;
-    /**
-     * @deprecated
-     *
-     * Appears when the achievement is hovered over and locked, overrides the basic tooltip.
-     * This is to display the goal (or a hint).
-     * It can also be a function that returns updating text. Can use basic HTML.
-     */
-    goalTooltip?: Computable<string>;
-    /**
-     * @deprecated
-     *
-     * Appears when the achievement is hovered over and completed, overrides the basic tooltip.
-     * This can display what the player achieved (the goal), and the rewards, if any.
-     * It can also be a function that returns updating text. Can use basic HTML.
-     */
-    doneTooltip?: Computable<string>;
 }
 
 declare class Bar<L extends string> {
@@ -1752,6 +1736,13 @@ declare class LayerData {
 
 type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building' | 'plant' | 'freezer' | 'vending';
 type resources = 'science' | 'energy';
+type plants = 'wheat' | 'copper_wheat' |
+    'corn' | 'candy_corn' |
+    'strawberry' | 'clockberry' |
+    'sunflower' | 'starflower' |
+    'potato' | 'potato_battery' |
+    'eggplant' | 'egg_plant';
+type plant_stages = 'growing' | 'mature' | 'wilting';
 type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
     'red_fabric' | 'pyrite_coin' | 'rusty_gear' |
     'rotten_flesh' | 'brain' |
@@ -2507,6 +2498,7 @@ type Layers = {
                 /** List of unlocked plants */
                 list(): string[]
                 harvest_mult(): Decimal
+                /** Grow speed multiplier */
                 grow_mult(): Decimal
                 seeds_mult(): Decimal
                 regexes: {
@@ -2515,8 +2507,8 @@ type Layers = {
                 }
             }
         } & {
-            [plant: string]: {
-                readonly id: string
+            [plant in plants]: {
+                readonly id: plant
                 name: Computable<string>
                 style: {
                     /** General style shared by all others */
@@ -2524,27 +2516,23 @@ type Layers = {
                     grid?: CSSStyles
                 }
                 /**
-                 * List of ages, in seconds as (min, max]
-                 *
-                 * Going beyond the highest will kill the plant
+                 * List of duration (in seconds) for each age with the produce type
                  */
-                ages: Computable<[from: DecimalSource, to: DecimalSource][]>
-                /** Time to maturation (as in, first age it can be harvest for something) */
-                maturation: Computable<DecimalSource>
+                times: [DecimalSource, plant_stages][]
                 /** List of images to display for the age */
                 images: string[]
                 /** Items produced at an age */
-                produce(age: Decimal): [items, Decimal][]
+                produce(stage: plant_stages): [items, Decimal][]
                 /** Full list of produced items */
                 produces: items[]
                 /** Amount of seeds earned from harvest */
-                seeds(age: Decimal): Decimal
+                seeds(stage: plant_stages): Decimal
                 effect?(): any
                 effect_text?(): string
                 /** If true, the plant will notify the player it's ready */
                 notify(): boolean
                 unlocked?: Computable<boolean>
-                infusions: { [item in items]: string }
+                infusions: { [item in items]?: plants }
                 /**
                  * If not empty, a hint will be shown in the infusion tab
                  *
@@ -2831,7 +2819,12 @@ type Layers = {
         } & {
             [rarity in rarities]: Computable<Decimal>
         }
-        upgrades: { [id: string]: Upgrade<'v'> & { rarity: rarities } }
+        upgrades: {
+            [id: string]: Upgrade<'v'> & {
+                rarity: rarities
+                allow(): boolean
+            }
+        }
     }
     sp: Layer<'sp'> & {}
     // Hidden, for vending soft resets

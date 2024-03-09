@@ -351,10 +351,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
             cost: D(1),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         12: {
             rarity: 'common',
@@ -364,10 +392,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
             cost: D(1),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         13: {
             rarity: 'common',
@@ -377,10 +433,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
             cost: D(1),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         14: {
             rarity: 'common',
@@ -390,10 +474,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
             cost: D(1),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         15: {
             rarity: 'common',
@@ -403,10 +515,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
             cost: D(1),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         //#endregion Common Upgrades
         //#region Uncommon Upgrades
@@ -418,10 +558,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
             cost: D(5),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         22: {
             rarity: 'uncommon',
@@ -431,10 +599,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(15),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         23: {
             rarity: 'uncommon',
@@ -444,10 +640,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(10),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         24: {
             rarity: 'uncommon',
@@ -457,10 +681,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
             cost: D(5),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         25: {
             rarity: 'uncommon',
@@ -468,10 +720,38 @@ addLayer('v', {
             description: 'Unlock the Oil Pump in the City',
             cost: D(15),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         //#endregion Uncommon Upgrades
         //#region Rare Upgrades
@@ -483,10 +763,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
             cost: D(50),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         32: {
             rarity: 'rare',
@@ -496,10 +804,38 @@ addLayer('v', {
             effectDisplay() { return `-${format(D.minus(1, upgradeEffect(this.layer, this.id)).times(100))}%`; },
             cost: D(75),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         33: {
             rarity: 'rare',
@@ -509,10 +845,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
             cost: D(50),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         34: {
             rarity: 'rare',
@@ -522,10 +886,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
             cost: D(50),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         35: {
             rarity: 'rare',
@@ -533,10 +925,38 @@ addLayer('v', {
             description: 'Unlock the Refinery in the City',
             cost: D(75),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         //#endregion Rare Upgrades
         //#region Epic Upgrades
@@ -548,10 +968,38 @@ addLayer('v', {
             effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(125),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         42: {
             rarity: 'epic',
@@ -561,10 +1009,38 @@ addLayer('v', {
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(150),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         43: {
             rarity: 'epic',
@@ -574,10 +1050,38 @@ addLayer('v', {
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(150),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         44: {
             rarity: 'epic',
@@ -587,10 +1091,38 @@ addLayer('v', {
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(100),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         45: {
             rarity: 'epic',
@@ -598,10 +1130,38 @@ addLayer('v', {
             description: 'Unlock the Fuel Generator in the City',
             cost: D(150),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         //#endregion Epic Upgrades
         //#region Legendary Upgrades
@@ -613,10 +1173,38 @@ addLayer('v', {
             effectDisplay() { return `-${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(500),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         52: {
             rarity: 'legendary',
@@ -626,10 +1214,38 @@ addLayer('v', {
             effectDisplay() { return `-${format(D.minus(1, upgradeEffect(this.layer, this.id)).times(100))}%`; },
             cost: D(500),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         53: {
             rarity: 'legendary',
@@ -639,10 +1255,38 @@ addLayer('v', {
             effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(500),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         54: {
             rarity: 'legendary',
@@ -652,10 +1296,38 @@ addLayer('v', {
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(500),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         55: {
             rarity: 'legendary',
@@ -673,10 +1345,38 @@ addLayer('v', {
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(500),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
-            unlocked() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
-            style() { return { 'border-color': tmp.v.rarities[this.rarity].color }; },
-            canAfford() { return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
+            style() {
+                const style = { 'border-color': tmp.v.rarities[this.rarity].color };
+                if (!tmp[this.layer].upgrades[this.id].allow) {
+                    Object.assign(style, {
+                        'border-style': 'dashed',
+                        'background-color': 'transparent',
+                        'color': 'white',
+                    });
+                }
+                return style;
+            },
+            canAfford() {
+                return D.gte(player.s.points, tmp[this.layer].upgrades[this.id].cost) &&
+                    tmp[this.layer].upgrades[this.id].allow;
+            },
             pay() { player.s.points = D.minus(player.s.points, tmp[this.layer].upgrades[this.id].cost); },
+            fullDisplay() {
+                const thismp = tmp[this.layer].upgrades[this.id];
+                if (thismp.allow) {
+                    const effectDisplay = 'effectDisplay' in thismp ? `Currently: ${run(this.effectDisplay, this)}` : '';
+
+                    return `<h3>${thismp.title}</h3><br>\
+                        ${thismp.description}<br>\
+                        ${effectDisplay}\
+                        <br><br>
+                        ${thismp.costDisplay}`;
+                }
+                return `<h3>${thismp.title}</h3><br>\
+                    ${format(D.times(tmp.v.rarities[this.rarity].upgrade_chance, 100).div(5))}% chance to unlock<br><br>\
+                    ${thismp.costDisplay}`;
+            },
         },
         //#endregion Legendary Upgrades
     },
@@ -702,7 +1402,7 @@ addLayer('v', {
                 max: D(8),
             },
             color: '#228800',
-            upgrade_chance: .4,
+            upgrade_chance: .45,
         },
         rare: {
             _id: null,
@@ -712,7 +1412,7 @@ addLayer('v', {
                 max: D(4),
             },
             color: '#4488CC',
-            upgrade_chance: .3,
+            upgrade_chance: .4,
         },
         epic: {
             _id: null,
@@ -722,7 +1422,7 @@ addLayer('v', {
                 max: D.dTwo,
             },
             color: '#FFBB22',
-            upgrade_chance: .2,
+            upgrade_chance: .35,
         },
         legendary: {
             _id: null,
@@ -732,7 +1432,7 @@ addLayer('v', {
                 max: D.dOne,
             },
             color: '#AA55FF',
-            upgrade_chance: .1,
+            upgrade_chance: .3,
         },
     },
     items: {
