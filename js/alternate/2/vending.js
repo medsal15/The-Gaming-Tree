@@ -884,7 +884,7 @@ addLayer('v', {
             description: 'Coin gain is increased by 75%',
             effect() { return D(1.75); },
             effectDisplay() { return `+${format(D.minus(upgradeEffect(this.layer, this.id), 1).times(100))}%`; },
-            cost: D(50),
+            cost: D(25),
             costDisplay() { return `Cost: ${format_coins(this.cost, tmp.s.coins.names.map(name => `${name} coins`))}`; },
             allow() { return player.v.entries[this.rarity].upgrades.includes(+this.id) || hasUpgrade(this.layer, this.id); },
             style() {

@@ -110,13 +110,6 @@ Blessings (B)
         - auto c/m upgrades => only buy 1 path?
         - auto p/t upgrades => get at least 1 of every seed without having more than 3 wheat seeds
 
-~~Vending Machine~~ Shop (S)
-    - Buy items with coins
-    - Items have limited stock
-    - Item stocks refresh every ???
-    - Sell food for coins
-        - Depends on wanted/given
-
 Splitter (A)
     - Split layers into normal and alternates, both smaller / as halves
 
@@ -176,6 +169,7 @@ Party (sta, ???)
     - unlock party slots
     - unlock party members
         - can be leveled up
+    - unlock areas
     => Seal: ???
 
 ## Enemies ##
