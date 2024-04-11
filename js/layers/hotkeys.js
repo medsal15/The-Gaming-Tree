@@ -44,6 +44,15 @@ addLayer('_hotkeys', {
                 player.subtabs[player.tab].mainTabs = tabs[(currentIndex + 1) % tabs.length];
             },
         },
+        {
+            //hehe
+            key: '',
+            description: 'Alt+F4: Double all owned resources',
+            unlocked() {
+                const now = new Date();
+                return now.getDate() == 1 && now.getMonth() == 3;
+            },
+        },
     ],
     type: 'none',
     nodeStyle: { 'display': 'none', },
