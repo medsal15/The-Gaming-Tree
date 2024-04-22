@@ -808,6 +808,8 @@ addLayer('fr', {
 
                 speed = speed.times(tmp.k.dishes.candy_cane.effect.speed);
 
+                if (hasUpgrade('c', 115)) speed = speed.times(upgradeEffect('c', 115));
+
                 return speed;
             },
             cost_div() {

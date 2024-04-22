@@ -2425,7 +2425,7 @@ addLayer('lo', {
         },
     },
     grid: {
-        rows: 13,
+        rows: 14,
         cols: 6,
         getStartData(_) { return {}; },
         getStyle(_, id) {
@@ -2618,6 +2618,7 @@ addLayer('lo', {
                     if (hasUpgrade('xp', 43)) chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
 
                     chances['tamed_kill:slime'] = chances['enemy:slime'];
+                    chances['ranch:milk_slime'] = chances['enemy:slime'].div(2);
                     return chances;
                 },
                 per_second() {
@@ -2660,6 +2661,7 @@ addLayer('lo', {
                     if (hasUpgrade('xp', 43)) chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
 
                     chances['tamed_kill:slime'] = chances['enemy:slime'];
+                    chances['ranch:milk_slime'] = chances['enemy:slime'].div(2);
                     return chances;
                 },
                 per_second() {
@@ -2702,6 +2704,7 @@ addLayer('lo', {
                     if (hasUpgrade('xp', 43)) chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
 
                     chances['tamed_kill:slime'] = chances['enemy:slime'];
+                    chances['ranch:milk_slime'] = chances['enemy:slime'].div(2);
                     return chances;
                 },
                 other() {
@@ -4221,11 +4224,43 @@ addLayer('lo', {
             },
             unlocked() { return tmp.p.layerShown ?? true; },
         },
+        // Ranch
+        milk: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1001,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
+
+                    if (player.r.unlocked) {
+                        let amount = D.dOne;
+
+                        chances['ranch:milk_slime'] = amount;
+                    }
+
+                    return chances;
+                },
+            },
+            name: 'milk',
+            style: {
+                'background-image': `url('./resources/images/milk-carton.svg')`,
+                'background-color': '#FFFFFF',
+            },
+        },
+        /**
+         * ham https://game-icons.net/1x1/skoll/ham-shank.html
+         * honey https://game-icons.net/1x1/lorc/honeypot.html
+         * coffee beans https://game-icons.net/1x1/delapouite/coffee-beans.html
+         */
         // Freezer
         water: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1001,
+            grid: 1101,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
@@ -4288,7 +4323,7 @@ addLayer('lo', {
         ice: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1002,
+            grid: 1102,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
@@ -4319,7 +4354,7 @@ addLayer('lo', {
         icestone: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1101,
+            grid: 1201,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
@@ -4340,7 +4375,7 @@ addLayer('lo', {
         rust_ingot: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1102,
+            grid: 1202,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
@@ -4362,7 +4397,7 @@ addLayer('lo', {
         oil: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1201,
+            grid: 1301,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
@@ -4415,7 +4450,7 @@ addLayer('lo', {
         fuel: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1202,
+            grid: 1302,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
@@ -4466,7 +4501,7 @@ addLayer('lo', {
         holy_water: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1301,
+            grid: 1401,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
@@ -4489,7 +4524,7 @@ addLayer('lo', {
         stardust: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
-            grid: 1302,
+            grid: 1402,
             sources: {
                 _id: null,
                 get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },

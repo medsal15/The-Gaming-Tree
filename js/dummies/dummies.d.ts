@@ -16,7 +16,7 @@ type TabFormatEntries<L extends keyof Layers> = ['display-text', Computable<stri
 ['drop-down', [name: keyof Player[L], options: string[]]] |
 ['drop-down-double', [name: keyof Player[L], options: [value: string, display: string][]]] |
     'upgrades' | 'milestones' | 'challenges' | 'achievements' | 'buyables' | 'clickables' |
-['upgrades' | 'milestones' | 'challenges' | 'achievments' | 'buyables' | 'clickables', rows: number[]] |
+['upgrades' | 'milestones' | 'challenges' | 'achievements' | 'buyables' | 'clickables', rows: number[]] |
 ['upgrade' | 'milestone' | 'challenge' | 'achievment' | 'buyable' | 'clickable', id: number] |
 ['microtabs', microtabs: string[]] |
 ['bar', id: string] |
@@ -1734,7 +1734,7 @@ declare class LayerData {
     challenges?: { [id: number]: number }
 }
 
-type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building' | 'plant' | 'freezer' | 'vending';
+type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building' | 'plant' | 'ranch' | 'freezer' | 'vending';
 type resources = 'science' | 'energy';
 type plants = 'wheat' | 'copper_wheat' |
     'corn' | 'candy_corn' |
@@ -1742,6 +1742,7 @@ type plants = 'wheat' | 'copper_wheat' |
     'sunflower' | 'starflower' |
     'potato' | 'potato_battery' |
     'eggplant' | 'egg_plant';
+type animals = 'milk_slime' | 'hamgoblin' | 'bone_fish' | 'coffent';
 type plant_stages = 'growing' | 'mature' | 'wilting';
 type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
     'red_fabric' | 'pyrite_coin' | 'rusty_gear' |
@@ -1752,6 +1753,7 @@ type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
     'bronze_ingot' | 'steel_ingot' |
     'soaked_log' | 'normal_log' | 'plank' |
     'wheat' | 'corn' | 'strawberry' | 'potato' | 'eggplant' | 'egg' |
+    'milk' | 'ham' | 'fish' | 'coffee_beans' |
     'water' | 'ice' |
     'icestone' | 'rust_ingot' |
     'oil' | 'fuel' |
@@ -1762,7 +1764,7 @@ type dishes = 'failure' |
     'bread' | 'berries_bowl' | 'french_fries' |
     'fried_eggs' | 'cake' |
     'ice_cream' | 'popsicle' |
-    'slime_juice' | 'monster_meal' | 'star_crunch' |
+    'slime_juice' | 'monster_meal' | 'tea' | 'star_crunch' |
     'soda' | 'coffee' | 'candy_cane' | 'pizza' | 'chocolate';
 type time_units = 'seconds' | 'tames' | 'kills';
 type dish_groups = 'vegetable' | 'baked' | 'cold' | 'hot' | 'meat' | 'monster' | 'failure';
@@ -1770,18 +1772,21 @@ type rarities = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
 type Layers = {
     // Side
+    /** Achievements */
     ach: Layer<'ach'> & {
         getAchievementsRows(type?: AchievementTypes): number[]
         getAchievements(type?: AchievementTypes): string[]
         totalAchievements(type?: AchievementTypes): Decimal
         ownedAchievements(type?: AchievementTypes): Decimal
     }
+    /** Clock */
     clo: Layer<'clo'> & {
         upgrades: {
             [id: number]: Upgrade<'clo'> & { price?: [items, Decimal][] }
         }
         time_speed(layer?: keyof Layers, visual?: boolean): Decimal
     }
+    /** Casino */
     cas: Layer<'cas'> & {
         items: {
             /** Reverse lookup for item drops */
@@ -1825,6 +1830,7 @@ type Layers = {
         }
         regex: RegExp
     }
+    /** Magic */
     mag: Layer<'mag'> & {
         elements: {
             '*': {
@@ -1872,6 +1878,7 @@ type Layers = {
             cost: Computable<Decimal>
         }
     }
+    /** Stats */
     sta: Layer<'sta'> & {
         stats: {
             '*': {
@@ -1899,6 +1906,7 @@ type Layers = {
         }
     }
     // Row 0
+    /** Experience */
     xp: Layer<'xp'> & {
         color_kill: string
         enemies: {
@@ -1952,6 +1960,7 @@ type Layers = {
         }
         upgrades: { [id: string]: Upgrade<'xp'> & { allow(): boolean } }
     }
+    /** Mining */
     m: Layer<'m'> & {
         upgrades: {
             [id: number]: Upgrade<'m'> & { item: items }
@@ -1967,6 +1976,7 @@ type Layers = {
             mine_mult(): Decimal
         }
     }
+    /** Tree */
     t: Layer<'t'> & {
         upgrades: {
             [id: number]: Upgrade<'t'> & { item: string }
@@ -2021,6 +2031,7 @@ type Layers = {
         }
     }
     // Row 1
+    /** Level */
     l: Layer<'l'> & {
         regex: RegExp
         skills: {
@@ -2042,6 +2053,7 @@ type Layers = {
             }
         }
     }
+    /** Loot */
     lo: Layer<'lo'> & {
         buyables: Layer<'lo'>['buyables'] & {
             [id: number]: Buyable<'lo'> & {
@@ -2104,6 +2116,7 @@ type Layers = {
             }
         }
     }
+    /** Forge */
     f: Layer<'f'> & {
         fuels: {
             '*': {
@@ -2181,7 +2194,9 @@ type Layers = {
         }
     }
     // Row 2
+    /** Boss */
     b: Layer<'b'> & {}
+    /** Shop */
     s: Layer<'s'> & {
         coins: {
             /** List of coin names */
@@ -2207,6 +2222,7 @@ type Layers = {
             is_upg_loan(id?: number): boolean
         }
     }
+    /** Alternator */
     a: Layer<'a'> & {
         upgrades: {
             [id: number]: Upgrade<'a'> & { item: items }
@@ -2215,18 +2231,21 @@ type Layers = {
         change_efficiency(): Decimal
     }
     // Alt Side
+    /** Successes */
     suc: Layer<'suc'> & {
         getSuccessesRows(type?: AchievementTypes): number[]
         getSuccesses(type?: AchievementTypes): string[]
         totalSuccesses(type?: AchievementTypes): Decimal
         ownedSuccesses(type?: AchievementTypes): Decimal
     }
+    /** Time Cubes */
     tic: Layer<'tic'> & {
         time_speed(layer?: string): Decimal
         cubes: {
             gain(): Decimal
         }
     }
+    /** Bingo */
     bin: Layer<'bin'> & {
         cards: {
             /** List of existing cards */
@@ -2264,6 +2283,7 @@ type Layers = {
             ]
         }
     }
+    /** Condiments */
     con: Layer<'con'> & {
         spice: {
             gain(): Decimal
@@ -2367,6 +2387,7 @@ type Layers = {
         }
     }
     // Alt Row 0
+    /** Alternate Experience */
     xp_alt: Layer<'xp_alt'> & {
         color_tame: string
         monsters: {
@@ -2412,6 +2433,7 @@ type Layers = {
         }
         upgrades: { [id: string]: Upgrade<'xp_alt'> & { allow(): boolean } }
     }
+    /** City */
     c: Layer<'c'> & {
         upgrades: {
             [id: number]: Upgrade<'c'> & {
@@ -2492,6 +2514,7 @@ type Layers = {
             max: Computable<number>
         }
     }
+    /** Plants */
     p: Layer<'p'> & {
         plants: {
             '*': {
@@ -2501,9 +2524,15 @@ type Layers = {
                 /** Grow speed multiplier */
                 grow_mult(): Decimal
                 seeds_mult(): Decimal
+                /** Whether automation is allowed */
+                auto: {
+                    replant(): boolean
+                    harvest(): boolean
+                }
                 regexes: {
                     select: RegExp
                     infuse: RegExp
+                    auto: RegExp
                 }
             }
         } & {
@@ -2542,7 +2571,33 @@ type Layers = {
             }
         }
     }
+    /**
+     * Ranch
+     *
+     * Accessed through `p`
+     */
+    r: Layer<'r'> & {
+        animals: {
+            '*': {
+                age_speed(): Decimal
+            }
+        } & {
+            [animal in animals]: {
+                readonly id: animal
+                name: string
+                style: {
+                    grid: CSSStyles
+                }
+                /** Item needed for the animal to spawn */
+                item: items
+                /** Amount needed for the animal to spawn */
+                nextAt(amount?: DecimalSource): Decimal
+                trakc: items[]
+            }
+        }
+    }
     // Alt Row 1
+    /** Tower */
     to: Layer<'to'> & {
         /**
          * List of random materials for each random type
@@ -2561,6 +2616,7 @@ type Layers = {
             }>
         }
     }
+    /** Kitchen */
     k: Layer<'k'> & {
         temperatures: {
             current(): temperatures
@@ -2679,6 +2735,7 @@ type Layers = {
             }
         }
     }
+    /** Freezer */
     fr: Layer<'fr'> & {
         buyables: Layer<'fr'>['buyables'] & {
             [id: string]: Buyable<'fr'> & {
@@ -2758,7 +2815,11 @@ type Layers = {
         }
     }
     // Alt Row 2
-    bl: Layer<'bl'> & {}
+    /** Blessing */
+    bl: Layer<'bl'> & {
+        achievements?: { [id: string]: Achievement<'bl'> & { fail(): boolean } }
+    }
+    /** Vending Machine */
     v: Layer<'v'> & {
         items: {
             '*': {
@@ -2826,10 +2887,17 @@ type Layers = {
             }
         }
     }
+    /** Splitter */
     sp: Layer<'sp'> & {}
     // Hidden, for vending soft resets
+    /**
+     * Vending Machine soft resets
+     *
+     * **NOT A REAL LAYER**
+     */
     v_soft: Layer<'v_soft'>
     // Special
+    /** Star */
     star: Layer<'star'> & {
         star: {
             /** Time to hit a target, in seconds */
@@ -2873,13 +2941,16 @@ type Player = {
     version: string
     versionType: string
     // Side
+    /** Achievements */
     ach: LayerData & {
         short_mode: boolean
     }
+    /** Clock */
     clo: LayerData & {
         /** If true, uses advanced materials from the forge */
         use_advanced: boolean
     }
+    /** Casino */
     cas: LayerData & {
         /**
          * Each entry shares an `item_id` key, which points to the replacing item_id
@@ -2906,10 +2977,12 @@ type Player = {
         /** Amount of times respecced */
         respecs: Decimal
     }
+    /** Magic */
     mag: LayerData & {
         /** Current selected element */
         element: string
     }
+    /** Stats */
     sta: LayerData & {
         stats: {
             [stat: string]: {
@@ -2919,6 +2992,7 @@ type Player = {
         }
     }
     // Row 0
+    /** Experiecne */
     xp: LayerData & {
         /** Current selected enemy */
         type: string
@@ -2943,6 +3017,7 @@ type Player = {
             upgrade: boolean
         }
     }
+    /** Mining */
     m: LayerData & {
         health: Decimal
         last_drops: [string, Decimal][]
@@ -2954,6 +3029,7 @@ type Player = {
         show_deep: boolean
         auto_upgrade: boolean
     }
+    /** Tree */
     t: LayerData & {
         short_mode: boolean
         clicked: boolean
@@ -2974,6 +3050,7 @@ type Player = {
         auto_upgrade: boolean
     }
     // Row 1
+    /** Level */
     l: LayerData & {
         /** Amount of points being added/removed from a skill */
         change: Decimal
@@ -2988,6 +3065,7 @@ type Player = {
             }
         }
     }
+    /** Loot */
     lo: LayerData & {
         /** Replaces `unlocked` to allow buying the only upgrade */
         shown: boolean
@@ -2997,6 +3075,7 @@ type Player = {
             }
         }
     }
+    /** Forge */
     f: LayerData & {
         /**
          * List of fuels
@@ -3030,20 +3109,25 @@ type Player = {
         alloys: boolean
     }
     // Row 2
+    /** Boss */
     b: LayerData & {
         /** If true, bosses are automatically started unless beaten */
         auto_start: boolean
         final_challenges: number[]
     }
+    /** Shop */
     s: LayerData & {
         short_mode: boolean
         respecced: boolean
     }
+    /** Alternator */
     a: LayerData & {}
     // Alt Side
+    /** Successes */
     suc: LayerData & {
         short_mode: boolean
     }
+    /** Time Cubes */
     tic: LayerData & {
         /** If true, time speed is inverted and produce time cubes */
         invert: boolean
@@ -3053,6 +3137,7 @@ type Player = {
             time: Decimal
         }
     }
+    /** Bingo */
     bin: LayerData & {
         cards: {
             [layer in keyof Layers]?: {
@@ -3080,6 +3165,7 @@ type Player = {
          */
         swap: keyof Layers | ''
     }
+    /** Condiments */
     con: LayerData & {
         condiments: {
             [condiment: string]: {
@@ -3099,6 +3185,7 @@ type Player = {
         respecs: Decimal
     }
     // Alt Row 0
+    /** Alternate Experience */
     xp_alt: LayerData & {
         type: string
         clicked: boolean
@@ -3114,6 +3201,7 @@ type Player = {
         }
         auto_upgrade: boolean
     }
+    /** City */
     c: LayerData & {
         floors: {
             [id: number]: {
@@ -3135,11 +3223,12 @@ type Player = {
         }
         auto_research: boolean
     }
+    /** Plant */
     p: LayerData & {
         grid: {
             [id: number]: {
                 /** Plant placed on that tile */
-                plant: string
+                plant: plants | ''
                 /** Age of the plant */
                 age: Decimal
             }
@@ -3151,7 +3240,7 @@ type Player = {
         /** Last crop type harvested */
         last_harvest: string
         plants: {
-            [plant: string]: {
+            [plant in plants]: {
                 /** Amount of seeds in storage */
                 seeds: Decimal
                 harvested: Decimal
@@ -3161,13 +3250,40 @@ type Player = {
                 last_harvest: [string, Decimal][]
                 last_harvest_seeds: Decimal
                 last_harvest_count: Decimal
+                auto_replant: boolean
+                auto_harvest: boolean
+            }
+        }
+    }
+    /**
+     * Ranch
+     *
+     * Accessed through `p`
+     */
+    r: LayerData & {
+        /** Last animal type killed */
+        last_kill: string
+        grid: {
+            [id: number]: {
+                animal: animals | ''
+                age: Decimal
+            }
+        }
+        animals: {
+            [animal in animals]: {
+                killed: Decimal
+                last_kill: [string, Decimal][]
+                last_kill_count: Decimal
             }
         }
     }
     // Alt Row 1
+    /** Tower */
     to: LayerData & {
         random: items[]
+        auto_mat: boolean
     }
+    /** Kitchen */
     k: LayerData & {
         recipes: {
             [recipe: string]: {
@@ -3204,6 +3320,7 @@ type Player = {
         mode: temperatures
         selected: dishes | ''
     }
+    /** Freezer */
     fr: LayerData & {
         recipes: {
             [recipe: string]: {
@@ -3229,7 +3346,11 @@ type Player = {
         }
     }
     // Alt Row 2
-    bl: LayerData & {}
+    /** Blessing */
+    bl: LayerData & {
+        failed: number[]
+    }
+    /** Vending Machine */
     v: LayerData & {
         refresh: {
             specific: Decimal
@@ -3246,9 +3367,16 @@ type Player = {
         }
         buy: Decimal
     }
+    /**
+     * Vending Machine soft resets
+     *
+     * **NOT A REAL LAYER**
+     */
     v_soft: LayerData
+    /** Splitter */
     sp: LayerData
     // Special
+    /** Star */
     star: LayerData & {
         targets: number[]
         /** Time left to hit a target, in seconds */

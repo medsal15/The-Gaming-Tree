@@ -529,13 +529,28 @@ function get_monster_drops(monster, kills) {
         case 'amalgam': {
             const types = ['slime', 'goblin', 'zombie'];
 
-            if (false) types.push('ent'); //todo unlock ent
+            if (hasAchievement('bl', 13)) types.push('ent');
 
             return types.reduce((sum, type) => [...sum, ...get_monster_drops(type, kills)], []);
         }
         default:
             return [];
     }
+}
+/**
+ * **Does a loot roll (only important if casino is unlocked)**
+ *
+ * @param {animals} animal
+ * @param {DecimalSource} age
+ * @returns {[items, Decimal][]}
+ */
+function get_animal_drops(animal, age) {
+    let mult = D.abs(age).div(10);
+
+    if (mult.gt(1)) mult = mult.root(2);
+    else mult = mult.pow(2);
+
+    return get_type_drops(`ranch:${animal}`, mult);
 }
 /**
  * @type {((plant: string, age: DecimalSource) => number) & {
@@ -601,10 +616,8 @@ function type_name(type) {
     /** @type {[drop_sources, string, string?]} */
     const [from, sub, more] = type.split(':');
     switch (from) {
-        case 'enemy':
-            return tmp.xp.enemies[sub].name;
-        case 'mining':
-            return `${layers.m.ore.mode(sub)} ${tmp.m.name.toLowerCase()}`.trim();
+        case 'enemy': return tmp.xp.enemies[sub].name;
+        case 'mining': return `${layers.m.ore.mode(sub)} ${tmp.m.name.toLowerCase()}`.trim();
         case 'tree':
             if (sub == 'convertion') return 'Convertion';
             return `Chopping ${tmp.t.trees[sub].name}`;
@@ -623,8 +636,7 @@ function type_name(type) {
         }
         case 'tamed': case 'tamed_kill':
             return `tamed ${tmp.xp_alt.monsters[sub].name}`;
-        case 'building':
-            return `built ${tmp.c.buildings[sub].name}`;
+        case 'building': return `built ${tmp.c.buildings[sub].name}`;
         case 'plant': {
             let text = `grown ${tmp.p.plants[sub].name}`;
 
@@ -632,8 +644,8 @@ function type_name(type) {
 
             return text;
         }
-        case 'vending':
-            return `purchasing`;
+        case 'vending': return `purchasing`;
+        case 'ranch': return tmp.r.animals[sub].name;
     }
 }
 /**
@@ -897,3 +909,16 @@ const random_rarity_upgrade = rarity => {
         return i + Math.floor(Math.random() * 5) + 1;
     }
 };
+/**
+ * Checks whether a grid id is in bounds
+ *
+ * @param {string|number} id Grid id
+ * @param {number} rows Amount of rows available
+ * @param {number} cols Amount of columns available
+ */
+function is_grid_visible(id, rows, cols) {
+    const row = Math.floor(id / 100),
+        col = id % 100;
+
+    return row < rows && col < cols;
+}

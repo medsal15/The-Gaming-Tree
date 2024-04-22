@@ -169,27 +169,7 @@ addLayer('xp', {
         },
         'Upgrades': {
             content: [
-                () => {
-                    if (hasChallenge('b', 11)) return;
-
-                    /** @type {[number, DecimalSource][]} */
-                    const upgs = [
-                        [11, 5],
-                        [12, 10],
-                        [13, 15],
-                        [21, 30],
-                        [22, 50],
-                        [23, 70],
-                        [31, 100],
-                        [32, 125],
-                        [33, 150],
-                    ],
-                        next = upgs.find(([id, kills]) => !hasUpgrade('xp', id) && !tmp.xp.upgrades[id].unlocked && D.lt(tmp.xp.total.kills, kills));
-                    if (!next) return;
-
-                    return ['display-text', `You will unlock a new upgrades at ${formatWhole(next[1])} kills`];
-                },
-                () => hasChallenge('b', 12) ? ['row', [
+                () => (hasChallenge('b', 12) && tmp.b.layerShown) ? ['row', [
                     ['display-text', 'Automatically buy upgrades'],
                     'blank',
                     ['clickable', 'auto_upgrade'],
@@ -220,7 +200,7 @@ addLayer('xp', {
                     'layer-table',
                     () => {
                         const headers = ['Enemy', 'Health', 'Experience', 'Kills', options.colorLevels ? 'Color' : 'Level'],
-                            show_dps = hasChallenge('b', 12),
+                            show_dps = (hasChallenge('b', 12) && tmp.b.layerShown),
                             show_element = hasChallenge('b', 61) || inChallenge('b', 61),
                             enemy_style = (type, text, ...style) => {
                                 const color = tmp.xp.enemies[type].color;
@@ -345,8 +325,8 @@ addLayer('xp', {
             },
         },
         'auto_upgrade': {
-            unlocked() { return hasChallenge('b', 12); },
-            canClick() { return hasChallenge('b', 12); },
+            unlocked() { return hasChallenge('b', 12) && tmp.b.layerShown; },
+            canClick() { return hasChallenge('b', 12) && tmp.b.layerShown; },
             onClick() { player.xp.auto.upgrade = !player.xp.auto.upgrade; },
             display() { return player.xp.auto.upgrade ? 'ON' : 'OFF'; },
             style: {
@@ -369,7 +349,7 @@ addLayer('xp', {
                 return base;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp.total.kills.gte(5) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(5) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(5),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -416,7 +396,7 @@ addLayer('xp', {
                 const { health, experience } = upgradeEffect(this.layer, this.id);
                 return `+${format(health)} health, *${format(experience)} xp`;
             },
-            allow() { return tmp.xp.total.kills.gte(10) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(10) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(10),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -465,7 +445,7 @@ addLayer('xp', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp.total.kills.gte(15) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(15) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(15),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -512,7 +492,7 @@ addLayer('xp', {
                 return effect;
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp.total.kills.gte(30) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(30) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(50),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -544,9 +524,9 @@ addLayer('xp', {
             title: 'Sword Trap',
             description() {
                 let amount = '25%';
-                if (hasChallenge('b', 11)) amount = '50%';
+                if (hasChallenge('b', 11) && tmp.b.layerShown) amount = '50%';
                 let text = `Passively deal ${amount} of your damage every second`;
-                if (hasChallenge('b', 12)) text += `<br>Passively deal 25% of your damage to <u>every</u> monsters every second (see Info tab for current DPS)`;
+                if (hasChallenge('b', 12) && tmp.b.layerShown) text += `<br>Passively deal 25% of your damage to <u>every</u> monsters every second (see Info tab for current DPS)`;
 
                 return text;
             },
@@ -554,17 +534,17 @@ addLayer('xp', {
                 let active = D(.25),
                     global = D.dZero;
 
-                if (hasChallenge('b', 11)) active = D(.5);
+                if (hasChallenge('b', 11) && tmp.b.layerShown) active = D(.5);
 
-                if (hasChallenge('b', 12)) global = active.div(2);
+                if (hasChallenge('b', 12) && tmp.b.layerShown) global = active.div(2);
 
                 return { active, global };
             },
             effectDisplay() {
-                if (hasChallenge('b', 12)) return '';
+                if (hasChallenge('b', 12) && tmp.b.layerShown) return '';
                 return `${format(tmp.xp.enemies[player.xp.type].damage.times(upgradeEffect(this.layer, this.id).active))} /s`;
             },
-            allow() { return tmp.xp.total.kills.gte(50) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(50) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(150),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -603,7 +583,7 @@ addLayer('xp', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp.total.kills.gte(70) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(70) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(250),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -644,7 +624,7 @@ addLayer('xp', {
             },
             effect() { return player.xp.points.max(0).max(0).add(5).log(5); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp.total.kills.gte(100) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(100) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(400),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -683,7 +663,7 @@ addLayer('xp', {
                 return effect;
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1))} times`; },
-            allow() { return tmp.xp.total.kills.gte(125) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(125) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(600),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -716,7 +696,7 @@ addLayer('xp', {
             description: 'Unlock 2 new layers<br>Deal 50% more damage',
             effect() { return D(1.5); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp.total.kills.gte(150) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp.total.kills.gte(150) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(900),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -757,7 +737,7 @@ addLayer('xp', {
             },
             effect() { return tmp.xp.total.kills.max(0).add(9).log(9); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
+            unlocked() { return inChallenge('b', 31) || (hasChallenge('b', 31) && tmp.b.layerShown); },
             cost: D(195),
         },
         42: {
@@ -773,7 +753,7 @@ addLayer('xp', {
             },
             effect() { return player.xp.points.root(15).add(1); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
+            unlocked() { return inChallenge('b', 31) || (hasChallenge('b', 31) && tmp.b.layerShown); },
             cost: D(850),
         },
         43: {
@@ -786,7 +766,7 @@ addLayer('xp', {
                 return { level_mult, chance_mult };
             },
             effectDisplay() { return `level *${format(upgradeEffect(this.layer, this.id).level_mult)}, chance *${format(upgradeEffect(this.layer, this.id).chance_mult)}`; },
-            unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
+            unlocked() { return inChallenge('b', 31) || (hasChallenge('b', 31) && tmp.b.layerShown); },
             cost: D(2222),
         },
     },
@@ -1098,6 +1078,8 @@ addLayer('xp', {
                 if (hasUpgrade('c', 33)) mult = mult.times(upgradeEffect('c', 33).pow(tmp.a.change_efficiency));
 
                 mult = mult.times(D.pow(tmp.k.dishes.failure.effect, tmp.a.change_efficiency));
+
+                if (hasAchievement('bl', 11)) mult = mult.times(D.pow(achievementEffect('bl', 11), tmp.a.change_efficiency));
 
                 return mult;
             },
@@ -1808,5 +1790,5 @@ addLayer('xp', {
         });
         player.xp.auto = auto;
     },
-    autoUpgrade() { return hasChallenge('b', 12) && player.xp.auto.upgrade && !tmp.xp.deactivated; },
+    autoUpgrade() { return hasChallenge('b', 12) && tmp.b.layerShown && player.xp.auto.upgrade && !tmp.xp.deactivated; },
 });

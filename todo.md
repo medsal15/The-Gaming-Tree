@@ -18,73 +18,9 @@ Move items/resources in separate files
 
 ## Challenges ##
 
+Nerf goblin challenges
+
 ### Blessings ###
-
-??? (slime)
-    - restrictions:
-        - ???
-    - goal:
-        - ???
-    - reward:
-        - ???
-
-??? (goblin)
-    - restrictions:
-        - ???
-    - goal:
-        - ???
-    - reward:
-        - ???
-
-??? (zombie)
-    - restrictions:
-        - ???
-    - goal:
-        - ???
-    - reward:
-        - ???
-
-??? (ent)
-    - restrictions:
-        - ???
-    - goal:
-        - ???
-    - reward:
-        - ???
-
-??? (city)
-    - restrictions:
-        - ???
-    - goal:
-        - ???
-    - reward:
-        - ???
-
-Seed Mastery (Plant)
-    - restrictions:
-        - no more than 3 seeds of any kind at any point
-    - goal:
-        - harvest 1 of each plant
-    - reward:
-        - Auto harvest plants (with toggle)
-        - Auto replant plants (with toggle)
-
-??? (tower)
-    - restrictions:
-        - ???
-    - goal:
-        - ???
-    - reward:
-        - keep milestones on resets
-
-??? (kitchen)
-    - restrictions:
-        - ???
-    - goal:
-        - ???
-    - reward:
-        - auto cook
-        - ???
 
 ??? (freezer)
     - restrictions:

@@ -167,7 +167,7 @@ addLayer('c', {
                     [91],
                 ]],
             ],
-            unlocked() { return D.gt(player.c.resources.science.amount, 0) || player.c.upgrades.length > 0; },
+            unlocked() { return D.gt(player.c.resources.science.amount, 0) || player.c.upgrades.length > 0 || hasAchievement('bl', 21); },
             buttonStyle() {
                 // If you figure out why shouldNotify does nothing when it returns true, I'll use it again.
                 // Until then, it's done manually
@@ -266,6 +266,7 @@ addLayer('c', {
         },
     },
     upgrades: {
+        // Basic
         11: {
             title: 'Improved Making',
             description: '+10% item production and consumption',
@@ -769,6 +770,7 @@ addLayer('c', {
             branches: [33],
             unlocked() { return player.xp_alt.unlocked; },
         },
+        // Intermediate
         51: {
             title: 'Improved Blueprints',
             description() {
@@ -873,7 +875,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [51],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) || hasAchievement('bl', 21); },
         },
         62: {
             title: 'Metal Recycling',
@@ -924,7 +926,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [51],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) || hasAchievement('bl', 21); },
         },
         63: {
             title: 'Warmer Coal',
@@ -975,7 +977,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [51],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) || hasAchievement('bl', 21); },
         },
         64: {
             title: 'Sickle',
@@ -1026,7 +1028,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [51],
-            unlocked() { return hasUpgrade('c', 51) && player.p.unlocked; },
+            unlocked() { return (hasUpgrade('c', 51) || hasAchievement('bl', 21)) && player.p.unlocked; },
         },
         71: {
             title: 'Root Strengthening',
@@ -1048,7 +1050,7 @@ addLayer('c', {
             effectDisplay() {
                 /** @type {{quarry: Decimal, forest: Decimal}} */
                 const effect = upgradeEffect(this.layer, this.id);
-                return `*${format(effect.forest)} quarry production, *${format(effect.quarry)} forest production`;
+                return `*${format(effect.quarry)} quarry production, *${format(effect.forest)} forest production`;
             },
             style() {
                 const style = {};
@@ -1094,7 +1096,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [61],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) || hasAchievement('bl', 21); },
         },
         72: {
             title: 'Metal Recycling',
@@ -1116,7 +1118,7 @@ addLayer('c', {
             effectDisplay() {
                 /** @type {{mine: Decimal, sawmill: Decimal}} */
                 const effect = upgradeEffect(this.layer, this.id);
-                return `*${format(effect.sawmill)} quarry production, *${format(effect.mine)} forest production`;
+                return `*${format(effect.sawmill)} sawmill production, *${format(effect.mine)} mine production`;
             },
             style() {
                 const style = {};
@@ -1162,7 +1164,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [62],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) || hasAchievement('bl', 21); },
         },
         73: {
             title: 'Improved Structural Beams',
@@ -1213,7 +1215,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [63],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) || hasAchievement('bl', 21); },
         },
         74: {
             title: 'Greenhouse',
@@ -1264,7 +1266,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [64],
-            unlocked() { return hasUpgrade('c', 51) && player.p.unlocked; },
+            unlocked() { return (hasUpgrade('c', 51) || hasAchievement('bl', 21)) && player.p.unlocked; },
         },
         81: {
             title: 'Terrain Expansion',
@@ -1316,7 +1318,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [71],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) || hasAchievement('bl', 21); },
         },
         82: {
             title: 'Reinforced Foundations',
@@ -1368,7 +1370,7 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [72],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) || hasAchievement('bl', 21); },
         },
         83: {
             title: 'Reduced Item Usage',
@@ -1419,11 +1421,11 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [73],
-            unlocked() { return hasUpgrade('c', 51); },
+            unlocked() { return hasUpgrade('c', 51) || hasAchievement('bl', 21); },
         },
         84: {
             title: 'Bigger Garden',
-            description: '+1 garden columns',
+            description: '+1 garden column',
             effect() { return 1; },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             resource_costs() { return [['science', D(2).pow([81, 82, 83, 84].filter(id => hasUpgrade('c', id)).length).times(50)]]; },
@@ -1470,8 +1472,9 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [74],
-            unlocked() { return hasUpgrade('c', 51) && player.p.unlocked; },
+            unlocked() { return (hasUpgrade('c', 51) || hasAchievement('bl', 21)) && player.p.unlocked; },
         },
+        // Advanced
         91: {
             title: 'Reimproved Blueprints',
             description() {
@@ -1483,7 +1486,7 @@ addLayer('c', {
                 return `Formula: ${formula}`;
             },
             effect() { return D.pow(1.1, player.c.resources.science.amount.max(0).add(10).log10()); },
-            effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}`; },
+            effectDisplay() { return `*/${format(upgradeEffect(this.layer, this.id))}`; },
             style() {
                 const style = {};
 
@@ -1529,17 +1532,885 @@ addLayer('c', {
                     .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
             },
             branches: [81, 82, 83, 84],
+            unlocked() { return hasUpgrade('c', 51) || hasAchievement('bl', 21); },
+        },
+        101: {
+            title: 'Richer Coal',
+            description: '+100% deep mine and coal generator productions and consumptions',
+            effect() { return D(2.0); },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1).times(100))}%`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([101, 102, 103, 104, 105].filter(id => hasUpgrade('c', id)).length).times(250)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [91],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        102: {
+            title: 'Smarter Nerds',
+            description: '+50% research center and observatory productions and consumptions',
+            effect() { return D(1.5); },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1).times(100))}%`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([101, 102, 103, 104, 105].filter(id => hasUpgrade('c', id)).length).times(250)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [91],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        103: {
+            title: 'Higher Temperatures',
+            description: '+50% smelter and arc furnace productions and consumptions',
+            effect() { return D(1.5); },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1).times(100))}%`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([101, 102, 103, 104, 105].filter(id => hasUpgrade('c', id)).length).times(250)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [91],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        104: {
+            title: 'Vertical Garden Expansion',
+            description: '+1 garden row',
+            effect() { return 1; },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([101, 102, 103, 104, 105].filter(id => hasUpgrade('c', id)).length).times(250)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [91],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        105: {
+            title: 'Shorter Floors',
+            description: '+25% tower floor gain',
+            effect() { return D(1.25); },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1).times(100))}%`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([101, 102, 103, 104, 105].filter(id => hasUpgrade('c', id)).length).times(250)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [91],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        111: {
+            title: 'Carbon Capture',
+            description() {
+                if (!shiftDown) {
+                    return 'Bought deep mines and coal generators boost each other\'s production.';
+                }
+
+                let formula_deep_mine = '4√(coal generators + 1)',
+                    formula_coal_gen = '4√(deep mines + 1)';
+
+                return `Deep mine formula: ${formula_deep_mine}, coal generator formula: ${formula_coal_gen}`;
+            },
+            effect() {
+                let coal_generator = getBuyableAmount('c', 'deep_mine').add(1).root(4),
+                    deep_mine = getBuyableAmount('c', 'coal_generator').add(1).root(4);
+
+                return { deep_mine, coal_generator, };
+            },
+            effectDisplay() {
+                /** @type {{deep_mine: Decimal, coal_generator: Decimal}} */
+                const effect = upgradeEffect(this.layer, this.id);
+                return `*${format(effect.coal_generator)} coal generator production, *${format(effect.deep_mine)} deep mine production`;
+            },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([111, 112, 113, 114, 115].filter(id => hasUpgrade('c', id)).length).times(500)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [101],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        112: {
+            title: 'Research Loans',
+            description: '-25% research center and observatory costs',
+            effect() { return D(.75); },
+            effectDisplay() { return `-${format(D.minus(1, upgradeEffect(this.layer, this.id)).times(100))}%`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([111, 112, 113, 114, 115].filter(id => hasUpgrade('c', id)).length).times(500)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [102],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        113: {
+            title: 'Blast Furnaces',
+            description: '-25% smelter and arc furnace costs',
+            effect() { return D(.75); },
+            effectDisplay() { return `-${format(D.minus(1, upgradeEffect(this.layer, this.id)).times(100))}%`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([111, 112, 113, 114, 115].filter(id => hasUpgrade('c', id)).length).times(500)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [103],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        114: {
+            title: '100% Organic Ents¹',
+            description() { return `${layerColor('xp_alt', tmp.xp_alt.upgrades[22].title)} can catch ents`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([111, 112, 113, 114, 115].filter(id => hasUpgrade('c', id)).length).times(500)]]; },
+            item_costs: [['seed', D(20)]],
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [104],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        115: {
+            title: 'Better Freezing Techniques',
+            description() {
+                if (!shiftDown) {
+                    return 'Research upgrades boosts freezing speed';
+                }
+
+                let formula = '1 + upgrades / 50';
+
+                return `Formula: ${formula}`;
+            },
+            effect() { return D.div(player.c.upgrades.length, 50).add(1); },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([111, 112, 113, 114, 115].filter(id => hasUpgrade('c', id)).length).times(500)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [105],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        121: {
+            title: 'Repurposed Holes',
+            description() {
+                if (!shiftDown) {
+                    return 'Deep mines boost mines. Mines boost quarries.';
+                }
+
+                let formula_mine = '9√(deep mines + 1)',
+                    formula_quarry = '9√(mines + 1)';
+
+                return `Mine formula: ${formula_mine}, quarry formula: ${formula_quarry}`;
+            },
+            effect() {
+                let mine = getBuyableAmount('c', 'deep_mine').add(1).root(9),
+                    quarry = getBuyableAmount('c', 'mine').add(1).root(9);
+
+                return { quarry, mine, };
+            },
+            effectDisplay() {
+                /** @type {{quarry: Decimal, mine: Decimal}} */
+                const effect = upgradeEffect(this.layer, this.id);
+                return `*${format(effect.quarry)} quarry production, *${format(effect.mine)} mine production`;
+            },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([121, 122, 123, 124, 125].filter(id => hasUpgrade('c', id)).length).times(750)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [105],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        122: {
+            title: 'Space Telescopes',
+            description: 'Observatory effect is squared',
+            effect() { return D(2); },
+            effectDisplay() { return `^${format(upgradeEffect(this.layer, this.id))}`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([121, 122, 123, 124, 125].filter(id => hasUpgrade('c', id)).length).times(750)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [105],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        123: {
+            title: 'Residual Heat Cooking',
+            description() {
+                if (!shiftDown) {
+                    return 'Smelters boost cooking speed';
+                }
+
+                let formula = '2√(smelters + 1)';
+
+                return `Formula: ${formula}`;
+            },
+            effect() { return getBuyableAmount('c', 'smelter').add(1).root(2); },
+            effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([121, 122, 123, 124, 125].filter(id => hasUpgrade('c', id)).length).times(750)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [105],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        124: {
+            title: 'Faster Elevators',
+            description: '+1 maximum floors',
+            effect() { return D(1); },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([121, 122, 123, 124, 125].filter(id => hasUpgrade('c', id)).length).times(750)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [105],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        125: {
+            title: 'Higher Food Quality',
+            description: 'Food lasts 10% longer',
+            effect() { return D(1.1); },
+            effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1).times(100))}%`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs() { return [['science', D(3).pow([121, 122, 123, 124, 125].filter(id => hasUpgrade('c', id)).length).times(750)]]; },
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                    .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [105],
+            unlocked() { return hasAchievement('bl', 21); },
+        },
+        // Cosmic
+        131: {
+            title: 'Advanced Building Courses',
+            description() {
+                if (!shiftDown) {
+                    return 'Science reduces building costs.';
+                }
+
+                let formula = '0.99 ^ log10(science + 10)';
+
+                return `Formula: ${formula}`;
+            },
+            effect() { return D.pow(0.99, player.c.resources.science.amount.max(0).add(10).log10()); },
+            effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}`; },
+            style() {
+                const style = {};
+
+                if (!hasUpgrade(this.layer, this.id) && canAffordUpgrade(this.layer, this.id)) {
+                    let color;
+                    const tmphis = tmp[this.layer].upgrades[+this.id];
+
+                    if (Array.isArray(tmphis.resource_costs) &&
+                        tmphis.resource_costs.length > 0) {
+                        color = tmp.c.resources[tmphis.resource_costs[0][0]].color;
+                    } else {
+                        color = tmp.c.color;
+                    }
+
+                    style['background-color'] = color;
+                }
+
+                return style;
+            },
+            resource_costs: [['science', D(1e4)]],
+            costDisplay() {
+                /** @type {string[]} */
+                const cost_pieces = [
+                    ...(tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .map(([item, cost]) => `${formatWhole(cost)} ${tmp.lo.items[item].name}`),
+                    ...(tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .map(([resource, cost]) => `${formatWhole(cost)} ${tmp.c.resources[resource].name}`),
+                ];
+
+                return `Cost: ${listFormat.format(cost_pieces)}`;
+            },
+            canAfford() {
+                return [81, 82, 83].filter(id => hasUpgrade('c', id)).length >= 3 &&
+                    (tmp[this.layer].upgrades[this.id].item_costs ?? [])
+                        .every(([item, cost]) => D.gte(player.lo.items[item].amount, cost)) &&
+                    (tmp[this.layer].upgrades[this.id].resource_costs ?? [])
+                        .every(([resource, cost]) => D.gte(player.c.resources[resource].amount, cost));
+            },
+            pay() {
+                (tmp[this.layer].upgrades[+this.id].item_costs ?? [])
+                    .forEach(([item, cost]) => gain_items(item, D.neg(cost)));
+                (tmp[this.layer].upgrades[+this.id].resource_costs ?? [])
+                    .forEach(([resource, cost]) => gain_resource(resource, D.neg(cost)));
+            },
+            branches: [81, 82, 83, 84],
             unlocked() { return hasUpgrade('c', 51); },
         },
-        /*
-        TODO
-        101-121: boost deep mine/coal generator
-        102-122: boost research center/observatory
-        103-123: boost smelter/arc furnace
-        104-124: boost ???
-        105-125: boost ???
-        131: boost ???
-        */
     },
     buyables: new Proxy({}, {
         /** @returns {Buyable<'c'>} */
@@ -1739,33 +2610,33 @@ addLayer('c', {
         '*': {
             regex: /^(select|quick)_([a-z_]+)$/,
             placed() {
+                const rows = tmp.c.grid.rows,
+                    cols = tmp.c.grid.cols;
+
                 return player.c.floors.reduce(
                     /** @param {{[building: string]: Decimal}} full */
                     (full, grid) => {
                         return Object.entries(grid)
                             .reduce((sum, [id, data]) => {
                                 // Check if id is in the grid
-                                if (
-                                    Math.floor(id / 100) <= tmp.c.grid.rows &&
-                                    id % 100 <= tmp.c.grid.cols
-                                ) sum[data.building] = D.add(sum[data.building], 1);
+                                if (is_grid_visible(id, rows, cols)) sum[data.building] = D.add(sum[data.building], 1);
                                 return sum;
                             }, full);
                     }, {});
             },
             enabled() {
+                const rows = tmp.c.grid.rows,
+                    cols = tmp.c.grid.cols;
+
                 return player.c.floors.reduce(
                     /** @param {{[building: string]: Decimal}} full */
                     (full, grid) => {
                         return Object.entries(grid)
                             .reduce((sum, [id, data]) => {
                                 // Check if id is in the grid
-                                if (
-                                    Math.floor(id / 100) <= tmp.c.grid.rows &&
-                                    id % 100 <= tmp.c.grid.cols &&
+                                if (is_grid_visible(id, rows, cols) &&
                                     // Check if building is turned on
-                                    data.enabled
-                                ) sum[data.building] = D.add(sum[data.building], 1);
+                                    data.enabled) sum[data.building] = D.add(sum[data.building], 1);
                                 return sum;
                             }, full);
                     }, {});
@@ -1869,7 +2740,13 @@ addLayer('c', {
 
                 return mult;
             },
-            cost_mult() { return D.dOne; },
+            cost_mult() {
+                let mult = D.dOne;
+
+                if (hasUpgrade('c', 131)) mult = mult.times(upgradeEffect('c', 131));
+
+                return mult;
+            },
         },
         // T0
         quarry: {
@@ -1898,6 +2775,7 @@ addLayer('c', {
                     if (hasUpgrade('c', 21)) mult = mult.times(upgradeEffect('c', 21));
                     if (hasUpgrade('c', 61)) mult = mult.times(upgradeEffect('c', 61));
                     if (hasUpgrade('c', 71)) mult = mult.times(upgradeEffect('c', 71).quarry);
+                    if (hasUpgrade('c', 121)) mult = mult.times(upgradeEffect('c', 121).quarry);
 
                     const upg = tmp.s.investloans.item_upgrade[item] ?? false;
                     if (upg && hasUpgrade('s', upg)) {
@@ -1968,6 +2846,7 @@ addLayer('c', {
                     if (hasUpgrade('c', 21)) mult = mult.times(upgradeEffect('c', 21));
                     if (hasUpgrade('c', 62)) mult = mult.times(upgradeEffect('c', 62));
                     if (hasUpgrade('c', 72)) mult = mult.times(upgradeEffect('c', 72).mine);
+                    if (hasUpgrade('c', 121)) mult = mult.times(upgradeEffect('c', 121).mine);
 
                     const upg = tmp.s.investloans.item_upgrade[item] ?? false;
                     if (upg && hasUpgrade('s', upg)) {
@@ -2025,7 +2904,7 @@ addLayer('c', {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
                     .add(tmp.c.buildings.duplicator.effect[this.id]);
 
-                /** @type {[string, Decimal][]} */
+                /** @type {[items, Decimal][]} */
                 const items = [['normal_log', D(1 / 2)]];
 
                 items.forEach(([item, amount], i) => {
@@ -2045,6 +2924,10 @@ addLayer('c', {
 
                     items[i][1] = D.times(amount, mult);
                 });
+                if (tmp.k.dishes.tea.unlocked) {
+                    const i = items.findIndex(([i]) => i == 'normal_log');
+                    items[i][1] = D.times(items[i][1], tmp.k.dishes.tea.effect);
+                }
 
                 return {
                     items,
@@ -2188,6 +3071,8 @@ addLayer('c', {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult)
                         .times(tmp.c.resources[resource].gain_mult);
 
+                    if (hasUpgrade('c', 102)) mult = mult.times(upgradeEffect('c', 102));
+
                     resources[i][1] = D.times(amount, mult);
                 });
 
@@ -2206,6 +3091,8 @@ addLayer('c', {
 
                 cost.forEach(([, amount], i) => {
                     let mult = tmp.c.buildings['*'].cost_mult;
+
+                    if (hasUpgrade('c', 112)) mult = mult.times(upgradeEffect('c', 112));
 
                     cost[i][1] = D.times(amount, mult);
                 });
@@ -2255,6 +3142,8 @@ addLayer('c', {
 
                     if (hasUpgrade('c', 21)) mult = mult.times(upgradeEffect('c', 21));
                     if (hasUpgrade('c', 63)) mult = mult.times(upgradeEffect('c', 63));
+                    if (hasUpgrade('c', 101)) mult = mult.times(upgradeEffect('c', 101));
+                    if (hasUpgrade('c', 111)) mult = mult.times(upgradeEffect('c', 111).deep_mine);
 
                     const upg = tmp.s.investloans.item_upgrade[item] ?? false;
                     if (upg && hasUpgrade('s', upg)) {
@@ -2321,6 +3210,8 @@ addLayer('c', {
                         .times(tmp.c.resources[resource].gain_mult);
 
                     if (hasUpgrade('c', 63)) mult = mult.times(upgradeEffect('c', 63));
+                    if (hasUpgrade('c', 101)) mult = mult.times(upgradeEffect('c', 101));
+                    if (hasUpgrade('c', 111)) mult = mult.times(upgradeEffect('c', 111).coal_generator);
 
                     resources[i][1] = D.times(amount, mult);
                 });
@@ -2340,6 +3231,7 @@ addLayer('c', {
                     let mult = placed.times(tmp.c.buildings['*'].consume_mult).times(tmp.c.buildings['*'].item_consume_mult);
 
                     if (hasUpgrade('c', 63)) mult = mult.times(upgradeEffect('c', 63));
+                    if (hasUpgrade('c', 101)) mult = mult.times(upgradeEffect('c', 101));
 
                     if (item == 'coal') mult = mult.div(buyableEffect('fr', 22));
 
@@ -2406,6 +3298,8 @@ addLayer('c', {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult)
                         .times(tmp.c.resources[resource].gain_mult);
 
+                    if (hasUpgrade('c', 102)) mult = mult.times(upgradeEffect('c', 102));
+
                     resources[i][1] = D.times(amount, mult);
                 });
 
@@ -2424,6 +3318,8 @@ addLayer('c', {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult)
                         .times(tmp.c.resources[resource].gain_mult);
 
+                    if (hasUpgrade('c', 102)) mult = mult.times(upgradeEffect('c', 102));
+
                     resources[i][1] = D.times(amount, mult);
                 });
 
@@ -2435,7 +3331,11 @@ addLayer('c', {
                 const placed = D(amount_placed ?? tmp.c.buildings['*'].enabled[this.id])
                     .add(tmp.c.buildings.duplicator.effect[this.id]);
 
-                return D(.95).pow(placed);
+                let effect = D(.95).pow(placed);
+
+                if (hasUpgrade('c', 122)) effect = effect.pow(upgradeEffect('c', 122));
+
+                return effect;
             },
             cost(amount_built) {
                 const built = D(amount_built ?? getBuyableAmount('c', this.id));
@@ -2448,6 +3348,8 @@ addLayer('c', {
 
                 cost.forEach(([, amount], i) => {
                     let mult = tmp.c.buildings['*'].cost_mult;
+
+                    if (hasUpgrade('c', 112)) mult = mult.times(upgradeEffect('c', 112));
 
                     cost[i][1] = D.times(amount, mult);
                 });
@@ -2576,6 +3478,8 @@ addLayer('c', {
                         mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
+                    if (hasUpgrade('c', 103)) mult = mult.times(upgradeEffect('c', 103));
+
                     items[i][1] = D.times(amount, mult);
                 });
 
@@ -2606,6 +3510,8 @@ addLayer('c', {
 
                     if (item == 'coal') mult = mult.div(buyableEffect('fr', 22));
 
+                    if (hasUpgrade('c', 103)) mult = mult.times(upgradeEffect('c', 103));
+
                     items[i][1] = D.times(amount, mult);
                 });
 
@@ -2624,6 +3530,8 @@ addLayer('c', {
 
                 cost.forEach(([, amount], i) => {
                     let mult = tmp.c.buildings['*'].cost_mult;
+
+                    if (hasUpgrade('c', 113)) mult = mult.times(upgradeEffect('c', 113));
 
                     cost[i][1] = D.times(amount, mult);
                 });
@@ -2737,6 +3645,8 @@ addLayer('c', {
                         mult = mult.div(D.add(player.lo.items[item].amount.max(0), 10).log10().pow(tmp.a.change_efficiency));
                     }
 
+                    if (hasUpgrade('c', 103)) mult = mult.times(upgradeEffect('c', 103));
+
                     items[i][1] = D.times(amount, mult);
                 });
 
@@ -2763,11 +3673,15 @@ addLayer('c', {
                 items.forEach(([, amount], i) => {
                     let mult = placed.times(tmp.c.buildings['*'].consume_mult).times(tmp.c.buildings['*'].item_consume_mult);
 
+                    if (hasUpgrade('c', 103)) mult = mult.times(upgradeEffect('c', 103));
+
                     items[i][1] = D.times(amount, mult);
                 });
                 resources.forEach(([resource, amount], i) => {
                     let mult = placed.times(tmp.c.buildings['*'].produce_mult)
                         .times(tmp.c.resources[resource].gain_mult);
+
+                    if (hasUpgrade('c', 103)) mult = mult.times(upgradeEffect('c', 103));
 
                     resources[i][1] = D.times(amount, mult);
                 });
@@ -2788,6 +3702,8 @@ addLayer('c', {
 
                 cost.forEach(([, amount], i) => {
                     let mult = tmp.c.buildings['*'].cost_mult;
+
+                    if (hasUpgrade('c', 113)) mult = mult.times(upgradeEffect('c', 113));
 
                     cost[i][1] = D.times(amount, mult);
                 });
@@ -3092,6 +4008,8 @@ addLayer('c', {
 
                 mult = mult.times(buyableEffect('fr', 32).science);
 
+                if (hasAchievement('bl', 22)) mult = mult.times(achievementEffect('bl', 22));
+
                 return mult;
             },
             gain() {
@@ -3138,6 +4056,8 @@ addLayer('c', {
 
                 mult = mult.times(tmp.p.plants.potato_battery.effect);
 
+                if (hasAchievement('bl', 23)) mult = mult.times(achievementEffect('bl', 23));
+
                 return mult;
             },
             gain() {
@@ -3173,6 +4093,8 @@ addLayer('c', {
             let max = D.dZero;
 
             if (hasMilestone('to', 1)) max = max.add(tmp.to.milestones[1].effect);
+
+            if (hasUpgrade('c', 124)) max = max.add(upgradeEffect('c', 124));
 
             return max.toNumber();
         },

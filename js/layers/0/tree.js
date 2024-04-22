@@ -164,7 +164,7 @@ addLayer('t', {
                     'blank',
                     ['toggle', ['t', 'convert']],
                 ]] : undefined,
-                () => hasChallenge('b', 22) ? ['row', [
+                () => (hasChallenge('b', 22) && tmp.b.layerShown) ? ['row', [
                     ['display-text', 'Automatically buy upgrades'],
                     'blank',
                     ['toggle', ['t', 'auto_upgrade']],
@@ -369,7 +369,7 @@ addLayer('t', {
             },
             effect() { return D.add(player.lo.items.soaked_log.amount, 1).root(7); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 21) && tmp.b.layerShown); },
             cost: D(25),
             item: 'soaked_log',
             currencyInternalName: 'amount',
@@ -388,7 +388,7 @@ addLayer('t', {
             description: 'Passively cut the current tree with 25% of your damage',
             effect() { return D(.25); },
             effectDisplay() { return `${format(D.times(upgradeEffect(this.layer, this.id), tmp.t.trees['*'].damage_base))} dps`; },
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 21) && tmp.b.layerShown); },
             cost: D(80),
             item: 'normal_log',
             currencyInternalName: 'amount',
@@ -421,7 +421,7 @@ addLayer('t', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 21) && tmp.b.layerShown); },
             cost: D(100),
             item: 'plank',
             currencyInternalName: 'amount',
@@ -443,7 +443,7 @@ addLayer('t', {
                 return tmp.t.trees['driftwood'].health;
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 21) && tmp.b.layerShown); },
             cost: D(100),
             item: 'soaked_log',
             currencyInternalName: 'amount',
@@ -460,7 +460,7 @@ addLayer('t', {
         32: {
             title: 'Bartering Station',
             description: 'Unlock a new skill to earn more coins',
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 21) && tmp.b.layerShown); },
             cost: D(320),
             item: 'normal_log',
             currencyInternalName: 'amount',
@@ -485,7 +485,7 @@ addLayer('t', {
                 return effect;
             },
             effectDisplay() { return `*${format(D.times(upgradeEffect(this.layer, this.id), 100))}%`; },
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 21); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 21) && tmp.b.layerShown); },
             cost: D(444),
             item: 'plank',
             currencyInternalName: 'amount',
@@ -586,9 +586,12 @@ addLayer('t', {
 
                 mult = mult.times(tmp.l.skills.growing.effect);
 
-                if (hasChallenge('b', 42)) mult = mult.times(1.5);
+                if (hasChallenge('b', 42) && tmp.b.layerShown) mult = mult.times(1.5);
 
                 if (hasChallenge('b', 62) && !inChallenge('b', 62)) mult = mult.times(tmp.sta.stats.defense.effect);
+
+                // Alt
+                if (tmp.k.dishes.tea.unlocked) mult = mult.times(D.pow(tmp.k.dishes.tea.effect, tmp.a.change_efficiency));
 
                 return mult;
             },
@@ -609,7 +612,7 @@ addLayer('t', {
             regen_add() {
                 let add = D.dZero;
 
-                if (hasChallenge('b', 41)) add = add.add(.01);
+                if (hasChallenge('b', 41) && tmp.b.layerShown) add = add.add(.01);
 
                 return add;
             },
@@ -1049,5 +1052,5 @@ addLayer('t', {
     },
     branches: [() => player.f.unlocked ? 'f' : 'lo'],
     prestigeNotify() { return !hasUpgrade('t', 22) && player.t.current; },
-    autoUpgrade() { return hasChallenge('b', 22) && player.t.auto_upgrade && !tmp.t.deactivated; },
+    autoUpgrade() { return hasChallenge('b', 22) && tmp.b.layerShown && player.t.auto_upgrade && !tmp.t.deactivated; },
 });

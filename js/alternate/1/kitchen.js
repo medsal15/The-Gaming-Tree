@@ -196,9 +196,21 @@ addLayer('k', {
     },
     /**
      * TODO
-     * tea: boost ent, tree, wood
-     *  https://game-icons.net/1x1/delapouite/ice-cubes.html
-     *  leaf, water, ice
+     * Cheese (https://game-icons.net/1x1/lorc/cheese-wedge.html)
+     *  milk + slime goo
+     *  -> animal grow speed + monster production
+     * Bacon (https://game-icons.net/1x1/delapouite/bacon.html)
+     *  ham
+     *  -> ???
+     * Fried Fish (https://game-icons.net/1x1/darkzaitzev/fried-fish.html)
+     *  fish + wheat
+     *  -> ???
+     * Monster Meal (alt)
+     *  milk + fish + ham
+     * Pizza
+     *  milk + slime goo + strawberry + wheat + ham
+     * Coffee
+     *  coffee beans + water + leaf
      */
     recipes: {
         '*': {
@@ -240,6 +252,8 @@ addLayer('k', {
 
                 if (hasUpgrade('v', 22)) size = size.add(upgradeEffect('v', 22));
 
+                if (hasAchievement('bl', 52)) size = size.add(achievementEffect('bl', 52));
+
                 return size.round().max(0);
             },
             default_amount(recipe, amount) {
@@ -256,6 +270,8 @@ addLayer('k', {
                 let mult = D.dOne;
 
                 mult = mult.times(tmp.k.dishes.slime_juice.effect);
+
+                if (hasUpgrade('c', 123)) mult = mult.times(upgradeEffect('c', 123));
 
                 return mult;
             },
@@ -506,6 +522,35 @@ addLayer('k', {
             },
             unlocked() { return tmp.xp_alt.monsters.zombie.unlocked || tmp.xp_alt.monsters.amalgam.unlocked; },
         },
+        tea: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.recipes).find(recipe => layers.k.recipes[recipe] == this); },
+            heats: ['low', 'medium', 'high',],
+            consumes(amount) {
+                amount = layers.k.recipes['*'].default_amount(this.id, amount);
+
+                return [
+                    ['slime_goo', D.pow(3.5, amount).times(100)],
+                    ['water', D.pow(2.5, amount).times(75)],
+                    ['leaf', D.pow(3, amount)],
+                    ['seed', D.pow(2, amount)],
+                ];
+            },
+            produces: 'tea',
+            time(amount) {
+                amount = layers.k.recipes['*'].default_amount(this.id, amount);
+
+                return D.times(amount, 30).add(60);
+            },
+            formulas: {
+                'slime_goo': '3.5 ^ amount * 100',
+                'water': '2.5 ^ amount * 75',
+                'leaf': '3 ^ amount',
+                'seed': '2 ^ amount',
+                'time': '30 * amount + 60',
+            },
+            unlocked() { return hasAchievement('bl', 13); },
+        },
         star_crunch: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.recipes).find(recipe => layers.k.recipes[recipe] == this); },
@@ -553,6 +598,8 @@ addLayer('k', {
                 size = size.add(tmp.con.condiments['*'].total.k.stomach_size ?? D.dZero);
 
                 if (hasUpgrade('v', 42)) size = size.add(upgradeEffect('v', 42));
+
+                if (hasAchievement('bl', 51)) size = size.add(achievementEffect('bl', 51));
 
                 return size.round().max(0).toNumber();
             },
@@ -631,6 +678,8 @@ addLayer('k', {
                 let mult = D.dOne;
 
                 mult = mult.times(tmp.bin.cards.multipliers['k'] ?? 1);
+
+                if (hasUpgrade('c', 125)) mult = mult.times(upgradeEffect('c', 125));
 
                 return mult;
             },
@@ -1248,14 +1297,27 @@ addLayer('k', {
             },
             effect(duration) {
                 duration = layers.k.dishes['*'].default_duration(this.id, duration);
+                let effect = D.dZero;
+
                 if (tmp.k.deactivated) duration = D.dZero;
-                if (D.gt(duration, 0)) return D.div(duration, 30);
-                return D.dZero;
+                if (D.gt(duration, 0)) effect = D.div(duration, 30);
+
+                if (hasAchievement('bl', 13)) effect = effect.add(1);
+
+                return effect;
             },
             effect_description(duration) {
                 if (D.lte(duration, 0)) duration = D(tmp.k.dishes[this.id].duration.time);
-                let effect = shiftDown ? '[time left / 30 * 100]' : format(this.effect(duration).times(100));
-                return `Passively tames zombies with ${effect}% efficiency`;
+                let effect;
+                if (shiftDown) {
+                    effect = 'time left / 30'
+                    if (hasAchievement('bl', 13)) effect = `(${effect} + 1)`;
+                    effect = `[${effect} * 100]`;
+                } else {
+                    effect = format(this.effect(duration).times(100));
+                }
+                if (hasAchievement('bl', 13)) return `Multiplies passive tames by ${effect}%`;
+                else return `Passively tames zombies with ${effect}% efficiency`;
             },
             value() {
                 let value = D(3);
@@ -1271,10 +1333,72 @@ addLayer('k', {
             },
             groups: ['meat', 'monster', 'hot'],
         },
-        star_crunch: {
+        tea: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
             grid: 603,
+            style: {
+                'background-image': `url('./resources/images/ice-cubes.svg')`,
+                'background-color': '#99BB77',
+            },
+            name: 'tea',
+            type: 'drink',
+            duration: {
+                _id: null,
+                get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish].duration == this); },
+                unit: 'seconds',
+                time() {
+                    let time = D(120);
+
+                    time = time.times(tmp.k.dishes['*'].duration_mult);
+
+                    if (tmp.k.dishes[this.id].condiment.good.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].bonus);
+                    }
+                    if (tmp.k.dishes[this.id].condiment.bad.includes(tmp.con.condiments['*'].highest)) {
+                        time = time.times(tmp.con.condiments['*'].malus);
+                    }
+
+                    return time;
+                },
+            },
+            effect(duration) {
+                duration = layers.k.dishes['*'].default_duration(this.id, duration);
+                let effect = D.dOne;
+
+                if (tmp.k.deactivated) duration = D.dZero;
+                if (D.gt(duration, 0)) effect = D.div(duration, 30).sqrt().add(1);
+
+                return effect;
+            },
+            effect_description(duration) {
+                if (D.lte(duration, 0)) duration = D(tmp.k.dishes[this.id].duration.time);
+                let effect;
+                if (shiftDown) {
+                    effect = '[(2√(time left / 30) + 1) * 100]'
+                } else {
+                    effect = format(this.effect(duration).times(100));
+                }
+                return `Multiplies passive tames and wood gain by ${effect}%`;
+            },
+            value() {
+                let value = D(3);
+
+                if (hasUpgrade('s', 31)) value = value.add(upgradeEffect('s', 31).pow(tmp.a.change_efficiency));
+
+                return value;
+            },
+            unlocked() { return tmp.xp_alt.monsters.ent.unlocked; },
+            condiment: {
+                good: ['mint', 'ginger'],
+                bad: ['pepper', 'vinegar'],
+            },
+            groups: ['cold', 'hot', 'monster'],
+        },
+        star_crunch: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.k.dishes).find(/**@param {dishes} dish*/dish => layers.k.dishes[dish] == this); },
+            grid: 604,
             style: {
                 'background-image': `url('./resources/images/staryu.svg')`,
                 'background-color'() { return tmp.xp.enemies.star.color; },

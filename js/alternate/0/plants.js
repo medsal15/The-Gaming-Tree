@@ -16,6 +16,8 @@ addLayer('p', {
                     last_harvest: [],
                     last_harvest_seeds: D.dZero,
                     last_harvest_count: D.dZero,
+                    auto_replant: false,
+                    auto_harvest: false,
                 }])
             ),
             infuse_target: '',
@@ -121,21 +123,31 @@ addLayer('p', {
                 [
                     'layer-table',
                     () => {
+                        const headers = ['Name', 'Life', 'Effect', 'Amount'],
+                            auto = hasAchievement('bl', 31) || false;
+                        if (auto) headers.push('Auto');
                         return [
-                            ['Name', 'Life', 'Effect', 'Amount'],
+                            headers,
                             ...tmp.p.plants['*'].list.map(plant_id => {
                                 const plant = tmp.p.plants[plant_id],
-                                    produces = plant.produces.map(item => ['display-text', `${format(player.lo.items[item].amount)} ${tmp.lo.items[item].name}`]);
+                                    produces = plant.produces.map(item => ['display-text', `${format(player.lo.items[item].amount)} ${tmp.lo.items[item].name}`]),
 
-                                return [
-                                    [['display-text', capitalize(plant.name)]],
-                                    [
-                                        ['display-text', `Maturation: ${formatTime(plant_maturation_time(plant_id))}`],
-                                        ['display-text', `Lifespan: ${formatTime(plant_lifespan(plant_id))}`]
-                                    ],
-                                    [['display-text', plant.effect_text ?? 'None']],
-                                    [['display-text', `${format(player.p.plants[plant_id].seeds)} seeds`], 'h-line', ...produces],
-                                ];
+                                    content = [
+                                        [['display-text', capitalize(plant.name)]],
+                                        [
+                                            ['display-text', `Maturation: ${formatTime(plant_maturation_time(plant_id))}`],
+                                            ['display-text', `Lifespan: ${formatTime(plant_lifespan(plant_id))}`]
+                                        ],
+                                        [['display-text', plant.effect_text ?? 'None']],
+                                        [['display-text', `${format(player.p.plants[plant_id].seeds)} seeds`], 'h-line', ...produces],
+                                    ];
+
+                                if (auto) content.push([
+                                    ['clickable', `auto_replant_${plant_id}`],
+                                    ['clickable', `auto_harvest_${plant_id}`],
+                                ]);
+
+                                return content;
                             })
                         ];
                     },
@@ -223,6 +235,14 @@ addLayer('p', {
                 }],
             ],
         },
+        'Ranch': {
+            content: [
+                ['layer-proxy', ['r', ['grid']]],
+            ],
+            unlocked() { return player.r.unlocked; },
+        },
+        //todo ranch tab
+        //todo animals tab
     },
     clickables: new Proxy({}, {
         /** @returns {Clickable<'p'>} */
@@ -266,7 +286,7 @@ addLayer('p', {
 
             const matches_select = layers.p.plants['*'].regexes.select.exec(prop);
             if (matches_select) {
-                /** @type {[string, 'quick', string]} */
+                /** @type {[string, 'quick', plants]} */
                 const [, , plant] = matches_select;
 
                 return obj[prop] ??= {
@@ -310,7 +330,7 @@ addLayer('p', {
 
             const matches_infusion = layers.p.plants['*'].regexes.infuse.exec(prop);
             if (matches_infusion) {
-                /** @type {[string, 'infuse', string, items]} */
+                /** @type {[string, 'infuse', plants, items]} */
                 const [, , plant, item] = matches_infusion;
                 return obj[prop] ??= {
                     canClick() {
@@ -357,6 +377,38 @@ addLayer('p', {
                     },
                 };
             }
+
+            const matches_auto = layers.p.plants['*'].regexes.auto.exec(prop);
+            if (matches_auto) {
+                /** @type {[string, 'replant'|'harvest', plants]} */
+                const [, type, plant] = matches_auto;
+
+                return {
+                    canClick: true,
+                    onClick() {
+                        switch (type) {
+                            case 'replant':
+                                player.p.plants[plant].auto_replant = !player.p.plants[plant].auto_replant;
+                                break;
+                            case 'harvest':
+                                player.p.plants[plant].auto_harvest = !player.p.plants[plant].auto_harvest;
+                        }
+                    },
+                    display() {
+                        let type_name, enabled;
+                        switch (type) {
+                            case 'replant':
+                                type_name = 'replant';
+                                enabled = player.p.plants[plant].auto_replant;
+                                break;
+                            case 'harvest':
+                                type_name = 'harvest';
+                                enabled = player.p.plants[plant].auto_replant;
+                        }
+                        return `Auto ${type_name}<br>${enabled ? 'ON' : 'OFF'}`;
+                    },
+                };
+            }
         },
         getOwnPropertyDescriptor(_, prop) {
             if (prop == 'layer' ||
@@ -391,7 +443,14 @@ addLayer('p', {
             return cols;
         },
         maxCols: 6,
-        rows: 5,
+        rows() {
+            let rows = 5;
+
+            if (hasUpgrade('c', 104)) rows += upgradeEffect('c', 104);
+
+            return rows;
+        },
+        maxRows: 6,
         getStartData(_) {
             return {
                 plant: '',
@@ -412,11 +471,15 @@ addLayer('p', {
                 // Get items
                 const stage = tmp.p.plants[data.plant].times[plant_age_index(data.plant, data.age)][1],
                     drops = layers.p.plants[data.plant].produce(stage),
-                    seeds = layers.p.plants[data.plant].seeds(stage),
-                    player_data = player.p.plants[data.plant],
-                    equal = drops.length == player_data.last_harvest.length &&
-                        seeds.eq(player_data.last_harvest_seeds) &&
-                        drops.every(([item, amount]) => player_data.last_harvest.some(([litem, lamount]) => litem == item && D.eq(lamount, amount)));
+                    player_data = player.p.plants[data.plant];
+                let seeds = layers.p.plants[data.plant].seeds(stage);
+                const equal = drops.length == player_data.last_harvest.length &&
+                    seeds.eq(player_data.last_harvest_seeds) &&
+                    drops.every(([item, amount]) => player_data.last_harvest.some(([litem, lamount]) => litem == item && D.eq(lamount, amount)));
+
+                if (tmp.p.plants['*'].auto.replant && player.p.plants[data.plant].auto_replant) {
+                    seeds = seeds.minus(1);
+                }
 
                 gain_items(drops);
                 player_data.seeds = D.add(player_data.seeds, seeds);
@@ -433,7 +496,9 @@ addLayer('p', {
                 if (drops.length) player_data.harvested = D.add(player_data.harvested, 1);
 
                 // Wipe
-                data.plant = '';
+                if (!tmp.p.plants['*'].auto.replant || !player.p.plants[data.plant].auto_replant) {
+                    data.plant = '';
+                }
                 data.age = D.dZero;
             } else if (
                 player.p.plant != '' &&
@@ -471,8 +536,12 @@ addLayer('p', {
             );
         },
         getTooltip(data, _) {
-            if (data?.plant in tmp.p.plants) return capitalize(tmp.p.plants[data.plant].name);
-            return 'Empty';
+            let text = 'Empty';
+            if (data?.plant in tmp.p.plants) text = capitalize(tmp.p.plants[data.plant].name);
+
+            if (hasAchievement('bl', 33)) text += `Aged ${formatTime(data.age)}`;
+
+            return text;
         },
     },
     plants: {
@@ -523,6 +592,7 @@ addLayer('p', {
             regexes: {
                 select: /^(quick)_([a-z_]+)$/,
                 infuse: /^(infuse)_([a-z_]+)-([a-z_]+)$/,
+                auto: /^auto_(replant|harvest)_([a-z_]+)$/,
             },
         },
         wheat: {
@@ -1389,33 +1459,50 @@ addLayer('p', {
             if (data.plant == '') return;
 
             data.age = D.add(data.age, grow);
-            if (D.gte(data.age, plant_lifespan(data.plant))) {
+
+            let drops = [],
+                seeds = D.dZero;
+            const plant_id = data.plant,
+                player_data = player.p.plants[plant_id];
+
+            if (D.gte(data.age, plant_lifespan(plant_id))) {
                 // Oops, plant is dead
-                const drops = layers.p.plants[data.plant].produce('wilting'),
-                    seeds = layers.p.plants[data.plant].seeds('wilting'),
-                    player_data = player.p.plants[data.plant],
-                    equal = drops.length == player_data.last_harvest.length &&
-                        seeds.eq(player_data.last_harvest_seeds) &&
-                        drops.every(([item, amount]) => player_data.last_harvest.some(([litem, lamount]) => litem == item && D.eq(lamount, amount)));
-
-                if (equal) {
-                    player_data.last_harvest_count = D.add(player_data.last_harvest_count, 1);
-                } else {
-                    player_data.last_harvest_count = D.dOne;
-                    player_data.last_harvest = drops;
-                    player_data.last_harvest_seeds = seeds;
-                }
-                player.p.last_harvest = data.plant;
-
-                gain_items(drops);
-                player_data.seeds = D.add(player_data.seeds, seeds);
-
-                player_data.dead = D.add(player_data.dead, 1);
-
-                // Wipe
-                data.plant = '';
-                data.age = D.dZero;
+                drops = layers.p.plants[plant_id].produce('wilting');
+                seeds = layers.p.plants[plant_id].seeds('wilting');
+            } else if (tmp.p.plants['*'].auto.harvest &&
+                player_data.auto_harvest &&
+                data.age.gte(plant_maturation_time(plant_id))) {
+                // Auto harvest
+                drops = layers.p.plants[plant_id].produce('mature');
+                seeds = layers.p.plants[plant_id].seeds('mature');
+            } else {
+                // Do nothing
+                return;
             }
+
+            const equal = drops.length == player_data.last_harvest.length &&
+                seeds.eq(player_data.last_harvest_seeds) &&
+                drops.every(([item, amount]) => player_data.last_harvest.some(([litem, lamount]) => litem == item && D.eq(lamount, amount)));
+
+            if (equal) {
+                player_data.last_harvest_count = D.add(player_data.last_harvest_count, 1);
+            } else {
+                player_data.last_harvest_count = D.dOne;
+                player_data.last_harvest = drops;
+                player_data.last_harvest_seeds = seeds;
+            }
+            player.p.last_harvest = plant_id;
+
+            gain_items(drops);
+
+            player_data.seeds = D.add(player_data.seeds, seeds);
+            player_data.dead = D.add(player_data.dead, 1);
+
+            // Wipe
+            if (!tmp.p.plants['*'].auto.replant || !player.p.plants[data.plant].auto_replant) {
+                data.plant = '';
+            }
+            data.age = D.dZero;
         });
         // Ensure that the player always has wheat by checking for 1 wheat seed or 1 planted wheat seed
         if (player.p.plants.wheat.seeds.lt(1) &&
@@ -1454,6 +1541,8 @@ addLayer('p', {
             max_seeds = D.add(buyableEffect('lo', 62).t_hold.pow(tmp.a.change_efficiency), buyableEffect('fr', 31).p_hold),
             hold = Object.entries(player.p.plants).map(([plant, data]) => [plant, {
                 seeds: D.min(max_seeds, data.seeds),
+                auto_replant: data.auto_replant,
+                auto_harvest: data.auto_harvest,
             }]);
 
         layerDataReset(this.layer, keep);
@@ -1464,6 +1553,8 @@ addLayer('p', {
             last_harvest: [],
             last_harvest_seeds: D.dZero,
             last_harvest_count: D.dZero,
+            auto_replant: data.auto_replant,
+            auto_harvest: data.auto_harvest,
         }));
     },
     branches: [() => {
@@ -1482,5 +1573,128 @@ addLayer('p', {
     },
     shouldNotify() {
         return Object.keys(layers.p.plants).some(plant => tmp.p.plants[plant].notify);
+    },
+});
+addLayer('r', {
+    name: 'Ranch',
+    symbol: 'R',
+    startData() {
+        return {
+            unlocked: false,
+            animals: Object.fromEntries(
+                Object.keys(layers.r.animals)
+                    .filter(animal => animal != '*')
+                    .map(/**@param{animals}animal*/animal => [animal, {
+                        killed: D.dZero,
+                        last_kill: [],
+                        last_kill_count: D.dZero,
+                    }])
+            ),
+            last_kill: '',
+        };
+    },
+    layerShown: false,
+    color: '#CC8800',
+    row: 0,
+    position: 2.75,
+    resource: 'animals',
+    animals: {
+        '*': {
+            age_speed() { return D.dOne; },
+        },
+        milk_slime: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.r.animals).find(plant => layers.r.animals[plant] == this); },
+            item: 'wheat',
+            style: {
+                grid: {
+                    'background': `url('./resources/images/transparent-slime.svg') no-repeat center, white`,
+                },
+            },
+            nextAt(amount) {
+                amount ??= D.add(
+                    Object.keys(player.r.grid)
+                        .filter(id => is_grid_visible(id, tmp.r.grid.rows, tmp.r.grid.cols) && player.r.grid[id].animal == this.id)
+                        .length,
+                    player.r.animals[this.id].killed
+                );
+
+                return D.pow(10, amount).times(10);
+            },
+        },
+        /**
+         * hamgoblin https://game-icons.net/1x1/caro-asercion/goblin.html
+         *  -> ham
+         * zombee https://game-icons.net/1x1/lorc/bee.html
+         *  -> honey
+         * coffeent https://game-icons.net/1x1/delapouite/berry-bush.html
+         *  -> coffee beans
+         */
+    },
+    //todo bars (Proxy)
+    grid: {
+        rows: 7,
+        cols: 7,
+        getStartData(id) {
+            return {
+                age: D.dZero,
+                animal: '',
+            };
+        },
+        getCanClick(data, _) { return data.animal != ''; },
+        getStyle(data, _) {
+            if (!data.animal) return {};
+            const nega = D.lt(data.age, 0),
+                negastyle = {
+                    'transform': `scaleY(-1)`,
+                    'filter': `invert(1)`,
+                    'z-index': 10,
+                };
+
+            return Object.assign(
+                {},
+                tmp.r.animals[data.animal].style.grid,
+                nega ? negastyle : {},
+            );
+        },
+        onClick(data, _) {
+            if (!data.animal || D.lte(data.age, 0)) return;
+
+            const drops = get_animal_drops(data.animal, data.age),
+                player_data = player.r.animals[data.animal],
+                equal = drops.length == player_data.last_kill.length &&
+                    drops.every(([item, amount]) => player_data.last_kill.some(([litem, lamount]) => litem == item && D.eq_tolerance(lamount, amount, 1e-3)));
+
+            gain_items(drops);
+
+            if (equal) {
+                player_data.last_kill_count = D.add(player_data.last_kill_count, 1);
+            } else {
+                player_data.last_kill_count = D.dOne;
+                player_data.last_kill = drops;
+            }
+            player_data.killed = D.add(player_data.killed, 1);
+
+            player.r.last_kill = data.animal;
+
+            data.age = D.dZero;
+            data.animal = '';
+        },
+        getTooltip(data, _) {
+            if (data.animal == '') return;
+            return capitalize(tmp.r.animals[data.animal].name);
+        },
+    },
+    //todo automate
+    //  randomly move animals to a random neighbor
+    //  spawn new animals when space is available
+    doReset(layer) {
+        if (layers[layer].row <= this.row) return;
+
+        layerDataReset(this.layer);
+        Object.values(player.r.animals).forEach(data => Object.assign(data, {
+            killed: D.dZero,
+            last_kill_count: D.dZero,
+        }));
     },
 });

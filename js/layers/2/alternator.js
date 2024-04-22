@@ -113,7 +113,7 @@ addLayer('a', {
             },
             onPurchase() {
                 player.xp_alt.unlocked = true;
-                doReset('s', true);
+                doReset('a', true);
             },
             pay() { gain_items('stardust', -1); },
             canAfford() { return D.gte(player.lo.items.stardust.amount, this.cost()); },
@@ -146,7 +146,7 @@ addLayer('a', {
             },
             onPurchase() {
                 player.c.unlocked = true;
-                doReset('s', true);
+                doReset('a', true);
             },
             pay() { gain_items('stardust', -1); },
             canAfford() { return D.gte(player.lo.items.stardust.amount, this.cost()); },
@@ -179,7 +179,7 @@ addLayer('a', {
             },
             onPurchase() {
                 player.p.unlocked = true;
-                doReset('s', true);
+                doReset('a', true);
             },
             pay() { gain_items('stardust', -1); },
             canAfford() { return D.gte(player.lo.items.stardust.amount, this.cost()); },
@@ -243,7 +243,7 @@ addLayer('a', {
             },
             onPurchase() {
                 player.to.unlocked = true;
-                doReset('s', true);
+                doReset('a', true);
             },
             pay() { gain_items('stardust', -1); },
         },
@@ -279,7 +279,7 @@ addLayer('a', {
             },
             onPurchase() {
                 player.k.unlocked = true;
-                doReset('s', true);
+                doReset('a', true);
             },
             pay() { gain_items('stardust', -1); },
         },
@@ -315,7 +315,7 @@ addLayer('a', {
             },
             onPurchase() {
                 player.fr.unlocked = true;
-                doReset('s', true);
+                doReset('a', true);
             },
             pay() { gain_items('stardust', -1); },
         },
@@ -352,7 +352,7 @@ addLayer('a', {
         },
         31: {
             title: 'Alternate Bosses',
-            description: 'Not Yet Implemented<br>You get to choose (or do you?)<br><br>Requires all 2nd row layer alternates',
+            description: 'You get to choose (or do you?)<br><br>Requires all 2nd row layer alternates',
             cost() { return D.add(player.a.upgrades.filter(id => id % 10 < 4).length, 1); },
             item: 'stardust',
             currencyInternalName: 'amount',
@@ -362,9 +362,10 @@ addLayer('a', {
                 const style = {};
 
                 if (hasUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-color'] = tmp.bl.color;
                 } else if (canAffordUpgrade(this.layer, this.id)) {
-                    //todo
+                    style['background-image'] = `linear-gradient(to right, ${tmp.b.color}, ${tmp.bl.color})`;
+                    style['background-origin'] = `border-box`;
                 } else {
                     style['background-color'] = tmp.b.color;
                 }
@@ -372,9 +373,14 @@ addLayer('a', {
                 return style;
             },
             canAfford() {
-                return [21, 22, 23].every(id => hasUpgrade('a', id)) && false &&
+                return [21, 22, 23].every(id => hasUpgrade('a', id)) &&
                     D.gte(player.lo.items.stardust.amount, this.cost());
             },
+            onPurchase() {
+                player.bl.unlocked = true;
+                doReset('a', true);
+            },
+            pay() { gain_items('stardust', -1); },
         },
         32: {
             title: 'Alternate Shop',
@@ -404,7 +410,7 @@ addLayer('a', {
             },
             onPurchase() {
                 player.v.unlocked = true;
-                doReset('s', true);
+                doReset('a', true);
             },
             pay() { gain_items('stardust', -1); },
         },
@@ -526,7 +532,9 @@ addLayer('a', {
             canAfford: false,
         },
     },
-    type: 'none',
+    type: 'static',
+    baseAmount() { return D.dZero; },
+    requires() { return D.dOne; },
     doReset(layer) { },
     branches: [() => tmp.f.layerShown ? 'f' : ['fr', 3]],
     change_efficiency() {

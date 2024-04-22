@@ -190,7 +190,7 @@ addLayer('l', {
 
                 max = max.add(buyableEffect('lo', 43));
 
-                if (hasChallenge('b', 21)) max = max.add(1);
+                if (hasChallenge('b', 21) && tmp.b.layerShown) max = max.add(1);
 
                 return max;
             },

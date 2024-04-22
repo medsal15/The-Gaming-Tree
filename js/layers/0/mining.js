@@ -140,7 +140,7 @@ addLayer('m', {
                     'blank',
                     ['toggle', ['m', 'short_mode']]
                 ]],
-                () => hasChallenge('b', 21) ? ['row', [
+                () => (hasChallenge('b', 21) && tmp.b.layerShown) ? ['row', [
                     ['display-text', 'Automatically buy upgrades'],
                     'blank',
                     ['toggle', ['m', 'auto_upgrade']],
@@ -342,7 +342,7 @@ addLayer('m', {
             effect() { return D.add(player.lo.items.stone.amount, 1).root(5); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(50),
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 12) && tmp.b.layerShown); },
             item: 'stone',
             currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -359,7 +359,7 @@ addLayer('m', {
             title: 'Copper Drill',
             description: 'Automatically mine the whole ore when it\'s full',
             cost: D(20),
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 12) && tmp.b.layerShown); },
             item: 'copper_ore',
             currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -384,7 +384,7 @@ addLayer('m', {
             effect() { return player.m.health.max(0).add(1).root(7); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(3),
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 12) && tmp.b.layerShown); },
             item: 'tin_ore',
             currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -409,7 +409,7 @@ addLayer('m', {
             effect() { return D.add(player.lo.items.stone.amount.max(0), 10).log10(); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(250),
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 12) && tmp.b.layerShown); },
             item: 'stone',
             currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -426,7 +426,7 @@ addLayer('m', {
             title: 'Copper Filter',
             description() { return `Get as much stone as ores<br>Stop getting stone otherwise<br>${layerColor('m', tmp.m.upgrades[13].title, 'text-shadow:#000 0 0 10px')}\'s effect is changed`; },
             cost: D(80),
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 12) && tmp.b.layerShown); },
             item: 'copper_ore',
             currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -465,7 +465,7 @@ addLayer('m', {
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
             cost: D(9),
-            unlocked() { return hasUpgrade(this.layer, this.id - 10) || hasChallenge('b', 12); },
+            unlocked() { return hasUpgrade(this.layer, this.id - 10) || (hasChallenge('b', 12) && tmp.b.layerShown); },
             item: 'tin_ore',
             currencyInternalName: 'amount',
             currencyDisplayName() { return tmp.lo.items[this.item].name; },
@@ -731,7 +731,7 @@ addLayer('m', {
 
             regen = regen.add(tmp.l.skills.mining.effect);
 
-            if (hasChallenge('b', 62) && !inChallenge('b', 62)) regen = regen.add(tmp.sta.stats.regeneration.effect);
+            if (hasChallenge('b', 62) && !inChallenge('b', 62) && tmp.b.layerShown) regen = regen.add(tmp.sta.stats.regeneration.effect);
 
             if (hasUpgrade('m', 23)) regen = regen.times(upgradeEffect('m', 23));
 
@@ -848,5 +848,5 @@ addLayer('m', {
             'border-radius': 0,
         }
     },
-    autoUpgrade() { return hasChallenge('b', 21) && player.m.auto_upgrade && !tmp.m.deactivated; },
+    autoUpgrade() { return hasChallenge('b', 21) && tmp.b.layerShown && player.m.auto_upgrade && !tmp.m.deactivated; },
 });

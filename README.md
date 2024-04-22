@@ -53,6 +53,7 @@ By [Delapouite](https://delapouite.com/):
 - [furnace](https://game-icons.net/1x1/delapouite/furnace.html)
 - [hot meal](https://game-icons.net/1x1/delapouite/hot-meal.html)
 - [ice cream cone](https://game-icons.net/1x1/delapouite/ice-cream-cone.html)
+- [ice cubes](https://game-icons.net/1x1/delapouite/ice-cubes.html)
 - [ice pop](https://game-icons.net/1x1/delapouite/ice-pop.html)
 - [log](https://game-icons.net/1x1/delapouite/log.html)
 - [next button](https://game-icons.net/1x1/delapouite/next-button.html)
@@ -92,6 +93,11 @@ By [Guard13007](https://guard13007.com/)
 By [rihlsul](https://game-icons.net/)
 
 - [chocolate bar](https://game-icons.net/1x1/rihlsul/chocolate-bar.html)
+- [milk carton](https://game-icons.net/1x1/rihlsul/milk-carton.html)
+
+By [Cathelineau](https://game-icons.net/)
+
+- [transparent slime](https://game-icons.net/1x1/cathelineau/transparent-slime.html)
 
 Images available from [OpenGameArt](https://opengameart.org)
 

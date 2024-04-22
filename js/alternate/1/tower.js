@@ -8,6 +8,7 @@ addLayer('to', {
             unlocked: false,
             points: D.dZero,
             random: randomize_tower_materials(),
+            auto_mat: false,
         };
     },
     layerShown() { return player.to.unlocked && !tmp[this.layer].deactivated; },
@@ -52,6 +53,7 @@ addLayer('to', {
             content: [
                 'main-display',
                 'prestige-button',
+                () => hasAchievement('bl', 43) ? ['toggle', ['to', 'auto_mat']] : undefined,
                 'blank',
                 'buyables',
             ],
@@ -187,7 +189,11 @@ addLayer('to', {
             buy() {
                 const item = player.to.random[0];
 
-                gain_items(item, tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items(item, cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -233,7 +239,11 @@ addLayer('to', {
             buy() {
                 const item = player.to.random[1];
 
-                gain_items(item, tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items(item, cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -280,7 +290,11 @@ addLayer('to', {
             buy() {
                 const item = player.to.random[2];
 
-                gain_items(item, tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items(item, cost.neg());
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -316,7 +330,11 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.stone.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                gain_items('stone', tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items('stone', cost);
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -349,7 +367,11 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.plank.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                gain_items('plank', tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items('plank', cost);
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -382,7 +404,11 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.copper_ore.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                gain_items('copper_ore', tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items('copper_ore', cost);
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -416,7 +442,11 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.stone_brick.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                gain_items('stone_brick', tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items('stone_brick', cost);
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -450,7 +480,11 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.copper_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                gain_items('copper_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items('copper_ingot', cost);
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -484,7 +518,11 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.iron_ore.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                gain_items('iron_ore', tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items('iron_ore', cost);
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -519,7 +557,11 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.iron_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                gain_items('iron_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items('iron_ingot', cost);
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -553,7 +595,11 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.bronze_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                gain_items('bronze_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items('bronze_ingot', cost);
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -587,7 +633,11 @@ addLayer('to', {
             },
             canAfford() { return D.gte(player.lo.items.steel_ingot.amount, tmp[this.layer].buyables[this.id].cost); },
             buy() {
-                gain_items('steel_ingot', tmp[this.layer].buyables[this.id].cost.neg());
+                let cost = tmp[this.layer].buyables[this.id].cost;
+
+                if (hasAchievement('bl', 43)) cost = D.times(cost, upgradeEffect('bl', 43));
+
+                gain_items('steel_ingot', cost);
                 addBuyables(this.layer, this.id, 1);
             },
             style() {
@@ -611,6 +661,8 @@ addLayer('to', {
             mult = mult.times(tmp.con.condiments['*'].total.to.material_cost ?? D.dOne);
 
             if (hasUpgrade('v', 41)) mult = mult.div(upgradeEffect('v', 41));
+
+            if (hasAchievement('bl', 41)) mult = mult.div(achievementEffect('bl', 41));
 
             return mult;
         },
@@ -709,10 +761,13 @@ addLayer('to', {
     getResetGain() {
         if (D.eq(0, tmp.to.gainMult)) return D.dZero;
 
-        let start = D.div(12.5, tmp.to.gainMult),
-            ratio = D(2);
+        let base = 12.5;
+        if (hasAchievement('bl', 24)) base = 10;
+        let start = D.div(base, tmp.to.gainMult),
+            ratio = D.dTwo;
 
         if (hasUpgrade('v', 51)) ratio = ratio.minus(upgradeEffect('v', 51));
+        if (hasAchievement('bl', 42)) ratio = ratio.minus(achievementEffect('bl', 42));
 
         let max_gain = D.affordGeometricSeries(tmp.to.baseAmount, start, ratio, player.to.points);
 
@@ -723,10 +778,13 @@ addLayer('to', {
     getNextAt(canMax) {
         if (D.eq(0, tmp.to.gainMult)) return D.dInf;
 
-        let start = D.div(12.5, tmp.to.gainMult),
-            ratio = D(2);
+        let base = 12.5;
+        if (hasAchievement('bl', 24)) base = 10;
+        let start = D.div(base, tmp.to.gainMult),
+            ratio = D.dTwo;
 
         if (hasUpgrade('v', 51)) ratio = ratio.minus(upgradeEffect('v', 51));
+        if (hasAchievement('bl', 42)) ratio = ratio.minus(achievementEffect('bl', 42));
 
         if (!canMax) {
             return player.to.points.pow_base(ratio).times(start);
@@ -762,7 +820,7 @@ addLayer('to', {
         if (hasMilestone('to', 3)) milestones.push(3);
         if (hasMilestone('to', 7)) milestones.push(7);
 
-        layerDataReset(this.layer);
+        layerDataReset(this.layer, ['auto_mat']);
 
         player.to.milestones.push(...milestones);
     },
@@ -771,6 +829,8 @@ addLayer('to', {
         let mult = D.dOne;
 
         if (tmp.bin.layerShown) mult = mult.times(tmp.bin.cards.multipliers['to'] ?? 1);
+
+        if (hasUpgrade('c', 105)) mult = mult.times(upgradeEffect('c', 105));
 
         mult = mult.times(tmp.k.dishes.popsicle.effect);
         mult = mult.times(tmp.k.dishes.soda.effect.floor);
@@ -791,6 +851,13 @@ addLayer('to', {
         ];
         if (same.some(([i, r]) => !(player.to.random[i] in tmp.to.materials[r]))) {
             player.to.random = randomize_tower_materials();
+        }
+
+        // Autobuy buyables
+        if (hasAchievement('bl', 43) && player.to.auto_mat) {
+            Object.keys(tmp.to.buyables)
+                .filter(id => !isNaN(id) && canBuyBuyable(this.layer, id))
+                .forEach(id => buyBuyable(this.layer, id));
         }
     },
 });

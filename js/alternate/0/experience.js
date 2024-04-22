@@ -133,28 +133,7 @@ addLayer('xp_alt', {
         'Upgrades': {
             content: [
                 () => {
-                    if (hasChallenge('b', 11)) return;
-
-                    /** @type {[number, DecimalSource][]} */
-                    const upgs = [
-                        [11, 5],
-                        [12, 10],
-                        [13, 15],
-                        [21, 30],
-                        [22, 50],
-                        [23, 70],
-                        [31, 100],
-                        [32, 125],
-                        [33, 150],
-                        [51, 567],
-                    ],
-                        next = upgs.find(([id, tames]) => !hasUpgrade('xp_alt', id) && !tmp.xp_alt.upgrades[id].unlocked && D.lt(tmp.xp_alt.total.tamed, tames));
-                    if (!next) return;
-
-                    return ['display-text', `You will unlock a new upgrades at ${formatWhole(next[1])} kills`];
-                },
-                () => {
-                    if (hasChallenge('b', 12) && tmp.b.layerShown)
+                    if ((hasChallenge('b', 12) && tmp.b.layerShown) || hasAchievement('bl', 15))
                         return ['row', [
                             ['display-text', 'Automatically buy upgrades'],
                             'blank',
@@ -362,7 +341,7 @@ addLayer('xp_alt', {
                 return base;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp_alt.total.tamed.gte(5) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(5) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(5),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -404,7 +383,7 @@ addLayer('xp_alt', {
                 const { difficulty, produce } = upgradeEffect(this.layer, this.id);
                 return `+${format(difficulty)} difficulty, *${format(produce)} production`;
             },
-            allow() { return tmp.xp_alt.total.tamed.gte(10) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(10) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(10),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -449,7 +428,7 @@ addLayer('xp_alt', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp_alt.total.tamed.gte(15) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(15) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(15),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -494,7 +473,7 @@ addLayer('xp_alt', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp_alt.total.tamed.gte(30) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(30) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(50),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -537,7 +516,7 @@ addLayer('xp_alt', {
                     return `Formula: ${formula}`;
                 }
             },
-            allow() { return tmp.xp_alt.total.tamed.gte(50) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(50) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(150),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -576,7 +555,7 @@ addLayer('xp_alt', {
                 return effect;
             },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp_alt.total.tamed.gte(70) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(70) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(250),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -590,7 +569,7 @@ addLayer('xp_alt', {
                         Cost: ${formatWhole(thismp.cost)} experience`;
                 }
                 return `<h3>${thismp.title}</h3><br>\
-                    Requires 23 tames<br><br>\
+                    Requires 70 tames<br><br>\
                     Cost: ??? experience`;
             },
             canAfford() { return tmp[this.layer].upgrades[this.id].allow; },
@@ -617,7 +596,7 @@ addLayer('xp_alt', {
             },
             effect() { return tmp.xp_alt.total.tamed.max(0).add(5).log(5); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp_alt.total.tamed.gte(100) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(100) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(400),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -656,7 +635,7 @@ addLayer('xp_alt', {
                 return mult;
             },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id).minus(1).times(100))}%`; },
-            allow() { return tmp.xp_alt.total.tamed.gte(125) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(125) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(600),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -689,7 +668,7 @@ addLayer('xp_alt', {
             description: 'Unlock goblins<br>Halve taming difficulty',
             effect() { return D(2); },
             effectDisplay() { return `/${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp_alt.total.tamed.gte(150) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(150) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(900),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -732,7 +711,7 @@ addLayer('xp_alt', {
             },
             effect() { return tmp.xp.total.kills.max(0).add(10).log10(); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
+            unlocked() { return inChallenge('b', 31) || (hasChallenge('b', 31) && tmp.b.layerShown); },
             cost: D(195),
         },
         42: {
@@ -748,7 +727,7 @@ addLayer('xp_alt', {
             },
             effect() { return player.xp_alt.points.root(15).add(1); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
+            unlocked() { return inChallenge('b', 31) || (hasChallenge('b', 31) && tmp.b.layerShown); },
             cost: D(850),
         },
         43: {
@@ -756,7 +735,7 @@ addLayer('xp_alt', {
             description: 'Increase tamed monsters amount',
             effect() { return D(1.25); },
             effectDisplay() { return `*${format(upgradeEffect(this.layer, this.id))}`; },
-            unlocked() { return inChallenge('b', 31) || hasChallenge('b', 31); },
+            unlocked() { return inChallenge('b', 31) || (hasChallenge('b', 31) && tmp.b.layerShown); },
             cost: D(2222),
         },
         51: {
@@ -772,7 +751,7 @@ addLayer('xp_alt', {
             },
             effect() { return tmp.xp_alt.total.tamed.div(50); },
             effectDisplay() { return `+${format(upgradeEffect(this.layer, this.id))}`; },
-            allow() { return tmp.xp_alt.total.tamed.gte(567) || hasUpgrade(this.layer, this.id) || hasChallenge('b', 11); },
+            allow() { return tmp.xp_alt.total.tamed.gte(567) || hasUpgrade(this.layer, this.id) || (hasChallenge('b', 11) && tmp.b.layerShown); },
             cost: D(1234),
             fullDisplay() {
                 const thismp = tmp[this.layer].upgrades[this.id];
@@ -826,6 +805,8 @@ addLayer('xp_alt', {
                 mult = mult.times(tmp.k.dishes.failure.effect);
                 mult = mult.times(tmp.k.dishes.coffee.effect.monster);
 
+                if (hasAchievement('bl', 11)) mult = mult.times(achievementEffect('bl', 11));
+
                 // Main
                 if (hasUpgrade('xp', 12)) mult = mult.times(upgradeEffect('xp', 12).experience.pow(tmp.a.change_efficiency));
                 if (hasUpgrade('xp', 13)) mult = mult.times(upgradeEffect('xp', 13).pow(tmp.a.change_efficiency));
@@ -861,6 +842,8 @@ addLayer('xp_alt', {
 
                 if (hasUpgrade('v', 11)) mult = mult.times(upgradeEffect('v', 11));
 
+                if (hasAchievement('bl', 14)) mult = mult.times(achievementEffect('bl', 14));
+
                 return mult;
             },
             difficulty_add() {
@@ -875,6 +858,8 @@ addLayer('xp_alt', {
 
                 if (hasUpgrade('xp_alt', 33)) mult = mult.div(upgradeEffect('xp_alt', 33));
                 if (hasUpgrade('xp_alt', 41)) mult = mult.div(upgradeEffect('xp_alt', 41));
+
+                if (hasAchievement('bl', 14)) mult = mult.div(achievementEffect('bl', 14));
 
                 return mult;
             },
@@ -892,6 +877,8 @@ addLayer('xp_alt', {
                 mult = mult.times(buyableEffect('fr', 33).monster);
 
                 if (hasUpgrade('v', 31)) mult = mult.times(upgradeEffect('v', 31).produce);
+
+                if (hasAchievement('bl', 12)) mult = mult.times(achievementEffect('bl', 12));
 
                 return mult;
             },
@@ -912,6 +899,9 @@ addLayer('xp_alt', {
                 let mult = D.dOne;
 
                 mult = mult.times(tmp.k.dishes.berries_bowl.effect);
+                mult = mult.times(tmp.k.dishes.tea.effect);
+
+                if (hasAchievement('bl', 13)) mult = mult.times(tmp.k.dishes.monster_meal.effect);
 
                 return mult;
             },
@@ -1152,7 +1142,8 @@ addLayer('xp_alt', {
             passive_tame(tamed) {
                 let mult = D.dZero;
 
-                mult = mult.add(tmp.k.dishes.monster_meal.effect);
+                if (!hasAchievement('bl', 13)) mult = tmp.k.dishes.monster_meal.effect;
+                else mult = D.dOne;
 
                 if (mult.lte(0)) return D.dZero;
 
@@ -1236,8 +1227,20 @@ addLayer('xp_alt', {
 
                 return base;
             },
-            passive_tame(tamed) { return D.dZero; },
-            unlocked: false,
+            passive_tame(tamed) {
+                /** @type {typeof tmp.xp_alt.monsters[string]} */
+                const monster = tmp.xp_alt.monsters[this.type];
+
+                if (!hasUpgrade('xp_alt', 22) || !hasUpgrade('c', 114) || !monster.unlocked) return D.dZero;
+
+                tamed ??= player.xp_alt.monsters[this.type].tamed ?? D.dZero;
+
+                let gain = D.div(monster.progress_gain, layers.xp_alt.monsters[this.type].difficulty(tamed))
+                    .times(monster.tames).times(tmp.xp_alt.monsters['*'].tames_passive_mult);
+
+                return gain;
+            },
+            unlocked() { return hasAchievement('bl', 13); },
         },
         // Challenge
         world_tree: {
@@ -1297,7 +1300,7 @@ addLayer('xp_alt', {
             color() {
                 const types = ['slime', 'goblin', 'zombie'];
 
-                if (false) types.push('ent'); //todo unlock ent
+                if (hasAchievement('bl', 13)) types.push('ent');
 
                 return colors_average(...types.map(type => tmp.xp_alt.monsters[type].color));
             },
@@ -1306,7 +1309,7 @@ addLayer('xp_alt', {
                 tamed ??= player.xp_alt.monsters[this.type].tamed;
                 const types = ['slime', 'goblin', 'zombie'];
 
-                if (false) types.push('ent'); //todo unlock ent
+                if (hasAchievement('bl', 13)) types.push('ent');
 
                 return types.reduce((sum, type) => D.add(sum, layers.xp_alt.monsters[type].difficulty(tamed)), 0);
             },
@@ -1321,7 +1324,7 @@ addLayer('xp_alt', {
                 tamed ??= player.xp_alt.monsters[this.type].tamed;
                 const types = ['slime', 'goblin', 'zombie'];
 
-                if (false) types.push('ent'); //todo unlock ent
+                if (hasAchievement('bl', 13)) types.push('ent');
 
                 return types.reduce((sum, type) => D.add(sum, layers.xp_alt.monsters[type].experience(tamed)), 0);
             },
@@ -1330,7 +1333,7 @@ addLayer('xp_alt', {
                 tamed ??= player.xp_alt.monsters[this.type].tamed;
                 const types = ['slime', 'goblin', 'zombie'];
 
-                if (false) types.push('ent'); //todo unlock ent
+                if (hasAchievement('bl', 13)) types.push('ent');
 
                 return types.reduce((sum, type) => [...sum, ...layers.xp_alt.monsters[type].produces(tamed)], []);
             },
@@ -1338,7 +1341,7 @@ addLayer('xp_alt', {
                 tamed ??= player.xp_alt.monsters[this.type].tamed;
                 const types = ['slime', 'goblin', 'zombie'];
 
-                if (false) types.push('ent'); //todo unlock ent
+                if (hasAchievement('bl', 13)) types.push('ent');
 
                 return D.div(types.reduce((sum, type) => D.add(sum, layers.xp_alt.monsters[type].passive_tame(tamed)), 0), types.length);
             },
@@ -1417,5 +1420,5 @@ addLayer('xp_alt', {
         }
         if (!(tmp.xp_alt.monsters[player.xp_alt.type].unlocked ?? true)) player.xp_alt.type = 'slime';
     },
-    autoUpgrade() { return player.xp_alt.auto_upgrade && hasChallenge('b', 12) && tmp.b.layerShown && player.xp_alt.unlocked; },
+    autoUpgrade() { return player.xp_alt.auto_upgrade && ((hasChallenge('b', 12) && tmp.b.layerShown) || hasAchievement('bl', 15)) && player.xp_alt.unlocked; },
 });

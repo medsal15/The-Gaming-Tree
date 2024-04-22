@@ -450,6 +450,44 @@ addLayer('suc', {
             },
             unlocked() { return tmp.fr.layerShown; },
         },
+        /*
+        91: {
+            name: 'It returns',
+            tooltip: 'Unlock ents once more',
+            done() { return hasAchievement('bl', 13); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.bl.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.bl.color;
+                return s;
+            },
+            unlocked() { return tmp.bl.layerShown; },
+        },
+        92: {
+            name: 'Know your ABCs',
+            tooltip: 'Use science to cheapen buildings',
+            done() { return hasUpgrade('c', 131); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.bl.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.bl.color;
+                return s;
+            },
+            unlocked() { return tmp.bl.layerShown; },
+        },
+        93: {
+            name: 'True farmer',
+            tooltip: 'Open a ranch',
+            done() { return hasAchievement('bl', 53); },
+            onComplete() { if (tmp.suc.layerShown) doPopup("achievement", tmp[this.layer].achievements[this.id].name, "Success Completed!", 3, tmp.bl.color); },
+            style() {
+                let s = {};
+                if (hasAchievement(this.layer, this.id)) s['background-color'] = tmp.bl.color;
+                return s;
+            },
+            unlocked() { return tmp.bl.layerShown; },
+        },
+        */
         //todo 9X blessings
         101: {
             name: 'Gambler',
