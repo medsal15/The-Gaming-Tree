@@ -2615,7 +2615,10 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
 
-                    if (hasUpgrade('xp', 43)) chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                    if (hasUpgrade('xp', 43)) {
+                        chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                        chances['ranch:hamgoblin'] = chances['enemy:goblin'].div(2);
+                    }
 
                     chances['tamed_kill:slime'] = chances['enemy:slime'];
                     chances['ranch:milk_slime'] = chances['enemy:slime'].div(2);
@@ -2658,7 +2661,10 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
 
-                    if (hasUpgrade('xp', 43)) chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                    if (hasUpgrade('xp', 43)) {
+                        chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                        chances['ranch:hamgoblin'] = chances['enemy:goblin'].div(2);
+                    }
 
                     chances['tamed_kill:slime'] = chances['enemy:slime'];
                     chances['ranch:milk_slime'] = chances['enemy:slime'].div(2);
@@ -2701,7 +2707,10 @@ addLayer('lo', {
 
                     if (hasChallenge('b', 31)) chances['enemy:slime'] = chances['enemy:slime'].times(2);
 
-                    if (hasUpgrade('xp', 43)) chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                    if (hasUpgrade('xp', 43)) {
+                        chances['tamed_kill:goblin'] = chances['enemy:goblin'] = chances['enemy:slime'].times(upgradeEffect('xp', 43).chance_mult);
+                        chances['ranch:hamgoblin'] = chances['enemy:goblin'].div(2);
+                    }
 
                     chances['tamed_kill:slime'] = chances['enemy:slime'];
                     chances['ranch:milk_slime'] = chances['enemy:slime'].div(2);
@@ -2734,6 +2743,7 @@ addLayer('lo', {
                     if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
 
                     chances['tamed_kill:goblin'] = chances['enemy:goblin'];
+                    chances['ranch:hamgoblin'] = chances['enemy:goblin'].div(2);
                     return chances;
                 },
                 per_second() {
@@ -2778,6 +2788,7 @@ addLayer('lo', {
                     if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
 
                     chances['tamed_kill:goblin'] = chances['enemy:goblin'];
+                    chances['ranch:hamgoblin'] = chances['enemy:goblin'].div(2);
                     return chances;
                 },
                 per_second() {
@@ -2819,6 +2830,7 @@ addLayer('lo', {
                     if (hasChallenge('b', 32)) chances['enemy:goblin'] = chances['enemy:goblin'].times(2);
 
                     chances['tamed_kill:goblin'] = chances['enemy:goblin'];
+                    chances['ranch:hamgoblin'] = chances['enemy:goblin'].div(2);
                     return chances;
                 },
                 other() {
@@ -2849,6 +2861,7 @@ addLayer('lo', {
                     if (hasChallenge('b', 41)) chances['enemy:zombie'] = D.times(chances['enemy:zombie'], 2);
 
                     chances['tamed_kill:zombie'] = chances['enemy:zombie'];
+                    chances['ranch:zombee'] = chances['enemy:zombie'].div(2);
                     return chances;
                 },
                 per_second() {
@@ -2890,6 +2903,7 @@ addLayer('lo', {
                     if (hasChallenge('b', 41)) chances['enemy:zombie'] = D.times(chances['enemy:zombie'], 2);
 
                     chances['tamed_kill:zombie'] = chances['enemy:zombie'];
+                    chances['ranch:zombee'] = chances['enemy:zombie'].div(2);
                     return chances;
                 },
                 per_second() {
@@ -2932,6 +2946,7 @@ addLayer('lo', {
                     if (hasChallenge('b', 42)) chances['enemy:ent'] = chances['enemy:ent'].times(2);
 
                     chances['tamed_kill:ent'] = chances['enemy:ent'];
+                    chances['ranch:coffent'] = chances['enemy:ent'].div(2);
                     return chances;
                 },
                 per_second() {
@@ -2973,6 +2988,7 @@ addLayer('lo', {
                     if (hasChallenge('b', 42)) chances['enemy:ent'] = chances['enemy:ent'].times(2);
 
                     chances['tamed_kill:ent'] = chances['enemy:ent'];
+                    chances['ranch:coffent'] = chances['enemy:ent'].div(2);
                     return chances;
                 },
                 per_second() {
@@ -3318,6 +3334,7 @@ addLayer('lo', {
                     if (hasChallenge('b', 41)) chances['enemy:zombie'] = D.times(chances['enemy:zombie'], 2);
 
                     chances['tamed_kill:zombie'] = chances['enemy:zombie'];
+                    chances['ranch:zombee'] = chances['enemy:zombie'].div(2);
                     return chances;
                 },
                 weights() {
@@ -3894,6 +3911,7 @@ addLayer('lo', {
                         if (hasChallenge('b', 42)) chances['enemy:ent'] = chances['enemy:ent'].times(2);
 
                         chances['tamed_kill:ent'] = chances['enemy:ent'];
+                        chances['ranch:coffent'] = chances['enemy:ent'].div(2);
                     }
                     if (hasChallenge('b', 42)) {
                         chances['tree:baobab'] = D(1);
@@ -4250,12 +4268,89 @@ addLayer('lo', {
                 'background-image': `url('./resources/images/milk-carton.svg')`,
                 'background-color': '#FFFFFF',
             },
+            unlocked() { return player.r.unlocked; },
         },
-        /**
-         * ham https://game-icons.net/1x1/skoll/ham-shank.html
-         * honey https://game-icons.net/1x1/lorc/honeypot.html
-         * coffee beans https://game-icons.net/1x1/delapouite/coffee-beans.html
-         */
+        ham: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1002,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
+
+                    if (player.r.unlocked) {
+                        let amount = D.dOne;
+
+                        chances['ranch:hamgoblin'] = amount;
+                    }
+
+                    return chances;
+                },
+            },
+            name: 'ham',
+            style: {
+                'background-image': `url('./resources/images/ham-shank.svg')`,
+                'background-color': '#EE7777',
+            },
+            unlocked() { return player.r.unlocked; },
+        },
+        honey: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1003,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
+
+                    if (player.r.unlocked) {
+                        let amount = D.dOne;
+
+                        chances['ranch:zombee'] = amount;
+                    }
+
+                    return chances;
+                },
+            },
+            name: 'honey',
+            style: {
+                'background-image': `url('./resources/images/honeypot.svg')`,
+                'background-color': '#FFBB00',
+            },
+            unlocked() { return player.r.unlocked; },
+        },
+        coffee_beans: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.lo.items).find(item => layers.lo.items[item] == this); },
+            grid: 1004,
+            sources: {
+                _id: null,
+                get id() { return this._id ??= Object.values(layers.lo.items).find(item => item.sources == this)?.id; },
+                chances() {
+                    /** @type {Computed<Layers['lo']['items'][items]['sources']['chances']>} */
+                    const chances = {};
+
+                    if (player.r.unlocked) {
+                        let amount = D.dOne;
+
+                        chances['ranch:coffent'] = amount;
+                    }
+
+                    return chances;
+                },
+            },
+            name: 'coffee beans',
+            style: {
+                'background-image': `url('./resources/images/coffee-beans.svg')`,
+                'background-color': '#664433',
+            },
+            unlocked() { return player.r.unlocked; },
+        },
         // Freezer
         water: {
             _id: null,

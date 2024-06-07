@@ -11,6 +11,7 @@ SVGs available from [game-icons.net](https://game-icons.net), ([license](https:/
 By [Lorc](https://lorcblog.blogspot.com/):
 
 - [eggplant](https://game-icons.net/1x1/lorc/aubergine.html)
+- [bee](https://game-icons.net/1x1/lorc/bee.html)
 - [brain](https://game-icons.net/1x1/lorc/brain.html)
 - [cake slice](https://game-icons.net/1x1/lorc/cake-slice.html)
 - [carrion](https://game-icons.net/1x1/lorc/carrion.html)
@@ -23,6 +24,7 @@ By [Lorc](https://lorcblog.blogspot.com/):
 - [falling leaf](https://game-icons.net/1x1/lorc/falling-leaf.html)
 - [fleshy mass](https://game-icons.net/1x1/lorc/fleshy-mass.html)
 - [glass shot](https://game-icons.net/1x1/lorc/glass-shot.html)
+- [honeypot](https://game-icons.net/1x1/lorc/honeypot.html)
 - [ice cube](https://game-icons.net/1x1/lorc/ice-cube.html)
 - [metal bar](https://game-icons.net/1x1/lorc/metal-bar.html)
 - [mirror mirror](https://game-icons.net/1x1/lorc/mirror-mirror.html)
@@ -42,8 +44,10 @@ By [Lorc](https://lorcblog.blogspot.com/):
 By [Delapouite](https://delapouite.com/):
 
 - [berries bowl](https://game-icons.net/1x1/delapouite/berries-bowl.html)
+- [berry bush](https://game-icons.net/1x1/delapouite/berry-bush.html)
 - [candy canes](https://game-icons.net/1x1/delapouite/candy-canes.html)
 - [clay brick](https://game-icons.net/1x1/delapouite/clay-brick.html)
+- [coffee beans](https://game-icons.net/1x1/delapouite/coffee-beans.html)
 - [crafting](https://game-icons.net/1x1/delapouite/crafting.html)
 - [corn](https://game-icons.net/1x1/delapouite/corn.html)
 - [cube](https://game-icons.net/1x1/delapouite/cube.html)
@@ -74,6 +78,7 @@ By [Delapouite](https://delapouite.com/):
 By Skoll:
 
 - [gladius](https://game-icons.net/1x1/skoll/gladius.html)
+- [ham shank](https://game-icons.net/1x1/skoll/ham-shank.html)
 - [open palm](https://game-icons.net/1x1/skoll/open-palm.html)
 
 By [Faithtoken](http://www.faithtoken.com/)
@@ -98,6 +103,10 @@ By [rihlsul](https://game-icons.net/)
 By [Cathelineau](https://game-icons.net/)
 
 - [transparent slime](https://game-icons.net/1x1/cathelineau/transparent-slime.html)
+
+By [Caro Asercion](https://game-icons.net/)
+
+- [goblin](https://game-icons.net/1x1/caro-asercion/goblin.html)
 
 Images available from [OpenGameArt](https://opengameart.org)
 

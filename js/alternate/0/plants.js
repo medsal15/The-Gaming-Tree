@@ -237,12 +237,14 @@ addLayer('p', {
         },
         'Ranch': {
             content: [
-                ['layer-proxy', ['r', ['grid']]],
+                ['layer-proxy', ['r', [
+                    //todo
+                    'blank',
+                    'grid',
+                ]]],
             ],
             unlocked() { return player.r.unlocked; },
         },
-        //todo ranch tab
-        //todo animals tab
     },
     clickables: new Proxy({}, {
         /** @returns {Clickable<'p'>} */
@@ -1513,7 +1515,7 @@ addLayer('p', {
 
                 return row > 0 && row <= tmp.p.grid.rows && col > 0 && col <= tmp.p.grid.cols;
             })) {
-            player.p.plants.wheat.seeds = D.add(player.p.plants.wheat.seeds, diff);
+            player.p.plants.wheat.seeds = D.add(player.p.plants.wheat.seeds, diff).min(1);
         }
     },
     type: 'none',
@@ -1605,6 +1607,7 @@ addLayer('r', {
         milk_slime: {
             _id: null,
             get id() { return this._id ??= Object.keys(layers.r.animals).find(plant => layers.r.animals[plant] == this); },
+            name: 'milk slime',
             item: 'wheat',
             style: {
                 grid: {
@@ -1612,30 +1615,65 @@ addLayer('r', {
                 },
             },
             nextAt(amount) {
-                amount ??= D.add(
-                    Object.keys(player.r.grid)
-                        .filter(id => is_grid_visible(id, tmp.r.grid.rows, tmp.r.grid.cols) && player.r.grid[id].animal == this.id)
-                        .length,
-                    player.r.animals[this.id].killed
-                );
+                amount ??= player.r.animals[this.id].spawned;
 
                 return D.pow(10, amount).times(10);
             },
         },
-        /**
-         * hamgoblin https://game-icons.net/1x1/caro-asercion/goblin.html
-         *  -> ham
-         * zombee https://game-icons.net/1x1/lorc/bee.html
-         *  -> honey
-         * coffeent https://game-icons.net/1x1/delapouite/berry-bush.html
-         *  -> coffee beans
-         */
+        hamgoblin: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.r.animals).find(plant => layers.r.animals[plant] == this); },
+            name: 'hamgoblin',
+            item: 'copper_ore',
+            style: {
+                grid: {
+                    'background': `url('./resources/images/goblin.svg') no-repeat center, #009966`,
+                },
+            },
+            nextAt(amount) {
+                amount ??= player.r.animals[this.id].spawned;
+
+                return D.pow(15, amount).times(15);
+            },
+        },
+        zombee: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.r.animals).find(plant => layers.r.animals[plant] == this); },
+            name: 'zombee',
+            item: 'gold_ore',
+            style: {
+                grid: {
+                    'background': `url('./resources/images/bee.svg') no-repeat center, #AA9911`,
+                },
+            },
+            nextAt(amount) {
+                amount ??= player.r.animals[this.id].spawned;
+
+                return D.pow(20, amount).times(20);
+            },
+        },
+        coffent: {
+            _id: null,
+            get id() { return this._id ??= Object.keys(layers.r.animals).find(plant => layers.r.animals[plant] == this); },
+            name: 'coffent',
+            item: 'seed',
+            style: {
+                grid: {
+                    'background': `url('./resources/images/berry-bush.svg') no-repeat center, #332222`,
+                },
+            },
+            nextAt(amount) {
+                amount ??= player.r.animals[this.id].spawned;
+
+                return D.pow(25, amount).times(25);
+            },
+        },
     },
     //todo bars (Proxy)
     grid: {
         rows: 7,
         cols: 7,
-        getStartData(id) {
+        getStartData(_) {
             return {
                 age: D.dZero,
                 animal: '',
@@ -1673,7 +1711,6 @@ addLayer('r', {
                 player_data.last_kill_count = D.dOne;
                 player_data.last_kill = drops;
             }
-            player_data.killed = D.add(player_data.killed, 1);
 
             player.r.last_kill = data.animal;
 
@@ -1681,13 +1718,39 @@ addLayer('r', {
             data.animal = '';
         },
         getTooltip(data, _) {
-            if (data.animal == '') return;
+            if (!data?.animal) return;
             return capitalize(tmp.r.animals[data.animal].name);
         },
     },
-    //todo automate
-    //  randomly move animals to a random neighbor
-    //  spawn new animals when space is available
+    automate() {
+        if (!player.r.unlocked) return;
+
+        const free = Object.keys(player.r.grid)
+            .filter(id => player.r.grid[+id].animal == '')
+            .map(id => +id);
+        // Shuffle, for spawning
+        free.sort(() => Math.random() - .5);
+
+        // Spawn a new animal
+        if (free.length) {
+            Object.values(tmp.r.animals).forEach(animal => {
+                // Skip the wildcard
+                if (!('nextAt' in animal)) return;
+
+                if (D.gte(player.lo.items[animal.item].amount, animal.nextAt)) {
+                    // Spawn a new animal in the grid
+                    const id = free.pop();
+                    player.r.grid[id].animal = animal.id;
+                    player.r.grid[id].age = D.dZero;
+                    player.r.animals[animal.id].spawned = D.add(player.r.animals[animal.id].spawned, 1);
+                }
+            });
+        }
+
+        //todo move animals to a random neighbor 10%(?) of the time
+    },
+    //todo update
+    //  age animals
     doReset(layer) {
         if (layers[layer].row <= this.row) return;
 

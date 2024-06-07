@@ -1742,7 +1742,7 @@ type plants = 'wheat' | 'copper_wheat' |
     'sunflower' | 'starflower' |
     'potato' | 'potato_battery' |
     'eggplant' | 'egg_plant';
-type animals = 'milk_slime' | 'hamgoblin' | 'bone_fish' | 'coffent';
+type animals = 'milk_slime' | 'hamgoblin' | 'zombee' | 'coffent';
 type plant_stages = 'growing' | 'mature' | 'wilting';
 type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
     'red_fabric' | 'pyrite_coin' | 'rusty_gear' |
@@ -1753,7 +1753,7 @@ type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
     'bronze_ingot' | 'steel_ingot' |
     'soaked_log' | 'normal_log' | 'plank' |
     'wheat' | 'corn' | 'strawberry' | 'potato' | 'eggplant' | 'egg' |
-    'milk' | 'ham' | 'fish' | 'coffee_beans' |
+    'milk' | 'ham' | 'honey' | 'coffee_beans' |
     'water' | 'ice' |
     'icestone' | 'rust_ingot' |
     'oil' | 'fuel' |
@@ -3271,7 +3271,7 @@ type Player = {
         }
         animals: {
             [animal in animals]: {
-                killed: Decimal
+                spawned: Decimal
                 last_kill: [string, Decimal][]
                 last_kill_count: Decimal
             }

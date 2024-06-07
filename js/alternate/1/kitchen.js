@@ -201,14 +201,11 @@ addLayer('k', {
      *  -> animal grow speed + monster production
      * Bacon (https://game-icons.net/1x1/delapouite/bacon.html)
      *  ham
-     *  -> ???
-     * Fried Fish (https://game-icons.net/1x1/darkzaitzev/fried-fish.html)
-     *  fish + wheat
-     *  -> ???
+     *  -> city ??? + monster ???
      * Monster Meal (alt)
      *  milk + fish + ham
      * Pizza
-     *  milk + slime goo + strawberry + wheat + ham
+     *  milk + strawberry + wheat + ham
      * Coffee
      *  coffee beans + water + leaf
      */
