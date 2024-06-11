@@ -156,6 +156,7 @@ function canReset(layer) {
 		return false
 }
 
+//todo reset items amount/total
 /**
  * @param {Number} row
  * @param {keyof Layers} layer
@@ -224,7 +225,7 @@ function generatePoints(layer, diff) {
  * @param {Boolean} force
  */
 function doReset(layer, force = false) {
-	if (tmp[layer].type == "none") return
+	if (tmp[layer].type == "none" && !force) return
 	let row = tmp[layer].row
 	if (!force) {
 
@@ -272,6 +273,7 @@ function doReset(layer, force = false) {
 	for (const r in OTHER_LAYERS) {
 		rowReset(r, layer)
 	}
+	reset_items(row);
 
 	player[layer].resetTime = 0
 

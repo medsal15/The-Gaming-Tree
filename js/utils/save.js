@@ -213,6 +213,7 @@ function load() {
 	changeTheme();
 	changeTreeQuality();
 	updateLayers();
+	setupItems();
 	setupModInfo();
 
 	setupTemp();

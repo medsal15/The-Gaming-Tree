@@ -16,7 +16,6 @@ function getStartOptions() {
 		forceOneTab: false,
 		oldStyle: false,
 		forceTooltips: true,
-		colorLevels: false,
 		/** @type {keyof typeof CHANCE_MODE} */
 		chanceMode: 'NEVER',
 		noRNG: false,

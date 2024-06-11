@@ -491,7 +491,7 @@ function loadVue() {
 	Vue.component('bar', {
 		props: ['layer', 'data'],
 		computed: {
-			style() { return constructBarStyle(this.layer, this.data) }
+			style() { return constructBarStyle(tmp[this.layer].bars[this.data]); }
 		},
 		template: `
 		<div v-if="tmp[layer].bars && tmp[layer].bars[data].unlocked" v-bind:style="{'position': 'relative'}"><div v-bind:style="[tmp[layer].bars[data].style, style.dims, {'display': 'table'}]">
@@ -630,6 +630,63 @@ function loadVue() {
 				<option v-for="item in data[1]" v-bind:value="item[0]">{{item[1]}}</option>
 			</select>
 		`
+	});
+
+	Vue.component('tile', {
+		props: ['layer', 'data'],
+		template: `
+			<button
+			v-bind:class="{tile: true, can: canClick, locked: !canClick, tooltipBox: true,}"
+			v-bind:style="[canClick ? {'background-color': tmp[layer].color} : {}, this.data.style ?? {}]"
+			v-on:click="onClick()"  @mousedown="start" @mouseleave="stop" @mouseup="stop" @touchstart="start" @touchend="stop" @touchcancel="stop">
+				<span v-html="data.text"></span>
+				<tooltip v-if="data.tooltip" :text="data.tooltip"></tooltip>
+			</button>
+		`,
+		computed: {
+			canClick() { return this.data.canClick ? this.data.canClick() : true; },
+		},
+		data() { return { interval: false, time: 0, } },
+		methods: {
+			start() {
+				if (!this.interval && this.data.onHold) {
+					this.interval = setInterval((function () {
+						if (this.time >= 5 && this.data.canClick) {
+							this.data.onHold();
+						}
+						this.time = this.time + 1
+					}).bind(this), 50)
+				}
+			},
+			stop() {
+				clearInterval(this.interval)
+				this.interval = false
+				this.time = 0
+			},
+			onClick() {
+				if (this.data.canClick && !this.data.canClick()) return;
+				if (this.data.onClick) this.data.onClick();
+			},
+		},
+	});
+
+	Vue.component('dynabar', {
+		props: ['layer', 'data'],
+		computed: {
+			style() { return constructBarStyle(this.data); },
+		},
+		template: `
+		<div v-bind:style="{'position':'relative'}">
+			<div v-bind:style="[style.dims, {'display':'table'}]">
+				<div class="overlayTextContainer barBorder" v-bind:style="[data.borderStyle, style.dims]">
+					<span class="overlayText" v-bind:style="[data.textStyle]" v-html="run(data.display, data)"></span>
+				</div>
+				<div class="barBG barBorder" v-bind:style="[data.baseStyle, data.borderStyle, style.dims]">
+					<div class="fill" v-bind:style="[data.fillStyle, style.fillDims]"></div>
+				</div>
+			</div>
+		</div>
+		`,
 	});
 
 	// These are for buyables, data is the id of the corresponding buyable

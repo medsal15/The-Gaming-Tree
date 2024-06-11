@@ -292,7 +292,7 @@ function subtabShouldNotify(layer, family, id) {
 	let subtab = {}
 	if (family == "mainTabs") subtab = tmp[layer].tabFormat[id]
 	else subtab = tmp[layer].microtabs[family][id]
-	if (!subtab.unlocked) return false
+	if (!(subtab.unlocked ?? true)) return false
 	if (subtab.embedLayer) return tmp[subtab.embedLayer].notify
 	else return subtab.shouldNotify
 }
@@ -547,10 +547,11 @@ function run(func, target, args = null) {
 }
 
 /**
- * @param {keyof Layers} layer
- * @param {String|Number} func id of a function in a grid
- * @param {any} data
- * @param {any}
+ * @template {keyof Layers} L
+ * @param {L} layer
+ * @param {string} func id of a function in a grid
+ * @param {Player[L]['grid'][number]} data
+ * @param {string|number}
  * @returns {any} returns `func` if it's not a valid function
  */
 function gridRun(layer, func, data, id) {

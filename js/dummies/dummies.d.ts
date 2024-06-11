@@ -34,7 +34,30 @@ type TabFormatEntries<L extends keyof Layers> = ['display-text', Computable<stri
         headers: string[],
         ...string[][]
     ]
+] |
+['tile', tile] | [
+    'dynabar',
+    {
+        direction: 0 | 1 | 2 | 3
+        progress(): number | Decimal
+        width: number
+        height: number
+        display?: Computable<string>
+        baseStyle?: Computable<CSSStyles>
+        fillStyle?: Computable<CSSStyles>
+        borderStyle?: Computable<CSSStyles>
+        textStyle?: Computable<CSSStyles>
+    }
 ];
+
+type tile = {
+    text?: Computable<string>
+    tooltip?: Computable<string>
+    style?: Computable<CSSStyles>
+    canClick?(): boolean
+    onClick?(): void
+    onHold?(): void
+};
 
 declare class Decimal {
     //#region Constants
@@ -1696,12 +1719,12 @@ declare class Upgrade<L extends string> {
      * A third element in the array optionally specifies line width.
      */
     branches?: Computable<string[] | [string, string | 1 | 2 | 3, number?][]>
-}
-declare class CurrencyUpgrade<T, L extends string> extends Upgrade<L> {
     /**
      * The name to display for the currency for the upgrade.
      */
-    currencyDisplayName: string
+    currencyDisplayName?: string
+}
+declare class CurrencyUpgrade<T, L extends string> extends Upgrade<L> {
     /**
      * The internal name for that currency.
      */
@@ -1734,1178 +1757,169 @@ declare class LayerData {
     challenges?: { [id: number]: number }
 }
 
-type drop_sources = 'enemy' | 'mining' | 'tree' | 'forge' | 'tamed' | 'tamed_kill' | 'building' | 'plant' | 'ranch' | 'freezer' | 'vending';
-type resources = 'science' | 'energy';
-type plants = 'wheat' | 'copper_wheat' |
-    'corn' | 'candy_corn' |
-    'strawberry' | 'clockberry' |
-    'sunflower' | 'starflower' |
-    'potato' | 'potato_battery' |
-    'eggplant' | 'egg_plant';
-type animals = 'milk_slime' | 'hamgoblin' | 'zombee' | 'coffent';
-type plant_stages = 'growing' | 'mature' | 'wilting';
-type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' |
-    'red_fabric' | 'pyrite_coin' | 'rusty_gear' |
-    'rotten_flesh' | 'brain' |
-    'leaf' | 'seed' |
-    'stone' | 'copper_ore' | 'tin_ore' | 'coal' | 'iron_ore' | 'gold_ore' |
-    'stone_brick' | 'copper_ingot' | 'tin_ingot' | 'iron_ingot' | 'gold_ingot' |
-    'bronze_ingot' | 'steel_ingot' |
-    'soaked_log' | 'normal_log' | 'plank' |
-    'wheat' | 'corn' | 'strawberry' | 'potato' | 'eggplant' | 'egg' |
-    'milk' | 'ham' | 'honey' | 'coffee_beans' |
-    'water' | 'ice' |
-    'icestone' | 'rust_ingot' |
-    'oil' | 'fuel' |
-    'stardust' | 'holy_water';
-type temperatures = 'none' | 'low' | 'medium' | 'high' | 'burning';
-type dishes = 'failure' |
-    'grilled_corn' | 'roasted_eggplant' |
-    'bread' | 'berries_bowl' | 'french_fries' |
-    'fried_eggs' | 'cake' |
-    'ice_cream' | 'popsicle' |
-    'slime_juice' | 'monster_meal' | 'tea' | 'star_crunch' |
-    'soda' | 'coffee' | 'candy_cane' | 'pizza' | 'chocolate';
-type time_units = 'seconds' | 'tames' | 'kills';
-type dish_groups = 'vegetable' | 'baked' | 'cold' | 'hot' | 'meat' | 'monster' | 'failure';
-type rarities = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+declare class Item<I> {
+    readonly id: I
+    color: Computable<string>
+    name: string
+    /** Position in the grid, 0-based */
+    grid?: [number, number]
+    /** Position of the icon, 0-based */
+    icon: Computable<[number, number]>
+    /** Amount is reset when that row is */
+    row?: Layer<string>['row']
+    unlocked?: boolean
+
+    lore: Computable<string>
+
+    /**
+     * Item sources
+     *
+     * Note that the items don't deal with applying them
+     */
+    sources?: {
+        readonly id: I
+        /** Chance-based source (0.5 has a 50% chance) */
+        chance?: Computable<{ [key in drop_sources]: Decimal }>
+        /** Chance-based source, unaffected by chance multipliers */
+        fixed?: Computable<{ [key in drop_sources]: Decimal }>
+        /** Produced per second by another layer */
+        per_second?: Computable<{ [key in drop_sources]: Decimal }>
+        /** Total produced every second */
+        per_second_total?(): Decimal
+        other?: Computable<drop_sources[]>
+    }
+
+    effect(amount?: DecimalSource): any
+    effectDescription(amount?: DecimalSource): string
+}
+
+type monsters = 'slime';
+type items = 'slime_goo' | 'slime_core_shard' | 'slime_core' | 'dense_slime_core' |
+    'slime_crystal' | 'slime_page' | 'slime_pocket' | 'slime_dice';
+type drop_sources = `kill:${drop_subs}`;
+type drop_types = 'kill' | 'crafting';
+type recipe_category = 'materials' |
+    'slime';
 
 type Layers = {
     // Side
-    /** Achievements */
     ach: Layer<'ach'> & {
-        getAchievementsRows(type?: AchievementTypes): number[]
-        getAchievements(type?: AchievementTypes): string[]
-        totalAchievements(type?: AchievementTypes): Decimal
-        ownedAchievements(type?: AchievementTypes): Decimal
-    }
-    /** Clock */
-    clo: Layer<'clo'> & {
-        upgrades: {
-            [id: number]: Upgrade<'clo'> & { price?: [items, Decimal][] }
-        }
-        time_speed(layer?: keyof Layers, visual?: boolean): Decimal
-    }
-    /** Casino */
-    cas: Layer<'cas'> & {
-        items: {
-            /** Reverse lookup for item drops */
-            sources(item: items): {
-                chances: { [source: `${drop_sources}:${string}`]: Decimal }
-                weights: { [source: `${drop_sources}:${string}`]: Decimal }
-                per_second: { [source: `${drop_sources}:${string}`]: Decimal }
-                other: `${drop_sources}:${string}`[]
-            }
-            /**
-             * Reverse lookup for items
-             *
-             * Points to the original item (that was swapped)
-             */
-            base(item: items, type?: 'chances' | 'weights' | 'challenge'): string
-            /** Copy of layers.lo.items.*.items but modified to apply swaps */
-            items(source: `${drop_sources}:${string}`): {
-                chances?: { [item_id in items]: Decimal }
-                weights?: { [item_id in items]: Decimal }
-            }
-            shuffle(): Record<string, string>
-            swap_cost(): Decimal
-            swap_cost_formula(): string
-            /** Makes an item be replaced with another */
-            swap(from: items, dest: items, type?: 'chances' | 'weights' | 'challenge'): void
-            /** Removes items swapped with themselves from the player data */
-            clean_swaps(): void
-            /** Returns a row that displays the swapping */
-            show_row(item: items): ['row', [
-                ['clickable', `swap_chances_left_${string}`],
-                ['clickable', `swap_weights_left_${string}`],
-                'blank',
-                ['display-text', ' is currently replaced by '],
-                'blank',
-                ['clickable', `swap_chances_right_${string}`],
-                ['clickable', `swap_weights_right_${string}`],
-            ]] | undefined
-        }
-        token: {
-            chance(): Decimal
-        }
-        regex: RegExp
-    }
-    /** Magic */
-    mag: Layer<'mag'> & {
-        elements: {
-            '*': {
-                /** Damage multiplier when an element is used against a stronger one */
-                weak_multiplier: Decimal
-                /** Damage multiplier when an element is used against a weaker one */
-                strong_multiplier: Decimal
-                /**
-                 * Returns the element for an entity
-                 *
-                 * May return a different element on subsequent calls
-                 */
-                element(enemy: string): string
-                /** Returns a random element */
-                random(): string
-            }
-        } & {
-            [element: string]: {
-                readonly id: string
-                name: string
+        categories: {
+            normal: {
                 color: Computable<string>
-                effects(): {
-                    xp?: {
-                        damage_multiplier?: Decimal
-                        drop_multiplier?: Decimal
-                    }
-                    mining?: {
-                        regen_multiplier?: Decimal
-                        chance_multiplier?: Decimal
-                    }
-                    tree?: {
-                        size_multiplier?: Decimal
-                        damage_multiplier?: Decimal
-                    }
-                }
-                /** Strong against */
-                strong: string[]
-                /** Weak against */
-                readonly weak: string[]
+                rows: number[]
+                visible(): number[]
+                owned(): number[]
             }
-        }
-        mana: {
-            gain(): Decimal
-            formula: Computable<string>
-            cost: Computable<Decimal>
-        }
-    }
-    /** Stats */
-    sta: Layer<'sta'> & {
-        stats: {
-            '*': {
-                total(): Decimal
-                left(): Decimal
-                /** Amount of points gained on kill */
-                gain(): Decimal
-                gain_formula: string
-                regex: RegExp
-                show_row(stat: string): [['row', [
-                    ['display-text', string],
-                    'blank',
-                    ['clickable', `${string}_increase`],
-                    'blank',
-                    ['clickable', `${string}_decrease`],
-                ]], 'blank'] | undefined
-            }
-        } & {
-            [stat: string]: {
-                readonly id: string
-                name: string
-                effect(): Decimal
-                text(): string
+            secret: {
+                color: Computable<string>
+                rows: number[]
+                visible(): number[]
+                owned(): number[]
             }
         }
     }
     // Row 0
-    /** Experience */
     xp: Layer<'xp'> & {
-        color_kill: string
-        enemies: {
-            '*': {
-                color_level(level?: DecimalSource): string
-                level_mult(): Decimal
-                level_exp(): Decimal
-                health_mult(): Decimal
-                health_add(): Decimal
-                exp_mult(): Decimal
-                exp_cap(): Decimal
-                kill_mult(): Decimal
-                damage_mult(): Decimal
-                damage_add(): Decimal
-                /** Damage multiplier for dps on the current enemy */
-                dps_mult_active(): Decimal
-                /** Damage multiplier for dps on all enemies */
-                dps_mult_inactive(): Decimal
-                /** Added % of health regeneration */
-                regen_add(): Decimal
-                drops_mult(): Decimal
-                /** List of currently unlocked enemies */
-                list(): string[]
+        upgrades: { [id: string]: Upgrade<'xp'> & { kills: Decimal, show(): boolean } }
+        monsters: { [monster in monsters]: {
+            private _id: monster | null
+            readonly id: monster
+            color: string
+            /** Name of the monster, lowercase */
+            name: string
+            /** Position of the monster in the monster spritesheet */
+            position: Computable<[number, number]>
+            /** Level of the monster when killed an amount of times */
+            level(kills?: DecimalSource): Decimal
+            /** Maximum health of the monster at a given level */
+            health(level?: DecimalSource): Decimal
+            /** XP gained on kill */
+            experience(level?: DecimalSource): Decimal
+            /** Damage on attack */
+            damage(): Decimal
+            /** Passive damage per second */
+            damage_per_second(): Decimal
+            lore: Computable<string>
+            unlocked?(): boolean
+        } }
+        monster_list(): monsters[]
+        kill: {
+            color: string
+            total(): Decimal
+        }
+        modifiers: {
+            damage: {
+                base(): Decimal
+                mult(): Decimal
+                total(): Decimal
             }
-        } & {
-            [type: string]: {
-                readonly type: string
-                /** Current levels */
-                level(): Decimal
-                /** Color version of level */
-                color_level(): string
-                /** Color of the enemy */
-                color: Computable<string>
-                health(level?: DecimalSource): Decimal
-                experience(level?: DecimalSource): Decimal
-                /** Gained kills on death */
-                kills(): Decimal
-                /** Current name (lowercase) */
-                name: Computable<string>
-                damage(): Decimal
-                /** Amount of damage dealt every second */
-                dps(): Decimal
-                /** Amount of health regenerated each second */
-                regen(level?: DecimalSource): Decimal
-                /** Determines whether the enemy is visible */
-                unlocked(): boolean
+            xp: {
+                base(): Decimal
+                mult(): Decimal
+                /** XP limit */
+                cap(): Decimal
+                /** XP left until limit */
+                gain_cap(): Decimal
             }
-        }
-        total: {
-            kills(): Decimal
-        }
-        upgrades: { [id: string]: Upgrade<'xp'> & { allow(): boolean } }
-    }
-    /** Mining */
-    m: Layer<'m'> & {
-        upgrades: {
-            [id: number]: Upgrade<'m'> & { item: items }
-        }
-        ore: {
-            health(): Decimal
-            regen(): Decimal
-            chance(mode?: Player['m']['mode']): Decimal
-            /** Name of the mode */
-            mode(mode?: Player['m']['mode']): string
-            /** List of items tracked by the layer */
-            items: items[]
-            mine_mult(): Decimal
-        }
-    }
-    /** Tree */
-    t: Layer<'t'> & {
-        upgrades: {
-            [id: number]: Upgrade<'t'> & { item: string }
-        }
-        trees: {
-            '*': {
-                health_mult(): Decimal
-                growth_mult(): Decimal
-                /** Base damage, may be changed depending on trees */
-                damage_base(): Decimal
-                /** Damage multiplier for dps on the current tree */
-                dps_mult_active(): Decimal
-                /** Damage multiplier for dps on all trees */
-                dps_mult_inactive(): Decimal
-                size_add(): Decimal
-                size_mult(): Decimal
-                cap_add(): Decimal
-                cap_mult(): Decimal
-                /** Added % of health regeneration */
-                regen_add(): Decimal
-                /** Tracked items for display */
-                items: string[]
-                /** Chance to get wood when hitting a tree */
-                chance(): Decimal
-                /** Total amount of logs */
-                logs(): Decimal
+            health: {
+                mult(): Decimal
             }
-        } & {
-            [tree: string]: {
-                readonly id: string
-                unlocked(): boolean
-                health: Computable<Decimal>
-                name: Computable<string>
-                growth: Computable<Decimal>
-                regen: Computable<Decimal>
-                damage: Computable<Decimal>
-                dps: Computable<Decimal>
-                /** Amount of wood when felling a tree */
-                size: Computable<Decimal>
-                cap: Computable<Decimal>
-            }
-        }
-        convertion: {
-            /** Items that can be converted to planks */
-            from: items[]
-            /** Amount of an item being converted at once */
-            rate(item?: items): Decimal
-            /** Multiplier to planks produced from an item */
-            efficiency(item?: items): Decimal
-            /** Actual amount of an item consumed/produced each second by convertion */
-            per_second(item?: items): Decimal
         }
     }
     // Row 1
-    /** Level */
     l: Layer<'l'> & {
-        regex: RegExp
-        skills: {
-            '*': {
-                max(): Decimal
-                /** Skill points remaining for use */
+        skill: {
+            color: string
+            points: {
+                total(): Decimal
                 left(): Decimal
-                speed(): Decimal
-                /** Bonus skill points for all skills (excluding locked ones) */
-                bonus(): Decimal
-            }
-            [skill: string]: {
-                readonly id: string
-                effect(): Decimal
-                needed(): Decimal
-                unlocked(): boolean
-                text(): string
-                name: string
             }
         }
     }
-    /** Loot */
-    lo: Layer<'lo'> & {
-        buyables: Layer<'lo'>['buyables'] & {
-            [id: number]: Buyable<'lo'> & {
-                /** Value per buyable */
-                value(): Decimal
-                cost(): { [item in items]: Decimal }
-            }
-        }
-        items: {
-            '*': {
-                global_chance_multiplier(): Decimal
-                /** Total amount of items */
-                amount(): Decimal
-                /** Total weight of a type (or all types) */
-                weight(type?: `${drop_sources}:${string}`): typeof type extends string ? Decimal : { [key: `${drop_sources}:${string}`]: Decimal }
-                has_anvil(): boolean
-                /** Total value of all buyables */
-                value: Computable<Decimal>
-                /** Multiplier to items gained */
-                gain_multiplier: Computable<Decimal>
-                /** Multiplier to effective buyable costs */
-                craft_consumption: Computable<Decimal>
-                /** Items dropped by a type, split between chances and weights */
-                items(type: `${drop_sources}:${string}`): {
-                    chances?: { [item_id in items]: Decimal }
-                    weights?: { [item_id in items]: Decimal }
-                }
-            }
-        } & {
-            [id in items]: {
-                readonly id: id
-                readonly grid: number
-                sources: {
-                    readonly id: id
-                    /**
-                     * Odds for the item to drop from a given type
-                     *
-                     * If the value is greater or equal to 1, the drop is guaranteed to be the chance
-                     */
-                    chances?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
-                    /**
-                     * Odds for the item to drop from a given type
-                     *
-                     * Actual odds are `weight/total weight`
-                     */
-                    weights?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
-                    /**
-                     * Amount gained/lost per second from another source
-                     *
-                     * Done by the other source
-                     */
-                    per_second?: Computable<{ [type: `${drop_sources}:${string}`]: Decimal }>
-                    total_per_second?: Computable<Decimal>
-                    other?: Computable<`${drop_sources}:${string}`[]>
-                }
-                /** Item style */
-                style?: Computable<CSSStyles>
-                name: Computable<string>
-                unlocked?: Computable<boolean>
-            }
-        }
-    }
-    /** Forge */
-    f: Layer<'f'> & {
-        fuels: {
-            '*': {
-                regex: RegExp
-                /** Maximum amount of a fuel that can be consumed per second */
-                size(): Decimal
-                /** Amount of the item being consumed every second */
-                consuming(item: items): Decimal
-            }
-            [fuel: string]: {
-                readonly id: string
-                heat: Computable<Decimal>
-                /** @default true */
-                unlocked?: Computable<boolean>
-                item: items
-                /** Currently consuming amount of fuel */
-                consuming: Computable<Decimal>
-                /** Currently producing amount of heat */
-                producing: Computable<Decimal>
-            }
-        }
+    c: Layer<'c'> & {
+        chance_multiplier(): Decimal
         recipes: {
-            '*': {
-                /** List of regexes for the clickables and bar */
-                regexes: {
-                    bar: RegExp
-                    display: RegExp
-                    amount: RegExp
-                }
-                /** Returns a row that displays the recipe */
-                show_recipe(recipe: string): TabFormatEntries<'f'>[] | undefined
-                /** Maximum amount of items produced at once */
-                size(): Decimal
-                /** Computes a recipe's default amount (for tmp display) */
-                default_amount(recipe: string, amount?: Decimal): Decimal
-                speed(): Decimal
-            }
-            [recipe: string]: {
+            [id: string]: {
+                private _id: string | null
                 readonly id: string
-                /** Required heat to start producing */
-                heat: Computable<Decimal>
-                /** @default true */
                 unlocked?: Computable<boolean>
+
+                /** Items consumed for an output multiplier */
+                consumes(amount?: DecimalSource, all_time?: DecimalSource): [items, Decimal][]
+                /** Items produced with a given multiplier */
+                produces(amount?: DecimalSource, all_time?: DecimalSource): [items, Decimal][]
+                /** Duration to craft an amount of items, if 0 or absent, crafting is instant */
+                duration?(amount?: DecimalSource, all_time?: DecimalSource): Decimal
+                formulas: {
+                    duration?: string
+                    consumes: { [item in items]?: string }
+                    produces: { [item in items]?: string }
+                }
                 /**
-                 * A recipe will not run if it can't consume everything
-                 * @param amount Target amount to produce
-                 *
-                 * Defaults to currently being produced, or wanted produced
+                 * If true, all time crafted amount will be counted for consuming and producing
                  */
-                consumes(amount?: Decimal): [item: items, amount: Decimal][]
-                /** Produced item */
-                produces: items
-                /**
-                 * Time it takes to produce the item in seconds
-                 * @param amount Target amount to produce
-                 *
-                 * Defaults to currently being produced, or wanted produced
-                 */
-                time(amount?: Decimal): Decimal
-                /** Formulas that determine amounts consumed **and** time */
-                formulas: Computable<{ [key in items | 'time']: string }>
+                static?: boolean
+                category: recipe_category[]
             }
         }
-        heat: {
-            /** Speed multiplier from heat */
+        crafting: {
+            /** Max multiplier for crafting amount */
+            max(): Decimal
+            /** Total times static recipes have been crafted */
+            crafted(): Decimal
+            /** Divides crafting time */
             speed(): Decimal
-            speed_formula: Computable<string>
-            /** Total heat gained every second (used only for display) */
-            gain(): Decimal
-            /** Multiplier to heat gain */
-            mult(): Decimal
-            /** Speed divider from heat to freezer */
-            slow(): Decimal
-            slow_formula: Computable<string>
         }
     }
     // Row 2
-    /** Boss */
-    b: Layer<'b'> & {}
-    /** Shop */
-    s: Layer<'s'> & {
-        coins: {
-            /** List of coin names */
-            names: string[]
-            /** List of coin colors */
-            colors: string[]
-        }
-        investloans: {
-            /**
-             * Amount of investments/loans bought
-             *
-             * If real, coins the boss investment as 1 (instead of its current value)
-             */
-            amount(real?: boolean): Decimal
-            /** Determines whether the player is in a loan/debt challenge */
-            use_loans(): boolean
-            type(): 'loan' | 'debt' | 'investment'
-            /** List of investments/loans linked to specific items */
-            item_upgrade: {
-                [item in items]: number | undefined
-            }
-            /** Checks whether the upgrade id is an investment/loan/debt */
-            is_upg_loan(id?: number): boolean
-        }
-    }
-    /** Alternator */
-    a: Layer<'a'> & {
-        upgrades: {
-            [id: number]: Upgrade<'a'> & { item: items }
-        }
-        /** Efficiency of alt effects on normal gains and vice versa as an exponent */
-        change_efficiency(): Decimal
-    }
-    // Alt Side
-    /** Successes */
-    suc: Layer<'suc'> & {
-        getSuccessesRows(type?: AchievementTypes): number[]
-        getSuccesses(type?: AchievementTypes): string[]
-        totalSuccesses(type?: AchievementTypes): Decimal
-        ownedSuccesses(type?: AchievementTypes): Decimal
-    }
-    /** Time Cubes */
-    tic: Layer<'tic'> & {
-        time_speed(layer?: string): Decimal
-        cubes: {
-            gain(): Decimal
-        }
-    }
-    /** Bingo */
-    bin: Layer<'bin'> & {
-        cards: {
-            /** List of existing cards */
-            list(): (keyof Layers)[]
-            /** List of potential cards */
-            possibles(): (keyof Layers)[]
-            /** List of cards available */
-            availables(): (keyof Layers)[]
-            /** Cost of a new card in bingo bucks */
-            cost(): Decimal
-            cost_formula: Computable<string>
-            show_card(card?: Player['bin']['show']): [
-                layer: keyof Layers,
-                never[],
-                ...string[][]
-            ] | never[]
-            /** Checks if a specific card has a bingo */
-            has_bingo(card: number[]): boolean
-            /** Checks if any card has a bingo */
-            bingo(): false | (keyof Layers)[]
-            multiplier(layer: keyof Layers): Decimal
-            multipliers(): { [layer in keyof Layers]?: Decimal }
-        }
-        balls: {
-            /** Time between rolls */
-            time: Computable<Decimal>
-            /** Lowest number for a bingo ball */
-            min: Computable<number>
-            /** Highest number for a bingo ball */
-            max: Computable<number>
-            /** Full grid of all potential balls */
-            grid(): [
-                never[],
-                ...string[][]
-            ]
-        }
-    }
-    /** Condiments */
-    con: Layer<'con'> & {
-        spice: {
-            gain(): Decimal
-            formula: Computable<string>
-        }
-        condiments: {
-            '*': {
-                /** Loss of all condiments */
-                loss(): Decimal
-                total: {
-                    to: {
-                        /** cost multiplier */
-                        material_cost(): Decimal
-                        /** gain multiplier */
-                        floor_cost(): Decimal
-                    }
-                    k: {
-                        /** addition */
-                        oven_size(): Decimal
-                        /** addition */
-                        stomach_size(): Decimal
-                    }
-                    /** gain multipliers */
-                    fr: {
-                        water(): Decimal
-                        cold(): Decimal
-                    }
-                }
-                /** Multiplier to correct food duration with the highest condiment */
-                bonus: Computable<Decimal>
-                /** Multiplier to incorrect food duration with the highest condiment */
-                malus: Computable<Decimal>
-                /** Condiment with highest amount */
-                highest(): string
-                /**
-                 * Cost of a random condiment after buying `x`
-                 */
-                cost(x?: DecimalSource): Decimal
-                cost_formula: string
-                cost_specific(x?: DecimalSource): Decimal
-                cost_formula_specific: string
-                /** Amount to add to the bought amount for specific condiment purchase */
-            }
-            [condiment: string]: {
-                readonly id: string
-                effect(): {
-                    to?: {
-                        /** cost multiplier */
-                        material_cost?: Decimal
-                        /** gain multiplier */
-                        floor_cost?: Decimal
-                    }
-                    k?: {
-                        /** addition */
-                        oven_size?: Decimal
-                        /** addition */
-                        stomach_size?: Decimal
-                    }
-                    /** gain multipliers */
-                    fr?: {
-                        water?: Decimal
-                        cold?: Decimal
-                    }
-                }
-                formulas: Computable<{
-                    to?: {
-                        material_cost?: string
-                        floor_cost?: string
-                    }
-                    k?: {
-                        oven_size?: string
-                        stomach_size?: string
-                    }
-                    fr?: {
-                        water?: string
-                        cold?: string
-                    }
-                }>
-                /**
-                 * If set and true, says the effect as positive
-                 * If set and false, says the effect as negative
-                 */
-                positive: Computable<{
-                    to?: {
-                        material_cost?: boolean
-                        floor_cost?: boolean
-                    }
-                    k?: {
-                        oven_size?: boolean
-                        stomach_size?: boolean
-                    }
-                    fr?: {
-                        water?: boolean
-                        cold?: boolean
-                    }
-                }>
-                name: string
+    b: Layer<'b'> & {
+        challenges?: {
+            [id: string]: Challenge<'b'> & {
                 color: string
-                gain(): Decimal
+                progress(): Decimal | number
+                bar_text(): string
             }
-        }
-    }
-    // Alt Row 0
-    /** Alternate Experience */
-    xp_alt: Layer<'xp_alt'> & {
-        color_tame: string
-        monsters: {
-            '*': {
-                /** List of currently unlocked monsters */
-                list(): string[]
-                /** Sum of experience gained per second */
-                experience(): Decimal
-                experience_mult(): Decimal
-                progress_mult(): Decimal
-                difficulty_add(): Decimal
-                difficulty_mult(): Decimal
-                produce_mult(): Decimal
-                tames_mult(): Decimal
-                tames_passive_mult(): Decimal
-            }
-        } & {
-            [type: string]: {
-                readonly type: string
-                /** Color of the monster */
-                color: Computable<string>
-                name: Computable<string>
-                /** Amount of progress needed to tame */
-                difficulty(tamed?: DecimalSource): Decimal
-                progress_gain(): Decimal
-                /** Total amount of experience produced every second */
-                experience(tamed?: DecimalSource): Decimal
-                tames(): Decimal
-                /**
-                 * Determines whether the monster is visible
-                 *
-                 * If absent, defaults to true
-                 */
-                unlocked?: Computable<boolean>
-                /** Total items produced per second */
-                produces(tamed?: DecimalSource): [items, Decimal][]
-                /** Amount of the monster gained every second */
-                passive_tame(tamed?: DecimalSource): Decimal
-            }
-        }
-        total: {
-            tamed(): Decimal
-        }
-        upgrades: { [id: string]: Upgrade<'xp_alt'> & { allow(): boolean } }
-    }
-    /** City */
-    c: Layer<'c'> & {
-        upgrades: {
-            [id: number]: Upgrade<'c'> & {
-                resource_costs?: Computable<[resources, Decimal][]>
-                item_costs?: Computable<[items, Decimal][]>
-            }
-        }
-        buildings: {
-            '*': {
-                regex: RegExp
-                placed(): { [building: string]: Decimal }
-                enabled(): { [building: string]: Decimal }
-                description(building_id: string, effect?: string): string
-                produce_mult(): Decimal
-                item_produce_mult(): Decimal
-                consume_mult(): Decimal
-                item_consume_mult(): Decimal
-                cost_mult(): Decimal
-            }
-        } & {
-            [building: string]: {
-                readonly id: string
-                name: Computable<string>
-                style: {
-                    /** General style shared by all others */
-                    general: CSSStyles
-                    buyable?: CSSStyles
-                    select?: CSSStyles
-                    grid?: CSSStyles
-                }
-                description: Computable<string>
-                produces(amount_placed?: DecimalSource): {
-                    /** Total items produced per second */
-                    items?: [items, Decimal][]
-                    /** Total resources produced per second */
-                    resources?: [resources, Decimal][]
-                }
-                consumes?(amount_placed?: DecimalSource): {
-                    /** Total items consumed per second */
-                    items?: [items, Decimal][]
-                    /** Total resources consumed per second */
-                    resources?: [resources, Decimal][]
-                }
-                effect?(amount_placed?: Decimal): any
-                /** Cost in items at amount */
-                cost(amount_built?: DecimalSource): [item: items, cost: Decimal][]
-                formulas: {
-                    cost: Computable<[item: items, formula: string][]>
-                    effect?: Computable<string>
-                }
-                unlocked?: Computable<boolean>
-            }
-        }
-        resources: {
-            '*': {
-                gain_mult(): Decimal
-            }
-        } & {
-            [resource in resources]: {
-                readonly id: resource
-                name: Computable<string>
-                color: Computable<string>
-                gain_mult(): Decimal
-                /**
-                 * **Theorical** gain from all active buildings
-                 *
-                 * May be negative
-                 */
-                gain(): Decimal
-            }
-        }
-        floors: {
-            /**
-             * Highest available floor (at least 0)
-             *
-             * Effectively means that there are `max + 1` floors available
-             */
-            max: Computable<number>
-        }
-    }
-    /** Plants */
-    p: Layer<'p'> & {
-        plants: {
-            '*': {
-                /** List of unlocked plants */
-                list(): string[]
-                harvest_mult(): Decimal
-                /** Grow speed multiplier */
-                grow_mult(): Decimal
-                seeds_mult(): Decimal
-                /** Whether automation is allowed */
-                auto: {
-                    replant(): boolean
-                    harvest(): boolean
-                }
-                regexes: {
-                    select: RegExp
-                    infuse: RegExp
-                    auto: RegExp
-                }
-            }
-        } & {
-            [plant in plants]: {
-                readonly id: plant
-                name: Computable<string>
-                style: {
-                    /** General style shared by all others */
-                    general: CSSStyles
-                    grid?: CSSStyles
-                }
-                /**
-                 * List of duration (in seconds) for each age with the produce type
-                 */
-                times: [DecimalSource, plant_stages][]
-                /** List of images to display for the age */
-                images: string[]
-                /** Items produced at an age */
-                produce(stage: plant_stages): [items, Decimal][]
-                /** Full list of produced items */
-                produces: items[]
-                /** Amount of seeds earned from harvest */
-                seeds(stage: plant_stages): Decimal
-                effect?(): any
-                effect_text?(): string
-                /** If true, the plant will notify the player it's ready */
-                notify(): boolean
-                unlocked?: Computable<boolean>
-                infusions: { [item in items]?: plants }
-                /**
-                 * If not empty, a hint will be shown in the infusion tab
-                 *
-                 * The hint is not shown if the seed is unlocked
-                 */
-                hint?: Computable<string>
-            }
-        }
-    }
-    /**
-     * Ranch
-     *
-     * Accessed through `p`
-     */
-    r: Layer<'r'> & {
-        animals: {
-            '*': {
-                age_speed(): Decimal
-            }
-        } & {
-            [animal in animals]: {
-                readonly id: animal
-                name: string
-                style: {
-                    grid: CSSStyles
-                }
-                /** Item needed for the animal to spawn */
-                item: items
-                /** Amount needed for the animal to spawn */
-                nextAt(amount?: DecimalSource): Decimal
-                trakc: items[]
-            }
-        }
-    }
-    // Alt Row 1
-    /** Tower */
-    to: Layer<'to'> & {
-        /**
-         * List of random materials for each random type
-         *
-         * Cost is `req * base ^ (exp ^ amount)`
-         */
-        materials: {
-            cost_mult(): Decimal
-        } & {
-            //todo use unlock instead of computable
-            [type in 'low' | 'medium' | 'high']: Computable<{
-                [item in items]: {
-                    base: DecimalSource
-                    exp: DecimalSource
-                }
-            }>
-        }
-    }
-    /** Kitchen */
-    k: Layer<'k'> & {
-        temperatures: {
-            current(): temperatures
-            info: { [temp in temperatures]: {
-                color: string
-                name: string
-                min?: DecimalSource
-                max?: DecimalSource
-            } }
-            regex: RegExp
-        }
-        recipes: {
-            '*': {
-                regexes: {
-                    display: RegExp
-                    amount: RegExp
-                    bar: RegExp
-                }
-                show_recipe(recipe: string): TabFormatEntries<'k'>[] | undefined
-                /** Maximum amount of items produced at once */
-                size(): Decimal
-                /** Computes a recipe's default amount (for tmp display) */
-                default_amount(recipe: string, amount?: Decimal): Decimal
-                speed(): Decimal
-                can_cook(recipe_id: string): boolean
-            }
-            [recipe: string]: {
-                readonly id: string
-                /**
-                 * Required heats to cook the dish
-                 * Other heats will cancel the dish
-                 */
-                heats: Computable<temperatures[]>
-                /** @default true */
-                unlocked?: Computable<boolean>
-                /**
-                 * A recipe will not run if it can't consume everything
-                 * @param amount Target amount to produce
-                 *
-                 * Defaults to currently being produced, or wanted produced
-                 */
-                consumes(amount?: Decimal): [item: items, amount: Decimal][]
-                /** Produced food */
-                produces: dishes
-                /**
-                 * Time it takes to produce the item in seconds
-                 * @param amount Target amount to produce
-                 *
-                 * Defaults to currently being produced, or wanted produced
-                 */
-                time(amount?: Decimal): Decimal
-                /** Formulas that determine amounts consumed **and** time */
-                formulas: Computable<{ [key in items | 'time']: string }>
-            }
-        }
-        dishes: {
-            '*': {
-                /** Converts a grid id to an item id (or false if there is none) */
-                grid_to_dish: ((id: number) => dishes | false) & {
-                    cache: { [k: number]: dishes | false }
-                }
-                /** Total amount of dishes */
-                amount(): Decimal
-                /** Total value of all dishes */
-                value: Computable<Decimal>
-                /**
-                 * Maximum amount of active dishes
-                 *
-                 * Newly eaten dishes will overwrite the **oldest** one
-                 */
-                size(): number
-                /**
-                 * Computes a dish's default duration (for tmp display)
-                 *
-                 * Returns, in order, given duration, time left from active effect, 0
-                 */
-                default_duration(dish: dishes, duration?: Decimal): Decimal
-                description_active(effect: number): string
-                description_dish(dish: dishes): string
-                units: { [unit in time_units]: {
-                    format(amount: Decimal): string
-                    /** Name to display */
-                    name: string
-                } }
-                duration_mult(): Decimal
-            }
-        } & {
-            [dish in dishes]: {
-                readonly id: dish
-                readonly grid: number
-                /** Dish style */
-                style?: Computable<CSSStyles>
-                name: Computable<string>
-                type: 'food' | 'drink'
-                /** @default true */
-                unlocked?: Computable<boolean>
-                duration: {
-                    readonly id: dish
-                    unit: time_units
-                    time: Computable<DecimalSource>
-                }
-                effect(duration: Decimal): any
-                effect_description(duration: Decimal): string
-                /** Value per dish */
-                value: Computable<Decimal>
-                condiment: {
-                    good: string[]
-                    bad: string[]
-                }
-                groups: dish_groups[]
-            }
-        }
-        groups: {
-            [group in dish_groups]: {
-                name: string
-            }
-        }
-    }
-    /** Freezer */
-    fr: Layer<'fr'> & {
-        buyables: Layer<'fr'>['buyables'] & {
-            [id: string]: Buyable<'fr'> & {
-                cost(): { [item in items]: Decimal }
-            }
-        }
-        water: {
-            /** Amount of water generated by condensation every second */
-            gain(): Decimal
-            /** Total amount of water generated by condensation every second */
-            total_gain(): Decimal
-        }
-        cold: {
-            /** Amount of cold generated by cooling every second */
-            gain(): Decimal
-            /** Amount of water consumed by cooling every second */
-            consumes(): Decimal
-            /** Speed multiplier from cold */
-            speed(): Decimal
-            speed_formula: Computable<string>
-            /** Speed divider from cold to forge */
-            slow(): Decimal
-            slow_formula: Computable<string>
-        }
-        ice: {
-            /** Amount of ice generated by freezing every second */
-            gain(): Decimal
-            /** Amount of water and cold consumed by freezing every second */
-            consumes(): Decimal
-            /** Multiplier to cold production */
-            mult(): Decimal
-            mult_formula: Computable<string>
-        }
-        recipes: {
-            '*': {
-                /** List of regexes for the clickables and bar */
-                regexes: {
-                    bar: RegExp
-                    display: RegExp
-                    amount: RegExp
-                }
-                /** Returns a row that displays the recipe */
-                show_recipes(recipe_id: string): TabFormatEntries<'fr'>[] | undefined
-                /** Maximum amount of items produced at once */
-                size(): Decimal
-                /** Computes a recipe's default amount (for tmp display) */
-                default_amount(recipe: string, amount?: Decimal): Decimal
-                speed(): Decimal
-                /** Divides resource costs for freezing */
-                cost_div(): Decimal
-            }
-            [recipe: string]: {
-                readonly id: string
-                /** Required cold to start producing */
-                cold: Computable<Decimal>
-                /** @default true */
-                unlocked?: Computable<boolean>
-                /**
-                 * A recipe will not run if it can't consume everything
-                 * @param amount Target amount to produce
-                 *
-                 * Defaults to currently being produced, or wanted produced
-                 */
-                consumes(amount?: Decimal): [item: items, amount: Decimal][]
-                /** Produced item */
-                produces: items
-                /**
-                 * Time it takes to produce the item in seconds
-                 * @param amount Target amount to produce
-                 *
-                 * Defaults to currently being produced, or wanted produced
-                 */
-                time(amount?: Decimal): Decimal
-                /** Formulas that determine amounts consumed **and** time */
-                formulas: Computable<{ [key in items | 'time']: string }>
-            }
-        }
-    }
-    // Alt Row 2
-    /** Blessing */
-    bl: Layer<'bl'> & {
-        achievements?: { [id: string]: Achievement<'bl'> & { fail(): boolean } }
-    }
-    /** Vending Machine */
-    v: Layer<'v'> & {
-        items: {
-            '*': {
-                /** Multiplies amount of items being sold */
-                amount_mult(): Decimal
-                /** Multiplies cost of items being sold */
-                cost_mult(): Decimal
-                regex: RegExp
-            }
-        } & {
-            [entry: string]: {
-                merch: {
-                    type: 'item'
-                    item: items
-                } | {
-                    type: 'dish'
-                    dish: dishes
-                }
-                rarity: Computable<rarities>
-                /** Cost in copper coins each */
-                cost: {
-                    max: Computable<DecimalSource>
-                    min: Computable<DecimalSource>
-                }
-                /** Amount of the item being sold */
-                amount: {
-                    max: Computable<DecimalSource>
-                    min: Computable<DecimalSource>
-                }
-                unlocked?: Computable<boolean>
-            }
-        }
-        rarities: {
-            '*': {
-                /** Multiplies amount of different items available */
-                amount_mult(): Decimal
-            }
-        } & {
-            [rarity in rarities]: {
-                readonly id: rarity
-                /** Amount of items being sold */
-                amount: {
-                    max: Computable<DecimalSource>
-                    min: Computable<DecimalSource>
-                }
-                color: string
-                /** Chance to get an upgrade */
-                upgrade_chance: number
-            }
-        }
-        /** Time between refreshes, in seconds */
-        time: {
-            '*': {
-                /** Divides time between refreshes */
-                time_mult(): Decimal
-            }
-            specific: Computable<Decimal>
-        } & {
-            [rarity in rarities]: Computable<Decimal>
-        }
-        upgrades: {
-            [id: string]: Upgrade<'v'> & {
-                rarity: rarities
-                allow(): boolean
-            }
-        }
-    }
-    /** Splitter */
-    sp: Layer<'sp'> & {}
-    // Hidden, for vending soft resets
-    /**
-     * Vending Machine soft resets
-     *
-     * **NOT A REAL LAYER**
-     */
-    v_soft: Layer<'v_soft'>
-    // Special
-    /** Star */
-    star: Layer<'star'> & {
-        star: {
-            /** Time to hit a target, in seconds */
-            time: Computable<Decimal>
-            /** Size of the grid */
-            size: Computable<Decimal>
-            /** Amount of targets on the grid */
-            targets: Computable<Decimal>
         }
     }
 };
@@ -2919,6 +1933,7 @@ type Temp = {
         screenHeight: number,
     }
     scrolled: boolean
+    items: RComputed<typeof item_list>
 } & RComputed<Layers>;
 type Player = {
     devSpeed: string
@@ -2940,451 +1955,45 @@ type Player = {
     timePlayed: number
     version: string
     versionType: string
+    items: { [item in items]: {
+        amount: Decimal
+        total: Decimal
+    } }
     // Side
-    /** Achievements */
-    ach: LayerData & {
-        short_mode: boolean
-    }
-    /** Clock */
-    clo: LayerData & {
-        /** If true, uses advanced materials from the forge */
-        use_advanced: boolean
-    }
-    /** Casino */
-    cas: LayerData & {
-        /**
-         * Each entry shares an `item_id` key, which points to the replacing item_id
-         *
-         * Example: With `chances['driftwood'] == 'brain'`, brains will drop instead of driftwood
-         */
-        swaps: {
-            /** Swapped values of `item.sources.chances` */
-            chances: { [item_id: string]: string }
-            /** Swapped values of `item.sources.weights` */
-            weights: { [item_id: string]: string }
-            /** Swapped values of both `item.sources.weights` and `item.sources.chances` */
-            challenge: { [item_id: string]: string }
-            count: Decimal
-        }
-        /** Items being swapped, false if none */
-        swapping: {
-            chances: string | false
-            weights: string | false
-            challenge: string | false
-        }
-        /** Amount of times swapped */
-        count: Decimal
-        /** Amount of times respecced */
-        respecs: Decimal
-    }
-    /** Magic */
-    mag: LayerData & {
-        /** Current selected element */
-        element: string
-    }
-    /** Stats */
-    sta: LayerData & {
-        stats: {
-            [stat: string]: {
-                /** Amount of points in a stat */
-                points: Decimal,
-            }
-        }
-    }
+    ach: LayerData & {}
     // Row 0
-    /** Experiecne */
     xp: LayerData & {
-        /** Current selected enemy */
-        type: string
-        clicked: boolean
-        enemies: {
-            [enemy: string]: {
-                /** Enemy health left */
-                health: Decimal
-                kills: Decimal
-                last_drops: [string, Decimal][]
-                /** Amount of times the value in last_drops was dropped */
-                last_drops_times: Decimal
-                /** Current element, irrelevant if magic is locked */
-                element: string
-                /** Star-only saved name */
-                name?: string
-            }
-        }
-        auto: {
-            attack_current: boolean
-            attack_all: boolean
-            upgrade: boolean
-        }
-    }
-    /** Mining */
-    m: LayerData & {
-        health: Decimal
-        last_drops: [string, Decimal][]
-        /** Amount of times the value in last_drops was dropped */
-        last_drops_times: Decimal
-        short_mode: boolean
-        mode: 'shallow' | 'deep'
-        /** If true, shows deep mining upgrades */
-        show_deep: boolean
-        auto_upgrade: boolean
-    }
-    /** Tree */
-    t: LayerData & {
-        short_mode: boolean
-        clicked: boolean
-        trees: {
-            [id: string]: {
-                amount: Decimal
-                health: Decimal
-                last_drops: [string, Decimal][]
-                /** Amount of times the value in last_drops was dropped */
-                last_drops_times: Decimal
-            }
-        }
-        /** Current selected tree */
-        current: string
-        /** Current focused tree, only used with `options.noRNG` */
-        focus: string
-        convert: boolean
-        auto_upgrade: boolean
+        selected: monsters
+        lore: monsters
+        monsters: { [monster in monsters]: {
+            kills: Decimal
+            health: Decimal
+            last_drops: [items, Decimal][]
+            last_drops_times: Decimal
+        } }
     }
     // Row 1
-    /** Level */
-    l: LayerData & {
-        /** Amount of points being added/removed from a skill */
-        change: Decimal
-        skills: {
-            [skill: string]: {
-                /** Amount of points in a skill */
-                points: Decimal
-                /** Current level of the skill */
-                level: Decimal
-                /** Progress towards next level of the skill */
-                progress: Decimal
-            }
-        }
-    }
-    /** Loot */
-    lo: LayerData & {
-        /** Replaces `unlocked` to allow buying the only upgrade */
+    l: LayerData & {}
+    c: LayerData & {
         shown: boolean
-        items: {
-            [id in items]: {
-                amount: Decimal,
-            }
-        }
-    }
-    /** Forge */
-    f: LayerData & {
-        /**
-         * List of fuels
-         *
-         * If `true`, the fuel is consumed to produce heat
-         */
-        fuels: { [fuel: string]: boolean }
         recipes: {
-            [recipe: string]: {
-                /**
-                 * Current amount being smelted
-                 *
-                 * 0 if not being smelted
-                 */
-                amount_smelting: Decimal
-                /** Current input value */
-                amount_target: Decimal
-                /**
-                 * Progress in seconds since the recipe was started
-                 *
-                 * If amount_smelting > 0, increase this one until >= tmp.f.recipes.time(amount_smelting)
-                 */
-                progress: Decimal
-                /**
-                 * If true, the recipe is rerun on completion
-                 */
-                auto: boolean
+            [id: string]: {
+                target: Decimal
+                making: Decimal
+                time_left: Decimal
+                /** Total times crafted */
+                crafted: Decimal
             }
         }
-        /** If true, shows alloys upgrades and buyables */
-        alloys: boolean
+        hide_cat: recipe_category[]
+        lore: items
     }
     // Row 2
-    /** Boss */
     b: LayerData & {
-        /** If true, bosses are automatically started unless beaten */
-        auto_start: boolean
-        final_challenges: number[]
-    }
-    /** Shop */
-    s: LayerData & {
-        short_mode: boolean
-        respecced: boolean
-    }
-    /** Alternator */
-    a: LayerData & {}
-    // Alt Side
-    /** Successes */
-    suc: LayerData & {
-        short_mode: boolean
-    }
-    /** Time Cubes */
-    tic: LayerData & {
-        /** If true, time speed is inverted and produce time cubes */
-        invert: boolean
-        /** Challenge only */
-        chal: {
-            speed: Decimal
-            time: Decimal
-        }
-    }
-    /** Bingo */
-    bin: LayerData & {
-        cards: {
-            [layer in keyof Layers]?: {
-                spots: number[]
-                /** Consecutive wins */
-                wins: Decimal
-            }
-        }
-        /** Rolled numbers */
-        rolled: number[]
-        respecs: Decimal
-        /** Time until next bingo ball */
-        time: Decimal
-        /** Currently selected bingo card */
-        show: keyof Layers | ''
-        bingo_notify: boolean
-        warn: {
-            respec: boolean
-            create: boolean
-        }
-        /**
-         * noRNG only
-         *
-         * Swaps highest win streak with the selected layer
-         */
-        swap: keyof Layers | ''
-    }
-    /** Condiments */
-    con: LayerData & {
-        condiments: {
-            [condiment: string]: {
-                amount: Decimal
-            }
-        }
-        grid: {
-            [id: number]: {
-                /** Condiment on the cell */
-                condiment: string
-                /** Condiment tier */
-                tier: Decimal
-            }
-        }
-        swap: number | false
-        bought: Decimal
-        respecs: Decimal
-    }
-    // Alt Row 0
-    /** Alternate Experience */
-    xp_alt: LayerData & {
-        type: string
-        clicked: boolean
-        monsters: {
-            [monster: string]: {
-                /** Monster progress left */
-                progress: Decimal
-                tamed: Decimal
-                last_drops: [string, Decimal][]
-                /** Amount of times the value in last_drops was dropped */
-                last_drops_times: Decimal
-            }
-        }
-        auto_upgrade: boolean
-    }
-    /** City */
-    c: LayerData & {
-        floors: {
-            [id: number]: {
-                /** Building placed on that tile */
-                building: string
-                /** Whether the building is active */
-                enabled: boolean
-            }
-        }[]
-        /** Current floor to show */
-        floor: number
-        mode: 'place' | 'destroy' | 'toggle'
-        /** Currently selected building for placement */
-        building: string
-        resources: {
-            [resource in resources]: {
-                amount: Decimal
-            }
-        }
-        auto_research: boolean
-    }
-    /** Plant */
-    p: LayerData & {
-        grid: {
-            [id: number]: {
-                /** Plant placed on that tile */
-                plant: plants | ''
-                /** Age of the plant */
-                age: Decimal
-            }
-        }
-        /** Currently selected plant for placement */
-        plant: string
-        infuse_target: string
-        infuse_item: string
-        /** Last crop type harvested */
-        last_harvest: string
-        plants: {
-            [plant in plants]: {
-                /** Amount of seeds in storage */
-                seeds: Decimal
-                harvested: Decimal
-                dead: Decimal
-                /** Known infusions */
-                infusions: string[]
-                last_harvest: [string, Decimal][]
-                last_harvest_seeds: Decimal
-                last_harvest_count: Decimal
-                auto_replant: boolean
-                auto_harvest: boolean
-            }
-        }
-    }
-    /**
-     * Ranch
-     *
-     * Accessed through `p`
-     */
-    r: LayerData & {
-        /** Last animal type killed */
-        last_kill: string
-        grid: {
-            [id: number]: {
-                animal: animals | ''
-                age: Decimal
-            }
-        }
-        animals: {
-            [animal in animals]: {
-                spawned: Decimal
-                last_kill: [string, Decimal][]
-                last_kill_count: Decimal
-            }
-        }
-    }
-    // Alt Row 1
-    /** Tower */
-    to: LayerData & {
-        random: items[]
-        auto_mat: boolean
-    }
-    /** Kitchen */
-    k: LayerData & {
-        recipes: {
-            [recipe: string]: {
-                /**
-                 * Current amount being smelted
-                 *
-                 * 0 if not being smelted
-                 */
-                amount_cooking: Decimal
-                /** Current input value */
-                amount_target: Decimal
-                /**
-                 * Progress in seconds since the recipe was started
-                 *
-                 * If amount_cooking > 0, increase this one until >= tmp.f.recipes.time(amount_cooking)
-                 */
-                progress: Decimal
-                /**
-                 * If true, the recipe is rerun on completion
-                 */
-                auto: boolean
-            }
-        }
-        /** Active dishes */
-        active: {
-            id: dishes
-            units: time_units
-            time: Decimal
-        }[]
-        dishes: { [dish in dishes]: {
-            amount: Decimal
-        } }
-        /** Current target temperature set in the kitchen */
-        mode: temperatures
-        selected: dishes | ''
-    }
-    /** Freezer */
-    fr: LayerData & {
-        recipes: {
-            [recipe: string]: {
-                /**
-                 * Current amount being frozen
-                 *
-                 * 0 if not being frozen
-                 */
-                amount_freezing: Decimal
-                /** Current input value */
-                amount_target: Decimal
-                /**
-                 * Progress in seconds since the recipe was started
-                 *
-                 * If amount_freezing > 0, increase this one until >= tmp.f.recipes.time(amount_freezing)
-                 */
-                progress: Decimal
-                /**
-                 * If true, the recipe is rerun on completion
-                 */
-                auto: boolean
-            }
-        }
-    }
-    // Alt Row 2
-    /** Blessing */
-    bl: LayerData & {
-        failed: number[]
-    }
-    /** Vending Machine */
-    v: LayerData & {
-        refresh: {
-            specific: Decimal
-        } & {
-            [rarity in rarities]: Decimal
-        }
-        entries: {
-            group: dish_groups
-        } & {
-            [rarity in rarities]: {
-                items: [entry: string, amount: Decimal, cost: Decimal][]
-                upgrades: number[]
-            }
-        }
-        buy: Decimal
-    }
-    /**
-     * Vending Machine soft resets
-     *
-     * **NOT A REAL LAYER**
-     */
-    v_soft: LayerData
-    /** Splitter */
-    sp: LayerData
-    // Special
-    /** Star */
-    star: LayerData & {
-        targets: number[]
-        /** Time left to hit a target, in seconds */
-        time: Decimal
-        /** If true, leaves from the star fight automatically */
-        auto_leave: boolean
+        shown: boolean
     }
 };
+
 /** Adds the items in question to the player data */
 function gain_items(items: [items, DecimalSource][]): void
 /** Adds the item in question to the player data */

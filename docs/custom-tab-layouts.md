@@ -93,6 +93,16 @@ These are the existing components, but you can create more in [components.js](/j
     ],
     ```
 
+- tile: Lets you create a standalone tile. The second parameter contains the tile data.
+  - text: Text to display
+  - tooltip: Tooltip to display when the tile is hovered
+  - style: Style of the tile
+  - canClick: A function that returns true if the tile is clickable. Defaults to true
+  - onClick: Function to run when the tile is clicked
+  - onHold: Function to run when the tile is held
+
+- dynabar: Lets you create a dynamic bar straight from tabFormat. It has the same properties as a normal bar. (Except, of course, for layer and id)
+
 The rest of the components are sub-components. They can be used just like other components, but are typically part of another component.
 
 - upgrade, milestone, challenge, buyable, clickable, achievement, gridable: An individual upgrade, challenge, etc. The argument is the id. This can be used if you want to have upgrades split up across multiple subtabs, for example.

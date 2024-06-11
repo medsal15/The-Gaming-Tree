@@ -4,126 +4,16 @@ Display chapter/sub-chapter for player progress
 
 Add an export save to file
 
-Show effect difference when buying a buyable
-
 Use [\<dialog\>](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog) for import
-
-Final pre-1.0 is `0.~`
 
 ## Cleanup/Prettying up ##
 
-Ensure there are no more functions that need to be called to do something
-
-Move items/resources in separate files
-
 ## Challenges ##
-
-Nerf goblin challenges
-
-### Blessings ###
-
-??? (freezer)
-    - restrictions:
-        - ???
-    - goal:
-        - ???
-    - reward:
-        - ???
-
-### Seals ###
-
-Party
-    - ???
 
 ## Layers ##
 
 ### Alternates ###
 
-Blessings (B)
-    - Reset button for respeccing lower layers (same effect as boss reset)
-    - "Challenges" that don't need entering
-        - auto xp/xp_alt upgrades => only own final xp_alt upg
-        - auto c/m upgrades => only buy 1 path?
-        - auto p/t upgrades => get at least 1 of every seed without having more than 3 wheat seeds
-
-Splitter (A)
-    - Split layers into normal and alternates, both smaller / as halves
-
-Yin/Yang (Y/Y)
-    - Unlock synergies between alt and normal layers
-    - 2 small layers (one is a node actually ;P)
-        - XP
-            - ???
-        - M
-            - mining chance mutliples mines productions
-        - T
-            - ???
-        - L
-            - levels divide material costs
-        - LO
-            - new crafts for alt items
-        - F
-            - heat/cold boosts freezer/forge speed instead of divide
-        - B
-            - blessings count as bosses?
-        - S
-            - alt investments/debts
-        - CLO
-            - ???
-        - CAS
-            - gain bingo bucks with same base rate of tokens
-        - MAG
-            - ???
-        - STA
-            - more stats for alt layers
-        - XP_alt
-            - ???
-        - C
-            - ???
-        - P
-            - ???
-        - TO
-            - floors divide level costs
-        - CO
-            - new foods for normal layers
-        - FR
-            - heat/cold reduce freezer/forge material costs
-        - BL
-            - new blessings for main layers
-        - V
-            - sell main items
-        - TIC
-            - boost time cube gain based on clock speed
-        - BIN
-            - casino card that boosts token gain
-        - CON
-            - ???
-        - PAR
-            - ???
-
-Party (sta, ???)
-    - unlock party slots
-    - unlock party members
-        - can be leveled up
-    - unlock areas
-    => Seal: ???
-
 ## Enemies ##
 
-Supernova
-    - unlocked by completing `alt_b ???`
-    - attacking it shows a minigame
-    - minigame gets easier the more kills
-    - replaces Star
-
 ## Post endgame ##
-
-Easy mode
-    - Plants stop aging when mature
-    - ???
-
-Hard mode
-    - Resource caps
-    - Items caps
-        - Crafts to increase cap
-    - ???

@@ -5,12 +5,12 @@ let modInfo = {
 	/**
 	 * The name of your mod.
 	 */
-	name: 'The Gaming Tree',
+	name: 'The Gaming Tree Rewritten',
 	/**
 	 * The id for your mod, a unique string that is used to determine savefile location.
 	 * Be sure to set it when you start making a mod, and don't change it later because it will erase all saves.
 	 */
-	id: 'thegamingtreev3',
+	id: 'thegamingtreev4',
 	/**
 	 * The name of the author, displayed in the info tab.
 	 */
@@ -25,18 +25,14 @@ let modInfo = {
 	 */
 	modFiles: [
 		'tree.js',
-		'layers/hotkeys.js', 'layers/star.js',
+		'items.js',
+		'layers/hotkeys.js',
 
-		'layers/side/achievements.js', 'layers/side/clock.js', 'layers/side/casino.js', 'layers/side/magic.js', 'layers/side/stats.js',
-		'layers/0/experience.js', 'layers/0/mining.js', 'layers/0/tree.js',
-		'layers/1/level.js', 'layers/1/loot.js', 'layers/1/forge.js',
-		'layers/2/boss.js', 'layers/2/shop.js', 'layers/2/alternator.js',
-
-		//todo alternate/side/party.js
-		'alternate/side/successes.js', 'alternate/side/time_cubes.js', 'alternate/side/bingo.js', 'alternate/side/condiments.js',
-		'alternate/0/experience.js', 'alternate/0/city.js', 'alternate/0/plants.js',
-		'alternate/1/tower.js', 'alternate/1/kitchen.js', 'alternate/1/freezer.js',
-		'alternate/2/blessing.js', 'alternate/2/vending.js', 'alternate/2/splitter.js',
+		// main
+		'layers/main/side/achievement.js',
+		'layers/main/0/experience.js',
+		'layers/main/1/level.js', 'layers/main/1/crafting.js',
+		'layers/main/2/boss.js',
 	],
 	/**
 	 * If you have a Discord server or other discussion place, you can add a link to it.
@@ -69,11 +65,11 @@ let VERSION = {
 	/**
 	 * The mod's version number, displayed at the top right of the tree tab.
 	 */
-	num: 'R0.C',
+	num: 'R0.1',
 	/**
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
-	name: 'Blessing of Greed',
+	name: 'RRewrite',
 	beta: true,
 };
 
@@ -81,46 +77,9 @@ let VERSION = {
  * HTML displayed in the changelog tab
  */
 let changelog = `<h1>Changelog:</h1><br>
-	<h3>v0.C</h3><br>
-		- Added 4 new layers.<br>
-		- QoL: Items now display the total gain/loss per second.<br>
-		- QoL: Improved experience upgrade display.<br>
-		- Update endgame: Alternate the Alternator.<br>
-	<h3>v0.B.1</h3><br>
-		- Fixed a bug with the Freezer.<br>
-	<h3>v0.B</h3><br>
-		- Added 5 new layers.<br>
-		- QoL: Add quick select buttons for city and plant.<br>
-		- Update endgame: Get all 3 new row 1 layers.<br>
-	<h3>v0.A</h3><br>
-		- Added 4 new layers.<br>
-		- Update endgame: Get all 3 new row 0 layers.<br>
-	<h3>v0.6</h3><br>
-		- Added 3 new layers.<br>
-		- Added the 4th boss, miniboss, and relic.<br>
-		- QoL: Added automatic upgrades to row 1 layers.<br>
-		- Update endgame: Beat the 4th boss.<br>
-	<h3>v0.5</h3><br>
-		- Added 1 new layer.<br>
-		- Added the 3rd boss, miniboss, and relic.<br>
-		- QoL: Keep shop upgrades on reset (not the investments though).<br>
-		- Update endgame: Beat the 3rd boss.<br>
-	<h3>v0.4</h3><br>
-		- Added 4 new layers.<br>
-		- Added the 2nd boss, 2nd miniboss, and 2nd relic.<br>
-		- Rewrote the enemy color algorithm.<br>
-		- Added an option to disable luck.<br>
-		- Update endgame: Beat the 2nd boss.<br>
-	<h3>v0.3</h3><br>
-		- Added 2 new layers.<br>
-		- Added a boss, miniboss and a relic.<br>
-		- Update endgame: Beat the boss.<br>
-	<h3>v0.2</h3><br>
-		- Added Levels and Loot.<br>
-		- Update endgame: 1000 slime kills.<br>
 	<h3>v0.1</h3><br>
-		- Added XP.<br>
-		- Update endgame: 9th XP upgrades.`;
+		- Rewrote XP, Level, Loot, and Boss.<br>
+		- Update endgame: Enter the first boss fight.`;
 
 let winText = `Congratulations! You have finished the current content in the game. Look forward for more.`;
 
@@ -147,7 +106,14 @@ var doNotCallTheseFunctionsEveryTick = [];
  * }}
  * ```
  */
-function addedPlayerData() { }
+function addedPlayerData() {
+	return {
+		items: Object.fromEntries(Object.keys(item_list).map(id => [id, {
+			amount: D.dZero,
+			total: D.dZero,
+		}])),
+	};
+}
 
 /**
  * An array of functions used to display extra things at the top of the tree tab.
@@ -160,9 +126,10 @@ var displayThings = [
 	() => VERSION.beta ? '<span class="warning">Beta version, things might be a bit unstable</span>' : '',
 	() => isEndgame() ? '<span style="color:#60C0F0">You are past endgame. Content may not be balanced.</span>' : '',
 	() => {
-		const id = activeChallenge('b');
-		if (!id) return '';
-		return `In boss challenge: ${layerColor('b', layers.b.challenges[id].name)}`;
+		const chal = activeChallenge('b');
+		if (!chal) return '';
+
+		return `You are in challenge ${resourceColor(tmp.b.challenges[chal].color, tmp.b.challenges[chal].name)}`;
 	},
 ];
 
@@ -172,7 +139,7 @@ var displayThings = [
  * @returns {Boolean}
  */
 function isEndgame() {
-	return [31, 32].every(id => hasUpgrade('a', id));
+	return inChallenge('b', 11);
 }
 
 
@@ -182,7 +149,7 @@ function isEndgame() {
 /**
  * A CSS object containing the styling for the background of the full game. Can be a function!
  *
- * @type {Computable<CSSStyleObject>}
+ * @type {Computable<CSSStyles>}
  */
 var backgroundStyle = {}
 
@@ -205,30 +172,4 @@ function maxTickLength() {
  * @param {string} oldVersion
  */
 function fixOldSave(oldVersion) {
-	if (oldVersion <= 'R0.4') {
-		player.xp.enemies = Object.fromEntries(
-			Object.keys(player.xp.enemies)
-				.map(type => [type, {
-					health: new Decimal(player.xp.health[type]),
-					kills: new Decimal(player.xp.kills[type]),
-					last_drops: player.xp.last_drops[type] ?? [],
-				}])
-		);
-		Object.entries(player.t.trees)
-			.forEach(([tree, data]) => {
-				data.health = (tree == player.t.current || !(tree in layers.t.trees)) ? player.t.health : run(layers.t.trees[tree].health);
-				data.last_drops = tree == player.t.current ? player.t.last_drops : [];
-			});
-	}
-	if (oldVersion <= 'R0.5') {
-		player.s.upgrades = player.s.upgrades.map(id => {
-			if (id > 90) return id;
-
-			if (id > 60) return id - 50;
-			else return id + 30;
-		});
-	}
-	if (oldVersion <= 'R0.A') {
-		if ('grid' in player.c) player.c.floors = [player.c?.grid];
-	}
 }
