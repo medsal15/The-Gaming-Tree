@@ -70,7 +70,7 @@ let VERSION = {
 	 * The version's name, displayed alongside the number in the info tab.
 	 */
 	name: 'RRewrite',
-	beta: true,
+	beta: false,
 };
 
 /**
